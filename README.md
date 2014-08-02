@@ -1,7 +1,7 @@
 Tensō
 =====
 
-Tensō is a REST framework for node.js, designed to simplify the implementation of APIs.
+Tensō is a REST API facade for node.js, designed to simplify the implementation of APIs.
 
 ## Example
 Creating an API with Tensō is as simple as three statements.
@@ -32,6 +32,22 @@ module.exports.get = {
 	}
 }
 ```
+
+## Responses
+Responses will have a standard shape. Hypermedia (pagination, links, etc.) will be in `data` as `link:[ {"uri": "...", "rel": "..."}, ...]`. Pagination will also be present via the `Link` HTTP header.
+
+```json
+{
+  "data": {{ `null` or the response }},
+  "error": {{ `null` or an `Error` stack trace / message }},
+  "status": {{ HTTP status code }}
+}
+```
+
+## REST / Hypermedia
+Hypermedia is a prerequisite of REST, and is best described by the [Richard Maturity Model](http://martinfowler.com/articles/richardsonMaturityModel.html). Tensō will automagically paginate Arrays of results, or parse Entity representations for keys that imply
+relationships, and create the appropriate Objects in the `link` Array, as well as the `Link` HTTP header. Object keys that match this pattern: `/_(guid|uuid|id|uri|url)$/` will be considered
+hypermedia links.
 
 ## Configuration
 This is a sample configuration for Tensō, without authentication or SSL. This would be ideal for development, but not production! Enabling SSL is as easy as providing file paths for the two keys.
@@ -77,17 +93,6 @@ Dtrace probes can be enabled by configuration (disabled by default), and can be 
 "respond",        "char *", "char *", "char *", "int", "int"
 "status",         "int", "int", "int", "int", "int"
 "write",          "char *", "char *", "char *", "char *", "int"
-```
-
-## Responses
-Responses will have a standard shape. Hypermedia (pagination, links, etc.) will be in `data` as `link:[ {"uri": "...", "rel": "..."}, ...]`. Pagination will also be present via the `Link` header.
-
-```json
-{
-  "data": {{ `null` or the response }},
-  "error": {{ `null` or an `Error` stack trace / message }},
-  "status": {{ HTTP status code }}
-}
 ```
 
 ## License

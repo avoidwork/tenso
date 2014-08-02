@@ -3,7 +3,7 @@
 	"hostname": "localhost",
 	"pageSize": 5,
 	"port": 8000,
-	"routes": "routes.js",
+	"routes": null,
 	"log": {
 		"dtrace": false,
 		"syslog": false

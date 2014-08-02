@@ -3,7 +3,9 @@ var random  = require( "keigai" ).util.number.random,
 
 module.exports.get = {
 	"/": [],
-	"/reports/tps": "TPS Cover Sheet not attached",
+	"/reports/tps": function ( req, res ) {
+		this.respond( req, res, prepare( null, "TPS Cover Sheet not attached", 785 ), 785 );
+	},
 	"/random": function ( req, res ) {
 		this.respond( req, res, prepare( random() ) );
 	}

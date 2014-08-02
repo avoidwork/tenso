@@ -2,11 +2,13 @@
  * Tenso factory
  *
  * @method factory
- * @return {Object} Tenso instance
+ * @param {Object} arg [Optional] Configuration
+ * @return {Object}    Tenso instance
  */
-function factory ( config ) {
-	var HOSTNAME = config.hostname || "localhost",
+function factory ( arg ) {
+	var HOSTNAME = arg ? arg.hostname || "localhost" : "localhost",
         vhosts   = {},
+        config   = arg ? merge( clone( CONFIG, true ), arg ) : CONFIG,
         instance;
 
 	if ( !config.port ) {

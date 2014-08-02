@@ -3,6 +3,8 @@ Tensō
 
 Tensō is a REST API facade for node.js, designed to simplify the implementation of APIs.
 
+Tensō will handle the serialization & creation of hypermedia links, all you have to do is give it `Arrays` or `Objects`.
+
 ## Example
 Creating an API with Tensō is as simple as three statements.
 
@@ -34,7 +36,8 @@ module.exports.get = {
 ```
 
 ## Responses
-Responses will have a standard shape. Hypermedia (pagination, links, etc.) will be in `data` as `link:[ {"uri": "...", "rel": "..."}, ...]`. Pagination will also be present via the `Link` HTTP header.
+Responses will have a standard shape. The result, and hypermedia will be in `data`. Hypermedia (pagination, links, etc.) will be in `data.link:[ {"uri": "...", "rel": "..."}, ...]`, & pagination will also be present via the `Link` HTTP header.
+The result will be in `data.result`.
 
 ```json
 {
@@ -48,6 +51,8 @@ Responses will have a standard shape. Hypermedia (pagination, links, etc.) will 
 Hypermedia is a prerequisite of REST, and is best described by the [Richard Maturity Model](http://martinfowler.com/articles/richardsonMaturityModel.html). Tensō will automagically paginate Arrays of results, or parse Entity representations for keys that imply
 relationships, and create the appropriate Objects in the `link` Array, as well as the `Link` HTTP header. Object keys that match this pattern: `/_(guid|uuid|id|uri|url)$/` will be considered
 hypermedia links.
+
+For example, if the key `user_id` was found, it would be mapped to `/users/:id` with a link `rel` of `alternative`.
 
 ## Configuration
 This is a sample configuration for Tensō, without authentication or SSL. This would be ideal for development, but not production! Enabling SSL is as easy as providing file paths for the two keys.

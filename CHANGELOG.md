@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.0.4
+- Implementing a clean Basic Auth (by config)
+
 ## 0.0.3
 - Updated `turtle.io` to 2.1.9 to gain customization of JSON formatting
 - Updated routing such that handlers execute with the context of the Tensō instance

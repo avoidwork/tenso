@@ -38,16 +38,18 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 
 ```json
 {
-	"hostname": "localhost",
-	"port": 8000,
-	"routes": require( "./routes.js" ),
-	"logs": {
+	"auth": ["username:password", ...] or {"realm": "Super Secret", "list": ["username:password", ...]} // Optional 
+	"hostname": "localhost", /* Optional, default is 'localhost' */
+	"port": 8000, /* Optional, default is 8000 */
+	"uid": N, /* Optional, system account uid to drop to after starting with elevated privileges to run on a low port */
+	"routes": require( "./routes.js" ), /* Required! */
+	"logs": { /* Optional */
 		"level": "info",
 		"stdout": true,
 		"dtrace": false,
 		"syslog": false
 	},
-	"ssl": {
+	"ssl": { /* Optional */
 		"key": null,
 		"cert": null
 	}

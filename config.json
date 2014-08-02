@@ -1,10 +1,9 @@
 {
 	"auth": null,
 	"hostname": "localhost",
-	"pageSize": 5,
 	"port": 8000,
 	"routes": null,
-	"log": {
+	"logs": {
 		"dtrace": false,
 		"syslog": false
 	},

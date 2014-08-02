@@ -7,49 +7,43 @@ Tensō is a REST framework for node.js, designed to simplify the implementation 
 Creating an API with Tensō is as simple as three statements.
 
 ```javascript
-var tenso  = require( "tenso" ).factory,
+var tenso  = require( "tenso" ),
     routes = require( "./routes.js" ),
     app    = tenso( {routes: routes} );
 ```
 
 ### Creating Routes
-Routes are loaded as a module, with each HTTP method as an export, affording a very customizable API server. The following example will create GET routes that will return an empty `Array` at `/`, an `Error` at `/reports/tps`, & a random number at `/random`. Route handlers have the context of the API server, i.e. `this` will allow you to send a response with `this.respond( req, res, body[, status, headers] )`.
+Routes are loaded as a module, with each HTTP method as an export, affording a very customizable API server.
+
+Route handlers have the context of the Tensō server, i.e. `this` will allow you to send a response with `this.respond( req, res, body[, status, headers] )`.
+
+The following example will create GET routes that will return an empty `Array` at `/`, an `Error` at `/reports/tps`, & a version 4 UUID at `/uuid`.
 
 ```javascript
-var random   = require( "keigai" ).util.number.random,
-    response = require( "tenso" ).response;
+var uuid = require( "keigai" ).util.uuid;
 
 module.exports.get = {
 	"/": [],
 	"/reports/tps": function ( req, res ) {
-		this.respond( req, res, response( new Error( "TPS Cover Sheet not attached" ), 785 ), 785 );
+		this.respond( req, res, new Error( "TPS Cover Sheet not attached" ), 785 );
 	},
-	"/random": function ( req, res ) {
-		this.respond( req, res, response( random() ) );
+	"/uuid": function ( req, res ) {
+		this.respond( req, res, uuid() );
 	}
 }
 ```
 
-## API
-### factory( [config] )
-Tensō factory, which accepts a configuration Object
-
-### prepare( data[, error, status] )
-Prepares a standard response body, use `response()` unless you need to by pass validation
-
-### response( arg[, status] )
-Quick way to prepare a response body
-
 ## Configuration
-This is a sample configuration for Tensō, without authentication or SSL. This would be ideal for development, but not production! Enabling is as easy as providing file paths for the two keys.
+This is a sample configuration for Tensō, without authentication or SSL. This would be ideal for development, but not production! Enabling SSL is as easy as providing file paths for the two keys.
 
 ```json
 {
 	"hostname": "localhost",
-	"pageSize": 5,
 	"port": 8000,
-	"routes": "routes.js",
-	"log": {
+	"routes": require( "./routes.js" ),
+	"logs": {
+		"level": "info",
+		"stdout": true,
 		"dtrace": false,
 		"syslog": false
 	},
@@ -57,6 +51,40 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 		"key": null,
 		"cert": null
 	}
+}
+```
+
+## Logging
+Standard log levels are supported, and are emitted (by configuration) to `stdout` & `stderr`, & `syslog`.
+
+
+## Dtrace
+Dtrace probes are can be enabled by configuration (disabled by default), and can be observed as `turtle-io`; Tensō is built on `turtle.io`.
+
+```
+"allowed",        "char *", "char *", "char *", "int"
+"allows",         "char *", "char *", "int"
+"compress",       "char *", "char *", "int"
+"compression",    "char *", "int"
+"error",          "char *", "char *", "int", "char *", "int"
+"headers",        "int", "int"
+"log",            "char *", "int", "int", "int"
+"proxy",          "char *", "char *", "char *", "char *", "int"
+"middleware",     "char *", "char *", "int"
+"request",        "char *", "int"
+"respond",        "char *", "char *", "char *", "int", "int"
+"status",         "int", "int", "int", "int", "int"
+"write",          "char *", "char *", "char *", "char *", "int"
+```
+
+## Responses
+Responses will have a standard shape. Hypermedia (pagination, links, etc.) will be in `data` as `link:[ {"uri": "...", "rel": "..."}, ...]`. Pagination will also be present via the `Link` header.
+
+```json
+{
+  "data": {{ `null` or the response }},
+  "error": {{ `null` or an `Error` stack trace / message }},
+  "status": {{ HTTP status code }}
 }
 ```
 

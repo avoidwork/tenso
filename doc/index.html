@@ -107,38 +107,33 @@
 <p>Tensō is a REST framework for node.js, designed to simplify the implementation of APIs.</p>
 <h2>Example</h2>
 <p>Creating an API with Tensō is as simple as three statements.</p>
-<pre><code class="lang-javascript">var tenso  = require( &quot;tenso&quot; ).factory,
+<pre><code class="lang-javascript">var tenso  = require( &quot;tenso&quot; ),
     routes = require( &quot;./routes.js&quot; ),
     app    = tenso( {routes: routes} );</code></pre>
 <h3>Creating Routes</h3>
-<p>Routes are loaded as a module, with each HTTP method as an export, affording a very customizable API server. The following example will create GET routes that will return an empty <code>Array</code> at <code>/</code>, an <code>Error</code> at <code>/reports/tps</code>, &amp; a random number at <code>/random</code>. Route handlers have the context of the API server, i.e. <code>this</code> will allow you to send a response with <code>this.respond( req, res, body[, status, headers] )</code>.</p>
-<pre><code class="lang-javascript">var random   = require( &quot;keigai&quot; ).util.number.random,
-    response = require( &quot;tenso&quot; ).response;
+<p>Routes are loaded as a module, with each HTTP method as an export, affording a very customizable API server.</p>
+<p>Route handlers have the context of the Tensō server, i.e. <code>this</code> will allow you to send a response with <code>this.respond( req, res, body[, status, headers] )</code>.</p>
+<p>The following example will create GET routes that will return an empty <code>Array</code> at <code>/</code>, an <code>Error</code> at <code>/reports/tps</code>, &amp; a version 4 UUID at <code>/uuid</code>.</p>
+<pre><code class="lang-javascript">var uuid = require( &quot;keigai&quot; ).util.uuid;
 
 module.exports.get = {
     &quot;/&quot;: [],
     &quot;/reports/tps&quot;: function ( req, res ) {
-        this.respond( req, res, response( new Error( &quot;TPS Cover Sheet not attached&quot; ), 785 ), 785 );
+        this.respond( req, res, new Error( &quot;TPS Cover Sheet not attached&quot; ), 785 );
     },
-    &quot;/random&quot;: function ( req, res ) {
-        this.respond( req, res, response( random() ) );
+    &quot;/uuid&quot;: function ( req, res ) {
+        this.respond( req, res, uuid() );
     }
 }</code></pre>
-<h2>API</h2>
-<h3>factory( [config] )</h3>
-<p>Tensō factory, which accepts a configuration Object</p>
-<h3>prepare( data[, error, status] )</h3>
-<p>Prepares a standard response body, use <code>response()</code> unless you need to by pass validation</p>
-<h3>response( arg[, status] )</h3>
-<p>Quick way to prepare a response body</p>
 <h2>Configuration</h2>
 <p>This is a sample configuration for Tensō, without authentication or SSL. This would be ideal for development, but not production! Enabling is as easy as providing file paths for the two keys.</p>
 <pre><code class="lang-json">{
     &quot;hostname&quot;: &quot;localhost&quot;,
-    &quot;pageSize&quot;: 5,
     &quot;port&quot;: 8000,
-    &quot;routes&quot;: &quot;routes.js&quot;,
-    &quot;log&quot;: {
+    &quot;routes&quot;: require( &quot;./routes.js&quot; ),
+    &quot;logs&quot;: {
+        &quot;level&quot;: &quot;info&quot;,
+        &quot;stdout&quot;: true,
         &quot;dtrace&quot;: false,
         &quot;syslog&quot;: false
     },
@@ -146,6 +141,30 @@ module.exports.get = {
         &quot;key&quot;: null,
         &quot;cert&quot;: null
     }
+}</code></pre>
+<h2>Logging</h2>
+<p>Standard log levels are supported, and are emitted (by configuration) to <code>stdout</code> &amp; <code>stderr</code>, &amp; <code>syslog</code>.</p>
+<h2>Dtrace</h2>
+<p>Dtrace probes are can be enabled by configuration (disabled by default), and can be observed as <code>turtle-io</code>; Tensō is built on <code>turtle.io</code>.</p>
+<pre><code>&quot;allowed&quot;,        &quot;char *&quot;, &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;
+&quot;allows&quot;,         &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;
+&quot;compress&quot;,       &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;
+&quot;compression&quot;,    &quot;char *&quot;, &quot;int&quot;
+&quot;error&quot;,          &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;, &quot;char *&quot;, &quot;int&quot;
+&quot;headers&quot;,        &quot;int&quot;, &quot;int&quot;
+&quot;log&quot;,            &quot;char *&quot;, &quot;int&quot;, &quot;int&quot;, &quot;int&quot;
+&quot;proxy&quot;,          &quot;char *&quot;, &quot;char *&quot;, &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;
+&quot;middleware&quot;,     &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;
+&quot;request&quot;,        &quot;char *&quot;, &quot;int&quot;
+&quot;respond&quot;,        &quot;char *&quot;, &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;, &quot;int&quot;
+&quot;status&quot;,         &quot;int&quot;, &quot;int&quot;, &quot;int&quot;, &quot;int&quot;, &quot;int&quot;
+&quot;write&quot;,          &quot;char *&quot;, &quot;char *&quot;, &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;</code></pre>
+<h2>Responses</h2>
+<p>Responses will have a standard shape. Hypermedia (pagination, links, etc.) will be in <code>data</code> as <code>link:[ {&quot;uri&quot;: &quot;...&quot;, &quot;rel&quot;: &quot;...&quot;}, ...]</code>. Pagination will also be present via the <code>Link</code> header.</p>
+<pre><code class="lang-json">{
+  &quot;data&quot;: {{ `null` or the response }},
+  &quot;error&quot;: {{ `null` or an `Error` stack trace / message }},
+  &quot;status&quot;: {{ HTTP status code }}
 }</code></pre>
 <h2>License</h2>
 <p>Copyright (c) 2014 Jason Mulligan<br>Licensed under the BSD-3 license.</p></article>
@@ -170,7 +189,7 @@ module.exports.get = {
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a>
-		on Sat Aug 02 2014 09:00:16 GMT-0400 (EDT) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+		on Sat Aug 02 2014 10:47:22 GMT-0400 (EDT) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
 			</div>

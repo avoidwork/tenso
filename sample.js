@@ -1,3 +1,3 @@
-var tenso  = require( "./lib/tenso" ).factory,
+var tenso  = require( "./lib/tenso" ),
     routes = require( "./routes.js" ),
     app    = tenso( {routes: routes} );

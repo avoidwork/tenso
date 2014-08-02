@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "keigai": "0.6.0",
-    "turtle.io": "2.1.8"
+    "turtle.io": "2.1.9"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

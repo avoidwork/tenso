@@ -74,6 +74,10 @@ module.exports = function (grunt) {
 				files : "package.json",
 				tasks : "default"
 			},
+			readme : {
+				files : "README.md",
+				tasks : "default"
+			},
 			sass: {
 				files : "sass/style.scss",
 				tasks : "default"

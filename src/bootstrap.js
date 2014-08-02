@@ -20,7 +20,9 @@ function bootstrap( obj, config ) {
 		iterate( config.routes, function ( routes, method ) {
 			iterate( routes, function ( arg, route ) {
 				if ( typeof arg == "function" ) {
-					obj.server[method]( route, arg );
+					obj.server[method]( route, function () {
+						arg.apply( obj, array.cast( arguments ) );
+					} );
 				}
 				else {
 					obj.server[method]( route, function ( req, res ) {

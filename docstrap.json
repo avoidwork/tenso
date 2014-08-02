@@ -1,0 +1,23 @@
+{
+	"tags": {
+		"allowUnknownTags": true
+	},
+	"plugins": ["plugins/markdown"],
+	"templates": {
+		"cleverLinks": false,
+		"monospaceLinks": false,
+		"default": {
+			"outputSourceFiles": true
+		},
+		"systemName": "Tensō",
+		"footer": "",
+		"copyright": "Copyright &copy; 2014 Jason Mulligan",
+		"navType": "vertical",
+		"theme": "cerulean",
+		"linenums": true
+	} ,
+	"markdown": {
+		"parser": "gfm",
+		"hardwrap": true
+	}
+}

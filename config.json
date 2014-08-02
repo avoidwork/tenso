@@ -1,0 +1,14 @@
+{
+	"auth": null,
+	"hostname": "localhost",
+	"pageSize": 5,
+	"port": 8000,
+	"log": {
+		"dtrace": false,
+		"syslog": false
+	},
+	"ssl": {
+		"key": null,
+		"cert": null
+	}
+}

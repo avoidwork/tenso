@@ -22,6 +22,7 @@ module.exports = function (grunt) {
 					"src/error.js",
 					"src/factory.js",
 					"src/prepare.js",
+					"src/response.js",
 					"src/outro.js"
 				],
 				dest : "lib/<%= pkg.name %>.js"

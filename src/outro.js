@@ -1,3 +1,4 @@
-factory.prepare = prepare;
-module.exports  = factory;
+module.exports.factory  = factory;
+module.exports.prepare  = prepare;
+module.exports.response = response;
 } )();

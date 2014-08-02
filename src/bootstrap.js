@@ -24,7 +24,7 @@ function bootstrap( obj, config ) {
 				}
 				else {
 					obj.server[method]( route, function ( req, res ) {
-						this.respond( req, res, prepare( arg ) );
+						this.respond( req, res, response( arg ) );
 					} );
 				}
 			} );

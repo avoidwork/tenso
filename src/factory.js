@@ -18,7 +18,6 @@ function factory ( arg ) {
 
 	vhosts[HOSTNAME]  = "www";
 	config.root       = __dirname + "/../";
-	config.routes     = require( config.root + config.routes );
 	config.vhosts     = vhosts;
 	config["default"] = HOSTNAME;
 

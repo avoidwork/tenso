@@ -19,9 +19,14 @@ function bootstrap( obj, config ) {
 	if ( config.routes instanceof Object ) {
 		iterate( config.routes, function ( routes, method ) {
 			iterate( routes, function ( arg, route ) {
-				obj.server[method]( route, function ( res, req ) {
-					this.respond( res, req, prepare( arg ) );
-				} );
+				if ( typeof arg == "function" ) {
+					obj.server[method]( route, arg );
+				}
+				else {
+					obj.server[method]( route, function ( req, res ) {
+						this.respond( req, res, prepare( arg ) );
+					} );
+				}
 			} );
 		} );
 	}

@@ -31,5 +31,7 @@ Tenso.prototype.constructor = Tenso;
  * @return {Undefined}      undefined
  */
 Tenso.prototype.respond = function ( req, res, arg, status, headers ) {
-	this.server.respond( req, res, response( arg, status ), status, headers );
+	var ref = [headers || {}];
+
+	this.server.respond( req, res, hypermedia( this.server, req, response( arg, status ), ref[0] ), status, ref[0] );
 };

@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tensō is a REST framework for node.js, designed to simplify the implementation of APIs.",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "homepage": "http://avoidwork.github.io/tenso",
   "author": {
     "name": "Jason Mulligan",
@@ -22,7 +22,7 @@
   ],
   "main": "lib/tenso",
   "engines": {
-    "node": ">=0.8.0"
+    "node": ">=0.10.0"
   },
   "scripts": {
     "test": "grunt test"

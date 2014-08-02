@@ -7,16 +7,19 @@
  * @return {Object}        Response body
  */
 function response ( arg, status ) {
-	var error = arg instanceof Error;
+	var error = arg instanceof Error,
+	    rep;
 
 	if ( error ) {
 		if ( status === undefined ) {
 			throw new Error( "Invalid arguments" );
 		}
 
-		return prepare( null, arg, status );
+		rep = prepare( null, arg, status );
 	}
 	else {
-		return prepare( arg, null, status );
+		rep = prepare( arg, null, status );
 	}
+
+	return rep;
 }

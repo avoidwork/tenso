@@ -61,7 +61,7 @@ Standard log levels are supported, and are emitted (by configuration) to `stdout
 
 
 ## Dtrace
-Dtrace probes are can be enabled by configuration (disabled by default), and can be observed as `turtle-io`; Tensō is built on `turtle.io`.
+Dtrace probes can be enabled by configuration (disabled by default), and can be observed as `turtle-io`; Tensō is built on `turtle.io`.
 
 ```
 "allowed",        "char *", "char *", "char *", "int"

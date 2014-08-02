@@ -21,6 +21,7 @@ module.exports = function (grunt) {
 					"src/bootstrap.js",
 					"src/error.js",
 					"src/factory.js",
+					"src/hypermedia.js",
 					"src/prepare.js",
 					"src/response.js",
 					"src/outro.js"

@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.0.5
+- Implementing hypermedia & automagic pagination
+
 ## 0.0.4
 - Implementing a clean Basic Auth (by config)
 

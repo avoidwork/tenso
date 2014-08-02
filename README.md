@@ -52,7 +52,7 @@ Hypermedia is a prerequisite of REST, and is best described by the [Richard Matu
 relationships, and create the appropriate Objects in the `link` Array, as well as the `Link` HTTP header. Object keys that match this pattern: `/_(guid|uuid|id|uri|url)$/` will be considered
 hypermedia links.
 
-For example, if the key `user_id` was found, it would be mapped to `/users/:id` with a link `rel` of `alternative`.
+For example, if the key `user_id` was found, it would be mapped to `/users/:id` with a link `rel` of `related`.
 
 ## Configuration
 This is a sample configuration for Tensō, without authentication or SSL. This would be ideal for development, but not production! Enabling SSL is as easy as providing file paths for the two keys.

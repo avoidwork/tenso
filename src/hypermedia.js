@@ -61,7 +61,7 @@ function hypermedia ( server, req, rep, headers ) {
 				if ( /_(guid|uuid|id|url|uri)$/.test( i ) ) {
 					collection = i.replace( /_.*$/, "" ).replace( /s$/, "" ) + "s";
 					uri =/^(\w+\:\/\/)|\//.test( rep.data.result[i] ) ? ( rep.data.result[i].indexOf( "//" ) > -1 ? rep.data.result[i] : req.parsed.protocol + "//" + req.parsed.host + rep.data.result[i] ) : ( req.parsed.protocol + "//" + req.parsed.host + "/" + collection + "/" + rep.data.result[i] );
-					rep.data.link.push( {uri: uri, rel: "alternative"} );
+					rep.data.link.push( {uri: uri, rel: "related"} );
 					delete rep.data.result[i];
 				}
 			} );

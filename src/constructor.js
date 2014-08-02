@@ -4,6 +4,7 @@
  * @constructor
  */
 function Tenso () {
-	this.server  = new TurtleIO();
-	this.version = "{{VERSION}}";
+	this.messages = {};
+	this.server   = new TurtleIO();
+	this.version  = "{{VERSION}}";
 }

@@ -1,0 +1,52 @@
+{
+  "name": "tenso",
+  "description": "Tensō is a REST framework for node.js, designed to simplify the implementation of APIs.",
+  "version": "0.0.1",
+  "homepage": "http://avoidwork.github.io/tenso",
+  "author": {
+    "name": "Jason Mulligan",
+    "email": "jason.mulligan@avoidwork.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/avoidwork/tenso.git"
+  },
+  "bugs": {
+    "url": "https://github.com/avoidwork/tenso/issues"
+  },
+  "licenses": [
+    {
+      "type": "BSD-3",
+      "url": "https://raw.github.com/avoidwork/tenso/master/LICENSE"
+    }
+  ],
+  "main": "lib/tenso",
+  "engines": {
+    "node": ">=0.8.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "dependencies": {
+    "keigai": "0.6.0",
+    "turtle.io": "2.1.8"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-cli": "~0.1.6",
+    "grunt-exec": "~0.4",
+    "grunt-sed": "~0.1",
+    "grunt-contrib-concat": "~0.1.3",
+    "grunt-contrib-jshint": "~0.1",
+    "grunt-contrib-nodeunit": "~0.1.2",
+    "grunt-contrib-watch": "~0.2",
+    "grunt-contrib-sass": "~0.4.0",
+    "grunt-jsdoc": "~0.5.1",
+    "ink-docstrap" : "~0.3.0"
+  },
+  "keywords": [
+    "REST",
+    "API",
+    "framework"
+  ]
+}

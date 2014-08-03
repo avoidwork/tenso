@@ -20,7 +20,7 @@ function auth ( obj, config, hostname ) {
 		config.auth = tmp;
 	}
 	else {
-		protect = config.auth.protect.map( function ( i ) {
+		protect = ( config.auth.protect || [] ).map( function ( i ) {
 			return new RegExp( "^" + string.escape( i ), "i" );
 		} );
 

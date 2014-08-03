@@ -103,6 +103,7 @@ module.exports = function (grunt) {
 
 	// aliases
 	grunt.registerTask("build", ["concat", "sed", "sass"]);
+	grunt.registerTask("test", ["mochaTest"]);
 	grunt.registerTask("default", ["build", "jshint"]);
-	grunt.registerTask("package", ["default", "mochaTest", "jsdoc"]);
+	grunt.registerTask("package", ["default", "test", "jsdoc"]);
 };

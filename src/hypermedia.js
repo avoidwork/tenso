@@ -41,7 +41,7 @@ function hypermedia ( server, req, rep, headers ) {
 				rep.data.link.push( {uri: root.replace( "page=0", "page=1" ), rel: "first"} );
 			}
 
-			if ( page - 1 > 1 ) {
+			if ( page - 1 > 1 && page <= nth ) {
 				rep.data.link.push( {uri: root.replace( "page=0", "page=" + ( page - 1 ) ), rel: "prev"} );
 			}
 
@@ -49,7 +49,7 @@ function hypermedia ( server, req, rep, headers ) {
 				rep.data.link.push( {uri: root.replace( "page=0", "page=" + ( page + 1 ) ), rel: "next"} );
 			}
 
-			if ( page < nth ) {
+			if ( page !== nth ) {
 				rep.data.link.push( {uri: root.replace("page=0", "page=" + nth ), rel: "last"} );
 			}
 		}

@@ -152,6 +152,22 @@ describe("Pagination", function () {
 				});
 		});
 	});
+
+	describe("GET /items?page=4&page_size=5", function () {
+		it("returns page 4/3 of an array of numbers (empty)", function (done) {
+			api()
+				.get("/items?page=4&page_size=5")
+				.expectStatus(200)
+				.expectValue("data.link", [{ uri: "http://localhost:8000/items?page=1&page_size=5", rel: "first" }, { uri: "http://localhost:8000/items?page=3&page_size=5", rel: "last" }])
+				.expectValue("data.result", [])
+				.expectValue("error", null)
+				.expectValue("status", 200)
+				.end(function(err) {
+					if (err) throw err;
+					done();
+				});
+		});
+	});
 });
 
 describe("Hypermedia", function () {

@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.0.8
+- Fixing `hypermedia()` to deal with an out of bounds `page`
+
 ## 0.0.7
 - Added hippie functional tests
 - Updated turtle.io dependency to fix a permission error

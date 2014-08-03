@@ -102,8 +102,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-mocha-test");
 
 	// aliases
-	grunt.registerTask("test", ["jshint", "mochaTest"]);
 	grunt.registerTask("build", ["concat", "sed", "sass"]);
-	grunt.registerTask("default", ["build", "test"]);
-	grunt.registerTask("package", ["default", "jsdoc"]);
+	grunt.registerTask("default", ["build", "jshint"]);
+	grunt.registerTask("package", ["default", "mochaTest", "jsdoc"]);
 };

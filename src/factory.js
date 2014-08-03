@@ -21,10 +21,6 @@ function factory ( arg ) {
 	config.vhosts     = vhosts;
 	config["default"] = HOSTNAME;
 
-	if ( config.auth !== null ) {
-		config = auth( config, HOSTNAME );
-	}
-
 	instance = new Tenso();
 
 	return bootstrap( instance, config );

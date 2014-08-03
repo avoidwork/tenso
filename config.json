@@ -1,5 +1,15 @@
 {
-	"auth": null,
+	"auth": {
+		"basic": {
+			"enabled": false,
+			"list": [],
+			"realm": "Private"
+		},
+		"bearer": {
+			"enabled": false,
+			"list": []
+		}
+	},
 	"hostname": "localhost",
 	"port": 8000,
 	"routes": null,

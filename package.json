@@ -28,9 +28,10 @@
     "test": "grunt test"
   },
   "dependencies": {
-    "keigai": "0.6.0",
-    "turtle.io": "2.1.10",
-    "passport": "0.2.0"
+    "keigai": "0.6.1",
+    "turtle.io": "2.1.11",
+    "passport": "0.2.0",
+    "passport-http-bearer": "1.0.1"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

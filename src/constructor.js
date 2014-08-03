@@ -19,6 +19,16 @@ function Tenso () {
 Tenso.prototype.constructor = Tenso;
 
 /**
+ * Bootstraps Tenso instance
+ *
+ * @method bootstrap
+ * @return {Object} Tenso instance
+ */
+Tenso.prototype.bootstrap = function () {
+	return this;
+};
+
+/**
  * Sends a response to the Client
  *
  * @method respond

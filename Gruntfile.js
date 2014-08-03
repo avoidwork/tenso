@@ -46,8 +46,13 @@ module.exports = function (grunt) {
 			},
 			src : "lib/<%= pkg.name %>.js"
 		},
-		nodeunit : {
-			all : ["test/*.js"]
+		mochaTest : {
+			options: {
+				reporter: "spec"
+			},
+			test : {
+				src : ["test/*_test.js"]
+			}
 		},
 		sass: {
 			dist: {
@@ -90,13 +95,14 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-sed");
 	grunt.loadNpmTasks("grunt-jsdoc");
 	grunt.loadNpmTasks("grunt-contrib-concat");
-	grunt.loadNpmTasks("grunt-contrib-nodeunit");
 	grunt.loadNpmTasks("grunt-contrib-jshint");
 	grunt.loadNpmTasks("grunt-contrib-watch");
 	grunt.loadNpmTasks("grunt-contrib-sass");
+	grunt.loadNpmTasks("grunt-mocha-test");
 
 	// aliases
-	grunt.registerTask("test", ["jshint"/*, "nodeunit"*/]);
+	grunt.registerTask("test", ["jshint", "mochaTest"]);
 	grunt.registerTask("build", ["concat", "sed", "sass"]);
-	grunt.registerTask("default", ["build", "test", "jsdoc"]);
+	grunt.registerTask("default", ["build", "test"]);
+	grunt.registerTask("package", ["default", "jsdoc"]);
 };

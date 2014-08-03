@@ -5,6 +5,8 @@ Tensō is a REST API facade for node.js, designed to simplify the implementation
 
 Tensō will handle the serialization & creation of hypermedia links, all you have to do is give it `Arrays` or `Objects`.
 
+[![build status](https://secure.travis-ci.org/avoidwork/tenso.svg)](http://travis-ci.org/avoidwork/tenso)
+
 ## Example
 Creating an API with Tensō is as simple as three statements.
 
@@ -59,7 +61,7 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 
 ```json
 {
-	"auth": ["username:password", ...] or {"realm": "Super Secret", "list": ["username:password", ...]} // Optional 
+	"auth": ["username:password", ...] or {"realm": "Super Secret", "list": ["username:password", ...]} /* Optional */
 	"hostname": "localhost", /* Optional, default is 'localhost' */
 	"port": 8000, /* Optional, default is 8000 */
 	"uid": N, /* Optional, system account uid to drop to after starting with elevated privileges to run on a low port */

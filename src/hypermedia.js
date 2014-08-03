@@ -41,7 +41,7 @@ function hypermedia ( server, req, rep, headers ) {
 				rep.data.link.push( {uri: root.replace( "page=0", "page=1" ), rel: "first"} );
 			}
 
-			if ( page - 1 > 0 ) {
+			if ( page - 1 > 1 ) {
 				rep.data.link.push( {uri: root.replace( "page=0", "page=" + ( page - 1 ) ), rel: "prev"} );
 			}
 

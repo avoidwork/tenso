@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.0.7
+- Added hippie functional tests
+- Updated turtle.io dependency to fix a permission error
+
+## 0.0.6
+- Changing the default hypermedia link rel to related for a more generic implied relationship
+
 ## 0.0.5
 - Implementing hypermedia & automagic pagination
 

@@ -18,6 +18,7 @@ module.exports = function (grunt) {
 				src : [
 					"src/intro.js",
 					"src/constructor.js",
+					"src/auth.js",
 					"src/bootstrap.js",
 					"src/error.js",
 					"src/factory.js",

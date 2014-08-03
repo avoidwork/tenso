@@ -9,7 +9,7 @@ function factory ( arg ) {
 	var HOSTNAME = arg ? arg.hostname || "localhost" : "localhost",
         vhosts   = {},
         config   = arg ? merge( clone( CONFIG, true ), arg ) : CONFIG,
-        auth, instance;
+        instance;
 
 	if ( !config.port ) {
 		console.error( "Invalid configuration" );
@@ -22,15 +22,7 @@ function factory ( arg ) {
 	config["default"] = HOSTNAME;
 
 	if ( config.auth !== null ) {
-		if ( config.auth.type === "basic" ) {
-			auth = {};
-			auth[HOSTNAME] = {
-				authRealm: config.auth.realm || "Private",
-				authList: config.auth.list || config.auth
-			};
-
-			config.auth = auth;
-		}
+		config = auth( config, HOSTNAME );
 	}
 
 	instance = new Tenso();

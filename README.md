@@ -98,9 +98,11 @@ Planned authentication options are `Basic Auth`, `Bearer Token`, `OAuth2 (generi
 ```json
 {
 	"auth": {
-		"type": "basic",
-		"list": ["username:password", ...],
-		"realm": "Private" // `realm` is optional
+		"basic": {
+			"enabled": true,
+			"list": ["username:password", ...],
+			"realm": "Private" // `realm` is optional
+		}
 	}
 }
 ```

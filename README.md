@@ -37,6 +37,9 @@ module.exports.get = {
 }
 ```
 
+### Request Helpers
+Tensō decorates `req` with "helpers" such as `req.ip`, & `req.parsed`. Cookies are available at `req.cookies{}`. Sessions are available at `req.sessions{}`. `PATCH`, `PUT`, or `POST` payloads are available as `req.body`.
+
 ## Responses
 Responses will have a standard shape. The result, and hypermedia will be in `data`. Hypermedia (pagination, links, etc.) will be in `data.link:[ {"uri": "...", "rel": "..."}, ...]`, & pagination will also be present via the `Link` HTTP header.
 The result will be in `data.result`.
@@ -68,7 +71,7 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 
 ```json
 {
-	"auth": ["username:password", ...] or {"realm": "Super Secret", "list": ["username:password", ...]} /* Optional */
+	"auth": /* Optional, see Authentication section */ 
 	"hostname": "localhost", /* Optional, default is 'localhost' */
 	"port": 8000, /* Optional, default is 8000 */
 	"uid": N, /* Optional, system account uid to drop to after starting with elevated privileges to run on a low port */
@@ -86,12 +89,33 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 }
 ```
 
+## Authentication
+Authentication can be enabled two ways, one being Basic Auth:
+
+```json
+{
+	"auth": {
+		"type": "basic",
+		"list": ["username:password", ...],
+		"realm": "Private" // `realm` is optional
+	}
+}
+```
+
+and the other is `passport.js`, abstracted with a similar configuration, providing many different authentication options (in progress):
+
+```json
+{
+	"auth": {"type": "twitter"}
+}
+```
+
 ## Logging
 Standard log levels are supported, and are emitted (by configuration) to `stdout` & `stderr`, & `syslog`.
 
 
 ## Dtrace
-Dtrace probes can be enabled by configuration (disabled by default), and can be observed as `turtle-io`; Tensō is built on `turtle.io`.
+Dtrace probes can be enabled by configuration (disabled by default), and can be observed as `turtle-io`; Tensō is built on [turtle.io](https://github.com/avoidwork/turtle.io).
 
 ```
 "allowed",        "char *", "char *", "char *", "int"

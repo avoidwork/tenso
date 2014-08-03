@@ -22,13 +22,15 @@ function factory ( arg ) {
 	config["default"] = HOSTNAME;
 
 	if ( config.auth !== null ) {
-		auth = {};
-		auth[HOSTNAME] = {
-			authRealm : config.auth.realm || "Private",
-			authList  : config.auth.list  || config.auth
-		};
+		if ( config.auth.type === "basic" ) {
+			auth = {};
+			auth[HOSTNAME] = {
+				authRealm: config.auth.realm || "Private",
+				authList: config.auth.list || config.auth
+			};
 
-		config.auth = auth;
+			config.auth = auth;
+		}
 	}
 
 	instance = new Tenso();

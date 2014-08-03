@@ -23,22 +23,22 @@ function auth ( obj, config, hostname ) {
 		middleware = function ( req, res, next ) {
 			var uri = req.parsed.pathname;
 
-			if ( req.protected === undefined ) {
+			if ( req.protect === undefined ) {
 				array.each( config.auth.protect || [], function ( i ) {
 					var regex = new RegExp( "^" + string.escape( i ), "i" );
 
 					if ( regex.test( uri ) ) {
-						req.protected = true;
+						req.protect = true;
 						return false;
 					}
 				} );
 
-				if ( req.protected === undefined ) {
-					req.protected = false;
+				if ( req.protect === undefined ) {
+					req.protect = false;
 				}
 			}
 
-			if ( req.protected && next ) {
+			if ( req.protect && next ) {
 				next();
 			}
 			else {
@@ -53,31 +53,38 @@ function auth ( obj, config, hostname ) {
 			( function () {
 				var fn, x;
 
-				x  = config.auth.bearer.tokens;
+				x  = config.auth.bearer.tokens || [];
 				fn = function ( arg, cb ) {
-					if ( x.indexOf( arg ) > -1 ) {
-						cb( null, arg );
+					if ( x.length > 0 ) {
+						if ( x.indexOf( arg ) > -1 ) {
+							cb( null, arg );
+						}
+						else {
+							cb( null, {} );
+						}
 					}
 					else {
-						cb( null, x );
+						cb( new Error( "Bearer token list is empty" ), null );
 					}
 				};
 
 				passport.use(new BearerStrategy(
 					function(token, done) {
-						User.findOne({ token: token }, function (err, user) {
+						fn(token, function (err, user) {
 							if (err) {
 								return done(err);
 							}
+
 							if (!user) {
 								return done(null, false);
 							}
+
 							return done(null, user, {scope: "read"});
 						});
 					}
 				));
 
-				obj.server.use( passport.authenticate( "local" ) );
+				obj.server.use( passport.authenticate( "bearer", {session: false} ) );
 			} )();
 		}
 	}

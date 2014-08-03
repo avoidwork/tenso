@@ -37,8 +37,8 @@ function bootstrap( obj, config, hostname ) {
 	}
 
 	// Starting API server
-	obj.server.start( config, function ( req, res, status ) {
-		error( obj.server, req, res, status, obj.messages[status] );
+	obj.server.start( config, function ( req, res, status, msg ) {
+		error( obj.server, req, res, status, msg || obj.messages[status] );
 	} );
 
 	return obj;

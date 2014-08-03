@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "keigai": "0.6.1",
-    "turtle.io": "2.1.11",
+    "turtle.io": "2.1.12",
     "passport": "0.2.0",
     "passport-http-bearer": "1.0.1"
   },

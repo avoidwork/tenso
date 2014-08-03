@@ -1,14 +1,17 @@
 # Change Log
 
+## 0.0.9
+- Fixing `hypermedia()` URI reconstruction by encoding the query string values, added a test
+
 ## 0.0.8
-- Fixing `hypermedia()` to deal with an out of bounds `page`
+- Fixing `hypermedia()` to deal with an out of bounds `page`, added a test
 
 ## 0.0.7
 - Added hippie functional tests
 - Updated turtle.io dependency to fix a permission error
 
 ## 0.0.6
-- Changing the default hypermedia link rel to related for a more generic implied relationship
+- Changing the default hypermedia link rel to `related` for a more generic implied relationship
 
 ## 0.0.5
 - Implementing hypermedia & automagic pagination

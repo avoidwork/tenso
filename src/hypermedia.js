@@ -34,7 +34,7 @@ function hypermedia ( server, req, rep, headers ) {
 			query.page_size = page_size;
 
 			root += "?" + array.keys( query ).map( function ( i ) {
-				return i + "=" + query[i];
+				return i + "=" + encodeURIComponent( query[i] );
 			} ).join ( "&" );
 
 			if ( page > 1 ) {

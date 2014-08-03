@@ -168,6 +168,22 @@ describe("Pagination", function () {
 				});
 		});
 	});
+
+	describe("GET /items?email=user@domain.com", function () {
+		it("returns page 1/3 of an array of numbers, preserving the query string via encoding", function (done) {
+			api()
+				.get("/items?email=user@domain.com")
+				.expectStatus(200)
+				.expectValue("data.link", [{ uri: "http://localhost:8000/items?email=user%40domain.com&page=2&page_size=5", rel: "next" }, { uri: "http://localhost:8000/items?email=user%40domain.com&page=3&page_size=5", rel: "last" }])
+				.expectValue("data.result", [1,2,3,4,5])
+				.expectValue("error", null)
+				.expectValue("status", 200)
+				.end(function(err) {
+					if (err) throw err;
+					done();
+				});
+		});
+	});
 });
 
 describe("Hypermedia", function () {

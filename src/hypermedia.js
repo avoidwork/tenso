@@ -49,7 +49,7 @@ function hypermedia ( server, req, rep, headers ) {
 				rep.data.link.push( {uri: root.replace( "page=0", "page=" + ( page + 1 ) ), rel: "next"} );
 			}
 
-			if ( page !== nth ) {
+			if ( nth > 0 && page !== nth ) {
 				rep.data.link.push( {uri: root.replace("page=0", "page=" + nth ), rel: "last"} );
 			}
 		}

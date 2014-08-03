@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.0.10
+- Fixing `hypermedia()` by ensuring no `link` Objects when a collection is empty, added a test
+
 ## 0.0.9
 - Fixing `hypermedia()` URI reconstruction by encoding the query string values, added a test
 

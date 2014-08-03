@@ -105,6 +105,22 @@ describe("Permissions", function () {
 });
 
 describe("Pagination", function () {
+	describe("GET /empty", function () {
+		it("returns an empty array", function (done) {
+			api()
+				.get("/empty")
+				.expectStatus(200)
+				.expectValue("data.link", [])
+				.expectValue("data.result", [])
+				.expectValue("error", null)
+				.expectValue("status", 200)
+				.end(function(err) {
+					if (err) throw err;
+					done();
+				});
+		});
+	});
+
 	describe("GET /items", function () {
 		it("returns page 1/3 of an array of numbers", function (done) {
 			api()

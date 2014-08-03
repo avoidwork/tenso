@@ -6,6 +6,6 @@ module.exports.get = {
 		this.respond( req, res, new Error( "TPS Cover Sheet not attached" ), 785 );
 	},
 	"/uuid": function ( req, res ) {
-		this.respond( req, res, uuid() );
+		this.respond( req, res, uuid(), 200, {"cache-control": "no-cache"} )
 	}
 }

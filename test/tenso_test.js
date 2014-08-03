@@ -28,6 +28,21 @@ describe("Permissions", function () {
 		});
 	});
 
+	describe("GET /invalid", function () {
+		it("returns a 'not found' error", function (done) {
+			api()
+				.get("/invalid")
+				.expectStatus(404)
+				.expectValue("data", null)
+				.expectValue("error", "Not Found")
+				.expectValue("status", 404)
+				.end(function(err) {
+					if (err) throw err;
+					done();
+				});
+		});
+	});
+
 	describe("DELETE /", function () {
 		it("returns a 'method not allowed' error", function (done) {
 			api()

@@ -7,7 +7,7 @@
  * @param  {Object} hostname API hostname
  * @return {Object}          Tenso instance
  */
-function bootstrap( obj, config, hostname ) {
+function bootstrap ( obj, config, hostname ) {
 	config = auth( obj, config, hostname );
 
 	config.headers        = config.headers || {};

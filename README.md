@@ -90,7 +90,10 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 ```
 
 ## Authentication
-Authentication can be enabled two ways, one being Basic Auth:
+Planned authentication options are `Basic Auth`, `Bearer Token`, `OAuth2 (generic)`, `Twitter`, & `Facebook`.
+
+### Basic Auth
+`Basic Auth` will be applied to the entire API if enabled.
 
 ```json
 {
@@ -102,17 +105,23 @@ Authentication can be enabled two ways, one being Basic Auth:
 }
 ```
 
-and the other is `passport.js`, abstracted with a similar configuration, providing many different authentication options (in progress):
+### Bearer Token
+The `protect` Array is the folder paths (regex supported) that will be protected by `Bearer Tokens`.
 
 ```json
 {
-	"auth": {"type": "twitter"}
+	"auth": {
+		"bearer": {
+			"enabled": true,
+			"tokens": ["abc", ...]
+		},
+		"protect": ["/"]
+	}
 }
 ```
 
 ## Logging
 Standard log levels are supported, and are emitted (by configuration) to `stdout` & `stderr`, & `syslog`.
-
 
 ## Dtrace
 Dtrace probes can be enabled by configuration (disabled by default), and can be observed as `turtle-io`; Tensō is built on [turtle.io](https://github.com/avoidwork/turtle.io).

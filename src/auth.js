@@ -8,7 +8,7 @@
  * @return {Object}          Updated Tenso configuration
  */
 function auth ( obj, config, hostname ) {
-	var middleware, tmp;
+	var middleware, protect, tmp;
 
 	if ( config.auth.basic.enabled === "enabled" ) {
 		tmp = {};
@@ -20,29 +20,23 @@ function auth ( obj, config, hostname ) {
 		config.auth = tmp;
 	}
 	else {
+		protect = config.auth.protect.map( function ( i ) {
+			return new RegExp( "^" + string.escape( i ), "i" );
+		} );
+
 		middleware = function ( req, res, next ) {
-			var uri = req.parsed.pathname;
+			var uri      = req.parsed.pathname,
+				protectd = false;
 
-			if ( req.protect === undefined ) {
-				array.each( config.auth.protect || [], function ( i ) {
-					var regex = new RegExp( "^" + string.escape( i ), "i" );
-
-					if ( regex.test( uri ) ) {
-						req.protect = true;
-						return false;
-					}
-				} );
-
-				if ( req.protect === undefined ) {
-					req.protect = false;
+			array.each( protect, function ( regex ) {
+				if ( regex.test( uri ) ) {
+					protectd = true;
+					return false;
 				}
-			}
+			} );
 
-			if ( req.protect && next ) {
+			if ( protectd && next ) {
 				next();
-			}
-			else {
-				return true;
 			}
 		};
 
@@ -60,7 +54,7 @@ function auth ( obj, config, hostname ) {
 							cb( null, arg );
 						}
 						else {
-							cb( null, {} );
+							cb( new Error( "Unauthorized" ), null );
 						}
 					}
 					else {
@@ -68,21 +62,23 @@ function auth ( obj, config, hostname ) {
 					}
 				};
 
-				passport.use(new BearerStrategy(
-					function(token, done) {
-						fn(token, function (err, user) {
-							if (err) {
-								return done(err);
+				passport.use( new BearerStrategy (
+					function( token, done ) {
+						fn( token, function ( err, user ) {
+							if ( err ) {
+								// Removing the stack for a clean error message
+								delete err.stack;
+								return done( err );
 							}
 
 							if (!user) {
-								return done(null, false);
+								return done( null, false );
 							}
 
-							return done(null, user, {scope: "read"});
-						});
+							return done( null, user, {scope: "read"} );
+						} );
 					}
-				));
+				) );
 
 				obj.server.use( passport.authenticate( "bearer", {session: false} ) );
 			} )();

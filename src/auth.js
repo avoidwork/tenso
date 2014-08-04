@@ -2,17 +2,16 @@
  * Setups up authentication
  *
  * @method auth
- * @param  {Object} obj      Tenso instance
- * @param  {Object} config   Tenso configuration
- * @param  {String} hostname Server hostname
- * @return {Object}          Updated Tenso configuration
+ * @param  {Object} obj    Tenso instance
+ * @param  {Object} config Tenso configuration
+ * @return {Object}        Updated Tenso configuration
  */
-function auth ( obj, config, hostname ) {
+function auth ( obj, config ) {
 	var middleware, protect, tmp;
 
-	if ( config.auth.basic.enabled === "enabled" ) {
+	if ( config.auth.basic.enabled ) {
 		tmp = {};
-		tmp[hostname] = {
+		tmp[obj.hostname] = {
 			authRealm : config.auth.basic.realm || "Private",
 			authList  : config.auth.basic.list
 		};

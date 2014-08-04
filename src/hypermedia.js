@@ -57,7 +57,7 @@ function hypermedia ( server, req, rep, headers ) {
 			array.each( array.keys( rep.data.result ), function ( i ) {
 				var collection, uri;
 
-				// If ID like keys are found, and are not URLs, they are assumed to be root collections
+				// If ID like keys are found, and are not URIs, they are assumed to be root collections
 				if ( /_(guid|uuid|id|url|uri)$/.test( i ) ) {
 					collection = i.replace( /_.*$/, "" ).replace( /s$/, "" ) + "s";
 					uri =/^(\w+\:\/\/)|\//.test( rep.data.result[i] ) ? ( rep.data.result[i].indexOf( "//" ) > -1 ? rep.data.result[i] : req.parsed.protocol + "//" + req.parsed.host + rep.data.result[i] ) : ( req.parsed.protocol + "//" + req.parsed.host + "/" + collection + "/" + rep.data.result[i] );

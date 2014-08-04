@@ -6,22 +6,23 @@
  * @return {Object}    Tenso instance
  */
 function factory ( arg ) {
-	var HOSTNAME = arg ? arg.hostname || "localhost" : "localhost",
+	var hostname = arg ? arg.hostname || "localhost" : "localhost",
         vhosts   = {},
         config   = arg ? merge( clone( CONFIG, true ), arg ) : CONFIG,
-        instance;
+        obj;
 
 	if ( !config.port ) {
 		console.error( "Invalid configuration" );
 		process.exit( 1 );
 	}
 
-	vhosts[HOSTNAME]  = "www";
+	vhosts[hostname]  = "www";
 	config.root       = __dirname + "/../";
 	config.vhosts     = vhosts;
-	config["default"] = HOSTNAME;
+	config["default"] = hostname;
 
-	instance = new Tenso();
+	obj = new Tenso();
+	obj.hostname = hostname;
 
-	return bootstrap( instance, config );
+	return bootstrap( obj, config );
 }

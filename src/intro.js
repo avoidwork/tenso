@@ -12,4 +12,4 @@ var TurtleIO = require( "turtle.io" ),
     iterate  = util.iterate,
     merge    = util.merge,
     passport = require( "passport" ),
-    BearerStrategy = require( "passport-http-bearer" ).Strategy;
+    BearerStrategy  = require( "passport-http-bearer" ).Strategy;

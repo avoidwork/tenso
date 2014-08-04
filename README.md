@@ -12,8 +12,9 @@ Creating an API with Tensō is as simple as three statements.
 
 ```javascript
 var tenso  = require( "tenso" ),
-    routes = require( "./routes.js" ),
-    app    = tenso( {routes: routes} );
+    routes = require( "./routes.js" );
+
+tenso( {routes: routes} );
 ```
 
 ### Creating Routes

@@ -7,8 +7,9 @@
 		},
 		"bearer": {
 			"enabled": false,
-			"list": []
-		}
+			"tokens": []
+		},
+		"protect": ["/"]
 	},
 	"hostname": "localhost",
 	"port": 8000,

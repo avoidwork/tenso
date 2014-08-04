@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.1.1
+- Decorating `hostname` on Tenso instance
+- Removed temp function that made it into a release
+- Refactored tests to use multiple servers
+- Added tests for authentications
+
+## 0.1.0
+- Added OAuth2 Bearer Token authentication, tokens are expected to be updated 'by reference' (tbd)
+- Updated keigai to 0.6.1 to fix a string escape function
+- Updated turtle.io to 2.1.18 to fix middleware problem
+
 ## 0.0.10
 - Fixing `hypermedia()` by ensuring no `link` Objects when a collection is empty, added a test
 

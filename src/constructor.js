@@ -4,6 +4,7 @@
  * @constructor
  */
 function Tenso () {
+	this.hostname = "";
 	this.messages = {};
 	this.server   = new TurtleIO();
 	this.version  = "{{VERSION}}";
@@ -17,16 +18,6 @@ function Tenso () {
  * @type {Function}
  */
 Tenso.prototype.constructor = Tenso;
-
-/**
- * Bootstraps Tenso instance
- *
- * @method bootstrap
- * @return {Object} Tenso instance
- */
-Tenso.prototype.bootstrap = function () {
-	return this;
-};
 
 /**
  * Sends a response to the Client

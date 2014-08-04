@@ -2,14 +2,12 @@
  * Bootstraps an instance of Tenso
  *
  * @method bootstrap
- * @param  {Object} obj      Tenso instance
- * @param  {Object} config   Application configuration
- * @param  {Object} hostname API hostname
- * @return {Object}          Tenso instance
+ * @param  {Object} obj    Tenso instance
+ * @param  {Object} config Application configuration
+ * @return {Object}        Tenso instance
  */
-function bootstrap ( obj, config, hostname ) {
-	config = auth( obj, config, hostname );
-
+function bootstrap ( obj, config ) {
+	config                = auth( obj, config );
 	config.headers        = config.headers || {};
 	config.headers.server = SERVER;
 

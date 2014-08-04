@@ -46,7 +46,7 @@ The result will be in `data.result`.
 
 ```json
 {
-  "data": {{ `null` or the response }},
+  "data": {{ `null` or `{link: [], result: ?}` }},
   "error": {{ `null` or an `Error` stack trace / message }},
   "status": {{ HTTP status code }}
 }
@@ -90,7 +90,7 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 ```
 
 ## Authentication
-Planned authentication options are `Basic Auth`, `Bearer Token`, `OAuth2 (generic)`, `Twitter`, & `Facebook`.
+Planned authentication options are `Basic Auth`, `OAuth2 Bearer Token`, `Twitter`, & `Facebook`.
 
 ### Basic Auth
 `Basic Auth` will be applied to the entire API if enabled.
@@ -107,8 +107,8 @@ Planned authentication options are `Basic Auth`, `Bearer Token`, `OAuth2 (generi
 }
 ```
 
-### Bearer Token
-The `protect` Array is the folder paths (regex supported) that will be protected by `Bearer Tokens`.
+### Oauth2 Bearer Token
+The `protect` Array is the folder paths (regex supported) that will be protected by `OAuth2 Bearer Tokens`.
 
 ```json
 {

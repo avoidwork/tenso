@@ -109,7 +109,7 @@ Planned authentication options are `Basic Auth`, `OAuth2 Bearer Token`, `Twitter
 ```
 
 ### Oauth2 Bearer Token
-The `protect` Array is the folder paths (regex supported) that will be protected by `OAuth2 Bearer Tokens`.
+The `protect` Array is the endpoints that will be protected by `OAuth2 Bearer Tokens`.
 
 ```json
 {

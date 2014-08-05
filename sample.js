@@ -7,6 +7,12 @@ tenso( {
 		level: "debug",
 		dtrace: true
 	},
+	rate: {
+		enabled: true,
+		limit: 1000,
+		status: 420,
+		message: "Ease up bro"
+	},
 	auth: {
 		protect: ["/uuid"],
 		basic: {

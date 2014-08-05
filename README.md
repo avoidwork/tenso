@@ -39,7 +39,7 @@ module.exports.get = {
 ```
 
 ### Request Helpers
-Tensō decorates `req` with "helpers" such as `req.ip`, & `req.parsed`. Cookies are available at `req.cookies{}`. Sessions are available at `req.sessions{}`. `PATCH`, `PUT`, or `POST` payloads are available as `req.body`.
+Tensō decorates `req` with "helpers" such as `req.ip`, & `req.parsed`. `PATCH`, `PUT`, & `POST` payloads are available as `req.body`. Sessions are available as `req.session` when using `local` authentication.
 
 ## Responses
 Responses will have a standard shape. The result, and hypermedia will be in `data`. Hypermedia (pagination, links, etc.) will be in `data.link:[ {"uri": "...", "rel": "..."}, ...]`, & pagination will also be present via the `Link` HTTP header.
@@ -168,7 +168,19 @@ The `protect` Array is the endpoints that will be protected by `local` authentic
 ```
 
 ## Rate Limiting
-Rate limiting is controlled by configuration, and is disabled by default.
+Rate limiting is controlled by configuration, and is disabled by default. Rate limiting is based on `token`, `session`, or `ip`, depending upon authentication method.
+
+```javascript
+{
+	"rate": {
+		"enabled": true,
+		"limit": 1000, /* Maximum requests before `reset` */
+		"reset": 3600, /* TTL in seconds */
+		"status": 429, /* Optional HTTP status */
+		"message": "Too many requests"  /* Optional error message */
+	}
+}
+```
 
 ## Logging
 Standard log levels are supported, and are emitted (by configuration) to `stdout` & `stderr`, & `syslog`.

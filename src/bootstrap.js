@@ -10,7 +10,7 @@ function bootstrap ( obj, config ) {
 	// Early middleware hook for rate limiting
 	if ( config.rate.enabled ) {
 		obj.server.use( function ( req, res, next ) {
-			rate.call( obj, req, res, next );
+			rate( obj, req, res, next );
 		} );
 	}
 

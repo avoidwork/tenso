@@ -39,17 +39,16 @@ Tenso.prototype.error = function ( req, res, status, arg ) {
  * @method rate
  * @memberOf Tenso
  * @param {Object} req Client request
- * @param {Object} now Date of request
  * @returns {Array}    Array of rate limit information `[total, remaining, reset]`
  */
-Tenso.prototype.rate = function ( req, now ) {
+Tenso.prototype.rate = function ( /*req*/ ) {
 	var now       = new Date(),
 	    limit     = 0,
 		remaining = 0,
 		reset     = 0;
 
 	if ( reset === 0 ) {
-		reset = parseInt( now.setHours( now.getHours() + 1 ) / 1000, 10 )
+		reset = parseInt( now.setHours( now.getHours() + 1 ) / 1000, 10 );
 	}
 
 	return [limit, remaining, reset];

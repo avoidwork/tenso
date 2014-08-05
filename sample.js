@@ -8,8 +8,9 @@ tenso( {
 		dtrace: true
 	},
 	rate: {
-		enabled: true,
-		limit: 1000,
+		enabled: false,
+		limit: 450,
+		reset: 900,
 		status: 420,
 		message: "Ease up bro"
 	},

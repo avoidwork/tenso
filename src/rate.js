@@ -11,13 +11,14 @@
 function rate ( obj, req, res, next ) {
 	var headers = ["x-ratelimit-limit", "x-ratelimit-remaining", "x-ratelimit-reset"],
 	    results = obj.rate( req ),
+		valid   = results.shift(),
 	    config  = obj.server.config.rate;
 
 	array.each( headers, function ( i, idx ) {
 		res.setHeader( i, results[idx] );
 	} );
 
-	if ( results[1] > 0 ) {
+	if ( valid ) {
 		next();
 	}
 	else {

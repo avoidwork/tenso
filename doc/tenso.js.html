@@ -43,6 +43,10 @@
 					<ul class="dropdown-menu ">
 						
 						<li>
+							<a href="global.html#auth">auth</a>
+						</li>
+						
+						<li>
 							<a href="global.html#bootstrap">bootstrap</a>
 						</li>
 						
@@ -60,6 +64,10 @@
 						
 						<li>
 							<a href="global.html#prepare">prepare</a>
+						</li>
+						
+						<li>
+							<a href="global.html#rate">rate</a>
 						</li>
 						
 						<li>
@@ -95,20 +103,26 @@
  * @license BSD-3 &lt;https://raw.github.com/avoidwork/tenso/master/LICENSE>
  * @link http://avoidwork.github.io/tenso
  * @module tenso
- * @version 0.0.10
+ * @version 0.3.0
  */
 ( function () {
 "use strict";
 
 var TurtleIO = require( "turtle.io" ),
-    SERVER   = "tenso/0.0.10",
+    SERVER   = "tenso/0.3.0",
     CONFIG   = require( __dirname + "/../config.json" ),
     keigai   = require( "keigai" ),
     util     = keigai.util,
     array    = util.array,
+    string   = util.string,
     clone    = util.clone,
     iterate  = util.iterate,
-    merge    = util.merge;
+    merge    = util.merge,
+    parse    = util.parse,
+    uuid     = util.uuid,
+    session  = require( "express-session" ),
+    passport = require( "passport" ),
+    BearerStrategy  = require( "passport-http-bearer" ).Strategy;
 
 /**
  * Tenso
@@ -116,9 +130,11 @@ var TurtleIO = require( "turtle.io" ),
  * @constructor
  */
 function Tenso () {
+	this.hostname = "";
 	this.messages = {};
+	this.rates    = {};
 	this.server   = new TurtleIO();
-	this.version  = "0.0.10";
+	this.version  = "0.3.0";
 }
 
 /**
@@ -129,6 +145,80 @@ function Tenso () {
  * @type {Function}
  */
 Tenso.prototype.constructor = Tenso;
+
+/**
+ * Sends an Error to the Client
+ *
+ * @method redirect
+ * @memberOf Tenso
+ * @param  {Object} req Client request
+ * @param  {Object} res Client response
+ * @param  {Mixed}  uri Target URI
+ */
+Tenso.prototype.error = function ( req, res, status, arg ) {
+	this.server.error( req, res, status, arg );
+};
+
+/**
+ * Returns rate limit information for Client request
+ *
+ * @method rate
+ * @memberOf Tenso
+ * @param {Object} req Client request
+ * @returns {Array}    Array of rate limit information `[valid, total, remaining, reset]`
+ */
+Tenso.prototype.rate = function ( req ) {
+	var now       = new Date(),
+		next_hour = parseInt( now.setHours( now.getHours() + 1 ) / 1000, 10 ),
+		config    = this.server.config.rate,
+		limit     = 0,
+		remaining = 0,
+		reset     = 0,
+		regex     = /Bearer /,
+		id        = req.headers.authorization ? req.headers.authorization.replace( regex, "" ) : req.sessionID || req.ip,
+		valid     = true,
+		state;
+
+	if ( !this.rates[id] ) {
+		this.rates[id] = {
+			limit     : config.limit,
+			remaining : config.limit,
+			reset     : next_hour
+		};
+	}
+
+	state     = this.rates[id];
+	limit     = state.limit;
+	remaining = state.remaining;
+	reset     = state.reset;
+
+	if ( next_hour - reset >= config.reset ) {
+		reset     = state.reset     = next_hour;
+		remaining = state.remaining = limit;
+	}
+	else if ( remaining > 0 ) {
+		state.remaining--;
+		remaining = state.remaining;
+	}
+	else {
+		valid = false;
+	}
+
+	return [valid, limit, remaining, reset];
+};
+
+/**
+ * Redirects the Client
+ *
+ * @method redirect
+ * @memberOf Tenso
+ * @param  {Object} req Client request
+ * @param  {Object} res Client response
+ * @param  {Mixed}  uri Target URI
+ */
+Tenso.prototype.redirect = function ( req, res, uri ) {
+	this.server.respond( req, res, this.server.messages.NO_CONTENT, this.server.codes.FOUND, {location: uri} );
+};
 
 /**
  * Sends a response to the Client
@@ -145,8 +235,150 @@ Tenso.prototype.constructor = Tenso;
 Tenso.prototype.respond = function ( req, res, arg, status, headers ) {
 	var ref = [headers || {}];
 
-	this.server.respond( req, res, hypermedia( this.server, req, response( arg, status ), ref[0] ), status, ref[0] );
+	if ( !res._header ) {
+		this.server.respond( req, res, hypermedia( this.server, req, response( arg, status ), ref[0] ), status, ref[0] );
+	}
 };
+
+/**
+ * Setups up authentication
+ *
+ * @method auth
+ * @param  {Object} obj    Tenso instance
+ * @param  {Object} config Tenso configuration
+ * @return {Object}        Updated Tenso configuration
+ */
+function auth ( obj, config ) {
+	var middleware, protect, tmp;
+
+	if ( config.auth.basic.enabled ) {
+		tmp = {};
+		tmp[obj.hostname] = {
+			authRealm : config.auth.basic.realm || "Private",
+			authList  : config.auth.basic.list
+		};
+
+		config.auth = tmp;
+	}
+	else {
+		var login;
+
+		array.each( array.keys( config.auth ), function ( i ) {
+			if ( i.enabled && i.login ) {
+				login = i.login;
+
+				return false;
+			}
+		} );
+
+		protect = ( config.auth.protect || [] ).map( function ( i ) {
+			return new RegExp( "^" + i !== login ? string.escape( i ) : "$", "i" );
+		} );
+
+		middleware = function ( req, res, next ) {
+			var uri      = req.parsed.pathname,
+				protectd = false;
+
+			array.each( protect, function ( regex ) {
+				if ( regex.test( uri ) ) {
+					protectd = true;
+					return false;
+				}
+			} );
+
+			if ( protectd && next ) {
+				next();
+			}
+		};
+
+		obj.server.use( session( {
+			name: "tenso",
+			resave: true,
+			rolling: false,
+			saveUninitialized: false,
+			secret: config.session.key || uuid(),
+			cookie: {
+				maxAge: config.session.max_age || 60000
+			}
+		} ) );
+
+		obj.server.use( middleware );
+
+		if ( config.auth.bearer.enabled ) {
+			( function () {
+				var fn, x;
+
+				x  = config.auth.bearer.tokens || [];
+				fn = function ( arg, cb ) {
+					if ( x.length > 0 ) {
+						if ( x.indexOf( arg ) > -1 ) {
+							cb( null, arg );
+						}
+						else {
+							cb( new Error( "Unauthorized" ), null );
+						}
+					}
+					else {
+						cb( new Error( "Bearer token list is empty" ), null );
+					}
+				};
+
+				obj.server.use( passport.initialize() );
+
+				passport.use( new BearerStrategy (
+					function( token, done ) {
+						fn( token, function ( err, user ) {
+							if ( err ) {
+								// Removing the stack for a clean error message
+								delete err.stack;
+								return done( err );
+							}
+
+							if (!user) {
+								return done( null, false );
+							}
+
+							return done( null, user, {scope: "read"} );
+						} );
+					}
+				) );
+
+				obj.server.use( passport.authenticate( "bearer", {session: false} ) );
+			} )();
+		}
+		else if ( config.auth.local.enabled ) {
+			config.routes.get[config.auth.local.login] = "POST credentials to authenticate";
+			config.routes.post = config.routes.post || {};
+			config.routes.post[config.auth.local.login] = function ( req ) {
+				var args = array.cast( arguments );
+
+				if ( req.session === undefined ) {
+					req.sessionStore.get( req.sessionId, function ( session ) {
+						if ( req.session === undefined ) {
+							if ( session ) {
+								req.session = session;
+								req.session.save();
+							}
+							else {
+								req.session = {};
+							}
+
+							if ( parse( req.url ).pathname !== config.auth.local.login ) {
+								config.auth.local.auth.apply( obj, args );
+							}
+						} } );
+				}
+				else {
+					config.auth.local.auth.apply( obj, args );
+				}
+			};
+
+			obj.server.use( config.auth.local.middleware );
+		}
+	}
+
+	return config;
+}
 
 /**
  * Bootstraps an instance of Tenso
@@ -156,7 +388,16 @@ Tenso.prototype.respond = function ( req, res, arg, status, headers ) {
  * @param  {Object} config Application configuration
  * @return {Object}        Tenso instance
  */
-function bootstrap( obj, config ) {
+function bootstrap ( obj, config ) {
+	// Early middleware hook for rate limiting
+	if ( config.rate.enabled ) {
+		obj.server.use( function ( req, res, next ) {
+			rate( obj, req, res, next );
+		} );
+	}
+
+	// Bootstrapping configuration
+	config                = auth( obj, config );
 	config.headers        = config.headers || {};
 	config.headers.server = SERVER;
 
@@ -184,8 +425,8 @@ function bootstrap( obj, config ) {
 	}
 
 	// Starting API server
-	obj.server.start( config, function ( req, res, status ) {
-		error( obj.server, req, res, status, obj.messages[status] );
+	obj.server.start( config, function ( req, res, status, msg ) {
+		error( obj.server, req, res, status, msg || obj.messages[status] );
 	} );
 
 	return obj;
@@ -209,34 +450,25 @@ function error ( server, req, res, status, err ) {
  * @return {Object}    Tenso instance
  */
 function factory ( arg ) {
-	var HOSTNAME = arg ? arg.hostname || "localhost" : "localhost",
+	var hostname = arg ? arg.hostname || "localhost" : "localhost",
         vhosts   = {},
         config   = arg ? merge( clone( CONFIG, true ), arg ) : CONFIG,
-        auth, instance;
+        obj;
 
 	if ( !config.port ) {
 		console.error( "Invalid configuration" );
 		process.exit( 1 );
 	}
 
-	vhosts[HOSTNAME]  = "www";
+	vhosts[hostname]  = "www";
 	config.root       = __dirname + "/../";
 	config.vhosts     = vhosts;
-	config["default"] = HOSTNAME;
+	config["default"] = hostname;
 
-	if ( config.auth !== null ) {
-		auth = {};
-		auth[HOSTNAME] = {
-			authRealm : config.auth.realm || "Private",
-			authList  : config.auth.list  || config.auth
-		};
+	obj = new Tenso();
+	obj.hostname = hostname;
 
-		config.auth = auth;
-	}
-
-	instance = new Tenso();
-
-	return bootstrap( instance, config );
+	return bootstrap( obj, config );
 }
 
 /**
@@ -298,7 +530,7 @@ function hypermedia ( server, req, rep, headers ) {
 			array.each( array.keys( rep.data.result ), function ( i ) {
 				var collection, uri;
 
-				// If ID like keys are found, and are not URLs, they are assumed to be root collections
+				// If ID like keys are found, and are not URIs, they are assumed to be root collections
 				if ( /_(guid|uuid|id|url|uri)$/.test( i ) ) {
 					collection = i.replace( /_.*$/, "" ).replace( /s$/, "" ) + "s";
 					uri =/^(\w+\:\/\/)|\//.test( rep.data.result[i] ) ? ( rep.data.result[i].indexOf( "//" ) > -1 ? rep.data.result[i] : req.parsed.protocol + "//" + req.parsed.host + rep.data.result[i] ) : ( req.parsed.protocol + "//" + req.parsed.host + "/" + collection + "/" + rep.data.result[i] );
@@ -337,6 +569,34 @@ function prepare ( data, error, status ) {
 		error  : error ? ( error.stack || error.message || error ) : null,
 		status : status || 200
 	};
+}
+
+/**
+ * Rate limiting middleware
+ *
+ * @method rate
+ * @param  {Object}   obj  Tenso instance
+ * @param  {Object}   req  Client request
+ * @param  {Object}   res  Client response
+ * @param  {Function} next Next middleware
+ * @return {Undefined}     undefined
+ */
+function rate ( obj, req, res, next ) {
+	var headers = ["x-ratelimit-limit", "x-ratelimit-remaining", "x-ratelimit-reset"],
+	    results = obj.rate( req ),
+		valid   = results.shift(),
+	    config  = obj.server.config.rate;
+
+	array.each( headers, function ( i, idx ) {
+		res.setHeader( i, results[idx] );
+	} );
+
+	if ( valid ) {
+		next();
+	}
+	else {
+		obj.error( req, res, config.status || 429, config.message || "Too Many Requests" );
+	}
 }
 
 /**
@@ -388,7 +648,7 @@ module.exports = factory;
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a>
-		on Sun Aug 03 2014 09:31:03 GMT-0400 (EDT) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+		on Tue Aug 05 2014 07:30:25 GMT-0400 (EDT) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
 			</div>

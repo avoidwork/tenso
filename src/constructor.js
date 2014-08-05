@@ -39,19 +39,46 @@ Tenso.prototype.error = function ( req, res, status, arg ) {
  * @method rate
  * @memberOf Tenso
  * @param {Object} req Client request
- * @returns {Array}    Array of rate limit information `[total, remaining, reset]`
+ * @returns {Array}    Array of rate limit information `[valid, total, remaining, reset]`
  */
-Tenso.prototype.rate = function ( /*req*/ ) {
+Tenso.prototype.rate = function ( req ) {
 	var now       = new Date(),
-	    limit     = 0,
+		next_hour = parseInt( now.setHours( now.getHours() + 1 ) / 1000, 10 ),
+		config    = this.server.config.rate,
+		limit     = 0,
 		remaining = 0,
-		reset     = 0;
+		reset     = 0,
+		regex     = /Bearer /,
+		id        = req.headers.authorization ? req.headers.authorization.replace( regex, "" ) : req.sessionID || req.ip,
+		valid     = true,
+		state;
 
-	if ( reset === 0 ) {
-		reset = parseInt( now.setHours( now.getHours() + 1 ) / 1000, 10 );
+	if ( !this.rates[id] ) {
+		this.rates[id] = {
+			limit     : config.limit,
+			remaining : config.limit,
+			reset     : next_hour
+		};
 	}
 
-	return [limit, remaining, reset];
+	state     = this.rates[id];
+	limit     = state.limit;
+	remaining = state.remaining;
+	reset     = state.reset;
+
+	if ( next_hour - reset >= config.reset ) {
+		reset     = state.reset     = next_hour;
+		remaining = state.remaining = limit;
+	}
+	else if ( remaining > 0 ) {
+		state.remaining--;
+		remaining = state.remaining;
+	}
+	else {
+		valid = false;
+	}
+
+	return [valid, limit, remaining, reset];
 };
 
 /**

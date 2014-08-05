@@ -174,8 +174,8 @@ Rate limiting is controlled by configuration, and is disabled by default. Rate l
 {
 	"rate": {
 		"enabled": true,
-		"limit": 1000, /* Maximum requests before `reset` */
-		"reset": 3600, /* TTL in seconds */
+		"limit": 450, /* Maximum requests allowed before `reset` */
+		"reset": 900, /* TTL in seconds */
 		"status": 429, /* Optional HTTP status */
 		"message": "Too many requests"  /* Optional error message */
 	}

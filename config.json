@@ -39,8 +39,8 @@
 	},
 	"rate": {
 		"enabled": false,
-		"limit": 1000,
-		"reset": 3600,
+		"limit": 450,
+		"reset": 900,
 		"status": 429,
 		"message": "Too many requests"
 	}

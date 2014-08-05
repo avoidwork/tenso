@@ -43,6 +43,10 @@
 					<ul class="dropdown-menu ">
 						
 						<li>
+							<a href="global.html#auth">auth</a>
+						</li>
+						
+						<li>
 							<a href="global.html#bootstrap">bootstrap</a>
 						</li>
 						
@@ -60,6 +64,10 @@
 						
 						<li>
 							<a href="global.html#prepare">prepare</a>
+						</li>
+						
+						<li>
+							<a href="global.html#rate">rate</a>
 						</li>
 						
 						<li>
@@ -114,8 +122,9 @@
 <h2>Example</h2>
 <p>Creating an API with Tensō is as simple as three statements.</p>
 <pre><code class="lang-javascript">var tenso  = require( &quot;tenso&quot; ),
-    routes = require( &quot;./routes.js&quot; ),
-    app    = tenso( {routes: routes} );</code></pre>
+    routes = require( &quot;./routes.js&quot; );
+
+tenso( {routes: routes} );</code></pre>
 <h3>Creating Routes</h3>
 <p>Routes are loaded as a module, with each HTTP method as an export, affording a very customizable API server.</p>
 <p>Route handlers have the context of the Tensō server, i.e. <code>this</code> will allow you to send a response with <code>this.respond( req, res, body[, status, headers] )</code>.</p>
@@ -128,14 +137,16 @@ module.exports.get = {
         this.respond( req, res, new Error( &quot;TPS Cover Sheet not attached&quot; ), 785 );
     },
     &quot;/uuid&quot;: function ( req, res ) {
-        this.respond( req, res, uuid() );
+        this.respond( req, res, uuid(), 200, {&quot;cache-control&quot;: &quot;no-cache&quot;} );
     }
 }</code></pre>
+<h3>Request Helpers</h3>
+<p>Tensō decorates <code>req</code> with &quot;helpers&quot; such as <code>req.ip</code>, &amp; <code>req.parsed</code>. <code>PATCH</code>, <code>PUT</code>, &amp; <code>POST</code> payloads are available as <code>req.body</code>. Sessions are available as <code>req.session</code> when using <code>local</code> authentication.</p>
 <h2>Responses</h2>
 <p>Responses will have a standard shape. The result, and hypermedia will be in <code>data</code>. Hypermedia (pagination, links, etc.) will be in <code>data.link:[ {&quot;uri&quot;: &quot;...&quot;, &quot;rel&quot;: &quot;...&quot;}, ...]</code>, &amp; pagination will also be present via the <code>Link</code> HTTP header.
 The result will be in <code>data.result</code>.</p>
 <pre><code class="lang-json">{
-  &quot;data&quot;: {{ `null` or the response }},
+  &quot;data&quot;: {{ `null` or `{link: [], result: ?}` }},
   &quot;error&quot;: {{ `null` or an `Error` stack trace / message }},
   &quot;status&quot;: {{ HTTP status code }}
 }</code></pre>
@@ -144,10 +155,15 @@ The result will be in <code>data.result</code>.</p>
 relationships, and create the appropriate Objects in the <code>link</code> Array, as well as the <code>Link</code> HTTP header. Object keys that match this pattern: <code>/_(guid|uuid|id|uri|url)$/</code> will be considered
 hypermedia links.</p>
 <p>For example, if the key <code>user_id</code> was found, it would be mapped to <code>/users/:id</code> with a link <code>rel</code> of <code>related</code>.</p>
+<h2>Cache</h2>
+<p>Tensō has a robust multi-level cache strategy, starting at the response headers. If a response can be cached, an <code>Etag</code> will be sent to the <code>Client</code>, and registered in an <code>Etag LRU cache</code> which Tensō 
+uses along with a 'cache compressed asset to disk' strategy, allowing Tensō to stream the last known version of a resource to the next <code>Client</code> that supports the same compression (gzip or deflate).
+<code>Etags</code> will lazy expire from the cache, to minimize wasted cycles.</p>
+<p>Caching can be disabled by setting the <code>cache-control</code> header to a &quot;private&quot; or &quot;no cache&quot; directive (see the above <code>/uuid</code> example).</p>
 <h2>Configuration</h2>
 <p>This is a sample configuration for Tensō, without authentication or SSL. This would be ideal for development, but not production! Enabling SSL is as easy as providing file paths for the two keys.</p>
-<pre><code class="lang-json">{
-    &quot;auth&quot;: [&quot;username:password&quot;, ...] or {&quot;realm&quot;: &quot;Super Secret&quot;, &quot;list&quot;: [&quot;username:password&quot;, ...]} /* Optional */
+<pre><code class="lang-javascript">{
+    &quot;auth&quot;: /* Optional, see Authentication section */ 
     &quot;hostname&quot;: &quot;localhost&quot;, /* Optional, default is 'localhost' */
     &quot;port&quot;: 8000, /* Optional, default is 8000 */
     &quot;uid&quot;: N, /* Optional, system account uid to drop to after starting with elevated privileges to run on a low port */
@@ -163,10 +179,84 @@ hypermedia links.</p>
         &quot;cert&quot;: null
     }
 }</code></pre>
+<h2>Authentication</h2>
+<p>Planned authentication options include <code>OAuth2 (generic)</code>, <code>Twitter</code>, &amp; <code>Facebook</code>.</p>
+<h3>Basic Auth</h3>
+<p><code>Basic Auth</code> will be applied to the entire API if enabled.</p>
+<pre><code class="lang-javascript">{
+    &quot;auth&quot;: {
+        &quot;basic&quot;: {
+            &quot;enabled&quot;: true,
+            &quot;list&quot;: [&quot;username:password&quot;, ...],
+            &quot;realm&quot;: &quot;Private&quot; // `realm` is optional
+        }
+    }
+}</code></pre>
+<h3>Oauth2 Bearer Token</h3>
+<p>The <code>protect</code> Array is the endpoints that will be protected by <code>OAuth2 Bearer Tokens</code>.</p>
+<pre><code class="lang-javascript">{
+    &quot;auth&quot;: {
+        &quot;bearer&quot;: {
+            &quot;enabled&quot;: true,
+            &quot;tokens&quot;: [&quot;abc&quot;, ...]
+        },
+        &quot;protect&quot;: [&quot;/&quot;]
+    }
+}</code></pre>
+<h3>Local</h3>
+<p>The <code>protect</code> Array is the endpoints that will be protected by <code>local</code> authentication. Do not protect <code>/</code>, as it'll block the authentication end points.</p>
+<p><code>local</code> authentication will rely on sessions, so SSL is required for production servers.</p>
+<pre><code class="lang-javascript">{
+    &quot;auth&quot;: {
+        &quot;local&quot;: {
+            &quot;enabled&quot;: true,
+            &quot;auth&quot;: function ( req, res ) {
+                if ( !req.session.authorized ) {
+                    if ( ... ) {
+                        req.session.authorized = true;
+                    }
+                    else {
+                        req.session.authorized = false;
+                    }
+
+                    req.session.save();
+                }
+
+                if ( req.session.authorized ) {
+                    this.redirect( req, res, &quot;/stuff&quot; );
+                }
+                else {
+                    this.error( req, res, 401, &quot;Unauthorized&quot; );
+                }
+            },
+            &quot;middleware&quot;: function( req, res, next ) {
+                if ( req.session.authorized ) {
+                    next();
+                }
+                else {
+                    res.redirect( &quot;/login&quot; );
+                }
+            },
+            &quot;login&quot;: &quot;/login&quot;
+        }
+        &quot;protect&quot;: [&quot;/stuff&quot;]
+    }
+}</code></pre>
+<h2>Rate Limiting</h2>
+<p>Rate limiting is controlled by configuration, and is disabled by default. Rate limiting is based on <code>token</code>, <code>session</code>, or <code>ip</code>, depending upon authentication method.</p>
+<pre><code class="lang-javascript">{
+    &quot;rate&quot;: {
+        &quot;enabled&quot;: true,
+        &quot;limit&quot;: 450, /* Maximum requests allowed before `reset` */
+        &quot;reset&quot;: 900, /* TTL in seconds */
+        &quot;status&quot;: 429, /* Optional HTTP status */
+        &quot;message&quot;: &quot;Too many requests&quot;  /* Optional error message */
+    }
+}</code></pre>
 <h2>Logging</h2>
 <p>Standard log levels are supported, and are emitted (by configuration) to <code>stdout</code> &amp; <code>stderr</code>, &amp; <code>syslog</code>.</p>
 <h2>Dtrace</h2>
-<p>Dtrace probes can be enabled by configuration (disabled by default), and can be observed as <code>turtle-io</code>; Tensō is built on <code>turtle.io</code>.</p>
+<p>Dtrace probes can be enabled by configuration (disabled by default), and can be observed as <code>turtle-io</code>; Tensō is built on <a href="https://github.com/avoidwork/turtle.io">turtle.io</a>.</p>
 <pre><code>&quot;allowed&quot;,        &quot;char *&quot;, &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;
 &quot;allows&quot;,         &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;
 &quot;compress&quot;,       &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;
@@ -203,7 +293,7 @@ hypermedia links.</p>
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a>
-		on Sun Aug 03 2014 09:31:03 GMT-0400 (EDT) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+		on Tue Aug 05 2014 07:30:25 GMT-0400 (EDT) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
 			</div>

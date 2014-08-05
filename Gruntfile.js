@@ -24,6 +24,7 @@ module.exports = function (grunt) {
 					"src/factory.js",
 					"src/hypermedia.js",
 					"src/prepare.js",
+					"src/rate.js",
 					"src/response.js",
 					"src/outro.js"
 				],
@@ -103,7 +104,7 @@ module.exports = function (grunt) {
 
 	// aliases
 	grunt.registerTask("build", ["concat", "sed", "sass"]);
-	grunt.registerTask("test", ["mochaTest"]);
-	grunt.registerTask("default", ["build", "jshint"]);
+	grunt.registerTask("test", ["jshint", "mochaTest"]);
+	grunt.registerTask("default", ["build", "test"]);
 	grunt.registerTask("package", ["default", "test", "jsdoc"]);
 };

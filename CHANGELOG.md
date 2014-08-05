@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.3.0
+- Added rate limiting
+- Reverted a change to the Grunt file, such that 'test' runs jshint & mocha tests
+
 ## 0.2.0
 - Created `Tenso.redirect(req, res, uri)`, & `Tenso.error(req, res, status, arg)`
 - Added `local` authentication, which is controlled by config

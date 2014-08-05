@@ -105,11 +105,10 @@ function auth ( obj, config ) {
 			} )();
 		}
 		else if ( config.auth.local.enabled ) {
-			config.routes.get[config.auth.local.login] = "POST to authenticate"
+			config.routes.get[config.auth.local.login] = "POST credentials to authenticate";
 			config.routes.post = config.routes.post || {};
-			config.routes.post[config.auth.local.login] = function ( req, res ) {
-				var args = array.cast( arguments ),
-				    session;
+			config.routes.post[config.auth.local.login] = function ( req ) {
+				var args = array.cast( arguments );
 
 				if ( req.session === undefined ) {
 					req.sessionStore.get( req.sessionId, function ( session ) {
@@ -130,7 +129,8 @@ function auth ( obj, config ) {
 				else {
 					config.auth.local.auth.apply( obj, args );
 				}
-			}
+			};
+
 			obj.server.use( config.auth.local.middleware );
 		}
 	}

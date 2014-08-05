@@ -36,5 +36,9 @@
 	"ssl": {
 		"key": null,
 		"cert": null
+	},
+	"rate": {
+		"enabled": false,
+		"limit": 1000
 	}
 }

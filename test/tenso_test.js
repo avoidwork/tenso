@@ -376,7 +376,7 @@ describe("Local", function () {
 				.get("/login")
 				.expectStatus(200)
 				.expectValue("data.link", [])
-				.expectValue("data.result", "POST to authenticate")
+				.expectValue("data.result", "POST credentials to authenticate")
 				.expectValue("error", null)
 				.expectValue("status", 200)
 				.end(function(err) {

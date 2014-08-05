@@ -91,7 +91,7 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 ```
 
 ## Authentication
-Planned authentication options are `Basic Auth`, `OAuth2 Bearer Token`, `Twitter`, & `Facebook`.
+Planned authentication options include `OAuth2 (generic)`, `Twitter`, & `Facebook`.
 
 ### Basic Auth
 `Basic Auth` will be applied to the entire API if enabled.
@@ -166,6 +166,9 @@ The `protect` Array is the endpoints that will be protected by `local` authentic
 	}
 }
 ```
+
+## Rate Limiting
+Rate limiting is controlled by configuration, and is disabled by default.
 
 ## Logging
 Standard log levels are supported, and are emitted (by configuration) to `stdout` & `stderr`, & `syslog`.

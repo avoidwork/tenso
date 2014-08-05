@@ -18,7 +18,7 @@ tenso( {
 			tokens:["test-123"]
 		},
 		local: {
-			enabled: true,
+			enabled: false,
 			auth: function ( req, res ) {
 				var args = array.chunk( req.body.split( /&|=/ ), 2 );
 

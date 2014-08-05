@@ -12,3 +12,5 @@
 .travis.yml
 docstrap.json
 Gruntfile.js
+sample.js
+routes.js

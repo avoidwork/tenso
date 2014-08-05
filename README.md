@@ -131,9 +131,9 @@ The `protect` Array is the endpoints that will be protected by `local` authentic
 ```javascript
 {
 	"auth": {
-		local: {
-			enabled: true,
-			auth: function ( req, res ) {
+		"local": {
+			"enabled": true,
+			"auth": function ( req, res ) {
 				if ( !req.session.authorized ) {
 					if ( ... ) {
 						req.session.authorized = true;
@@ -152,7 +152,7 @@ The `protect` Array is the endpoints that will be protected by `local` authentic
 					this.error( req, res, 401, "Unauthorized" );
 				}
 			},
-			middleware: function( req, res, next ) {
+			"middleware": function( req, res, next ) {
 				if ( req.session.authorized ) {
 					next();
 				}
@@ -160,7 +160,7 @@ The `protect` Array is the endpoints that will be protected by `local` authentic
 					res.redirect( "/login" );
 				}
 			},
-			login: "/login"
+			"login": "/login"
 		}
 		"protect": ["/stuff"]
 	}

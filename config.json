@@ -39,6 +39,7 @@
 	},
 	"rate": {
 		"enabled": false,
-		"limit": 1000
+		"limit": 1000,
+		"reset": 3600
 	}
 }

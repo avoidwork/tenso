@@ -3,6 +3,9 @@
 ## 0.3.0
 - Added rate limiting
 - Reverted a change to the Grunt file, such that 'test' runs jshint & mocha tests
+- Updating turtle.io to 2.2.3 for a middleware fix
+- Creating `Tenso.rates` to store rate limiting data
+- Creating `Tenso.rates()` to be called from `rate()` middleware
 
 ## 0.2.0
 - Created `Tenso.redirect(req, res, uri)`, & `Tenso.error(req, res, status, arg)`

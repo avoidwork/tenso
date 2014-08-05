@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.2.0
+- Created `Tenso.redirect(req, res, uri)`, & `Tenso.error(req, res, status, arg)`
+- Added `local` authentication, which is controlled by config
+- Added `express-session` as a dependency, and enabled sessions
+- Updated turtle.io to gain `res.redirect()`
+
 ## 0.1.1
 - Decorating `hostname` on Tenso instance
 - Removed temp function that made it into a release

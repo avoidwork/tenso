@@ -19,8 +19,18 @@ function auth ( obj, config ) {
 		config.auth = tmp;
 	}
 	else {
+		var login;
+
+		array.each( array.keys( config.auth ), function ( i ) {
+			if ( i.enabled && i.login ) {
+				login = i.login;
+
+				return false;
+			}
+		} );
+
 		protect = ( config.auth.protect || [] ).map( function ( i ) {
-			return new RegExp( "^" + string.escape( i ), "i" );
+			return new RegExp( "^" + i !== login ? string.escape( i ) : "$", "i" );
 		} );
 
 		middleware = function ( req, res, next ) {
@@ -39,8 +49,18 @@ function auth ( obj, config ) {
 			}
 		};
 
+		obj.server.use( session( {
+			name: "tenso",
+			resave: true,
+			rolling: false,
+			saveUninitialized: false,
+			secret: config.session.key || uuid(),
+			cookie: {
+				maxAge: config.session.max_age || 60000
+			}
+		} ) );
+
 		obj.server.use( middleware );
-		obj.server.use( passport.initialize() );
 
 		if ( config.auth.bearer.enabled ) {
 			( function () {
@@ -60,6 +80,8 @@ function auth ( obj, config ) {
 						cb( new Error( "Bearer token list is empty" ), null );
 					}
 				};
+
+				obj.server.use( passport.initialize() );
 
 				passport.use( new BearerStrategy (
 					function( token, done ) {
@@ -81,6 +103,35 @@ function auth ( obj, config ) {
 
 				obj.server.use( passport.authenticate( "bearer", {session: false} ) );
 			} )();
+		}
+		else if ( config.auth.local.enabled ) {
+			config.routes.get[config.auth.local.login] = "POST to authenticate"
+			config.routes.post = config.routes.post || {};
+			config.routes.post[config.auth.local.login] = function ( req, res ) {
+				var args = array.cast( arguments ),
+				    session;
+
+				if ( req.session === undefined ) {
+					req.sessionStore.get( req.sessionId, function ( session ) {
+						if ( req.session === undefined ) {
+							if ( session ) {
+								req.session = session;
+								req.session.save();
+							}
+							else {
+								req.session = {};
+							}
+
+							if ( parse( req.url ).pathname !== config.auth.local.login ) {
+								config.auth.local.auth.apply( obj, args );
+							}
+						} } );
+				}
+				else {
+					config.auth.local.auth.apply( obj, args );
+				}
+			}
+			obj.server.use( config.auth.local.middleware );
 		}
 	}
 

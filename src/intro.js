@@ -11,5 +11,7 @@ var TurtleIO = require( "turtle.io" ),
     clone    = util.clone,
     iterate  = util.iterate,
     merge    = util.merge,
+    uuid     = util.uuid,
+    session  = require( "express-session" ),
     passport = require( "passport" ),
     BearerStrategy  = require( "passport-http-bearer" ).Strategy;

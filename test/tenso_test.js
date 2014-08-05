@@ -1,12 +1,18 @@
 var expect = require('chai').expect,
     hippie = require( "hippie" ),
     tenso  = require( "../lib/tenso" ),
-    routes = require( "./routes.js" );
+    routes = require( "./routes.js" ),
+	array  = require( "keigai" ).util.array;
 
 function api ( port, not_json ) {
 	var obj = hippie().base("http://localhost:" + port)
 
 	return not_json ? obj : obj.expectHeader("Content-Type", "application/json").json();
+}
+
+function persistCookies ( opts, next ) {
+	opts.jar = true;
+	next( opts );
 }
 
 describe("Permissions", function () {
@@ -298,4 +304,134 @@ describe("OAuth2 Token Bearer", function () {
 				} );
 		} );
 	} );
+});
+
+describe("Local", function () {
+	var port = 8006;
+
+	tenso( {
+		port: port,
+		routes: require( "./routes.js" ),
+		logs: {
+			level: "error",
+			dtrace: true,
+			stderr: true
+		},
+		auth: {
+			protect: ["/uuid"],
+			local: {
+				enabled: true,
+				auth: function ( req, res ) {
+					var args = req.body ? array.chunk( req.body.split( /&|=/ ), 2 ) : [];
+					if ( !req.session.authorized ) {
+						if ( args.length > 0 && args[0][1] == "test" && args[1][1] == "123" ) {
+							req.session.authorized = true;
+						}
+						else {
+							req.session.authorized = false;
+						}
+
+						req.session.save();
+					}
+
+					if ( req.session.authorized ) {
+						this.redirect( req, res, "/uuid" );
+					}
+					else {
+						this.error( req, res, 401, "Unauthorized" );
+					}
+				},
+				middleware: function( req, res, next ) {
+					if ( req.url !== "/login" ) {
+						if ( req.session.authorized ) {
+							next();
+						}
+
+						res.error( "Unauthorized", 401 );
+					}
+				},
+				login: "/login"
+			}
+		}
+	} );
+
+	describe("GET /uuid (invalid)", function () {
+		it("returns an 'unauthorized' error", function (done) {
+			api( port )
+				.get("/uuid")
+				.expectStatus(401)
+				.expectValue("data", null)
+				.expectValue("error", "Unauthorized")
+				.expectValue("status", 401)
+				.end(function(err) {
+					if (err) throw err;
+					done();
+				});
+		});
+	});
+
+	describe("GET /login", function () {
+		it("returns an authentication message", function (done) {
+			api( port )
+				.get("/login")
+				.expectStatus(200)
+				.expectValue("data.link", [])
+				.expectValue("data.result", "POST to authenticate")
+				.expectValue("error", null)
+				.expectValue("status", 200)
+				.end(function(err) {
+					if (err) throw err;
+					done();
+				});
+		});
+	});
+
+	describe("POST /login (invalid)", function () {
+		it("returns an 'unauthorized' error", function (done) {
+			api( port )
+				.post("/login")
+				.form()
+				.send({username:"test", password:1232})
+				.expectStatus(401)
+				.expectValue("data", null)
+				.expectValue("error", "Unauthorized")
+				.expectValue("status", 401)
+				.end(function(err) {
+					if (err) throw err;
+					done();
+				});
+		});
+	});
+
+	describe("POST /login", function () {
+		it("redirects to a predetermined URI", function (done) {
+			api( port, true )
+				.post("/login")
+				.form()
+				.send({username:"test", password:123})
+				.expectStatus(302)
+				.expectHeader("Location", "/uuid")
+				.use(persistCookies)
+				.end(function(err) {
+					if (err) throw err;
+					done();
+				});
+		});
+	});
+
+	describe("GET /uuid (session)", function () {
+		it("returns a version 4 uuid", function (done) {
+			api( port )
+				.get("/uuid")
+				.expectStatus(200)
+				.expectValue("data.link", [])
+				.expectValue("error", null)
+				.expectValue("status", 200)
+				.use(persistCookies)
+				.end(function(err) {
+					if (err) throw err;
+					done();
+				});
+		});
+	});
 });

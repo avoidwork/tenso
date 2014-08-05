@@ -70,7 +70,7 @@ Caching can be disabled by setting the `cache-control` header to a "private" or 
 ## Configuration
 This is a sample configuration for Tensō, without authentication or SSL. This would be ideal for development, but not production! Enabling SSL is as easy as providing file paths for the two keys.
 
-```json
+```javascript
 {
 	"auth": /* Optional, see Authentication section */ 
 	"hostname": "localhost", /* Optional, default is 'localhost' */
@@ -96,7 +96,7 @@ Planned authentication options are `Basic Auth`, `OAuth2 Bearer Token`, `Twitter
 ### Basic Auth
 `Basic Auth` will be applied to the entire API if enabled.
 
-```json
+```javascript
 {
 	"auth": {
 		"basic": {
@@ -111,7 +111,7 @@ Planned authentication options are `Basic Auth`, `OAuth2 Bearer Token`, `Twitter
 ### Oauth2 Bearer Token
 The `protect` Array is the endpoints that will be protected by `OAuth2 Bearer Tokens`.
 
-```json
+```javascript
 {
 	"auth": {
 		"bearer": {
@@ -119,6 +119,50 @@ The `protect` Array is the endpoints that will be protected by `OAuth2 Bearer To
 			"tokens": ["abc", ...]
 		},
 		"protect": ["/"]
+	}
+}
+```
+
+### Local
+The `protect` Array is the endpoints that will be protected by `local` authentication. Do not protect `/`, as it'll block the authentication end points.
+
+`local` authentication will rely on sessions, so SSL is required for production servers.
+
+```javascript
+{
+	"auth": {
+		local: {
+			enabled: true,
+			auth: function ( req, res ) {
+				if ( !req.session.authorized ) {
+					if ( ... ) {
+						req.session.authorized = true;
+					}
+					else {
+						req.session.authorized = false;
+					}
+
+					req.session.save();
+				}
+
+				if ( req.session.authorized ) {
+					this.redirect( req, res, "/stuff" );
+				}
+				else {
+					this.error( req, res, 401, "Unauthorized" );
+				}
+			},
+			middleware: function( req, res, next ) {
+				if ( req.session.authorized ) {
+					next();
+				}
+				else {
+					res.redirect( "/login" );
+				}
+			},
+			login: "/login"
+		}
+		"protect": ["/stuff"]
 	}
 }
 ```

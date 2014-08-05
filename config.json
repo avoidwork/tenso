@@ -9,6 +9,17 @@
 			"enabled": false,
 			"tokens": []
 		},
+		"local": {
+			"enabled": false,
+			"callback": null,
+			"login": "/login"
+		},
+		"twitter": {
+			"enabled": false,
+			"consumer_key": "",
+			"consumer_secret": "",
+			"callback_url": ""
+		},
 		"protect": ["/"]
 	},
 	"hostname": "localhost",
@@ -17,6 +28,10 @@
 	"logs": {
 		"dtrace": false,
 		"syslog": false
+	},
+	"session": {
+		"key": "",
+		"max_age": 60000
 	},
 	"ssl": {
 		"key": null,

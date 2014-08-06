@@ -182,6 +182,16 @@ Rate limiting is controlled by configuration, and is disabled by default. Rate l
 }
 ```
 
+## Limiting upload size
+A 'max byte' limit can be enforced on all routes that handle `PATCH`, `POST`, & `PUT` requests. The default limit is 1 MB (1048576 b).
+
+```javascript
+{
+	"maxBytes": 5242880
+}
+```
+
+
 ## Logging
 Standard log levels are supported, and are emitted (by configuration) to `stdout` & `stderr`, & `syslog`.
 

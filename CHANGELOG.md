@@ -2,6 +2,7 @@
 
 ## 0.3.1
 - Added `maxBytes` configuration flag to enforce limits on `PATCH`, `POST`, & `PUT` requests, added a test
+- Set `maxBytes` to a default of 1 MB
 - Upgraded turtle.io to 2.2.4
 
 ## 0.3.0

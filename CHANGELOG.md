@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.3.1
+- Added `maxBytes` configuration flag to enforce limits on `PATCH`, `POST`, & `PUT` requests, added a test
+- Upgraded turtle.io to 2.2.4
+
 ## 0.3.0
 - Added rate limiting
 - Reverted a change to the Grunt file, such that 'test' runs jshint & mocha tests

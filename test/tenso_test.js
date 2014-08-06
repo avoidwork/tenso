@@ -493,3 +493,43 @@ describe("Rate Limiting", function () {
 		} );
 	} );
 });
+
+
+describe("Request body max byte size", function () {
+	var port = 8008;
+
+	tenso( {port: port, routes: routes, logs: {level: "error"}, maxBytes: 2} );
+
+	describe( "POST /test", function () {
+		it( "returns an a result", function ( done ) {
+			api( port )
+				.post( "/test" )
+				.expectStatus( 200 )
+				.expectValue( "data.link", [] )
+				.expectValue( "data.result", "OK!" )
+				.expectValue( "error", null )
+				.expectValue( "status", 200 )
+				.end( function ( err ) {
+					if ( err ) throw err;
+					done();
+				} );
+		} );
+	} );
+
+	describe( "POST /test (invalid)", function () {
+		it( "returns a 'request entity too large' error", function ( done ) {
+			api( port, true )
+				.post( "/test" )
+				.form()
+				.send({"abc": true})
+				.expectStatus(413)
+				//.expectValue("data", null)
+				//.expectValue("error", "Request Entity Too Large")
+				//.expectValue("status", 413)
+				.end( function ( err ) {
+					if ( err ) throw err;
+					done();
+				} );
+		} );
+	} );
+})

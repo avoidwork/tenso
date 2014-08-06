@@ -9,3 +9,9 @@ module.exports.get = {
 	},
 	"/something": {"user_id": 123, "title": "This is a title", "body": "Where is my body?", "source_url": "http://source.tld"}
 }
+
+module.exports.post = {
+	"/test": function ( req, res ) {
+		this.respond( req, res, "OK!" );
+	}
+}

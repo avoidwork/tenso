@@ -29,6 +29,7 @@
 		"dtrace": false,
 		"syslog": false
 	},
+	"maxBytes": 0,
 	"session": {
 		"key": "",
 		"max_age": 60000

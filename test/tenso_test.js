@@ -477,15 +477,14 @@ describe("Rate Limiting", function () {
 		} );
 	} );
 
-	/* Why are the asserts failing, due to the noop parse? - why is it used? */
 	describe( "GET /", function () {
 		it( "returns a 'too many requests' error", function ( done ) {
 			api( port, true )
 				.get( "/" )
 				.expectStatus( 429 )
-				//.expectValue("data", null)
-				//.expectValue("error", "Too Many Requests")
-				//.expectValue("status", 429)
+				.expectValue("data", null)
+				.expectValue("error", "Too Many Requests")
+				.expectValue("status", 429)
 				.end( function ( err ) {
 					if ( err ) throw err;
 					done();
@@ -523,9 +522,9 @@ describe("Request body max byte size", function () {
 				.form()
 				.send({"abc": true})
 				.expectStatus(413)
-				//.expectValue("data", null)
-				//.expectValue("error", "Request Entity Too Large")
-				//.expectValue("status", 413)
+				.expectValue("data", null)
+				.expectValue("error", "Request Entity Too Large")
+				.expectValue("status", 413)
 				.end( function ( err ) {
 					if ( err ) throw err;
 					done();

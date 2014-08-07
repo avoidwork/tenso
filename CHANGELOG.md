@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.3.2
+- Disabled compression when SSL is enabled
+- Fixed wildcards in `protect` Array under `auth`
+
 ## 0.3.1
 - Added `maxBytes` configuration flag to enforce limits on `PATCH`, `POST`, & `PUT` requests, added a test
 - Set `maxBytes` to a default of 1 MB

@@ -30,7 +30,7 @@ function auth ( obj, config ) {
 		} );
 
 		protect = ( config.auth.protect || [] ).map( function ( i ) {
-			return new RegExp( "^" + i !== login ? string.escape( i ) : "$", "i" );
+			return new RegExp( "^" + i !== login ? i : "$", "i" );
 		} );
 
 		middleware = function ( req, res, next ) {

@@ -42,6 +42,12 @@ function bootstrap ( obj, config ) {
 		} );
 	}
 
+	// Disabling compression over SSL due to BREACH
+	if ( config.ssl.cert && config.ssl.key ) {
+		config.compress = false;
+		obj.server.log( "Compression over SSL is disabled for your protection", "debug" );
+	}
+
 	// Starting API server
 	obj.server.start( config, function ( req, res, status, msg ) {
 		error( obj.server, req, res, status, msg || obj.messages[status] );

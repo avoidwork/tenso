@@ -22,6 +22,8 @@
 		},
 		"protect": ["/"]
 	},
+	"cache": 1000,
+	"compress": true,
 	"hostname": "localhost",
 	"port": 8000,
 	"routes": null,

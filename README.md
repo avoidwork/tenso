@@ -77,6 +77,9 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 	"port": 8000, /* Optional, default is 8000 */
 	"uid": N, /* Optional, system account uid to drop to after starting with elevated privileges to run on a low port */
 	"routes": require( "./routes.js" ), /* Required! */
+	"cache": 1000, /* Optional, size of Etag LRU cache */
+	"compress": false, /* Optional, enabled by default, disabled with SSL */
+	"headers: { ... }, /* Optional, custom headers */
 	"logs": { /* Optional */
 		"level": "info",
 		"stdout": true,
@@ -167,6 +170,9 @@ The `protect` Array is the endpoints that will be protected by `local` authentic
 }
 ```
 
+## Compression
+Compression is enabled by default, for Clients that support `gzip` or `deflate`. Compression will be disabled if `SSL` is enabled.
+
 ## Rate Limiting
 Rate limiting is controlled by configuration, and is disabled by default. Rate limiting is based on `token`, `session`, or `ip`, depending upon authentication method.
 
@@ -190,7 +196,6 @@ A 'max byte' limit can be enforced on all routes that handle `PATCH`, `POST`, & 
 	"maxBytes": 5242880
 }
 ```
-
 
 ## Logging
 Standard log levels are supported, and are emitted (by configuration) to `stdout` & `stderr`, & `syslog`.

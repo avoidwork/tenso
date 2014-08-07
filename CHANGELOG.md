@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.3.4
+- Updating `config.json` with more options of `turtle.io`
+- Upgrading turtle.io to gain `accept: application/json; indent=n` driven pretty JSON
+
+## 0.3.3
+- Correcting the wildcard handling (forgot a case)
+
 ## 0.3.2
 - Disabled compression when SSL is enabled
 - Fixed wildcards in `protect` Array under `auth`

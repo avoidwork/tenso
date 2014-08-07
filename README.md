@@ -42,7 +42,7 @@ module.exports.get = {
 Tensō decorates `req` with "helpers" such as `req.ip`, & `req.parsed`. `PATCH`, `PUT`, & `POST` payloads are available as `req.body`. Sessions are available as `req.session` when using `local` authentication.
 
 ## Responses
-Responses will have a standard shape. The result, and hypermedia will be in `data`. Hypermedia (pagination, links, etc.) will be in `data.link:[ {"uri": "...", "rel": "..."}, ...]`, & pagination will also be present via the `Link` HTTP header.
+Responses will have a standard shape, and will be utf-8 by default. The result, and hypermedia will be in `data`. Hypermedia (pagination, links, etc.) will be in `data.link:[ {"uri": "...", "rel": "..."}, ...]`, & pagination will also be present via the `Link` HTTP header.
 The result will be in `data.result`.
 
 ```json
@@ -72,24 +72,25 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 
 ```javascript
 {
-	"auth": /* Optional, see Authentication section */ 
-	"hostname": "localhost", /* Optional, default is 'localhost' */
-	"port": 8000, /* Optional, default is 8000 */
-	"uid": N, /* Optional, system account uid to drop to after starting with elevated privileges to run on a low port */
-	"routes": require( "./routes.js" ), /* Required! */
+	"auth": /* Optional, see Authentication section */
 	"cache": 1000, /* Optional, size of Etag LRU cache */
 	"compress": false, /* Optional, enabled by default, disabled with SSL */
-	"headers: { ... }, /* Optional, custom headers */
+	"headers": { ... }, /* Optional, custom headers */
+	"hostname": "localhost", /* Optional, default is 'localhost' */
+	"json": 2, /* Optional, default indent for 'pretty' JSON */
 	"logs": { /* Optional */
 		"level": "info",
 		"stdout": true,
 		"dtrace": false,
 		"syslog": false
 	},
+	"port": 8000, /* Optional, default is 8000 */
+	"routes": require( "./routes.js" ), /* Required! */
 	"ssl": { /* Optional */
 		"key": null,
 		"cert": null
-	}
+	},
+	"uid": N /* Optional, system account uid to drop to after starting with elevated privileges to run on a low port */
 }
 ```
 

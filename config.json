@@ -25,13 +25,14 @@
 	"cache": 1000,
 	"compress": true,
 	"hostname": "localhost",
-	"port": 8000,
-	"routes": null,
+	"json": 2,
 	"logs": {
 		"dtrace": false,
 		"syslog": false
 	},
 	"maxBytes": 1048576,
+	"port": 8000,
+	"routes": null,
 	"session": {
 		"key": "",
 		"max_age": 60000

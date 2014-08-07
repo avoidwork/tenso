@@ -479,12 +479,12 @@ describe("Rate Limiting", function () {
 
 	describe( "GET /", function () {
 		it( "returns a 'too many requests' error", function ( done ) {
-			api( port, true )
+			api( port )
 				.get( "/" )
 				.expectStatus( 429 )
-				//.expectValue("data", null)
-				//.expectValue("error", "Too Many Requests")
-				//.expectValue("status", 429)
+				.expectValue("data", null)
+				.expectValue("error", "Too many requests")
+				.expectValue("status", 429)
 				.end( function ( err ) {
 					if ( err ) throw err;
 					done();
@@ -517,14 +517,13 @@ describe("Request body max byte size", function () {
 
 	describe( "POST /test (invalid)", function () {
 		it( "returns a 'request entity too large' error", function ( done ) {
-			api( port, true )
+			api( port )
 				.post( "/test" )
-				.form()
 				.send({"abc": true})
 				.expectStatus(413)
-				//.expectValue("data", null)
-				//.expectValue("error", "Request Entity Too Large")
-				//.expectValue("status", 413)
+				.expectValue("data", null)
+				.expectValue("error", "Request Entity Too Large")
+				.expectValue("status", 413)
 				.end( function ( err ) {
 					if ( err ) throw err;
 					done();

@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.3.5
+- Fixed tests
+
 ## 0.3.4
 - Updating `config.json` with more options of `turtle.io`
 - Upgrading turtle.io to gain `accept: application/json; indent=n` driven pretty JSON

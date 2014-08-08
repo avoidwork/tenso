@@ -95,7 +95,7 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 ```
 
 ## Authentication
-The `protect` Array is the endpoints that will require authentication. Planned authentication options include `OAuth2 (generic)`, `Twitter`, `Facebook`, & `LinkedIn`.
+The `protect` Array is the endpoints that will require authentication. Planned authentication options are `Twitter`, & `LinkedIn`.
 
 ### Basic Auth
 ```javascript
@@ -106,6 +106,25 @@ The `protect` Array is the endpoints that will require authentication. Planned a
 			"list": ["username:password", ...],
 		},
 		"protect": ["/"]
+	}
+}
+```
+
+### Facebook
+Facebook authentication will create `/auth`, & `/auth/facebook` routes. `auth(accessToken, refreshToken, profile, callback)` must execute `callback(err, user)`.
+ 
+```javascript
+{
+	"auth": {
+		"facebook": {
+			"enabled": true,
+			"auth": function ( ... ) { ... }, /* Authencation handler, to 'find' or 'create' a User */
+			"consumer_key": "", /* Get this from Facebook */
+			"consumer_secret": "", /* Get this from Facebook */
+			"callback_url": "" /* This must match your application in Facebook */
+			"login": "/login" /* Path to redirect to on failed authentication */
+		},
+		"protect": ["/private"]
 	}
 }
 ```

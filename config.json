@@ -9,9 +9,17 @@
 			"enabled": false,
 			"tokens": []
 		},
+		"facebook": {
+			"enabled": false,
+			"auth": null,
+			"consumer_key": "",
+			"consumer_secret": "",
+			"callback_url": "",
+			"login": "/login"
+		},
 		"local": {
 			"enabled": false,
-			"callback": null,
+			"auth": null,
 			"login": "/login"
 		},
 		"twitter": {

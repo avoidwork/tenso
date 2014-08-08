@@ -7,7 +7,7 @@
  * @return {Object}        Updated Tenso configuration
  */
 function auth ( obj, config ) {
-	var middleware, login, protect;
+	var login;
 
 	array.each( array.keys( config.auth ), function ( i ) {
 		if ( i.enabled && i.login ) {
@@ -16,26 +16,6 @@ function auth ( obj, config ) {
 			return false;
 		}
 	} );
-
-	protect = ( config.auth.protect || [] ).map( function ( i ) {
-		return new RegExp( "^" + i !== login ? i.replace( /\.\*/g, "*" ).replace( /\*/g, ".*" ) : "$", "i" );
-	} );
-
-	middleware = function ( req, res, next ) {
-		var uri      = req.parsed.pathname,
-			protectd = false;
-
-		array.each( protect, function ( regex ) {
-			if ( regex.test( uri ) ) {
-				protectd = true;
-				return false;
-			}
-		} );
-
-		if ( protectd && next ) {
-			next();
-		}
-	};
 
 	obj.server.use( session( {
 		name: "tenso",
@@ -48,7 +28,9 @@ function auth ( obj, config ) {
 		}
 	} ) );
 
-	obj.server.use( middleware );
+	obj.server.use( zuul( ( config.auth.protect || [] ).map( function ( i ) {
+		return new RegExp( "^" + i !== login ? i.replace( /\.\*/g, "*" ).replace( /\*/g, ".*" ) : "$", "i" );
+	} ) ) );
 
 	if ( config.auth.basic.enabled ) {
 		( function () {
@@ -131,6 +113,32 @@ function auth ( obj, config ) {
 
 			obj.server.use( passport.authenticate( "bearer", {session: false} ) );
 		} )();
+	}
+	else if ( config.auth.facebook.enabled ) {
+		obj.server.use( passport.initialize() );
+
+		passport.use( new FacebookStrategy ( {
+				clientID: config.auth.facebook.client_id,
+				clientSecret: config.auth.facebook.client_secret,
+				callbackURL: config.auth.facebook.callback_url
+			}, function( accessToken, refreshToken, profile, done ) {
+				config.augh.facebook.auth( accessToken, refreshToken, profile, function( err, user ) {
+					if ( err ) {
+						return done( err );
+					}
+
+					done( null, user );
+				} );
+			}
+		) );
+
+		config.routes.get["/auth"]          = ["/auth/facebook"];
+		config.routes.get["/auth/facebook"] = passport.authenticate( "facebook" );
+
+		obj.server.use( config.auth.facebook.callback_url, passport.authenticate( "facebook", {
+			successRedirect: "/",
+			failureRedirect: login || "/login"
+		} ) );
 	}
 	else if ( config.auth.local.enabled ) {
 		config.routes.get[config.auth.local.login] = "POST credentials to authenticate";

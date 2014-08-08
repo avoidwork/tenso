@@ -48,7 +48,7 @@ Tenso.prototype.rate = function ( req ) {
 		limit     = 0,
 		remaining = 0,
 		reset     = 0,
-		regex     = /Bearer /,
+		regex     = /(Basic|Bearer)\s/,
 		id        = req.headers.authorization ? req.headers.authorization.replace( regex, "" ) : req.sessionID || req.ip,
 		valid     = true,
 		state;

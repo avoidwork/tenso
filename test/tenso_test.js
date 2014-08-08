@@ -2,7 +2,7 @@ var expect = require('chai').expect,
     hippie = require( "hippie" ),
     tenso  = require( "../lib/tenso" ),
     routes = require( "./routes.js" ),
-	array  = require( "keigai" ).util.array;
+    array  = require( "keigai" ).util.array;
 
 function api ( port, not_json ) {
 	var obj = hippie().base("http://localhost:" + port)
@@ -239,7 +239,7 @@ describe("Hypermedia", function () {
 describe("Basic Auth", function () {
 	var port = 8004;
 
-	tenso( {port: port, routes: routes, logs: {level: "error"}, auth: {basic: {enabled: true, list:["test:123"]}}} );
+	tenso( {port: port, routes: routes, logs: {level: "error"}, auth: {basic: {enabled: true, list:["test:123"]}, protect: ["/"]}} );
 
 	describe( "GET /", function () {
 		it( "returns an array of endpoints (authorized)", function ( done ) {

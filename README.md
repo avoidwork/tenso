@@ -95,26 +95,22 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 ```
 
 ## Authentication
-Planned authentication options include `OAuth2 (generic)`, `Twitter`, & `Facebook`.
+The `protect` Array is the endpoints that will require authentication. Planned authentication options include `OAuth2 (generic)`, `Twitter`, `Facebook`, & `LinkedIn`.
 
 ### Basic Auth
-`Basic Auth` will be applied to the entire API if enabled.
-
 ```javascript
 {
 	"auth": {
 		"basic": {
 			"enabled": true,
 			"list": ["username:password", ...],
-			"realm": "Private" // `realm` is optional
-		}
+		},
+		"protect": ["/"]
 	}
 }
 ```
 
 ### Oauth2 Bearer Token
-The `protect` Array is the endpoints that will be protected by `OAuth2 Bearer Tokens`.
-
 ```javascript
 {
 	"auth": {
@@ -128,9 +124,7 @@ The `protect` Array is the endpoints that will be protected by `OAuth2 Bearer To
 ```
 
 ### Local
-The `protect` Array is the endpoints that will be protected by `local` authentication. Do not protect `/`, as it'll block the authentication end points.
-
-`local` authentication will rely on sessions, so SSL is required for production servers.
+Do not protect `/`, as it'll block the authentication end points. `local` authentication will rely on sessions, so SSL is required for production servers.
 
 ```javascript
 {
@@ -166,7 +160,7 @@ The `protect` Array is the endpoints that will be protected by `local` authentic
 			},
 			"login": "/login"
 		}
-		"protect": ["/stuff"]
+		"protect": ["/private"]
 	}
 }
 ```

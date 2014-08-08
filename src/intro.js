@@ -14,4 +14,5 @@ var TurtleIO = require( "turtle.io" ),
     uuid     = util.uuid,
     session  = require( "express-session" ),
     passport = require( "passport" ),
+    BasicStrategy = require( "passport-http" ).BasicStrategy,
     BearerStrategy  = require( "passport-http-bearer" ).Strategy;

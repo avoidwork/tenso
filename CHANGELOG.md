@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.3.6
+- Upgraded turtle.io to 2.3.0
+- Refactored `Basic Auth` to use `passport`
+
 ## 0.3.5
 - Fixed tests
 

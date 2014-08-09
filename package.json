@@ -29,14 +29,15 @@
   },
   "dependencies": {
     "keigai": "0.6.1",
-    "turtle.io": "2.3.0",
+    "turtle.io": "2.3.2",
     "express-session": "^1.7.2",
     "passport": "0.2.0",
     "passport-facebook": "1.0.3",
     "passport-google": "0.3.0",
     "passport-http": "0.2.2",
     "passport-http-bearer": "1.0.1",
-    "passport-twitter": "1.0.2"
+    "passport-twitter": "1.0.2",
+    "http-sync": "0.0.5"
   },
   "devDependencies": {
     "grunt-cli": "~0.1.13",

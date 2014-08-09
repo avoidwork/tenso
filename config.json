@@ -42,7 +42,7 @@
 	},
 	"cache": 1000,
 	"compress": true,
-	"hostname": "localhost",
+	"hostname": "127.0.0.1",
 	"json": 2,
 	"logs": {
 		"dtrace": false,

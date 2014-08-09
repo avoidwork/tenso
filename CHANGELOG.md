@@ -5,6 +5,8 @@
 - Added `LinkedIn` authentication
 - Fixed the `RegExp` used to retrieve the rate limit id from the `authorization` header
 - Moved authentication gateway middleware into `zuul()`, & fixed what it tests
+- Fixed `prepare()` by cloning the response body
+- Changed default host to `127.0.0.1`
 
 ## 0.3.6
 - Upgraded turtle.io to 2.3.0

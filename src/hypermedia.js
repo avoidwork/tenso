@@ -65,6 +65,10 @@ function hypermedia ( server, req, rep, headers ) {
 					delete rep.data.result[i];
 				}
 			} );
+
+			if ( array.keys( rep.data.result ).length === 0 ) {
+				rep.data.result = null;
+			}
 		}
 
 		if ( rep.data.link !== undefined && rep.data.link.length > 0 ) {

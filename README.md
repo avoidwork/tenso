@@ -117,7 +117,7 @@ Facebook authentication will create `/auth`, `/auth/facebook`, & `/auth/facebook
 			"enabled": true,
 			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
 			"client_id": "", /* Get this from Facebook */
-			"client_secret": "", /* Get this from Facebook */
+			"client_secret": "" /* Get this from Facebook */
 		},
 		"protect": ["/private"],
 		"login": "/login" /* Path to redirect to on failed authentication */
@@ -152,7 +152,7 @@ available as `req.session.user` in custom routes.
 			"enabled": true,
 			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
 			"api_key": "", /* Get this from LinkedIn */
-			"api_secret": /* Get this from LinkedIn */,
+			"api_secret": "", /* Get this from LinkedIn */,
 			"scope": "" /* Optional, permission scope */
 		}
 		"protect": ["/private"],
@@ -171,7 +171,7 @@ Twitter authentication will create `/auth`, `/auth/twitter`, & `/auth/twitter/ca
 			"enabled": true,
 			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
 			"consumer_key": "", /* Get this from Twitter */
-			"consumer_secret": "", /* Get this from Twitter */
+			"consumer_secret": "" /* Get this from Twitter */
 		},
 		"protect": ["/private"],
 		"login": "/login" /* Path to redirect to on failed authentication */

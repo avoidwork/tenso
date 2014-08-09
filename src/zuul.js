@@ -7,8 +7,8 @@
  */
 function zuul ( protect ) {
 	return function ( req, res, next ) {
-		var uri = req.parsed.pathname,
-			protectd = false;
+		var uri      = req.parsed.path,
+		    protectd = false;
 
 		array.each( protect, function ( regex ) {
 			if ( regex.test( uri ) ) {

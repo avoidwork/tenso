@@ -4,6 +4,7 @@
 - Added `Facebook` authentication via `passport`
 - Fixed the `RegExp` used to retrieve the rate limit id from the `authorization` header
 - Moved authentication gateway middleware into `zuul()`
+- Fixed what `zuul()` tests
 
 ## 0.3.6
 - Upgraded turtle.io to 2.3.0

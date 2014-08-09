@@ -8,13 +8,10 @@ Tensō will handle the serialization & creation of hypermedia links, all you hav
 [![build status](https://secure.travis-ci.org/avoidwork/tenso.svg)](http://travis-ci.org/avoidwork/tenso)
 
 ## Example
-Creating an API with Tensō is as simple as three statements.
+Creating an API with Tensō can be as simple as one statement.
 
 ```javascript
-var tenso  = require( "tenso" ),
-    routes = require( "./routes.js" );
-
-tenso( {routes: routes} );
+require( "tenso" )( {routes: require( __dirname + "/routes.js" )} );
 ```
 
 ### Creating Routes
@@ -95,7 +92,7 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 ```
 
 ## Authentication
-The `protect` Array is the endpoints that will require authentication. `LinkedIn` support is planned.
+The `protect` Array is the endpoints that will require authentication. Some authentication methods rely on sessions.
 
 ### Basic Auth
 ```javascript
@@ -111,7 +108,7 @@ The `protect` Array is the endpoints that will require authentication. `LinkedIn
 ```
 
 ### Facebook
-Facebook authentication will create `/auth`, & `/auth/facebook` routes. `auth(accessToken, refreshToken, profile, callback)` must execute `callback(err, user)`.
+Facebook authentication will create `/auth`, `/auth/facebook`, & `/auth/facebook/callback` routes. `auth(accessToken, refreshToken, profile, callback)` must execute `callback(err, user)`.
  
 ```javascript
 {
@@ -121,16 +118,15 @@ Facebook authentication will create `/auth`, & `/auth/facebook` routes. `auth(ac
 			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
 			"client_id": "", /* Get this from Facebook */
 			"client_secret": "", /* Get this from Facebook */
-			"callback_url": "" /* Get this from Facebook */
-			"login": "/login" /* Path to redirect to on failed authentication */
 		},
-		"protect": ["/private"]
+		"protect": ["/private"],
+		"login": "/login" /* Path to redirect to on failed authentication */
 	}
 }
 ```
 
 ### Google
-Google authentication will create `/auth`, `/auth/google`, & `/auth/google/return` routes. `auth(identifier, profile, callback)` must execute `callback(err, user)`.
+Google authentication will create `/auth`, `/auth/google`, & `/auth/google/callback` routes. `auth(identifier, profile, callback)` must execute `callback(err, user)`.
  
 ```javascript
 {
@@ -138,16 +134,35 @@ Google authentication will create `/auth`, `/auth/google`, & `/auth/google/retur
 		"google": {
 			"enabled": true,
 			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
-			"realm": "", /* Root pathname */
-			"login": "/login" /* Path to redirect to on failed authentication */
 		},
-		"protect": ["/private"]
+		"protect": ["/private"],
+		"login": "/login" /* Path to redirect to on failed authentication */
+	}
+}
+```
+
+### LinkedIn
+LinkedIn authentication will create `/auth`, `/auth/linkedin`, & `/auth/linkedin/callback` routes. `auth(authCode, authToken, expiresIn, callback)` must execute `callback(err, user)`; sessions are used for `LinkedIn` authentication, and the `user` argument will be
+available as `req.session.user` in custom routes.
+ 
+```javascript
+{
+	"auth": {
+		"linkedin": {
+			"enabled": true,
+			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
+			"api_key": "", /* Get this from LinkedIn */
+			"api_secret": /* Get this from LinkedIn */,
+			"scope": "" /* Optional, permission scope */
+		}
+		"protect": ["/private"],
+		"login": "/login" /* Path to redirect to on failed authentication */
 	}
 }
 ```
 
 ### Twitter
-Twitter authentication will create `/auth`, & `/auth/twitter` routes. `auth(token, tokenSecret, profile, callback)` must execute `callback(err, user)`.
+Twitter authentication will create `/auth`, `/auth/twitter`, & `/auth/twitter/callback` routes. `auth(token, tokenSecret, profile, callback)` must execute `callback(err, user)`.
  
 ```javascript
 {
@@ -157,10 +172,9 @@ Twitter authentication will create `/auth`, & `/auth/twitter` routes. `auth(toke
 			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
 			"consumer_key": "", /* Get this from Twitter */
 			"consumer_secret": "", /* Get this from Twitter */
-			"callback_url": "" /* Get this from Twitter */
-			"login": "/login" /* Path to redirect to on failed authentication */
 		},
-		"protect": ["/private"]
+		"protect": ["/private"],
+		"login": "/login" /* Path to redirect to on failed authentication */
 	}
 }
 ```
@@ -212,10 +226,10 @@ Do not protect `/`, as it'll block the authentication end points. `local` authen
 				else {
 					res.redirect( "/login" );
 				}
-			},
-			"login": "/login"
+			}
 		}
-		"protect": ["/private"]
+		"protect": ["/private"],
+		"login": "/login" /* Path to redirect to on failed authentication */
 	}
 }
 ```

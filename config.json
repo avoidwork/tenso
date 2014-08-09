@@ -13,29 +13,31 @@
 			"enabled": false,
 			"auth": null,
 			"client_id": "",
-			"client_secret": "",
-			"callback_url": "",
-			"login": "/login"
+			"client_secret": ""
 		},
 		"google": {
 			"enabled": false,
+			"auth": null
+		},
+		"linkedin": {
+			"enabled": false,
 			"auth": null,
-			"realm": "",
-			"login": "/login"
+			"api_key": "",
+			"api_secret": "",
+			"scope": null
 		},
 		"local": {
 			"enabled": false,
 			"auth": null,
-			"login": "/login"
+			"middleware": null
 		},
 		"twitter": {
 			"enabled": false,
 			"auth": null,
 			"consumer_key": "",
-			"consumer_secret": "",
-			"callback_url": "",
-			"login": "/login"
+			"consumer_secret": ""
 		},
+		"login": "/login",
 		"protect": ["/"]
 	},
 	"cache": 1000,

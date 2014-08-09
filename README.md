@@ -264,22 +264,23 @@ A 'max byte' limit can be enforced on all routes that handle `PATCH`, `POST`, & 
 ## Logging
 Standard log levels are supported, and are emitted (by configuration) to `stdout` & `stderr`, & `syslog`.
 
-## Dtrace
-Dtrace probes can be enabled by configuration (disabled by default), and can be observed as `turtle-io`; Tensō is built on [turtle.io](https://github.com/avoidwork/turtle.io).
+## DTrace
+DTrace probes can be enabled by configuration (disabled by default). A shell script is available at `./node_modules/turtle.io/dtrace.sh` to observe the probes.
+The last argument for each probe is the nanoseconds it took to execute.
 
 ```
 "allowed",        "char *", "char *", "char *", "int"
 "allows",         "char *", "char *", "int"
 "compress",       "char *", "char *", "int"
 "compression",    "char *", "int"
-"error",          "char *", "char *", "int", "char *", "int"
-"headers",        "int", "int"
-"log",            "char *", "int", "int", "int"
+"error",          "char *", "char *", "int",    "char *", "int"
+"headers",        "int",    "int"
+"log",            "char *", "int",    "int",    "int"
 "proxy",          "char *", "char *", "char *", "char *", "int"
 "middleware",     "char *", "char *", "int"
 "request",        "char *", "int"
-"respond",        "char *", "char *", "char *", "int", "int"
-"status",         "int", "int", "int", "int", "int"
+"respond",        "char *", "char *", "char *", "int",    "int"
+"status",         "int",    "int",    "int",    "int",    "int"
 "write",          "char *", "char *", "char *", "char *", "int"
 ```
 

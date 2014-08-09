@@ -133,6 +133,13 @@ function auth ( obj, config ) {
 
 		obj.server.use( "/auth/facebook",          passport.authenticate( "facebook" ) );
 		obj.server.use( "/auth/facebook/callback", passport.authenticate( "facebook", {successRedirect: "/", failureRedirect: config.auth.login} ) );
+		obj.server.use( function ( req, res, next ) {
+			if ( req.isAuthenticated() ) {
+				return next();
+			}
+
+			res.redirect( config.auth.login );
+		} );
 	}
 	else if ( config.auth.google.enabled ) {
 		obj.server.use( passport.initialize() );
@@ -159,6 +166,13 @@ function auth ( obj, config ) {
 
 		obj.server.use( "/auth/google",          passport.authenticate( "google" ) );
 		obj.server.use( "/auth/google/callback", passport.authenticate( "google", {failureRedirect: config.auth.login} ) );
+		obj.server.use( function ( req, res, next ) {
+			if ( req.isAuthenticated() ) {
+				return next();
+			}
+
+			res.redirect( config.auth.login );
+		} );
 	}
 	else if ( config.auth.local.enabled ) {
 		config.routes.get[config.auth.local.login] = "POST credentials to authenticate";
@@ -270,7 +284,7 @@ function auth ( obj, config ) {
 		} );
 
 		obj.server.use( function ( req, res, next ) {
-			if ( !req.session.authorized ) {
+			if ( !req.session || !req.session.authorized ) {
 				res.redirect( config.auth.login );
 			}
 
@@ -301,6 +315,13 @@ function auth ( obj, config ) {
 
 		obj.server.use( "/auth/twitter",          passport.authenticate( "twitter" ) );
 		obj.server.use( "/auth/twitter/callback", passport.authenticate( "twitter", {successRedirect: "/", failureRedirect: config.auth.login} ) );
+		obj.server.use( function ( req, res, next ) {
+			if ( req.isAuthenticated() ) {
+				return next();
+			}
+
+			res.redirect( config.auth.login );
+		} );
 	}
 
 	return config;

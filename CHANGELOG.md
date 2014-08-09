@@ -1,7 +1,7 @@
 # Change Log
 
 ## 0.4.0
-- Added `Facebook`, & `Twitter` authentication via `passport`
+- Added `Facebook`, `Google`, & `Twitter` authentication via `passport`
 - Fixed the `RegExp` used to retrieve the rate limit id from the `authorization` header
 - Moved authentication gateway middleware into `zuul()`, & fixed what it tests
 

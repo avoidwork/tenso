@@ -17,6 +17,12 @@
 			"callback_url": "",
 			"login": "/login"
 		},
+		"google": {
+			"enabled": false,
+			"auth": null,
+			"realm": "",
+			"login": "/login"
+		},
 		"local": {
 			"enabled": false,
 			"auth": null,

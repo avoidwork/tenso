@@ -17,4 +17,5 @@ var TurtleIO = require( "turtle.io" ),
     BasicStrategy    = require( "passport-http" ).BasicStrategy,
     BearerStrategy   = require( "passport-http-bearer" ).Strategy,
     FacebookStrategy = require( "passport-facebook" ).Strategy,
-	TwitterStrategy  = require( "passport-twitter" ).Strategy;
+    GoogleStrategy   = require( "passport-google" ).Strategy,
+    TwitterStrategy  = require( "passport-twitter" ).Strategy;

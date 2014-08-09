@@ -95,7 +95,7 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 ```
 
 ## Authentication
-The `protect` Array is the endpoints that will require authentication. Planned authentication options are `Twitter`, & `LinkedIn`.
+The `protect` Array is the endpoints that will require authentication. `LinkedIn` support is planned.
 
 ### Basic Auth
 ```javascript
@@ -118,10 +118,27 @@ Facebook authentication will create `/auth`, & `/auth/facebook` routes. `auth(ac
 	"auth": {
 		"facebook": {
 			"enabled": true,
-			"auth": function ( ... ) { ... }, /* Authencation handler, to 'find' or 'create' a User */
+			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
 			"client_id": "", /* Get this from Facebook */
 			"client_secret": "", /* Get this from Facebook */
 			"callback_url": "" /* Get this from Facebook */
+			"login": "/login" /* Path to redirect to on failed authentication */
+		},
+		"protect": ["/private"]
+	}
+}
+```
+
+### Google
+Google authentication will create `/auth`, `/auth/google`, & `/auth/google/return` routes. `auth(identifier, profile, callback)` must execute `callback(err, user)`.
+ 
+```javascript
+{
+	"auth": {
+		"google": {
+			"enabled": true,
+			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
+			"realm": "", /* Root pathname */
 			"login": "/login" /* Path to redirect to on failed authentication */
 		},
 		"protect": ["/private"]
@@ -137,7 +154,7 @@ Twitter authentication will create `/auth`, & `/auth/twitter` routes. `auth(toke
 	"auth": {
 		"twitter": {
 			"enabled": true,
-			"auth": function ( ... ) { ... }, /* Authencation handler, to 'find' or 'create' a User */
+			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
 			"consumer_key": "", /* Get this from Twitter */
 			"consumer_secret": "", /* Get this from Twitter */
 			"callback_url": "" /* Get this from Twitter */

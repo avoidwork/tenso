@@ -135,10 +135,32 @@ function auth ( obj, config ) {
 		config.routes.get["/auth"] = ["/auth/facebook"];
 
 		obj.server.use( "/auth/facebook", passport.authenticate( "facebook" ) );
-		obj.server.use( config.auth.facebook.callback_url, passport.authenticate( "facebook", {
-			successRedirect: "/",
-			failureRedirect: config.auth.facebook.login
-		} ) );
+		obj.server.use( config.auth.facebook.callback_url, passport.authenticate( "facebook", {successRedirect: "/", failureRedirect: config.auth.facebook.login} ) );
+	}
+	else if ( config.auth.google.enabled ) {
+		obj.server.use( passport.initialize() );
+
+		passport.use( new GoogleStrategy ( {
+				returnURL: config.auth.google.realm + "/auth/google/callback",
+				realm: config.auth.google.realm
+			}, function( identifier, profile, done ) {
+				config.auth.google.auth( identifier, profile, function( err, user ) {
+					if ( err ) {
+						return done( err );
+					}
+
+					done( null, user );
+				} );
+			}
+		) );
+
+		config.routes.get["/auth"] = ["/auth/google"];
+		config.routes.get["/auth/google/callback"] = function ( req, res ) {
+			this.respond( req, res, null, 302, {location: "/"} );
+		};
+
+		obj.server.use( "/auth/google", passport.authenticate( "google" ) );
+		obj.server.use( "/auth/google/callback", passport.authenticate( "google", {failureRedirect: config.auth.google.login} ) );
 	}
 	else if ( config.auth.twitter.enabled ) {
 		obj.server.use( passport.initialize() );
@@ -161,10 +183,7 @@ function auth ( obj, config ) {
 		config.routes.get["/auth"] = ["/auth/twitter"];
 
 		obj.server.use( "/auth/twitter", passport.authenticate( "twitter" ) );
-		obj.server.use( config.auth.twitter.callback_url, passport.authenticate( "twitter", {
-			successRedirect: "/",
-			failureRedirect: config.auth.twitter.login
-		} ) );
+		obj.server.use( config.auth.twitter.callback_url, passport.authenticate( "twitter", {successRedirect: "/", failureRedirect: config.auth.twitter.login} ) );
 	}
 	else if ( config.auth.local.enabled ) {
 		config.routes.get[config.auth.local.login] = "POST credentials to authenticate";

@@ -12,8 +12,8 @@
 		"facebook": {
 			"enabled": false,
 			"auth": null,
-			"consumer_key": "",
-			"consumer_secret": "",
+			"client_id": "",
+			"client_secret": "",
 			"callback_url": "",
 			"login": "/login"
 		},
@@ -24,9 +24,11 @@
 		},
 		"twitter": {
 			"enabled": false,
+			"auth": null,
 			"consumer_key": "",
 			"consumer_secret": "",
-			"callback_url": ""
+			"callback_url": "",
+			"login": "/login"
 		},
 		"protect": ["/"]
 	},

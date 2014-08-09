@@ -122,7 +122,7 @@ function auth ( obj, config ) {
 				clientSecret: config.auth.facebook.client_secret,
 				callbackURL: config.auth.facebook.callback_url
 			}, function( accessToken, refreshToken, profile, done ) {
-				config.augh.facebook.auth( accessToken, refreshToken, profile, function( err, user ) {
+				config.auth.facebook.auth( accessToken, refreshToken, profile, function( err, user ) {
 					if ( err ) {
 						return done( err );
 					}
@@ -132,12 +132,38 @@ function auth ( obj, config ) {
 			}
 		) );
 
-		config.routes.get["/auth"]          = ["/auth/facebook"];
-		config.routes.get["/auth/facebook"] = passport.authenticate( "facebook" );
+		config.routes.get["/auth"] = ["/auth/facebook"];
 
+		obj.server.use( "/auth/facebook", passport.authenticate( "facebook" ) );
 		obj.server.use( config.auth.facebook.callback_url, passport.authenticate( "facebook", {
 			successRedirect: "/",
-			failureRedirect: login || "/login"
+			failureRedirect: config.auth.facebook.login
+		} ) );
+	}
+	else if ( config.auth.twitter.enabled ) {
+		obj.server.use( passport.initialize() );
+
+		passport.use( new TwitterStrategy ( {
+				consumerKey: config.auth.twitter.consumer_key,
+				consumerSecret: config.auth.twitter.consumer_secret,
+				callbackURL: config.auth.twitter.callback_url
+			}, function( token, tokenSecret, profile, done ) {
+				config.auth.twitter.auth( token, tokenSecret, profile, function( err, user ) {
+					if ( err ) {
+						return done( err );
+					}
+
+					done( null, user );
+				} );
+			}
+		) );
+
+		config.routes.get["/auth"] = ["/auth/twitter"];
+
+		obj.server.use( "/auth/twitter", passport.authenticate( "twitter" ) );
+		obj.server.use( config.auth.twitter.callback_url, passport.authenticate( "twitter", {
+			successRedirect: "/",
+			failureRedirect: config.auth.twitter.login
 		} ) );
 	}
 	else if ( config.auth.local.enabled ) {

@@ -34,7 +34,8 @@
     "passport": "0.2.0",
     "passport-facebook": "1.0.3",
     "passport-http": "0.2.2",
-    "passport-http-bearer": "1.0.1"
+    "passport-http-bearer": "1.0.1",
+    "passport-twitter": "1.0.2"
   },
   "devDependencies": {
     "grunt-cli": "~0.1.13",

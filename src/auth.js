@@ -19,8 +19,8 @@ function auth ( obj, config ) {
 	obj.server.use( session( {
 		name: "tenso",
 		resave: true,
-		rolling: true,
-		saveUninitialized: true,
+		rolling: false,
+		saveUninitialized: false,
 		secret: config.session.key || uuid(),
 		cookie: {
 			maxAge: config.session.max_age || 60000
@@ -284,6 +284,7 @@ function auth ( obj, config ) {
 			arguments[0].protectAsync = true;
 			arguments[2]();
 		} );
+
 		obj.server.use( passport.initialize() );
 		obj.server.use( passport.session() );
 

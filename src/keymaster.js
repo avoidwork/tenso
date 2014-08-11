@@ -2,17 +2,19 @@
  * Keymaster for the request
  *
  * @method keymaster
- * @param req
- * @param res
+ * @param  {Object} req Client request
+ * @param  {Object} res Client response
+ * @return {Undefined}  undefined
  */
 function keymaster ( req, res ) {
-	var obj, result, routes, uri;
+	var obj, result, routes, uri, valid;
 
 	// No authentication, or it's already happened
-	if ( !req.protect || !req.protectAsync ) {
+	if ( !req.protect || !req.protectAsync || ( req.session && req.isAuthenticated() ) ) {
 		obj    = req.server.tenso;
 		routes = req.server.config.routes[req.method.toLowerCase()] || {};
 		uri    = req.parsed.pathname;
+		valid  = false;
 
 		if ( uri in routes ) {
 			result = routes[uri];
@@ -44,7 +46,22 @@ function keymaster ( req, res ) {
 				}
 			}
 			else {
-				obj.error( req, res, 404 );
+				iterate( req.server.config.routes.get || {}, function ( value, key ) {
+					var regex = new RegExp( "^" + key + "$", "i" );
+
+					if ( regex.test( uri ) ) {
+						valid = true;
+
+						return false;
+					}
+				} );
+
+				if ( valid ) {
+					obj.error( req, res, 405 );
+				}
+				else {
+					obj.error( req, res, 404 );
+				}
 			}
 		}
 	}

@@ -7,6 +7,8 @@
 - Moved authentication gateway middleware into `zuul()`, & fixed what it tests
 - Fixed `prepare()` by cloning the response body
 - Changed default host to `127.0.0.1`
+- Decorating `req.protect` & `req.protectAsync` from `zuul()` and various authentication strategies
+- Upgrading turtle.io to 3.0.0 for middleware pipeline
 
 ## 0.3.6
 - Upgraded turtle.io to 2.3.0

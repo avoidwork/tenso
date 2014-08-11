@@ -4,11 +4,12 @@
  * @constructor
  */
 function Tenso () {
-	this.hostname = "";
-	this.messages = {};
-	this.rates    = {};
-	this.server   = new TurtleIO();
-	this.version  = "{{VERSION}}";
+	this.hostname     = "";
+	this.messages     = {};
+	this.rates        = {};
+	this.server       = turtleio();
+	this.server.tenso = this;
+	this.version      = "{{VERSION}}";
 }
 
 /**

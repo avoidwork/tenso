@@ -23,6 +23,7 @@ module.exports = function (grunt) {
 					"src/error.js",
 					"src/factory.js",
 					"src/hypermedia.js",
+					"src/keymaster.js",
 					"src/prepare.js",
 					"src/rate.js",
 					"src/response.js",

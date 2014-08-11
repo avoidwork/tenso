@@ -19,8 +19,8 @@ function auth ( obj, config ) {
 	obj.server.use( session( {
 		name: "tenso",
 		resave: true,
-		rolling: false,
-		saveUninitialized: false,
+		rolling: true,
+		saveUninitialized: true,
 		secret: config.session.key || uuid(),
 		cookie: {
 			maxAge: config.session.max_age || 60000
@@ -113,6 +113,7 @@ function auth ( obj, config ) {
 	}
 	else if ( config.auth.facebook.enabled ) {
 		obj.server.use( passport.initialize() );
+		obj.server.use( passport.session() );
 
 		passport.use( new FacebookStrategy ( {
 				clientID     : config.auth.facebook.client_id,
@@ -279,7 +280,12 @@ function auth ( obj, config ) {
 		} );
 	}
 	else if ( config.auth.twitter.enabled ) {
+		obj.server.use( function () {
+			arguments[0].protectAsync = true;
+			arguments[2]();
+		} );
 		obj.server.use( passport.initialize() );
+		obj.server.use( passport.session() );
 
 		passport.use( new TwitterStrategy ( {
 				consumerKey    : config.auth.twitter.consumer_key,
@@ -300,11 +306,13 @@ function auth ( obj, config ) {
 
 		config.routes.get["/auth"]                  = {auth_uri: "/auth/twitter"};
 		config.routes.get["/auth/twitter"]          = {callback_uri: "/auth/twitter/callback"};
-		config.routes.get["/auth/twitter/callback"] = "ok";
+		config.routes.get["/auth/twitter/callback"] = function () {
+			arguments[1].redirect( "/" );
+		};
 
 		obj.server.use( "/auth/twitter",          passport.authenticate( "twitter" ) );
 		obj.server.use( "/auth/twitter/callback", passport.authenticate( "twitter", {successRedirect: "/", failureRedirect: config.auth.login} ) );
-		obj.server.use( "(?!/auth/twitter).*$", function ( req, res, next ) {
+		obj.server.use( "(?!/auth/twitter).*", function ( req, res, next ) {
 			if ( req.isAuthenticated() ) {
 				return next();
 			}
@@ -312,6 +320,8 @@ function auth ( obj, config ) {
 			res.redirect( config.auth.login );
 		} );
 	}
+
+	obj.server.use( keymaster );
 
 	return config;
 }

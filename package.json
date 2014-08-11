@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "keigai": "0.6.1",
-    "turtle.io": "2.3.2",
+    "turtle.io": "3.0.1",
     "express-session": "^1.7.2",
     "passport": "0.2.0",
     "passport-facebook": "1.0.3",

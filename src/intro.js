@@ -1,7 +1,7 @@
 ( function () {
 "use strict";
 
-var TurtleIO = require( "turtle.io" ),
+var turtleio = require( "turtle.io" ),
     SERVER   = "tenso/{{VERSION}}",
     CONFIG   = require( __dirname + "/../config.json" ),
     keigai   = require( "keigai" ),

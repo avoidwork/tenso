@@ -17,8 +17,15 @@ function zuul ( protect ) {
 			}
 		} );
 
+		// Setting state so the connection can be terminated properly
+		req.protect      = protectd;
+		req.protectAsync = false;
+
 		if ( protectd && next ) {
 			next();
+		}
+		else {
+			keymaster( req, res );
 		}
 	};
 }

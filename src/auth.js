@@ -291,7 +291,7 @@ function auth ( obj, config ) {
 			}
 
 			res.redirect( "/" );
-		}
+		};
 	}
 	else if ( config.auth.twitter.enabled ) {
 		config.auth.protect.push( new RegExp( "^/auth/twitter", "i" ) );

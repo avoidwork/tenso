@@ -2,11 +2,12 @@
  * Keymaster for the request
  *
  * @method keymaster
- * @param  {Object} req Client request
- * @param  {Object} res Client response
- * @return {Undefined}  undefined
+ * @param  {Object}   req  Client request
+ * @param  {Object}   res  Client response
+ * @param  {Function} next Next middleware
+ * @return {Undefined}     undefined
  */
-function keymaster ( req, res ) {
+function keymaster ( req, res, next ) {
 	var obj, result, routes, uri, valid;
 
 	// No authentication, or it's already happened
@@ -64,5 +65,8 @@ function keymaster ( req, res ) {
 				}
 			}
 		}
+	}
+	else {
+		next();
 	}
 }

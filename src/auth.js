@@ -19,8 +19,8 @@ function auth ( obj, config ) {
 	obj.server.use( session( {
 		name: "tenso",
 		resave: true,
-		rolling: false,
-		saveUninitialized: false,
+		rolling: true,
+		saveUninitialized: true,
 		secret: config.session.key || uuid(),
 		cookie: {
 			maxAge: config.session.max_age || 60000
@@ -195,15 +195,17 @@ function auth ( obj, config ) {
 	else if ( config.auth.linkedin.enabled ) {
 		config.auth.protect.push( new RegExp( "^/auth/linkedin", "i" ) );
 
-		config.routes.get["/auth"]                   = {auth_uri: "/auth/linkedin"};
-		config.routes.get["/auth/linkedin"]          = {callback_uri: "/auth/linkedin/callback"};
-		config.routes.get["/auth/linkedin/callback"] = "ok";
+		obj.server.use( function () {
+			arguments[0].protectAsync = true;
+			arguments[2]();
+		} );
 
-		obj.server.use( "/auth/linkedin/?$", function ( req, res ) {
+		obj.server.use( "/auth/linkedin", function ( req, res ) {
 			var uri   = "https://www.linkedin.com/uas/oauth2/authorization?response_type=code",
 				state = uuid( true );
 
 			req.session.state = state;
+			req.session.save();
 
 			uri += "&client_id="    + config.auth.linkedin.client_id;
 			uri += "&state="        + state;
@@ -259,7 +261,9 @@ function auth ( obj, config ) {
 						} );
 					}
 					else {
-						res.redirect( config.auth.login );
+						session.destroy();
+						res.error( 401, {result: arg.error_description || "Unauthorized", login_uri: config.auth.login}  );
+						//res.redirect( config.auth.login );
 					}
 				}
 				else {
@@ -271,15 +275,27 @@ function auth ( obj, config ) {
 			}
 		} );
 
-		obj.server.use( "(?!/auth/linkedin).*$", function ( req, res, next ) {
+		obj.server.use( "(?!/auth/linkedin).*", function ( req, res, next ) {
 			if ( !req.session.authorized ) {
 				res.redirect( config.auth.login );
 			}
 
 			next();
 		} );
+
+		config.routes.get["/auth"] = {auth_uri: "/auth/linkedin"};
+
+		config.routes.get["/logout"] = function ( req, res ) {
+			if ( req.session ) {
+				req.session.destroy();
+			}
+
+			res.redirect( "/" );
+		}
 	}
 	else if ( config.auth.twitter.enabled ) {
+		config.auth.protect.push( new RegExp( "^/auth/twitter", "i" ) );
+
 		obj.server.use( function () {
 			arguments[0].protectAsync = true;
 			arguments[2]();
@@ -303,13 +319,10 @@ function auth ( obj, config ) {
 			}
 		) );
 
-		config.auth.protect.push( new RegExp( "^/auth/twitter", "i" ) );
-
-		config.routes.get["/auth"]                  = {auth_uri: "/auth/twitter"};
-		config.routes.get["/auth/twitter"]          = {callback_uri: "/auth/twitter/callback"};
-		config.routes.get["/auth/twitter/callback"] = function () {
-			arguments[1].redirect( "/" );
-		};
+		obj.server.use( "/auth/twitter", function () {
+			console.log("here");
+			arguments[2]();
+		} );
 
 		obj.server.use( "/auth/twitter",          passport.authenticate( "twitter" ) );
 		obj.server.use( "/auth/twitter/callback", passport.authenticate( "twitter", {successRedirect: "/", failureRedirect: config.auth.login} ) );
@@ -320,6 +333,12 @@ function auth ( obj, config ) {
 
 			res.redirect( config.auth.login );
 		} );
+
+		config.routes.get["/auth"]                  = {auth_uri: "/auth/twitter"};
+		config.routes.get["/auth/twitter"]          = {callback_uri: "/auth/twitter/callback"};
+		config.routes.get["/auth/twitter/callback"] = function () {
+			arguments[1].redirect( "/" );
+		};
 	}
 
 	obj.server.use( keymaster );

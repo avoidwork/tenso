@@ -92,7 +92,7 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 ```
 
 ## Authentication
-The `protect` Array is the endpoints that will require authentication. Some authentication methods rely on sessions.
+The `protect` Array is the endpoints that will require authentication. Sessions are used for non `Basic` or `Bearer Token` authentication, and will have `/login`, `/logout`, & custom routes.
 
 ### Basic Auth
 ```javascript
@@ -119,8 +119,7 @@ Facebook authentication will create `/auth`, `/auth/facebook`, & `/auth/facebook
 			"client_id": "", /* Get this from Facebook */
 			"client_secret": "" /* Get this from Facebook */
 		},
-		"protect": ["/private"],
-		"login": "/login" /* Path to redirect to on failed authentication */
+		"protect": ["/private"]
 	}
 }
 ```
@@ -135,15 +134,13 @@ Google authentication will create `/auth`, `/auth/google`, & `/auth/google/callb
 			"enabled": true,
 			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
 		},
-		"protect": ["/private"],
-		"login": "/login" /* Path to redirect to on failed authentication */
+		"protect": ["/private"]
 	}
 }
 ```
 
 ### LinkedIn
-LinkedIn authentication will create `/auth`, `/auth/linkedin`, & `/auth/linkedin/callback` routes. `auth(authCode, authToken, expiresIn, callback)` must execute `callback(err, user)`; sessions are used for `LinkedIn` authentication, and the `user` argument will be
-available as `req.session.user` in custom routes.
+LinkedIn authentication will create `/auth`, `/auth/linkedin`, & `/auth/linkedin/callback` routes. `auth(authCode, authToken, expiresIn, callback)` must execute `callback(err, user)`.
  
 ```javascript
 {
@@ -151,12 +148,11 @@ available as `req.session.user` in custom routes.
 		"linkedin": {
 			"enabled": true,
 			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
-			"api_key": "", /* Get this from LinkedIn */
-			"api_secret": "", /* Get this from LinkedIn */,
+			"client_id": "", /* Get this from LinkedIn */
+			"client_secret": "", /* Get this from LinkedIn */,
 			"scope": "" /* Optional, permission scope */
 		}
-		"protect": ["/private"],
-		"login": "/login" /* Path to redirect to on failed authentication */
+		"protect": ["/private"]
 	}
 }
 ```
@@ -173,8 +169,7 @@ Twitter authentication will create `/auth`, `/auth/twitter`, & `/auth/twitter/ca
 			"consumer_key": "", /* Get this from Twitter */
 			"consumer_secret": "" /* Get this from Twitter */
 		},
-		"protect": ["/private"],
-		"login": "/login" /* Path to redirect to on failed authentication */
+		"protect": ["/private"]
 	}
 }
 ```
@@ -228,8 +223,7 @@ Do not protect `/`, as it'll block the authentication end points. `local` authen
 				}
 			}
 		}
-		"protect": ["/private"],
-		"login": "/login" /* Path to redirect to on failed authentication */
+		"protect": ["/private"]
 	}
 }
 ```

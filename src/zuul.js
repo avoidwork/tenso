@@ -3,7 +3,7 @@
  *
  * @method zuul
  * @param {Array} protect Array of routes
- * @return {Undefined}    undefined
+ * @return {Function}    Middleware
  */
 function zuul ( protect ) {
 	return function ( req, res, next ) {

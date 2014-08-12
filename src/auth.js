@@ -10,13 +10,9 @@ function auth ( obj, config ) {
 	var ssl   = config.ssl.cert && config.ssl.key,
 	    proto = "http" + ( ssl ? "s" : "" ),
 	    realm = proto + "://" + ( config.hostname === "localhost" ? "127.0.0.1" : config.hostname ) + ( config.port !== 80 && config.port !== 443 ? ":" + config.port : "" ),
-	    login = config.auth.login;
+	    sesh;
 
-	config.auth.protect = ( config.auth.protect || [] ).map( function ( i ) {
-		return new RegExp( "^" + i !== login ? i.replace( /\.\*/g, "*" ).replace( /\*/g, ".*" ) : "$", "i" );
-	} );
-
-	obj.server.use( session( {
+	sesh = {
 		name: "tenso",
 		resave: true,
 		rolling: true,
@@ -25,7 +21,16 @@ function auth ( obj, config ) {
 		cookie: {
 			maxAge: config.session.max_age || 60000
 		}
-	} ) );
+	};
+
+	config.auth.protect = ( config.auth.protect || [] ).map( function ( i ) {
+		return new RegExp( "^" + i !== "/login" ? i.replace( /\.\*/g, "*" ).replace( /\*/g, ".*" ) : "$", "i" );
+	} );
+
+	// Enabling sessions for non basic/bearer auth
+	if ( config.auth.facebook.enabled || config.auth.google.enabled || config.auth.local.enabled || config.auth.linkedin.enabled || config.auth.twitter.enabled ) {
+		obj.server.use( session( sesh ) );
+	}
 
 	obj.server.use( zuul( config.auth.protect ) );
 
@@ -137,13 +142,13 @@ function auth ( obj, config ) {
 		config.routes.get["/auth/facebook/callback"] = "ok";
 
 		obj.server.use( "/auth/facebook",          passport.authenticate( "facebook" ) );
-		obj.server.use( "/auth/facebook/callback", passport.authenticate( "facebook", {successRedirect: "/", failureRedirect: config.auth.login} ) );
+		obj.server.use( "/auth/facebook/callback", passport.authenticate( "facebook", {successRedirect: "/", failureRedirect: "/login"} ) );
 		obj.server.use( "(?!/auth/facebook).*$", function ( req, res, next ) {
 			if ( req.isAuthenticated() ) {
 				return next();
 			}
 
-			res.redirect( config.auth.login );
+			res.redirect( "/login" );
 		} );
 	}
 	else if ( config.auth.google.enabled ) {
@@ -172,25 +177,30 @@ function auth ( obj, config ) {
 		};
 
 		obj.server.use( "/auth/google",          passport.authenticate( "google" ) );
-		obj.server.use( "/auth/google/callback", passport.authenticate( "google", {failureRedirect: config.auth.login} ) );
+		obj.server.use( "/auth/google/callback", passport.authenticate( "google", {failureRedirect: "/login"} ) );
 		obj.server.use( "(?!/auth/google).*$", function ( req, res, next ) {
 			if ( req.isAuthenticated() ) {
 				return next();
 			}
 
-			res.redirect( config.auth.login );
+			res.redirect( "/login" );
 		} );
 	}
 	else if ( config.auth.local.enabled ) {
-		config.routes.get[config.auth.local.login] = "POST credentials to authenticate";
-		config.routes.post = config.routes.post || {};
-		config.routes.post[config.auth.local.login] = function () {
-			var args = array.cast( arguments );
-
-			config.auth.local.auth.apply( obj, args );
-		};
-
 		obj.server.use( config.auth.local.middleware );
+
+		config.routes.get["/login"] = "POST credentials to authenticate";
+		config.routes.get["/logout"] = function ( req, res ) {
+			if ( req.session.authorized ) {
+				req.session.destroy();
+			}
+
+			res.redirect( "/" );
+		};
+		config.routes.post = config.routes.post || {};
+		config.routes.post["/login"] = function () {
+			config.auth.local.auth.apply( obj, arguments );
+		};
 	}
 	else if ( config.auth.linkedin.enabled ) {
 		config.auth.protect.push( new RegExp( "^/auth/linkedin", "i" ) );
@@ -199,7 +209,6 @@ function auth ( obj, config ) {
 			arguments[0].protectAsync = true;
 			arguments[2]();
 		} );
-
 		obj.server.use( "/auth/linkedin", function ( req, res ) {
 			var uri   = "https://www.linkedin.com/uas/oauth2/authorization?response_type=code",
 				state = uuid( true );
@@ -217,11 +226,10 @@ function auth ( obj, config ) {
 
 			res.redirect( uri );
 		} );
-
 		obj.server.use( "/auth/linkedin/callback", function ( req, res ) {
 			var session = req.session,
 			    query   = req.parsed.query,
-			    arg, parsed, request, response, uri;
+			    uri;
 
 			if ( session && session.state === query.state && query.code ) {
 				session.code = query.code;
@@ -232,27 +240,14 @@ function auth ( obj, config ) {
 				uri += "&client_id=" + config.auth.linkedin.client_id;
 				uri += "&client_secret=" + config.auth.linkedin.client_secret;
 
-				parsed   = parse( uri );
-				request  = httpsync.request( {
-					url      : uri,
-					method   : "POST",
-					protocol : parsed.protocol.replace( ":", ""),
-					host     : parsed.host,
-					port     : parsed.port,
-					path     : parsed.path
-				} );
-				response = request.end();
-
-				if ( response.headers["Content-Type"].indexOf( "application/json" ) > -1 ) {
-					arg = json.decode( response.body.toString(), true );
-
+				request( uri, "POST", null, null, null ).then( function ( arg ) {
 					if ( arg.access_token ) {
 						session.authorized = true;
 
 						config.auth.linkedin.auth.call( obj, session.code, arg.access_token, arg.expires_in, function ( err, user ) {
 							if ( err ) {
 								session.destroy();
-								res.redirect( config.auth.login );
+								res.redirect( "/login" );
 							}
 
 							session.user = user;
@@ -262,31 +257,33 @@ function auth ( obj, config ) {
 					}
 					else {
 						session.destroy();
-						res.error( 401, {result: arg.error_description || "Unauthorized", login_uri: config.auth.login}  );
-						//res.redirect( config.auth.login );
+						res.error( {result: arg.error_description || "Unauthorized", login_uri: "/login"}, 401  );
 					}
-				}
-				else {
-					res.redirect( config.auth.login );
-				}
+				}, function ( e ) {
+					var msg = json.decode( e.message, true );
+
+					session.destroy();
+					res.error( {result: msg.error_description || "Unauthorized", login_uri: "/login"}, 401  );
+				} );
 			}
 			else {
-				res.redirect( config.auth.login );
+				session.destroy();
+				res.redirect( "/login" );
 			}
 		} );
-
 		obj.server.use( "(?!/auth/linkedin).*", function ( req, res, next ) {
 			if ( !req.session.authorized ) {
-				res.redirect( config.auth.login );
+				res.redirect( "/login" );
 			}
-
-			next();
+			else {
+				next();
+			}
 		} );
 
-		config.routes.get["/auth"] = {auth_uri: "/auth/linkedin"};
-
+		config.routes.get["/auth"]   = {auth_uri: "/auth/linkedin"};
+		config.routes.get["/login"]  = {login_uri: "/auth"};
 		config.routes.get["/logout"] = function ( req, res ) {
-			if ( req.session ) {
+			if ( req.session.authorized ) {
 				req.session.destroy();
 			}
 
@@ -325,13 +322,13 @@ function auth ( obj, config ) {
 		} );
 
 		obj.server.use( "/auth/twitter",          passport.authenticate( "twitter" ) );
-		obj.server.use( "/auth/twitter/callback", passport.authenticate( "twitter", {successRedirect: "/", failureRedirect: config.auth.login} ) );
+		obj.server.use( "/auth/twitter/callback", passport.authenticate( "twitter", {successRedirect: "/", failureRedirect: "/login"} ) );
 		obj.server.use( "(?!/auth/twitter).*", function ( req, res, next ) {
 			if ( req.isAuthenticated() ) {
 				return next();
 			}
 
-			res.redirect( config.auth.login );
+			res.redirect( "/login" );
 		} );
 
 		config.routes.get["/auth"]                  = {auth_uri: "/auth/twitter"};
@@ -341,7 +338,7 @@ function auth ( obj, config ) {
 		};
 	}
 
-	obj.server.use( keymaster );
+	obj.server.all( keymaster );
 
 	return config;
 }

@@ -1,5 +1,6 @@
 {
 	"auth": {
+		"protect": ["/"],
 		"basic": {
 			"enabled": false,
 			"list": [],
@@ -22,8 +23,8 @@
 		"linkedin": {
 			"enabled": false,
 			"auth": null,
-			"api_key": "",
-			"api_secret": "",
+			"client_id": "",
+			"client_secret": "",
 			"scope": null
 		},
 		"local": {
@@ -36,9 +37,7 @@
 			"auth": null,
 			"consumer_key": "",
 			"consumer_secret": ""
-		},
-		"login": "/login",
-		"protect": ["/"]
+		}
 	},
 	"compress": true,
 	"hostname": "127.0.0.1",

@@ -13,10 +13,10 @@ function auth ( obj, config ) {
 	    sesh;
 
 	sesh = {
-		name: "tenso",
-		resave: true,
-		rolling: true,
-		saveUninitialized: true,
+		name: config.cookie.name || "tenso",
+		resave: config.cookie.resave || false,
+		rolling: config.cookie.rolling || false,
+		saveUninitialized: config.cookie.saveUninitialized || false,
 		secret: config.session.key || uuid(),
 		cookie: {
 			maxAge: config.session.max_age || 60000
@@ -30,6 +30,7 @@ function auth ( obj, config ) {
 	// Enabling sessions for non basic/bearer auth
 	if ( config.auth.facebook.enabled || config.auth.google.enabled || config.auth.local.enabled || config.auth.linkedin.enabled || config.auth.twitter.enabled ) {
 		obj.server.use( session( sesh ) );
+		obj.server.use( cookie() );
 	}
 
 	obj.server.use( zuul( config.auth.protect ) );
@@ -238,7 +239,10 @@ function auth ( obj, config ) {
 		) );
 
 		obj.server.get( "/auth/linkedin",          passport.authenticate( "linkedin" ) );
-		obj.server.get( "/auth/linkedin/callback", passport.authenticate( "linkedin", { successRedirect: "/", failureRedirect: "/login" } ) );
+		obj.server.get( "/auth/linkedin/callback", passport.authenticate( "linkedin", {failureRedirect: "/login"} ) );
+		obj.server.get( "/auth/linkedin/callback", function () {
+			arguments[1].redirect( "/" );
+		} );
 		obj.server.use( "(?!/auth/linkedin).*", function ( req, res, next ) {
 			if ( !req.session.authorized ) {
 				res.redirect( "/login" );

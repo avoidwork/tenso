@@ -40,6 +40,12 @@
 		}
 	},
 	"compress": true,
+	"cookie": {
+		"secret": "tenso",
+		"resave": true,
+		"rolling": true,
+		"saveUninitialized": true
+	},
 	"hostname": "127.0.0.1",
 	"json": 2,
 	"logs": {

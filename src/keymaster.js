@@ -11,7 +11,7 @@ function keymaster ( req, res, next ) {
 	var obj, result, routes, uri, valid;
 
 	// No authentication, or it's already happened
-	if ( !req.protect || !req.protectAsync || ( req.session && req.isAuthenticated() ) ) {
+	if ( !req.protect || !req.protectAsync || ( req.session && ( req.session.authenticated || req.isAuthenticated() ) ) ) {
 		obj    = req.server.tenso;
 		routes = req.server.config.routes[req.method.toLowerCase()] || {};
 		uri    = req.parsed.pathname;

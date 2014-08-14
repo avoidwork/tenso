@@ -117,76 +117,6 @@ function auth ( obj, config ) {
 			obj.server.use( passport.authenticate( "bearer", {session: false} ) );
 		} )();
 	}
-	else if ( config.auth.facebook.enabled ) {
-		obj.server.use( passport.initialize() );
-		obj.server.use( passport.session() );
-
-		passport.use( new FacebookStrategy ( {
-				clientID     : config.auth.facebook.client_id,
-				clientSecret : config.auth.facebook.client_secret,
-				callbackURL  : realm + "/auth/facebook/callback"
-			}, function( accessToken, refreshToken, profile, done ) {
-				config.auth.facebook.auth( accessToken, refreshToken, profile, function( err, user ) {
-					if ( err ) {
-						return done( err );
-					}
-
-					done( null, user );
-				} );
-			}
-		) );
-
-		config.auth.protect.push( new RegExp( "^/auth/facebook", "i" ) );
-
-		config.routes.get["/auth"]                   = {auth_uri: "/auth/facebook"};
-		config.routes.get["/auth/facebook"]          = {callback_uri: "/auth/facebook/callback"};
-		config.routes.get["/auth/facebook/callback"] = "ok";
-
-		obj.server.use( "/auth/facebook",          passport.authenticate( "facebook" ) );
-		obj.server.use( "/auth/facebook/callback", passport.authenticate( "facebook", {successRedirect: "/", failureRedirect: "/login"} ) );
-		obj.server.use( "(?!/auth/facebook).*$", function ( req, res, next ) {
-			if ( req.isAuthenticated() ) {
-				return next();
-			}
-
-			res.redirect( "/login" );
-		} );
-	}
-	else if ( config.auth.google.enabled ) {
-		obj.server.use( passport.initialize() );
-
-		passport.use( new GoogleStrategy ( {
-				returnURL : realm + "/auth/google/callback",
-				realm     : realm
-			}, function( identifier, profile, done ) {
-				config.auth.google.auth( identifier, profile, function( err, user ) {
-					if ( err ) {
-						return done( err );
-					}
-
-					done( null, user );
-				} );
-			}
-		) );
-
-		config.auth.protect.push( new RegExp( "^/auth/google", "i" ) );
-
-		config.routes.get["/auth"]                 = {auth_uri: "/auth/google"};
-		config.routes.get["/auth/google"]          = {callback_uri: "/auth/google/callback"};
-		config.routes.get["/auth/google/callback"] = function ( req, res ) {
-			obj.respond( req, res, null, 302, {location: "/"} );
-		};
-
-		obj.server.use( "/auth/google",          passport.authenticate( "google" ) );
-		obj.server.use( "/auth/google/callback", passport.authenticate( "google", {failureRedirect: "/login"} ) );
-		obj.server.use( "(?!/auth/google).*$", function ( req, res, next ) {
-			if ( req.isAuthenticated() ) {
-				return next();
-			}
-
-			res.redirect( "/login" );
-		} );
-	}
 	else if ( config.auth.local.enabled ) {
 		obj.server.use( config.auth.local.middleware );
 
@@ -203,10 +133,8 @@ function auth ( obj, config ) {
 			config.auth.local.auth.apply( obj, arguments );
 		};
 	}
-	else if ( config.auth.linkedin.enabled ) {
-		config.auth.protect.push( new RegExp( "^/auth/linkedin", "i" ) );
-
-		obj.server.use( function () {
+	else {
+		obj.server.use( function asyncFlag () {
 			arguments[0].protectAsync = true;
 			arguments[2]();
 		} );
@@ -222,95 +150,154 @@ function auth ( obj, config ) {
 			done( null, obj );
 		} );
 
-		passport.use( new LinkedInStrategy ( {
-				consumerKey    : config.auth.linkedin.client_id,
-				consumerSecret : config.auth.linkedin.client_secret,
-				callbackURL    : realm + "/auth/linkedin/callback"
-			},
-			function ( token, tokenSecret, profile, done ) {
-				config.auth.linkedin.auth( token, tokenSecret, profile, function( err, user ) {
-					if ( err ) {
-						return done( err );
-					}
+		if ( config.auth.facebook.enabled ) {
+			config.auth.protect.push( new RegExp( "^/auth/facebook", "i" ) );
 
-					done( null, user );
-				} );
-			}
-		) );
+			passport.use( new FacebookStrategy( {
+					clientID: config.auth.facebook.client_id,
+					clientSecret: config.auth.facebook.client_secret,
+					callbackURL: realm + "/auth/facebook/callback"
+				}, function ( accessToken, refreshToken, profile, done ) {
+					config.auth.facebook.auth( accessToken, refreshToken, profile, function ( err, user ) {
+						if ( err ) {
+							return done( err );
+						}
 
-		obj.server.get( "/auth/linkedin",          passport.authenticate( "linkedin" ) );
-		obj.server.get( "/auth/linkedin/callback", passport.authenticate( "linkedin", {failureRedirect: "/login"} ) );
-		obj.server.get( "/auth/linkedin/callback", function () {
-			arguments[1].redirect( "/" );
-		} );
-		obj.server.use( "(?!/auth/linkedin).*", function ( req, res, next ) {
-			if ( !req.session.authorized ) {
+						done( null, user );
+					} );
+				}
+			) );
+
+			config.routes.get["/auth"] = {auth_uri: "/auth/facebook"};
+			config.routes.get["/auth/facebook"] = {callback_uri: "/auth/facebook/callback"};
+			config.routes.get["/auth/facebook/callback"] = function () {
+				arguments[1].redirect( "/" );
+			};
+
+			obj.server.use( "/auth/facebook", passport.authenticate( "facebook" ) );
+			obj.server.use( "/auth/facebook/callback", passport.authenticate( "facebook", {successRedirect: "/", failureRedirect: "/login"} ) );
+			obj.server.use( "(?!/auth/facebook).*$", function ( req, res, next ) {
+				if ( req.isAuthenticated() ) {
+					return next();
+				}
+				else {
+					res.redirect( "/login" );
+				}
+			} );
+		}
+		else if ( config.auth.google.enabled ) {
+			config.auth.protect.push( new RegExp( "^/auth/google", "i" ) );
+
+			passport.use( new GoogleStrategy( {
+					returnURL: realm + "/auth/google/callback",
+					realm: realm
+				}, function ( identifier, profile, done ) {
+					config.auth.google.auth.call( obj, identifier, profile, function ( err, user ) {
+						if ( err ) {
+							return done( err );
+						}
+
+						done( null, user );
+					} );
+				}
+			) );
+
+			config.routes.get["/auth"] = {auth_uri: "/auth/google"};
+			config.routes.get["/auth/google"] = {callback_uri: "/auth/google/callback"};
+			config.routes.get["/auth/google/callback"] = function () {
+				arguments[1].redirect( "/" );
+			};
+
+			obj.server.use( "/auth/google", passport.authenticate( "google" ) );
+			obj.server.use( "/auth/google/callback", passport.authenticate( "google", {failureRedirect: "/login"} ) );
+			obj.server.use( "(?!/auth/google).*$", function ( req, res, next ) {
+				if ( req.isAuthenticated() ) {
+					return next();
+				}
+				else {
+					res.redirect( "/login" );
+				}
+			} );
+		}
+		else if ( config.auth.linkedin.enabled ) {
+			config.auth.protect.push( new RegExp( "^/auth/linkedin", "i" ) );
+
+			passport.use( new LinkedInStrategy( {
+					consumerKey: config.auth.linkedin.client_id,
+					consumerSecret: config.auth.linkedin.client_secret,
+					callbackURL: realm + "/auth/linkedin/callback"
+				},
+				function ( token, tokenSecret, profile, done ) {
+					config.auth.linkedin.auth( token, tokenSecret, profile, function ( err, user ) {
+						if ( err ) {
+							return done( err );
+						}
+
+						done( null, user );
+					} );
+				}
+			) );
+
+			obj.server.get( "/auth/linkedin", passport.authenticate( "linkedin" ) );
+			obj.server.get( "/auth/linkedin/callback", passport.authenticate( "linkedin", {failureRedirect: "/login"} ) );
+			obj.server.get( "/auth/linkedin/callback", function () {
+				arguments[1].redirect( "/" );
+			} );
+			obj.server.use( "(?!/auth/linkedin).*", function ( req, res, next ) {
+				if ( req.isAuthenticated() ) {
+					return next();
+				}
+				else {
+					res.redirect( "/login" );
+				}
+			} );
+
+			config.routes.get["/auth"] = {auth_uri: "/auth/linkedin"};
+		}
+		else if ( config.auth.twitter.enabled ) {
+			config.auth.protect.push( new RegExp( "^/auth/twitter", "i" ) );
+
+			passport.use( new TwitterStrategy( {
+					consumerKey: config.auth.twitter.consumer_key,
+					consumerSecret: config.auth.twitter.consumer_secret,
+					callbackURL: realm + "/auth/twitter/callback"
+				}, function ( token, tokenSecret, profile, done ) {
+					config.auth.twitter.auth( token, tokenSecret, profile, function ( err, user ) {
+						if ( err ) {
+							return done( err );
+						}
+
+						done( null, user );
+					} );
+				}
+			) );
+
+			obj.server.get( "/auth/twitter", passport.authenticate( "twitter" ) );
+			obj.server.get( "/auth/twitter/callback", passport.authenticate( "twitter", {successRedirect: "/", failureRedirect: "/login"} ) );
+			obj.server.use( "(?!/auth/twitter).*", function ( req, res, next ) {
+				if ( req.isAuthenticated() ) {
+					return next();
+				}
+
 				res.redirect( "/login" );
-			}
-			else {
-				next();
-			}
-		} );
+			} );
 
-		config.routes.get["/auth"]   = {auth_uri: "/auth/linkedin"};
-		config.routes.get["/login"]  = {login_uri: "/auth"};
+			config.routes.get["/auth"] = {auth_uri: "/auth/twitter"};
+			config.routes.get["/auth/twitter"] = {callback_uri: "/auth/twitter/callback"};
+			config.routes.get["/auth/twitter/callback"] = function () {
+				arguments[1].redirect( "/" );
+			};
+		}
+
+		config.routes.get["/login"] = {login_uri: "/auth"};
 		config.routes.get["/logout"] = function ( req, res ) {
-			if ( req.session.authorized ) {
+			if ( req.session.authorized || req.session.isAuthorized() ) {
 				req.session.destroy();
 			}
 
 			res.redirect( "/" );
 		};
 	}
-	else if ( config.auth.twitter.enabled ) {
-		config.auth.protect.push( new RegExp( "^/auth/twitter", "i" ) );
-
-		obj.server.use( function () {
-			arguments[0].protectAsync = true;
-			arguments[2]();
-		} );
-
-		obj.server.use( passport.initialize() );
-		obj.server.use( passport.session() );
-
-		passport.use( new TwitterStrategy ( {
-				consumerKey    : config.auth.twitter.consumer_key,
-				consumerSecret : config.auth.twitter.consumer_secret,
-				callbackURL    : realm + "/auth/twitter/callback"
-			}, function( token, tokenSecret, profile, done ) {
-				config.auth.twitter.auth( token, tokenSecret, profile, function( err, user ) {
-					if ( err ) {
-						return done( err );
-					}
-
-					done( null, user );
-				} );
-			}
-		) );
-
-		obj.server.use( "/auth/twitter", function () {
-			console.log("here");
-			arguments[2]();
-		} );
-
-		obj.server.use( "/auth/twitter",          passport.authenticate( "twitter" ) );
-		obj.server.use( "/auth/twitter/callback", passport.authenticate( "twitter", {successRedirect: "/", failureRedirect: "/login"} ) );
-		obj.server.use( "(?!/auth/twitter).*", function ( req, res, next ) {
-			if ( req.isAuthenticated() ) {
-				return next();
-			}
-
-			res.redirect( "/login" );
-		} );
-
-		config.routes.get["/auth"]                  = {auth_uri: "/auth/twitter"};
-		config.routes.get["/auth/twitter"]          = {callback_uri: "/auth/twitter/callback"};
-		config.routes.get["/auth/twitter/callback"] = function () {
-			arguments[1].redirect( "/" );
-		};
-	}
-
-	obj.server.all( keymaster );
 
 	return config;
 }

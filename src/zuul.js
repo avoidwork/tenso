@@ -6,7 +6,7 @@
  * @return {Function}    Middleware
  */
 function zuul ( protect ) {
-	return function ( req, res, next ) {
+	return function zuul ( req, res, next ) {
 		var uri      = req.parsed.path,
 		    protectd = false;
 

@@ -40,12 +40,6 @@
 		}
 	},
 	"compress": true,
-	"cookie": {
-		"secret": "tenso",
-		"resave": true,
-		"rolling": true,
-		"saveUninitialized": true
-	},
 	"hostname": "127.0.0.1",
 	"json": 2,
 	"logs": {
@@ -55,10 +49,7 @@
 	"maxBytes": 1048576,
 	"port": 8000,
 	"routes": null,
-	"session": {
-		"key": "",
-		"max_age": 60000
-	},
+	"session" : null,
 	"ssl": {
 		"key": null,
 		"cert": null

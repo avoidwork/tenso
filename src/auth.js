@@ -17,7 +17,7 @@ function auth ( obj, config ) {
 
 	// Enabling sessions for non basic/bearer auth
 	if ( config.auth.facebook.enabled || config.auth.google.enabled || config.auth.local.enabled || config.auth.linkedin.enabled || config.auth.twitter.enabled ) {
-		obj.server.use( session( { secret: config.session || uuid() } ) );
+		obj.server.use( session( {secret: config.session.secret || uuid()} ) );
 		obj.server.use( cookie() );
 	}
 

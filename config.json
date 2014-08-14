@@ -49,7 +49,10 @@
 	"maxBytes": 1048576,
 	"port": 8000,
 	"routes": null,
-	"session" : null,
+	"session" : {
+		"secret": null,
+		"store": "memory"
+	},
 	"ssl": {
 		"key": null,
 		"cert": null

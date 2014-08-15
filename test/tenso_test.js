@@ -349,9 +349,10 @@ describe("Local", function () {
 
 						res.error( "Unauthorized", 401 );
 					}
-				},
-				login: "/login"
-			}
+				}
+			},
+			login: "/login",
+			session: {}
 		}
 	} );
 

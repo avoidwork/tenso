@@ -19,4 +19,5 @@ var turtleio = require( "turtle.io" ),
     FacebookStrategy = require( "passport-facebook" ).Strategy,
     GoogleStrategy   = require( "passport-google" ).Strategy,
     LinkedInStrategy = require( "passport-linkedin" ).Strategy,
-    TwitterStrategy  = require( "passport-twitter" ).Strategy;
+    TwitterStrategy  = require( "passport-twitter" ).Strategy,
+	RedisStore       = require( "connect-redis" )( session );

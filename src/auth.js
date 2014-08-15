@@ -9,7 +9,8 @@
 function auth ( obj, config ) {
 	var ssl   = config.ssl.cert && config.ssl.key,
 	    proto = "http" + ( ssl ? "s" : "" ),
-	    realm = proto + "://" + ( config.hostname === "localhost" ? "127.0.0.1" : config.hostname ) + ( config.port !== 80 && config.port !== 443 ? ":" + config.port : "" );
+	    realm = proto + "://" + ( config.hostname === "localhost" ? "127.0.0.1" : config.hostname ) + ( config.port !== 80 && config.port !== 443 ? ":" + config.port : "" ),
+	    sesh;
 
 	config.auth.protect = ( config.auth.protect || [] ).map( function ( i ) {
 		return new RegExp( "^" + i !== "/login" ? i.replace( /\.\*/g, "*" ).replace( /\*/g, ".*" ) : "$", "i" );
@@ -17,7 +18,15 @@ function auth ( obj, config ) {
 
 	// Enabling sessions for non basic/bearer auth
 	if ( config.auth.facebook.enabled || config.auth.google.enabled || config.auth.local.enabled || config.auth.linkedin.enabled || config.auth.twitter.enabled ) {
-		obj.server.use( session( {secret: config.session.secret || uuid()} ) );
+		sesh = {
+			secret: config.session.secret || uuid()
+		};
+
+		if ( config.session.store === "redis" ) {
+			sesh.store = new RedisStore( config.session.redis );
+		}
+
+		obj.server.use( session( sesh ) );
 		obj.server.use( cookie() );
 	}
 

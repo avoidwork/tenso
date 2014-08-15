@@ -57,6 +57,8 @@ hypermedia links.
 
 For example, if the key `user_id` was found, it would be mapped to `/users/:id` with a link `rel` of `related`.
 
+Tensō will bend the rules of REST when using authentication strategies provided by passport.js, which relies on a session. Session storage is in memory, or Redis. You have the option of a stateless or stateful API.
+
 ## Cache
 Tensō has a robust multi-level cache strategy, starting at the response headers. If a response can be cached, an `Etag` will be sent to the `Client`, and registered in an `Etag LRU cache` which Tensō 
 uses along with a 'cache compressed asset to disk' strategy, allowing Tensō to stream the last known version of a resource to the next `Client` that supports the same compression (gzip or deflate).
@@ -92,7 +94,7 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 ```
 
 ## Authentication
-The `protect` Array is the endpoints that will require authentication. Sessions are used for non `Basic` or `Bearer Token` authentication, and will have `/login`, `/logout`, & custom routes.
+The `protect` Array is the endpoints that will require authentication. Sessions are used for non `Basic` or `Bearer Token` authentication, and will have `/login`, `/logout`, & custom routes. Redis is supported for session storage.
 
 ### Basic Auth
 ```javascript
@@ -125,7 +127,7 @@ Facebook authentication will create `/auth`, `/auth/facebook`, & `/auth/facebook
 ```
 
 ### Google
-Google authentication will create `/auth`, `/auth/google`, & `/auth/google/callback` routes. `auth(identifier, profile, callback)` must execute `callback(err, user)`.
+Google authentication (OpenID) will create `/auth`, `/auth/google`, & `/auth/google/callback` routes. `auth(identifier, profile, callback)` must execute `callback(err, user)`.
  
 ```javascript
 {

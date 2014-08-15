@@ -51,7 +51,7 @@
 	"routes": null,
 	"session" : {
 		"secret": null,
-		"store": "redis",
+		"store": "memory",
 		"redis": {
 			"host": "127.0.0.1",
 			"port": 6379

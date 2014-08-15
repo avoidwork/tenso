@@ -17,7 +17,7 @@ require( "tenso" )( {routes: require( __dirname + "/routes.js" )} );
 ### Creating Routes
 Routes are loaded as a module, with each HTTP method as an export, affording a very customizable API server.
 
-Route handlers have the context of the Tensō server, i.e. `this` will allow you to send a response with `this.respond( req, res, body[, status, headers] )`.
+Route handlers have the context of the Tensō server, i.e. `this` will allow you to send a response with `this.respond( req, res, body[, status, headers] )`. You can also use `res` to `respond(body[, status])`, `redirect(url)`, or `error(Error[, status])`. 
 
 The following example will create GET routes that will return an empty `Array` at `/`, an `Error` at `/reports/tps`, & a version 4 UUID at `/uuid`.
 
@@ -85,9 +85,14 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 	},
 	"port": 8000, /* Optional, default is 8000 */
 	"routes": require( "./routes.js" ), /* Required! */
+	"session": { /* Optional */
+		"secret": null,
+		"store": "memory", /* "memory" or "redis" */
+		"redis": /* See connect-redis for options */
+	},
 	"ssl": { /* Optional */
-		"key": null,
-		"cert": null
+		"cert": null,
+		"key": null
 	},
 	"uid": N /* Optional, system account uid to drop to after starting with elevated privileges to run on a low port */
 }

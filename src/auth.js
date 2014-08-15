@@ -19,7 +19,9 @@ function auth ( obj, config ) {
 	// Enabling sessions for non basic/bearer auth
 	if ( config.auth.facebook.enabled || config.auth.google.enabled || config.auth.local.enabled || config.auth.linkedin.enabled || config.auth.twitter.enabled ) {
 		sesh = {
-			secret: config.session.secret || uuid()
+			secret: config.session.secret || uuid(),
+			saveUninitialized: true,
+			rolling: true
 		};
 
 		if ( config.session.store === "redis" ) {

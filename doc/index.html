@@ -62,6 +62,10 @@
 						</li>
 						
 						<li>
+							<a href="global.html#keymaster">keymaster</a>
+						</li>
+						
+						<li>
 							<a href="global.html#prepare">prepare</a>
 						</li>
 						
@@ -123,11 +127,8 @@
 <p>Tensō will handle the serialization &amp; creation of hypermedia links, all you have to do is give it <code>Arrays</code> or <code>Objects</code>.</p>
 <p><a href="http://travis-ci.org/avoidwork/tenso"><img src="https://secure.travis-ci.org/avoidwork/tenso.svg" alt="build status"></a></p>
 <h2>Example</h2>
-<p>Creating an API with Tensō is as simple as three statements.</p>
-<pre><code class="lang-javascript">var tenso  = require( &quot;tenso&quot; ),
-    routes = require( &quot;./routes.js&quot; );
-
-tenso( {routes: routes} );</code></pre>
+<p>Creating an API with Tensō can be as simple as one statement.</p>
+<pre><code class="lang-javascript">require( &quot;tenso&quot; )( {routes: require( __dirname + &quot;/routes.js&quot; )} );</code></pre>
 <h3>Creating Routes</h3>
 <p>Routes are loaded as a module, with each HTTP method as an export, affording a very customizable API server.</p>
 <p>Route handlers have the context of the Tensō server, i.e. <code>this</code> will allow you to send a response with <code>this.respond( req, res, body[, status, headers] )</code>.</p>
@@ -158,6 +159,7 @@ The result will be in <code>data.result</code>.</p>
 relationships, and create the appropriate Objects in the <code>link</code> Array, as well as the <code>Link</code> HTTP header. Object keys that match this pattern: <code>/_(guid|uuid|id|uri|url)$/</code> will be considered
 hypermedia links.</p>
 <p>For example, if the key <code>user_id</code> was found, it would be mapped to <code>/users/:id</code> with a link <code>rel</code> of <code>related</code>.</p>
+<p>Tensō will bend the rules of REST when using authentication strategies provided by passport.js, which relies on a session. Session storage is in memory, or Redis. You have the option of a stateless or stateful API.</p>
 <h2>Cache</h2>
 <p>Tensō has a robust multi-level cache strategy, starting at the response headers. If a response can be cached, an <code>Etag</code> will be sent to the <code>Client</code>, and registered in an <code>Etag LRU cache</code> which Tensō 
 uses along with a 'cache compressed asset to disk' strategy, allowing Tensō to stream the last known version of a resource to the next <code>Client</code> that supports the same compression (gzip or deflate).
@@ -187,7 +189,7 @@ uses along with a 'cache compressed asset to disk' strategy, allowing Tensō to 
     &quot;uid&quot;: N /* Optional, system account uid to drop to after starting with elevated privileges to run on a low port */
 }</code></pre>
 <h2>Authentication</h2>
-<p>The <code>protect</code> Array is the endpoints that will require authentication. Planned authentication options are <code>Twitter</code>, &amp; <code>LinkedIn</code>.</p>
+<p>The <code>protect</code> Array is the endpoints that will require authentication. Sessions are used for non <code>Basic</code> or <code>Bearer Token</code> authentication, and will have <code>/login</code>, <code>/logout</code>, &amp; custom routes. Redis is supported for session storage.</p>
 <h3>Basic Auth</h3>
 <pre><code class="lang-javascript">{
     &quot;auth&quot;: {
@@ -199,16 +201,52 @@ uses along with a 'cache compressed asset to disk' strategy, allowing Tensō to 
     }
 }</code></pre>
 <h3>Facebook</h3>
-<p>Facebook authentication will create <code>/auth</code>, &amp; <code>/auth/facebook</code> routes. <code>auth(accessToken, refreshToken, profile, callback)</code> must execute <code>callback(err, user)</code>.</p>
+<p>Facebook authentication will create <code>/auth</code>, <code>/auth/facebook</code>, &amp; <code>/auth/facebook/callback</code> routes. <code>auth(accessToken, refreshToken, profile, callback)</code> must execute <code>callback(err, user)</code>.</p>
 <pre><code class="lang-javascript">{
     &quot;auth&quot;: {
         &quot;facebook&quot;: {
             &quot;enabled&quot;: true,
-            &quot;auth&quot;: function ( ... ) { ... }, /* Authencation handler, to 'find' or 'create' a User */
-            &quot;consumer_key&quot;: &quot;&quot;, /* Get this from Facebook */
-            &quot;consumer_secret&quot;: &quot;&quot;, /* Get this from Facebook */
-            &quot;callback_url&quot;: &quot;&quot; /* This must match your application in Facebook */
-            &quot;login&quot;: &quot;/login&quot; /* Path to redirect to on failed authentication */
+            &quot;auth&quot;: function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
+            &quot;client_id&quot;: &quot;&quot;, /* Get this from Facebook */
+            &quot;client_secret&quot;: &quot;&quot; /* Get this from Facebook */
+        },
+        &quot;protect&quot;: [&quot;/private&quot;]
+    }
+}</code></pre>
+<h3>Google</h3>
+<p>Google authentication (OpenID) will create <code>/auth</code>, <code>/auth/google</code>, &amp; <code>/auth/google/callback</code> routes. <code>auth(identifier, profile, callback)</code> must execute <code>callback(err, user)</code>.</p>
+<pre><code class="lang-javascript">{
+    &quot;auth&quot;: {
+        &quot;google&quot;: {
+            &quot;enabled&quot;: true,
+            &quot;auth&quot;: function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
+        },
+        &quot;protect&quot;: [&quot;/private&quot;]
+    }
+}</code></pre>
+<h3>LinkedIn</h3>
+<p>LinkedIn authentication will create <code>/auth</code>, <code>/auth/linkedin</code>, &amp; <code>/auth/linkedin/callback</code> routes. <code>auth(authCode, authToken, expiresIn, callback)</code> must execute <code>callback(err, user)</code>.</p>
+<pre><code class="lang-javascript">{
+    &quot;auth&quot;: {
+        &quot;linkedin&quot;: {
+            &quot;enabled&quot;: true,
+            &quot;auth&quot;: function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
+            &quot;client_id&quot;: &quot;&quot;, /* Get this from LinkedIn */
+            &quot;client_secret&quot;: &quot;&quot;, /* Get this from LinkedIn */,
+            &quot;scope&quot;: &quot;&quot; /* Optional, permission scope */
+        }
+        &quot;protect&quot;: [&quot;/private&quot;]
+    }
+}</code></pre>
+<h3>Twitter</h3>
+<p>Twitter authentication will create <code>/auth</code>, <code>/auth/twitter</code>, &amp; <code>/auth/twitter/callback</code> routes. <code>auth(token, tokenSecret, profile, callback)</code> must execute <code>callback(err, user)</code>.</p>
+<pre><code class="lang-javascript">{
+    &quot;auth&quot;: {
+        &quot;twitter&quot;: {
+            &quot;enabled&quot;: true,
+            &quot;auth&quot;: function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
+            &quot;consumer_key&quot;: &quot;&quot;, /* Get this from Twitter */
+            &quot;consumer_secret&quot;: &quot;&quot; /* Get this from Twitter */
         },
         &quot;protect&quot;: [&quot;/private&quot;]
     }
@@ -255,10 +293,22 @@ uses along with a 'cache compressed asset to disk' strategy, allowing Tensō to 
                 else {
                     res.redirect( &quot;/login&quot; );
                 }
-            },
-            &quot;login&quot;: &quot;/login&quot;
+            }
         }
         &quot;protect&quot;: [&quot;/private&quot;]
+    }
+}</code></pre>
+<h2>Sessions</h2>
+<p>Sessions can use a memory (default) or redis store. Memory will limit your sessions to a single server instance, while redis will allow you to share sessions across a cluster of processes, or machines. To use redis, set the <code>store</code> property to &quot;redis&quot;.</p>
+<p>If the session <code>secret</code> is not provided, a version 4 <code>UUID</code> will be used.</p>
+<pre><code class="lang-javascript">{
+    &quot;session&quot; : {
+        &quot;secret&quot;: &quot;my secret&quot;,
+        &quot;store&quot;: &quot;redis&quot;,
+        &quot;redis&quot;: {
+            &quot;host&quot;: &quot;127.0.0.1&quot;,
+            &quot;port&quot;: 6379
+        }
     }
 }</code></pre>
 <h2>Compression</h2>
@@ -281,20 +331,21 @@ uses along with a 'cache compressed asset to disk' strategy, allowing Tensō to 
 }</code></pre>
 <h2>Logging</h2>
 <p>Standard log levels are supported, and are emitted (by configuration) to <code>stdout</code> &amp; <code>stderr</code>, &amp; <code>syslog</code>.</p>
-<h2>Dtrace</h2>
-<p>Dtrace probes can be enabled by configuration (disabled by default), and can be observed as <code>turtle-io</code>; Tensō is built on <a href="https://github.com/avoidwork/turtle.io">turtle.io</a>.</p>
+<h2>DTrace</h2>
+<p>DTrace probes can be enabled by configuration (disabled by default). A shell script is available at <code>./node_modules/turtle.io/dtrace.sh</code> to observe the probes.
+The last argument for each probe is the nanoseconds it took to execute.</p>
 <pre><code>&quot;allowed&quot;,        &quot;char *&quot;, &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;
 &quot;allows&quot;,         &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;
 &quot;compress&quot;,       &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;
 &quot;compression&quot;,    &quot;char *&quot;, &quot;int&quot;
-&quot;error&quot;,          &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;, &quot;char *&quot;, &quot;int&quot;
-&quot;headers&quot;,        &quot;int&quot;, &quot;int&quot;
-&quot;log&quot;,            &quot;char *&quot;, &quot;int&quot;, &quot;int&quot;, &quot;int&quot;
+&quot;error&quot;,          &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;,    &quot;char *&quot;, &quot;int&quot;
+&quot;headers&quot;,        &quot;int&quot;,    &quot;int&quot;
+&quot;log&quot;,            &quot;char *&quot;, &quot;int&quot;,    &quot;int&quot;,    &quot;int&quot;
 &quot;proxy&quot;,          &quot;char *&quot;, &quot;char *&quot;, &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;
 &quot;middleware&quot;,     &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;
 &quot;request&quot;,        &quot;char *&quot;, &quot;int&quot;
-&quot;respond&quot;,        &quot;char *&quot;, &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;, &quot;int&quot;
-&quot;status&quot;,         &quot;int&quot;, &quot;int&quot;, &quot;int&quot;, &quot;int&quot;, &quot;int&quot;
+&quot;respond&quot;,        &quot;char *&quot;, &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;,    &quot;int&quot;
+&quot;status&quot;,         &quot;int&quot;,    &quot;int&quot;,    &quot;int&quot;,    &quot;int&quot;,    &quot;int&quot;
 &quot;write&quot;,          &quot;char *&quot;, &quot;char *&quot;, &quot;char *&quot;, &quot;char *&quot;, &quot;int&quot;</code></pre>
 <h2>License</h2>
 <p>Copyright (c) 2014 Jason Mulligan<br>Licensed under the BSD-3 license.</p></article>
@@ -319,7 +370,7 @@ uses along with a 'cache compressed asset to disk' strategy, allowing Tensō to 
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a>
-		on 2014-08-08T20:30:08-04:00 using the <a
+		on 2014-08-15T07:43:52-04:00 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

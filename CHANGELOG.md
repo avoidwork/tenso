@@ -1,14 +1,14 @@
 # Change Log
 
 ## 0.4.0
-- Added `Facebook`, `Google`, & `Twitter` authentication via `passport`
-- Added `LinkedIn` authentication
+- Added `Facebook`, `Google`, `LinkedIn`, & `Twitter` authentication via `passport`
 - Fixed the `RegExp` used to retrieve the rate limit id from the `authorization` header
 - Moved authentication gateway middleware into `zuul()`, & fixed what it tests
 - Fixed `prepare()` by cloning the response body
 - Changed default host to `127.0.0.1`
 - Decorating `req.protect` & `req.protectAsync` from `zuul()` and various authentication strategies
-- Upgrading turtle.io to 3.0.0 for middleware pipeline
+- Upgrading turtle.io to 3.0.10 for middleware pipeline & misc fixes to make it play nice with passport.js
+- Added support for Redis as a session store
 
 ## 0.3.6
 - Upgraded turtle.io to 2.3.0

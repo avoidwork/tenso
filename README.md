@@ -57,7 +57,7 @@ hypermedia links.
 
 For example, if the key `user_id` was found, it would be mapped to `/users/:id` with a link `rel` of `related`.
 
-Tensō will bend the rules of REST when using authentication strategies provided by passport.js, which relies on a session. Session storage is in memory, or Redis. You have the option of a stateless or stateful API.
+Tensō will bend the rules of REST when using authentication strategies provided by passport.js, which rely on a session. Session storage is in memory, or Redis. You have the option of a stateless or stateful API.
 
 ## Cache
 Tensō has a robust multi-level cache strategy, starting at the response headers. If a response can be cached, an `Etag` will be sent to the `Client`, and registered in an `Etag LRU cache` which Tensō 
@@ -226,6 +226,24 @@ Do not protect `/`, as it'll block the authentication end points. `local` authen
 			}
 		}
 		"protect": ["/private"]
+	}
+}
+```
+
+## Sessions
+Sessions can use a memory (default) or redis store. Memory will limit your sessions to a single server instance, while redis will allow you to share sessions across a cluster of processes, or machines. To use redis, set the `store` property to "redis".
+
+If the session `secret` is not provided, a version 4 `UUID` will be used.
+
+```javascript
+{
+	"session" : {
+		"secret": "my secret",
+		"store": "redis",
+		"redis": {
+			"host": "127.0.0.1",
+			"port": 6379
+		}
 	}
 }
 ```

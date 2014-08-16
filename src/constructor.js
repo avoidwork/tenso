@@ -110,6 +110,12 @@ Tenso.prototype.redirect = function ( req, res, uri ) {
 Tenso.prototype.respond = function ( req, res, arg, status, headers ) {
 	var ref = [headers || {}];
 
+	if ( REGEX_MODIFY.test( this.server.allows( req.parsed.pathname ) ) ) {
+		if ( this.server.config.security.csrf && res.locals[this.server.config.security.key] ) {
+			ref[0]["x-csrf-token"] = res.locals[this.server.config.security.key];
+		}
+	}
+
 	if ( !res._header ) {
 		this.server.respond( req, res, hypermedia( this.server, req, response( arg, status ), ref[0] ), status, ref[0] );
 	}

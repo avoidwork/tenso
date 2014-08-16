@@ -16,8 +16,7 @@ function auth ( obj, config ) {
 		return new RegExp( "^" + i !== "/login" ? i.replace( /\.\*/g, "*" ).replace( /\*/g, ".*" ) : "$", "i" );
 	} );
 
-	// Enabling sessions for non basic/bearer auth
-	if ( config.auth.facebook.enabled || config.auth.google.enabled || config.auth.local.enabled || config.auth.linkedin.enabled || config.auth.twitter.enabled ) {
+	if ( config.auth.facebook.enabled || config.auth.google.enabled || config.auth.local.enabled || config.auth.linkedin.enabled || config.auth.twitter.enabled || config.security.csrf ) {
 		sesh = {
 			secret: config.session.secret || uuid(),
 			saveUninitialized: true,
@@ -30,6 +29,30 @@ function auth ( obj, config ) {
 
 		obj.server.use( session( sesh ) );
 		obj.server.use( cookie() );
+
+		if ( config.security.csrf ) {
+			obj.server.use( lusca.csrf( {key: config.security.key} ) );
+		}
+	}
+
+	if ( config.security.csp instanceof Object ) {
+		obj.server.use( lusca.csp( config.security.csp ) );
+	}
+
+	if ( !string.isEmpty( config.security.xframe ) ) {
+		obj.server.use( lusca.xframe( config.security.xframe ) );
+	}
+
+	if ( !string.isEmpty( config.security.p3p ) ) {
+		obj.server.use( lusca.p3p( config.security.p3p ) );
+	}
+
+	if ( config.security.hsts instanceof Object ) {
+		obj.server.use( lusca.hsts( config.security.hsts ) );
+	}
+
+	if ( config.security.xssProtection instanceof Object ) {
+		obj.server.use( lusca.xssProtection( config.security.xssProtection ) );
 	}
 
 	obj.server.use( zuul( config.auth.protect ) );
@@ -132,7 +155,7 @@ function auth ( obj, config ) {
 			config.auth.local.auth.apply( obj, arguments );
 		};
 	}
-	else {
+	else if ( config.auth.facebook.enabled || config.auth.google.enabled || config.auth.local.enabled || config.auth.linkedin.enabled || config.auth.twitter.enabled ) {
 		obj.server.use( function asyncFlag () {
 			arguments[0].protectAsync = true;
 			arguments[2]();

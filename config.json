@@ -46,6 +46,15 @@
 		"dtrace": false,
 		"syslog": false
 	},
+	"security": {
+		"key": "_csrf",
+		"csrf": false,
+		"csp": null,
+		"xframe": "",
+		"p3p": "",
+		"hsts": null,
+		"xssProtection": null
+	},
 	"maxBytes": 1048576,
 	"port": 8000,
 	"routes": null,

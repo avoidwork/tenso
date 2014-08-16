@@ -103,10 +103,12 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-contrib-watch");
 	grunt.loadNpmTasks("grunt-contrib-sass");
 	grunt.loadNpmTasks("grunt-mocha-test");
+	grunt.loadNpmTasks("grunt-nsp-package");
 
 	// aliases
 	grunt.registerTask("build", ["concat", "sed", "sass"]);
 	grunt.registerTask("test", ["jshint", "mochaTest"]);
 	grunt.registerTask("default", ["build", "test"]);
-	grunt.registerTask("package", ["default", "test", "jsdoc"]);
+	grunt.registerTask("validate", "validate-package");
+	grunt.registerTask("package", ["validate", "default", "test", "jsdoc"]);
 };

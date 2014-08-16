@@ -57,7 +57,7 @@ hypermedia links.
 
 For example, if the key `user_id` was found, it would be mapped to `/users/:id` with a link `rel` of `related`.
 
-Tensō will bend the rules of REST when using authentication strategies provided by passport.js, which rely on a session. Session storage is in memory, or Redis. You have the option of a stateless or stateful API.
+Tensō will bend the rules of REST when using authentication strategies provided by passport.js, or CSRF if is enabled, because they rely on a session. Session storage is in memory, or Redis. You have the option of a stateless or stateful API.
 
 ## Cache
 Tensō has a robust multi-level cache strategy, starting at the response headers. If a response can be cached, an `Etag` will be sent to the `Client`, and registered in an `Etag LRU cache` which Tensō 
@@ -250,6 +250,16 @@ If the session `secret` is not provided, a version 4 `UUID` will be used.
 			"port": 6379
 		}
 	}
+}
+```
+
+
+## Security
+Tensō uses [lusca](https://github.com/krakenjs/lusca#api) for security as a middleware. Please see it's documentation for how to configure it; each method & argument is a key:value pair for `security`.
+
+```javascript
+{
+	"security": { ... }
 }
 ```
 

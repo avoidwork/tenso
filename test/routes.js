@@ -7,7 +7,7 @@ module.exports.get = {
 	"/uuid": function (req, res) {
 		this.respond( req, res, uuid() );
 	},
-	"/something": {"user_id": 123, "title": "This is a title", "body": "Where is my body?", "source_url": "http://source.tld"}
+	"/somethings/abc": {"something_id": "abc", "user_id": 123, "title": "This is a title", "body": "Where is my body?", "source_url": "http://source.tld"}
 }
 
 module.exports.post = {

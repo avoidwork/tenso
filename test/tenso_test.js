@@ -219,13 +219,13 @@ describe("Hypermedia", function () {
 
 	tenso( {port: port, routes: routes, logs: {level: "error"}} );
 
-	describe("GET /something", function () {
+	describe("GET /somethings/abc", function () {
 		it("returns an entity that has hypermedia properties", function (done) {
 			api( port )
-				.get("/something")
+				.get("/somethings/abc")
 				.expectStatus(200)
-				.expectValue("data.link", [{ uri: "http://localhost:" + port + "/users/123", rel: "related" }, { uri: "http://source.tld", rel: "related" }])
-				.expectValue("data.result", {"title": "This is a title", "body": "Where is my body?"})
+				.expectValue("data.link", [{ uri: "http://localhost:" + port + "/somethings", rel: "collection" }, { uri: "http://localhost:" + port + "/users/123", rel: "related" }, { uri: "http://source.tld", rel: "related" }])
+				.expectValue("data.result", {"something_id": "abc", "title": "This is a title", "body": "Where is my body?"})
 				.expectValue("error", null)
 				.expectValue("status", 200)
 				.end(function(err) {

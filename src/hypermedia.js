@@ -14,7 +14,7 @@
  * @return {Undefined}      undefined
  */
 function hypermedia ( server, req, rep, headers ) {
-	var query, page, page_size, nth, root;
+	var query, page, page_size, nth, root, keys;
 
 	if ( rep.status >= 200 && rep.status <= 206 ) {
 		query     = req.parsed.query;
@@ -54,20 +54,28 @@ function hypermedia ( server, req, rep, headers ) {
 			}
 		}
 		else if ( rep.data.result instanceof Object ) {
-			array.each( array.keys( rep.data.result ), function ( i ) {
-				var collection, uri;
+			keys = array.keys( rep.data.result );
 
-				// If ID like keys are found, and are not URIs, they are assumed to be root collections
-				if ( /_(guid|uuid|id|url|uri)$/.test( i ) ) {
-					collection = i.replace( /_.*$/, "" ).replace( /s$/, "" ) + "s";
-					uri =/^(\w+\:\/\/)|\//.test( rep.data.result[i] ) ? ( rep.data.result[i].indexOf( "//" ) > -1 ? rep.data.result[i] : req.parsed.protocol + "//" + req.parsed.host + rep.data.result[i] ) : ( req.parsed.protocol + "//" + req.parsed.host + "/" + collection + "/" + rep.data.result[i] );
-					rep.data.link.push( {uri: uri, rel: "related"} );
-					delete rep.data.result[i];
-				}
-			} );
+			rep.data.link.push( {uri: root.replace( REGEX_COLLECTION, "$1" ), rel: "collection"} );
 
-			if ( array.keys( rep.data.result ).length === 0 ) {
+			if ( keys.length === 0 ) {
 				rep.data.result = null;
+			}
+			else {
+				array.each( keys, function ( i ) {
+					var collection, uri;
+
+					// If ID like keys are found, and are not URIs, they are assumed to be root collections
+					if ( REGEX_HYPERMEDIA.test( i ) ) {
+						collection = i.replace( REGEX_TRAILING, "" ).replace( REGEX_TRAILING_S, "" ) + "s";
+						uri = REGEX_SCHEME.test( rep.data.result[i] ) ? ( rep.data.result[i].indexOf( "//" ) > -1 ? rep.data.result[i] : req.parsed.protocol + "//" + req.parsed.host + rep.data.result[i] ) : ( req.parsed.protocol + "//" + req.parsed.host + "/" + collection + "/" + rep.data.result[i] );
+
+						if ( uri !== root ) {
+							rep.data.link.push( {uri: uri, rel: "related"} );
+							delete rep.data.result[i];
+						}
+					}
+				} );
 			}
 		}
 

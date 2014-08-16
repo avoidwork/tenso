@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.4.1
+- Fixed an edge case in `hypermedia()` such that the `URI` is not lifted into the `links` Array via automagic, updated test
+- Updated `hypermedia()` to add a `collection` link for an `Entity` representation _[RFC6573]_, updated test
+- Cached `RegExp` invariants
+
 ## 0.4.0
 - Added `Facebook`, `Google`, `LinkedIn`, & `Twitter` authentication via `passport`
 - Fixed the `RegExp` used to retrieve the rate limit id from the `authorization` header

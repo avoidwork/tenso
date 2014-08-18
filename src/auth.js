@@ -10,7 +10,7 @@ function auth ( obj, config ) {
 	var ssl   = config.ssl.cert && config.ssl.key,
 	    proto = "http" + ( ssl ? "s" : "" ),
 	    realm = proto + "://" + ( config.hostname === "localhost" ? "127.0.0.1" : config.hostname ) + ( config.port !== 80 && config.port !== 443 ? ":" + config.port : "" ),
-	    sesh;
+	    sesh, fnCookie, fnSesh, luscaCsrf, luscaCsp, luscaXframe, luscaP3p, luscaHsts, luscaXssProtection, protection;
 
 	config.auth.protect = ( config.auth.protect || [] ).map( function ( i ) {
 		return new RegExp( "^" + i !== "/login" ? i.replace( /\.\*/g, "*" ).replace( /\*/g, ".*" ) : "$", "i" );
@@ -27,35 +27,44 @@ function auth ( obj, config ) {
 			sesh.store = new RedisStore( config.session.redis );
 		}
 
-		obj.server.use( session( sesh ) );
-		obj.server.use( cookie() );
+		fnCookie = cookie();
+		fnSesh = session( sesh );
+		obj.server.use( fnSesh ).blacklist( fnSesh );
+		obj.server.use( fnCookie ).blacklist( fnCookie );
 
 		if ( config.security.csrf ) {
-			obj.server.use( lusca.csrf( {key: config.security.key} ) );
+			luscaCsrf = lusca.csrf( {key: config.security.key} );
+			obj.server.use( lusca.csrf( {key: config.security.key} ) ).blacklist( luscaCsrf );
 		}
 	}
 
 	if ( config.security.csp instanceof Object ) {
-		obj.server.use( lusca.csp( config.security.csp ) );
+		luscaCsp = lusca.csp( config.security.csp );
+		obj.server.use( luscaCsp ).blacklist( luscaCsp );
 	}
 
 	if ( !string.isEmpty( config.security.xframe ) ) {
-		obj.server.use( lusca.xframe( config.security.xframe ) );
+		luscaXframe = lusca.xframe( config.security.xframe );
+		obj.server.use( luscaXframe ).blacklist( luscaXframe );
 	}
 
 	if ( !string.isEmpty( config.security.p3p ) ) {
-		obj.server.use( lusca.p3p( config.security.p3p ) );
+		luscaP3p = lusca.p3p( config.security.p3p );
+		obj.server.use( luscaP3p ).blacklist( luscaP3p );
 	}
 
 	if ( config.security.hsts instanceof Object ) {
-		obj.server.use( lusca.hsts( config.security.hsts ) );
+		luscaHsts = lusca.hsts( config.security.hsts );
+		obj.server.use( luscaHsts ).blacklist( luscaHsts );
 	}
 
 	if ( config.security.xssProtection instanceof Object ) {
-		obj.server.use( lusca.xssProtection( config.security.xssProtection ) );
+		luscaXssProtection = lusca.xssProtection( config.security.xssProtection );
+		obj.server.use( luscaXssProtection ).blacklist( luscaXssProtection );
 	}
 
-	obj.server.use( zuul( config.auth.protect ) );
+	protection = zuul( config.auth.protect );
+	obj.server.use( protection ).blacklist( protection );
 
 	if ( config.auth.basic.enabled ) {
 		( function () {

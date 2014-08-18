@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.4.3
+- Upgrading turtle.io to 3.0.13 & blacklisting all authentication middleware
+
 ## 0.4.2
 - Added lusca for security, enabling CSRF by default
 - Added grunt-nsp-package for module vulnerability scanning during `package` task

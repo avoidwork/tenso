@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.4.4
+- Fixed blacklisting of middleware within `auth()`
+
 ## 0.4.3
 - Upgrading turtle.io to 3.0.13 & blacklisting all authentication middleware
 

@@ -10,7 +10,7 @@ function auth ( obj, config ) {
 	var ssl   = config.ssl.cert && config.ssl.key,
 	    proto = "http" + ( ssl ? "s" : "" ),
 	    realm = proto + "://" + ( config.hostname === "localhost" ? "127.0.0.1" : config.hostname ) + ( config.port !== 80 && config.port !== 443 ? ":" + config.port : "" ),
-	    sesh, fnCookie, fnSesh, luscaCsrf, luscaCsp, luscaXframe, luscaP3p, luscaHsts, luscaXssProtection, protection;
+	    sesh, fnCookie, fnSesh, luscaCsrf, luscaCsp, luscaXframe, luscaP3p, luscaHsts, luscaXssProtection, protection, passportAuth, passportInit, passportSession;
 
 	config.auth.protect = ( config.auth.protect || [] ).map( function ( i ) {
 		return new RegExp( "^" + i !== "/login" ? i.replace( /\.\*/g, "*" ).replace( /\*/g, ".*" ) : "$", "i" );
@@ -29,12 +29,13 @@ function auth ( obj, config ) {
 
 		fnCookie = cookie();
 		fnSesh = session( sesh );
+
 		obj.server.use( fnSesh ).blacklist( fnSesh );
 		obj.server.use( fnCookie ).blacklist( fnCookie );
 
 		if ( config.security.csrf ) {
 			luscaCsrf = lusca.csrf( {key: config.security.key} );
-			obj.server.use( lusca.csrf( {key: config.security.key} ) ).blacklist( luscaCsrf );
+			obj.server.use( luscaCsrf ).blacklist( luscaCsrf );
 		}
 	}
 
@@ -88,7 +89,8 @@ function auth ( obj, config ) {
 				}
 			};
 
-			obj.server.use( passport.initialize() );
+			passportInit = passport.initialize();
+			obj.server.use( passportInit ).blacklist( passportInit );
 
 			passport.use( new BasicStrategy (
 				function( username, password, done ) {
@@ -108,7 +110,8 @@ function auth ( obj, config ) {
 				}
 			) );
 
-			obj.server.use( passport.authenticate( "basic", {session: false} ) );
+			passportAuth = passport.authenticate( "basic", {session: false} );
+			obj.server.use( passportAuth ).blacklist( passportAuth );
 		} )();
 	}
 	else if ( config.auth.bearer.enabled ) {
@@ -125,7 +128,8 @@ function auth ( obj, config ) {
 				}
 			};
 
-			obj.server.use( passport.initialize() );
+			passportInit = passport.initialize();
+			obj.server.use( passportInit ).blacklist( passportInit );
 
 			passport.use( new BearerStrategy (
 				function( token, done ) {
@@ -145,11 +149,12 @@ function auth ( obj, config ) {
 				}
 			) );
 
-			obj.server.use( passport.authenticate( "bearer", {session: false} ) );
+			passportAuth = passport.authenticate( "bearer", {session: false} );
+			obj.server.use( passportAuth ).blacklist( passportAuth );
 		} )();
 	}
 	else if ( config.auth.local.enabled ) {
-		obj.server.use( config.auth.local.middleware );
+		obj.server.use( config.auth.local.middleware ).blacklist( config.auth.local.middleware );
 
 		config.routes.get["/login"] = "POST credentials to authenticate";
 		config.routes.get["/logout"] = function ( req, res ) {
@@ -170,8 +175,11 @@ function auth ( obj, config ) {
 			arguments[2]();
 		} );
 
-		obj.server.use( passport.initialize() );
-		obj.server.use( passport.session() );
+		passportInit    = passport.initialize();
+		passportSession = passport.session();
+
+		obj.server.use( passportInit ).blacklist( passportInit );
+		obj.server.use( passportSession ).blacklist( passportSession );
 
 		passport.serializeUser( function ( user, done ) {
 			done( null, user );
@@ -185,9 +193,9 @@ function auth ( obj, config ) {
 			config.auth.protect.push( new RegExp( "^/auth/facebook", "i" ) );
 
 			passport.use( new FacebookStrategy( {
-					clientID: config.auth.facebook.client_id,
-					clientSecret: config.auth.facebook.client_secret,
-					callbackURL: realm + "/auth/facebook/callback"
+					clientID     : config.auth.facebook.client_id,
+					clientSecret : config.auth.facebook.client_secret,
+					callbackURL  : realm + "/auth/facebook/callback"
 				}, function ( accessToken, refreshToken, profile, done ) {
 					config.auth.facebook.auth( accessToken, refreshToken, profile, function ( err, user ) {
 						if ( err ) {
@@ -220,8 +228,8 @@ function auth ( obj, config ) {
 			config.auth.protect.push( new RegExp( "^/auth/google", "i" ) );
 
 			passport.use( new GoogleStrategy( {
-					returnURL: realm + "/auth/google/callback",
-					realm: realm
+					returnURL : realm + "/auth/google/callback",
+					realm     : realm
 				}, function ( identifier, profile, done ) {
 					config.auth.google.auth.call( obj, identifier, profile, function ( err, user ) {
 						if ( err ) {
@@ -254,9 +262,9 @@ function auth ( obj, config ) {
 			config.auth.protect.push( new RegExp( "^/auth/linkedin", "i" ) );
 
 			passport.use( new LinkedInStrategy( {
-					consumerKey: config.auth.linkedin.client_id,
-					consumerSecret: config.auth.linkedin.client_secret,
-					callbackURL: realm + "/auth/linkedin/callback"
+					consumerKey    : config.auth.linkedin.client_id,
+					consumerSecret : config.auth.linkedin.client_secret,
+					callbackURL    : realm + "/auth/linkedin/callback"
 				},
 				function ( token, tokenSecret, profile, done ) {
 					config.auth.linkedin.auth( token, tokenSecret, profile, function ( err, user ) {
@@ -289,9 +297,9 @@ function auth ( obj, config ) {
 			config.auth.protect.push( new RegExp( "^/auth/twitter", "i" ) );
 
 			passport.use( new TwitterStrategy( {
-					consumerKey: config.auth.twitter.consumer_key,
-					consumerSecret: config.auth.twitter.consumer_secret,
-					callbackURL: realm + "/auth/twitter/callback"
+					consumerKey    : config.auth.twitter.consumer_key,
+					consumerSecret : config.auth.twitter.consumer_secret,
+					callbackURL    : realm + "/auth/twitter/callback"
 				}, function ( token, tokenSecret, profile, done ) {
 					config.auth.twitter.auth( token, tokenSecret, profile, function ( err, user ) {
 						if ( err ) {

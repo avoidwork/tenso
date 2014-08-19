@@ -7,11 +7,13 @@
  * @return {Object}        Tenso instance
  */
 function bootstrap ( obj, config ) {
+	function rateLimit ( req, res, next ) {
+		rate( obj, req, res, next );
+	}
+
 	// Early middleware hook for rate limiting
 	if ( config.rate.enabled ) {
-		obj.server.use( function ( req, res, next ) {
-			rate( obj, req, res, next );
-		} );
+		obj.server.use( rateLimit ).blacklist( rateLimit );
 	}
 
 	// Bootstrapping configuration

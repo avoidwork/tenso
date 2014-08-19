@@ -1,9 +1,10 @@
 # Change Log
 
 ## 0.4.4
-- Fixed blacklisting of middleware within `auth()`
+- Fixed blacklisting of middleware within `auth()`, & `bootstrap()`
 - Fixed `keymaster()` for `HEAD` & `OPTIONS` requests
 - Upgraded turtle.io to 3.0.14
+- Set session cookie flag to avoid warning messages during tests
 
 ## 0.4.3
 - Upgrading turtle.io to 3.0.13 & blacklisting all authentication middleware

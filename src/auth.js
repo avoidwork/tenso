@@ -12,6 +12,20 @@ function auth ( obj, config ) {
 	    realm = proto + "://" + ( config.hostname === "localhost" ? "127.0.0.1" : config.hostname ) + ( config.port !== 80 && config.port !== 443 ? ":" + config.port : "" ),
 	    sesh, fnCookie, fnSesh, luscaCsrf, luscaCsp, luscaXframe, luscaP3p, luscaHsts, luscaXssProtection, protection, passportAuth, passportInit, passportSession;
 
+	function asyncFlag () {
+		arguments[0].protectAsync = true;
+		arguments[2]();
+	}
+
+	function guard ( req, res, next ) {
+		if ( req.isAuthenticated() ) {
+			return next();
+		}
+		else {
+			res.redirect( "/login" );
+		}
+	}
+
 	config.auth.protect = ( config.auth.protect || [] ).map( function ( i ) {
 		return new RegExp( "^" + i !== "/login" ? i.replace( /\.\*/g, "*" ).replace( /\*/g, ".*" ) : "$", "i" );
 	} );
@@ -20,7 +34,8 @@ function auth ( obj, config ) {
 		sesh = {
 			secret: config.session.secret || uuid(),
 			saveUninitialized: true,
-			rolling: true
+			rolling: true,
+			resave: true
 		};
 
 		if ( config.session.store === "redis" ) {
@@ -170,14 +185,10 @@ function auth ( obj, config ) {
 		};
 	}
 	else if ( config.auth.facebook.enabled || config.auth.google.enabled || config.auth.local.enabled || config.auth.linkedin.enabled || config.auth.twitter.enabled ) {
-		obj.server.use( function asyncFlag () {
-			arguments[0].protectAsync = true;
-			arguments[2]();
-		} );
-
 		passportInit    = passport.initialize();
 		passportSession = passport.session();
 
+		obj.server.use( asyncFlag ).blacklist( asyncFlag );
 		obj.server.use( passportInit ).blacklist( passportInit );
 		obj.server.use( passportSession ).blacklist( passportSession );
 
@@ -215,14 +226,7 @@ function auth ( obj, config ) {
 
 			obj.server.use( "/auth/facebook", passport.authenticate( "facebook" ) );
 			obj.server.use( "/auth/facebook/callback", passport.authenticate( "facebook", {successRedirect: "/", failureRedirect: "/login"} ) );
-			obj.server.use( "(?!/auth/facebook).*$", function ( req, res, next ) {
-				if ( req.isAuthenticated() ) {
-					return next();
-				}
-				else {
-					res.redirect( "/login" );
-				}
-			} );
+			obj.server.use( "(?!/auth/facebook).*$", guard ).blacklist( guard );
 		}
 		else if ( config.auth.google.enabled ) {
 			config.auth.protect.push( new RegExp( "^/auth/google", "i" ) );
@@ -249,14 +253,7 @@ function auth ( obj, config ) {
 
 			obj.server.use( "/auth/google", passport.authenticate( "google" ) );
 			obj.server.use( "/auth/google/callback", passport.authenticate( "google", {failureRedirect: "/login"} ) );
-			obj.server.use( "(?!/auth/google).*$", function ( req, res, next ) {
-				if ( req.isAuthenticated() ) {
-					return next();
-				}
-				else {
-					res.redirect( "/login" );
-				}
-			} );
+			obj.server.use( "(?!/auth/google).*$", guard ).blacklist( guard );
 		}
 		else if ( config.auth.linkedin.enabled ) {
 			config.auth.protect.push( new RegExp( "^/auth/linkedin", "i" ) );
@@ -282,14 +279,7 @@ function auth ( obj, config ) {
 			obj.server.get( "/auth/linkedin/callback", function () {
 				arguments[1].redirect( "/" );
 			} );
-			obj.server.use( "(?!/auth/linkedin).*", function ( req, res, next ) {
-				if ( req.isAuthenticated() ) {
-					return next();
-				}
-				else {
-					res.redirect( "/login" );
-				}
-			} );
+			obj.server.use( "(?!/auth/linkedin).*", guard ).blacklist( guard );
 
 			config.routes.get["/auth"] = {auth_uri: "/auth/linkedin"};
 		}
@@ -313,13 +303,7 @@ function auth ( obj, config ) {
 
 			obj.server.get( "/auth/twitter", passport.authenticate( "twitter" ) );
 			obj.server.get( "/auth/twitter/callback", passport.authenticate( "twitter", {successRedirect: "/", failureRedirect: "/login"} ) );
-			obj.server.use( "(?!/auth/twitter).*", function ( req, res, next ) {
-				if ( req.isAuthenticated() ) {
-					return next();
-				}
-
-				res.redirect( "/login" );
-			} );
+			obj.server.use( "(?!/auth/twitter).*", guard ).blacklist( guard );
 
 			config.routes.get["/auth"] = {auth_uri: "/auth/twitter"};
 			config.routes.get["/auth/twitter"] = {callback_uri: "/auth/twitter/callback"};

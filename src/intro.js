@@ -28,4 +28,5 @@ var turtleio = require( "turtle.io" ),
     REGEX_TRAILING_S = /s$/,
     REGEX_SCHEME     = /^(\w+\:\/\/)|\//,
     REGEX_COLLECTION = /(.*)(\/.*)$/,
-    REGEX_MODIFY     = /DELETE|PATCH|POST|PUT/;
+    REGEX_MODIFY     = /DELETE|PATCH|POST|PUT/,
+    REGEX_GETREWRITE = /HEAD|OPTIONS/i;

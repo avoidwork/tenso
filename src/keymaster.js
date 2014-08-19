@@ -8,12 +8,13 @@
  * @return {Undefined}     undefined
  */
 function keymaster ( req, res, next ) {
-	var obj, result, routes, uri, valid;
+	var obj, method, result, routes, uri, valid;
 
 	// No authentication, or it's already happened
 	if ( !req.protect || !req.protectAsync || ( req.session && ( req.session.authenticated || req.isAuthenticated() ) ) ) {
 		obj    = req.server.tenso;
-		routes = req.server.config.routes[req.method.toLowerCase()] || {};
+		method = REGEX_GETREWRITE.test( req.method ) ? "get" : req.method.toLowerCase();
+		routes = req.server.config.routes[method] || {};
 		uri    = req.parsed.pathname;
 		valid  = false;
 

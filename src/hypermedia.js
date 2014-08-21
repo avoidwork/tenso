@@ -14,7 +14,7 @@
  * @return {Undefined}      undefined
  */
 function hypermedia ( server, req, rep, headers ) {
-	var query, page, page_size, nth, root, keys, remove;
+	var query, page, page_size, nth, root, keys, remove, rewrite;
 
 	if ( rep.status >= 200 && rep.status <= 206 ) {
 		query     = req.parsed.query;
@@ -28,8 +28,9 @@ function hypermedia ( server, req, rep, headers ) {
 				page = 1;
 			}
 
-			remove = [];
-			nth    = Math.ceil( rep.data.result.length / page_size );
+			rewrite = false;
+			remove  = [];
+			nth     = Math.ceil( rep.data.result.length / page_size );
 
 			if ( nth > 1 ) {
 				rep.data.result = array.limit( rep.data.result, ( page - 1 ) * page_size, page_size );
@@ -66,7 +67,8 @@ function hypermedia ( server, req, rep, headers ) {
 				var uri;
 
 				if ( typeof i == "string" && REGEX_SCHEME.test( i ) ) {
-					uri = i.indexOf( "//" ) > -1 ? i : req.parsed.protocol + "//" + req.parsed.host + i;
+					rewrite = true;
+					uri     = i.indexOf( "//" ) > -1 ? i : req.parsed.protocol + "//" + req.parsed.host + i;
 
 					if ( uri !== root ) {
 						rep.data.link.push( {uri: uri, rel: "related"} );
@@ -78,6 +80,10 @@ function hypermedia ( server, req, rep, headers ) {
 			array.each( remove.reverse(), function ( i ) {
 				array.remove( rep.data.result, i );
 			} );
+
+			if ( rewrite && rep.data.result.length === 0 ) {
+				rep.data.result = null;
+			}
 		}
 		else if ( rep.data.result instanceof Object ) {
 			keys = array.keys( rep.data.result );

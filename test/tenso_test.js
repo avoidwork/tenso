@@ -27,7 +27,7 @@ describe("Permissions", function () {
 				.expectStatus( 200 )
 				.expectHeader( "allow", "GET, HEAD, OPTIONS" )
 				.expectValue( "data.link", [{uri:'http://localhost:8001/items', rel:'related'}] )
-				.expectValue( "data.result", [] )
+				.expectValue( "data.result", null )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )
 				.end(function(err) {
@@ -249,7 +249,7 @@ describe("Basic Auth", function () {
 				.get( "/" )
 				.expectStatus( 200 )
 				.expectValue( "data.link", [{uri:'http://localhost:8004/items', rel:'related'}] )
-				.expectValue( "data.result", [] )
+				.expectValue( "data.result", null )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )
 				.end( function ( err ) {
@@ -284,7 +284,7 @@ describe("OAuth2 Token Bearer", function () {
 				.get( "/" )
 				.expectStatus( 200 )
 				.expectValue( "data.link", [{uri:'http://localhost:8005/items', rel:'related'}] )
-				.expectValue( "data.result", [] )
+				.expectValue( "data.result", null )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )
 				.end( function ( err ) {
@@ -452,7 +452,7 @@ describe("Rate Limiting", function () {
 				.expectHeader( "x-ratelimit-limit", "2" )
 				.expectHeader( "x-ratelimit-remaining", "1" )
 				.expectValue( "data.link", [{uri:'http://localhost:8007/items', rel:'related'}] )
-				.expectValue( "data.result", [] )
+				.expectValue( "data.result", null )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )
 				.end( function ( err ) {
@@ -470,7 +470,7 @@ describe("Rate Limiting", function () {
 				.expectHeader( "x-ratelimit-limit", "2" )
 				.expectHeader( "x-ratelimit-remaining", "0" )
 				.expectValue( "data.link", [{uri:'http://localhost:8007/items', rel:'related'}] )
-				.expectValue( "data.result", [] )
+				.expectValue( "data.result", null )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )
 				.end( function ( err ) {

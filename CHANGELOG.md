@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.5.1
+- Changed `data.result` to `null` if all content is lifted into `data.link`, updated tests
+
 ## 0.5.0
 - URIs (relative or absolute) in `data.result[]` are treated as hypermedia and lifted in `data.link`, updated tests
 - Added an `Allow` header assertion to the permission test

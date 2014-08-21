@@ -23,12 +23,13 @@ describe("Permissions", function () {
 	describe("GET /", function () {
 		it("returns an array of endpoints", function (done) {
 			api( port )
-				.get("/")
-				.expectStatus(200)
-				.expectValue("data.link", [])
-				.expectValue("data.result", ["/items"])
-				.expectValue("error", null)
-				.expectValue("status", 200)
+				.get( "/" )
+				.expectStatus( 200 )
+				.expectHeader( "allow", "GET, HEAD, OPTIONS" )
+				.expectValue( "data.link", [{uri:'http://localhost:8001/items', rel:'related'}] )
+				.expectValue( "data.result", [] )
+				.expectValue( "error", null )
+				.expectValue( "status", 200 )
 				.end(function(err) {
 					if (err) throw err;
 					done();
@@ -247,8 +248,8 @@ describe("Basic Auth", function () {
 				.auth('test', '123')
 				.get( "/" )
 				.expectStatus( 200 )
-				.expectValue( "data.link", [] )
-				.expectValue( "data.result", ["/items"] )
+				.expectValue( "data.link", [{uri:'http://localhost:8004/items', rel:'related'}] )
+				.expectValue( "data.result", [] )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )
 				.end( function ( err ) {
@@ -282,8 +283,8 @@ describe("OAuth2 Token Bearer", function () {
 				.header('Authorization', 'Bearer abc-123')
 				.get( "/" )
 				.expectStatus( 200 )
-				.expectValue( "data.link", [] )
-				.expectValue( "data.result", ["/items"] )
+				.expectValue( "data.link", [{uri:'http://localhost:8005/items', rel:'related'}] )
+				.expectValue( "data.result", [] )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )
 				.end( function ( err ) {
@@ -335,10 +336,10 @@ describe("Local", function () {
 					}
 
 					if ( req.session.authorized ) {
-						this.redirect( req, res, "/uuid" );
+						res.redirect( "/uuid" );
 					}
 					else {
-						this.error( req, res, 401, "Unauthorized" );
+						res.error( 401, "Unauthorized" );
 					}
 				},
 				middleware: function( req, res, next ) {
@@ -346,8 +347,9 @@ describe("Local", function () {
 						if ( req.session.authorized ) {
 							next();
 						}
-
-						res.error( "Unauthorized", 401 );
+						else {
+							res.error( 401, "Unauthorized" );
+						}
 					}
 				}
 			},
@@ -449,8 +451,8 @@ describe("Rate Limiting", function () {
 				.expectStatus( 200 )
 				.expectHeader( "x-ratelimit-limit", "2" )
 				.expectHeader( "x-ratelimit-remaining", "1" )
-				.expectValue( "data.link", [] )
-				.expectValue( "data.result", ["/items"] )
+				.expectValue( "data.link", [{uri:'http://localhost:8007/items', rel:'related'}] )
+				.expectValue( "data.result", [] )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )
 				.end( function ( err ) {
@@ -467,8 +469,8 @@ describe("Rate Limiting", function () {
 				.expectStatus( 200 )
 				.expectHeader( "x-ratelimit-limit", "2" )
 				.expectHeader( "x-ratelimit-remaining", "0" )
-				.expectValue( "data.link", [] )
-				.expectValue( "data.result", ["/items"] )
+				.expectValue( "data.link", [{uri:'http://localhost:8007/items', rel:'related'}] )
+				.expectValue( "data.result", [] )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )
 				.end( function ( err ) {

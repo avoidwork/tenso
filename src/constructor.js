@@ -26,9 +26,10 @@ Tenso.prototype.constructor = Tenso;
  *
  * @method redirect
  * @memberOf Tenso
- * @param  {Object} req Client request
- * @param  {Object} res Client response
- * @param  {Mixed}  uri Target URI
+ * @param  {Object} req    Client request
+ * @param  {Object} res    Client response
+ * @param  {Number} status Response status
+ * @param  {Object} arg    Response body
  */
 Tenso.prototype.error = function ( req, res, status, arg ) {
 	this.server.error( req, res, status, arg );
@@ -39,8 +40,8 @@ Tenso.prototype.error = function ( req, res, status, arg ) {
  *
  * @method rate
  * @memberOf Tenso
- * @param {Object} req Client request
- * @returns {Array}    Array of rate limit information `[valid, total, remaining, reset]`
+ * @param  {Object} req Client request
+ * @return {Array}      Array of rate limit information `[valid, total, remaining, reset]`
  */
 Tenso.prototype.rate = function ( req ) {
 	var now       = new Date(),

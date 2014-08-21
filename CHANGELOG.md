@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.5.0
+- URIs (relative or absolute) in `data.result[]` are treated as hypermedia and lifted in `data.link`, updated tests
+- Added an `Allow` header assertion to the permission test
+- Pagination is only decorated if the result exceeds the page size
+
 ## 0.4.4
 - Fixed blacklisting of middleware within `auth()`, & `bootstrap()`
 - Fixed `keymaster()` for `HEAD` & `OPTIONS` requests

@@ -17,7 +17,7 @@ require( "tenso" )( {routes: require( __dirname + "/routes.js" )} );
 ### Creating Routes
 Routes are loaded as a module, with each HTTP method as an export, affording a very customizable API server.
 
-Route handlers have the context of the Tensō server, i.e. `this` will allow you to send a response with `this.respond( req, res, body[, status, headers] )`. You can also use `res` to `respond(body[, status])`, `redirect(url)`, or `error(Error[, status])`. 
+Route handlers have the context of the Tensō server, i.e. `this` will allow you to send a response with `this.respond(req, res, body[, status, headers])`. You can also use `res` to `res.respond(body[, status, headers])`, `res.redirect(url)`, or `res.error(status[, Error])`. 
 
 The following example will create GET routes that will return an empty `Array` at `/`, an `Error` at `/reports/tps`, & a version 4 UUID at `/uuid`.
 
@@ -25,12 +25,13 @@ The following example will create GET routes that will return an empty `Array` a
 var uuid = require( "keigai" ).util.uuid;
 
 module.exports.get = {
-	"/": [],
+	"/": ["/reports", "/uuid"],
+	"/reports": ["/reports/tps"],
 	"/reports/tps": function ( req, res ) {
-		this.respond( req, res, new Error( "TPS Cover Sheet not attached" ), 785 );
+		res.error( 785, Error( "TPS Cover Sheet not attached" ) );
 	},
 	"/uuid": function ( req, res ) {
-		this.respond( req, res, uuid(), 200, {"cache-control": "no-cache"} );
+		res.respond( uuid(), 200, {"cache-control": "no-cache"} );
 	}
 }
 ```

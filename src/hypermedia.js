@@ -14,7 +14,7 @@
  * @return {Undefined}      undefined
  */
 function hypermedia ( server, req, rep, headers ) {
-	var query, page, page_size, nth, root, keys;
+	var query, page, page_size, nth, root, keys, remove;
 
 	if ( rep.status >= 200 && rep.status <= 206 ) {
 		query     = req.parsed.query;
@@ -28,30 +28,56 @@ function hypermedia ( server, req, rep, headers ) {
 				page = 1;
 			}
 
-			nth             = Math.ceil( rep.data.result.length / page_size );
-			rep.data.result = array.limit( rep.data.result, ( page - 1 ) * page_size, page_size );
-			query.page      = 0;
-			query.page_size = page_size;
+			remove = [];
+			nth    = Math.ceil( rep.data.result.length / page_size );
 
-			root += "?" + array.keys( query ).map( function ( i ) {
-				return i + "=" + encodeURIComponent( query[i] );
-			} ).join ( "&" );
+			if ( nth > 1 ) {
+				rep.data.result = array.limit( rep.data.result, ( page - 1 ) * page_size, page_size );
+				query.page = 0;
+				query.page_size = page_size;
 
-			if ( page > 1 ) {
-				rep.data.link.push( {uri: root.replace( "page=0", "page=1" ), rel: "first"} );
+				root += "?" + array.keys( query ).map( function ( i ) {
+					return i + "=" + encodeURIComponent( query[i] );
+				} ).join( "&" );
+
+				if ( page > 1 ) {
+					rep.data.link.push( {uri: root.replace( "page=0", "page=1" ), rel: "first"} );
+				}
+
+				if ( page - 1 > 1 && page <= nth ) {
+					rep.data.link.push( {uri: root.replace( "page=0", "page=" + ( page - 1 ) ), rel: "prev"} );
+				}
+
+				if ( page + 1 < nth ) {
+					rep.data.link.push( {uri: root.replace( "page=0", "page=" + ( page + 1 ) ), rel: "next"} );
+				}
+
+				if ( nth > 0 && page !== nth ) {
+					rep.data.link.push( {uri: root.replace( "page=0", "page=" + nth ), rel: "last"} );
+				}
+			}
+			else {
+				root += "?" + array.keys( query ).map( function ( i ) {
+					return i + "=" + encodeURIComponent( query[i] );
+				} ).join( "&" );
 			}
 
-			if ( page - 1 > 1 && page <= nth ) {
-				rep.data.link.push( {uri: root.replace( "page=0", "page=" + ( page - 1 ) ), rel: "prev"} );
-			}
+			array.each( rep.data.result, function ( i, idx ) {
+				var uri;
 
-			if ( page + 1 < nth ) {
-				rep.data.link.push( {uri: root.replace( "page=0", "page=" + ( page + 1 ) ), rel: "next"} );
-			}
+				if ( typeof i == "string" && REGEX_SCHEME.test( i ) ) {
+					uri = i.indexOf( "//" ) > -1 ? i : req.parsed.protocol + "//" + req.parsed.host + i;
 
-			if ( nth > 0 && page !== nth ) {
-				rep.data.link.push( {uri: root.replace("page=0", "page=" + nth ), rel: "last"} );
-			}
+					if ( uri !== root ) {
+						rep.data.link.push( {uri: uri, rel: "related"} );
+						remove.push( idx );
+					}
+				}
+			} );
+
+			array.each( remove.reverse(), function ( i ) {
+				array.remove( rep.data.result, i );
+			} );
 		}
 		else if ( rep.data.result instanceof Object ) {
 			keys = array.keys( rep.data.result );

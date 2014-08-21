@@ -108,6 +108,10 @@ function hypermedia ( server, req, rep, headers ) {
 						}
 					}
 				} );
+
+				if ( array.keys( rep.data.result ).length === 0 ) {
+					rep.data.result = null;
+				}
 			}
 		}
 

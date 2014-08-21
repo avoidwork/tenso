@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.5.2
+- Updated `hypermedia()` to apply the same logic to Entity reps, updated tests
+
 ## 0.5.1
 - Changed `data.result` to `null` if all content is lifted into `data.link`, updated tests
 

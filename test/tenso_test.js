@@ -256,7 +256,7 @@ describe("Hypermedia", function () {
 describe("Basic Auth", function () {
 	var port = 8004;
 
-	tenso( {port: port, routes: routes, logs: {level: "error"}, auth: {basic: {enabled: true, list:["test:123"]}, protect: ["/"]}} );
+	tenso( {port: port, routes: routes, logs: {level: "error"}, auth: {basic: {enabled: true, list:["test:123"], protect: ["/"]}}} );
 
 	describe( "GET /", function () {
 		it( "returns an array of endpoints (authorized)", function ( done ) {
@@ -291,7 +291,7 @@ describe("Basic Auth", function () {
 describe("OAuth2 Token Bearer", function () {
 	var port = 8005;
 
-	tenso( {port: port, routes: routes, logs: {level: "error"}, auth: {bearer: {enabled: true, tokens:["abc-123"]}}} );
+	tenso( {port: port, routes: routes, logs: {level: "error"}, auth: {bearer: {enabled: true, tokens:["abc-123"], protect:["/"]}}} );
 
 	describe( "GET /", function () {
 		it( "returns an array of endpoints (authorized)", function ( done ) {
@@ -335,7 +335,6 @@ describe("Local", function () {
 			stderr: true
 		},
 		auth: {
-			protect: ["/uuid"],
 			local: {
 				enabled: true,
 				auth: function ( req, res ) {
@@ -367,9 +366,9 @@ describe("Local", function () {
 							res.error( 401, "Unauthorized" );
 						}
 					}
-				}
+				},
+				protect: ["/uuid"]
 			},
-			login: "/login",
 			session: {}
 		}
 	} );

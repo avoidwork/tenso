@@ -4,6 +4,7 @@
 - Moved `mediator()` middleware out of `auth()` and into `bootstrap()`
 - Fixed redundant variable initialization in `Tenso.prototype.rate()`
 - Added CSS map file
+- Changed `auth` config such that protected routes are defined under the strategies
 
 ## 0.5.2
 - Updated `hypermedia()` to apply the same logic to Entity reps, updated tests

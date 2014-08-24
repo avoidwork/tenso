@@ -1,42 +1,47 @@
 {
 	"auth": {
-		"protect": ["/"],
 		"basic": {
 			"enabled": false,
 			"list": [],
-			"realm": "Private"
+			"protect": ["/"]
 		},
 		"bearer": {
 			"enabled": false,
-			"tokens": []
+			"tokens": [],
+			"protect": ["/"]
 		},
 		"facebook": {
 			"enabled": false,
 			"auth": null,
 			"client_id": "",
-			"client_secret": ""
+			"client_secret": "",
+			"protect": []
 		},
 		"google": {
 			"enabled": false,
-			"auth": null
+			"auth": null,
+			"protect": []
 		},
 		"linkedin": {
 			"enabled": false,
 			"auth": null,
 			"client_id": "",
 			"client_secret": "",
-			"scope": null
+			"scope": null,
+			"protect": []
 		},
 		"local": {
 			"enabled": false,
 			"auth": null,
-			"middleware": null
+			"middleware": null,
+			"protect": []
 		},
 		"twitter": {
 			"enabled": false,
 			"auth": null,
 			"consumer_key": "",
-			"consumer_secret": ""
+			"consumer_secret": "",
+			"protect": []
 		}
 	},
 	"compress": true,

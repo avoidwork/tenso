@@ -27,7 +27,6 @@ function bootstrap ( obj, config ) {
 		rate( obj, req, res, next );
 	}
 
-
 	obj.server.use( mediator ).blacklist( mediator );
 
 	if ( config.rate.enabled ) {

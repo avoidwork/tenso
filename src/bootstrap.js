@@ -7,11 +7,29 @@
  * @return {Object}        Tenso instance
  */
 function bootstrap ( obj, config ) {
+	function mediator ( req, res, next ) {
+		res.error = function ( status, body ) {
+			obj.error( req, res, status, body );
+		};
+
+		res.redirect = function ( uri ) {
+			obj.redirect( req, res, uri );
+		};
+
+		res.respond = function ( body, status, headers ) {
+			obj.respond( req, res, body, status, headers );
+		};
+
+		next();
+	}
+
 	function rateLimit ( req, res, next ) {
 		rate( obj, req, res, next );
 	}
 
-	// Early middleware hook for rate limiting
+
+	obj.server.use( mediator ).blacklist( mediator );
+
 	if ( config.rate.enabled ) {
 		obj.server.use( rateLimit ).blacklist( rateLimit );
 	}

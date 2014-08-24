@@ -45,15 +45,12 @@ Tenso.prototype.error = function ( req, res, status, arg ) {
  */
 Tenso.prototype.rate = function ( req ) {
 	var now       = new Date(),
-		next_hour = parseInt( now.setHours( now.getHours() + 1 ) / 1000, 10 ),
-		config    = this.server.config.rate,
-		limit     = 0,
-		remaining = 0,
-		reset     = 0,
-		regex     = /(Basic|Bearer)\s/,
-		id        = req.headers.authorization ? req.headers.authorization.replace( regex, "" ) : req.sessionID || req.ip,
-		valid     = true,
-		state;
+	    next_hour = parseInt( now.setHours( now.getHours() + 1 ) / 1000, 10 ),
+	    config    = this.server.config.rate,
+	    regex     = /(Basic|Bearer)\s/,
+	    id        = req.headers.authorization ? req.headers.authorization.replace( regex, "" ) : req.sessionID || req.ip,
+	    valid     = true,
+	    limit, remaining, reset, state;
 
 	if ( !this.rates[id] ) {
 		this.rates[id] = {

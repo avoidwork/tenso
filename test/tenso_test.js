@@ -256,12 +256,11 @@ describe("Hypermedia", function () {
 describe("Basic Auth", function () {
 	var port = 8004;
 
-	tenso( {port: port, routes: routes, logs: {level: "error"}, auth: {basic: {enabled: true, list:["test:123"]}, protect: ["/"]}} );
+	tenso( {port: port, routes: routes, logs: {level: "error"}, auth: {basic: {enabled: true, list:["test:123"]}, protect: ["/uuid"]}} );
 
 	describe( "GET /", function () {
-		it( "returns an array of endpoints (authorized)", function ( done ) {
+		it( "returns links", function ( done ) {
 			api( port )
-				.auth('test', '123')
 				.get( "/" )
 				.expectStatus( 200 )
 				.expectValue( "data.link", [{uri:'http://localhost:8004/items', rel:'related'}] )
@@ -275,10 +274,26 @@ describe("Basic Auth", function () {
 		} );
 	} );
 
-	describe( "GET /", function () {
+	describe( "GET /uuid", function () {
+		it( "returns a uuid (authorized)", function ( done ) {
+			api( port )
+				.auth('test', '123')
+				.get( "/uuid" )
+				.expectStatus( 200 )
+				.expectValue( "data.link", [] )
+				.expectValue( "error", null )
+				.expectValue( "status", 200 )
+				.end( function ( err ) {
+					if ( err ) throw err;
+					done();
+				} );
+		} );
+	} );
+
+	describe( "GET /uuid", function () {
 		it( "returns an 'unauthorized' error", function ( done ) {
 			api( port, true )
-				.get( "/" )
+				.get( "/uuid" )
 				.expectStatus( 401 )
 				.end( function ( err ) {
 					if ( err ) throw err;

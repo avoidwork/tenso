@@ -102,6 +102,8 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 ## Authentication
 The `protect` Array is the endpoints that will require authentication. Sessions are used for non `Basic` or `Bearer Token` authentication, and will have `/login`, `/logout`, & custom routes. Redis is supported for session storage.
 
+Multiple social authentication strategies can be enabled at once.
+
 ### Basic Auth
 ```javascript
 {

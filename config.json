@@ -1,47 +1,41 @@
 {
 	"auth": {
+		"protect": [],
 		"basic": {
 			"enabled": false,
-			"list": [],
-			"protect": ["/"]
+			"list": []
 		},
 		"bearer": {
 			"enabled": false,
-			"tokens": [],
-			"protect": ["/"]
+			"tokens": []
 		},
 		"facebook": {
 			"enabled": false,
 			"auth": null,
 			"client_id": "",
-			"client_secret": "",
-			"protect": []
+			"client_secret": ""
 		},
 		"google": {
 			"enabled": false,
-			"auth": null,
-			"protect": []
+			"auth": null
 		},
 		"linkedin": {
 			"enabled": false,
 			"auth": null,
 			"client_id": "",
 			"client_secret": "",
-			"scope": null,
-			"protect": []
+			"scope": null
 		},
 		"local": {
 			"enabled": false,
 			"auth": null,
-			"middleware": null,
-			"protect": []
+			"middleware": null
 		},
 		"twitter": {
 			"enabled": false,
 			"auth": null,
 			"consumer_key": "",
-			"consumer_secret": "",
-			"protect": []
+			"consumer_secret": ""
 		}
 	},
 	"compress": true,

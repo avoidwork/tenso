@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.6.1
+- Upgrading turtle.io to 3.0.15 for etag middleware fix (out of order execution negated it)
+
 ## 0.6.0
 - Moved `mediator()` middleware out of `auth()` and into `bootstrap()`
 - Fixed redundant variable initialization in `Tenso.prototype.rate()`

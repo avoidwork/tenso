@@ -381,7 +381,7 @@ describe("Local", function () {
 			api( port )
 				.get("/login")
 				.expectStatus(200)
-				.expectValue("data.link", [ { uri: 'http://localhost:8006', rel: 'collection' }, { uri: 'http://localhost:8006/auth', rel: 'related' } ])
+				.expectValue("data.link", [ { uri: 'http://localhost:8006', rel: 'collection' } ])
 				.expectValue("data.result", { instruction: 'POST username/password to authenticate' })
 				.expectValue("error", null)
 				.expectValue("status", 200)

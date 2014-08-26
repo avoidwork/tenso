@@ -11,6 +11,7 @@ function auth ( obj, config ) {
 	    proto     = "http" + ( ssl ? "s" : "" ),
 	    realm     = proto + "://" + ( config.hostname === "localhost" ? "127.0.0.1" : config.hostname ) + ( config.port !== 80 && config.port !== 443 ? ":" + config.port : "" ),
 	    async     = ( config.auth.facebook.enabled || config.auth.google.enabled || config.auth.linkedin.enabled || config.auth.twitter.enabled ),
+	    stateless = ( config.auth.basic.enabled || config.auth.bearer.enabled ),
 	    stateful  = ( async || config.auth.local.enabled || config.security.csrf ),
 	    authMap   = {},
 	    authUris  = [],
@@ -136,11 +137,11 @@ function auth ( obj, config ) {
 	protection = zuul( config.auth.protect );
 	obj.server.use( protection ).blacklist( protection );
 
-	if ( !stateful ) {
+	if ( stateless && !stateful ) {
 		passportInit = passport.initialize();
 		obj.server.use( passportInit ).blacklist( passportInit );
 	}
-	else {
+	else if ( stateful ) {
 		passportInit    = passport.initialize();
 		passportSession = passport.session();
 		obj.server.use( passportInit ).blacklist( passportInit );

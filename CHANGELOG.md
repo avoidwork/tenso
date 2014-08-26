@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.7.0
+- Added `OAuth2`, & `SAML` authentication
+
 ## 0.6.1
 - Upgrading turtle.io to 3.0.15 for etag middleware fix (out of order execution negated it)
 

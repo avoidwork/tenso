@@ -293,6 +293,53 @@ function auth ( obj, config ) {
 				obj.server.get( "/auth/linkedin/callback", redirect );
 			}
 
+			if ( config.auth.oauth2.enabled ) {
+				passport.use( new OAuth2Strategy( {
+						authorizationURL: config.auth.oauth2.auth_url,
+						tokenURL        : config.auth.oauth2.token_url,
+						clientID        : config.auth.oauth2.client_id,
+						clientSecret    : config.auth.oauth2.client_secret,
+						callbackURL     : realm + "/auth/oauth2/callback"
+					}, function ( accessToken, refreshToken, profile, done ) {
+						config.auth.oauth2.auth( accessToken, refreshToken, profile, function ( err, user ) {
+							if ( err ) {
+								return done( err );
+							}
+
+							done( null, user );
+						} );
+					}
+				) );
+
+				obj.server.get( "/auth/oauth2", passport.authenticate( "oauth2" ) );
+				obj.server.get( "/auth/oauth2/callback", passport.authenticate( "oauth2", {failureRedirect: "/login"} ) );
+				obj.server.get( "/auth/oauth2/callback", redirect );
+			}
+
+			if ( config.auth.saml.enabled ) {
+				( function () {
+					var config = config.auth.saml;
+
+					config.callbackURL = realm + "/auth/saml/callback";
+					delete config.enabled;
+
+					passport.use( new SAMLStrategy( config, function ( accessToken, refreshToken, profile, done ) {
+							config.auth.saml.auth( accessToken, refreshToken, profile, function ( err, user ) {
+								if ( err ) {
+									return done( err );
+								}
+
+								done( null, user );
+							} );
+						}
+					) );
+				} )();
+
+				obj.server.get( "/auth/saml", passport.authenticate( "saml" ) );
+				obj.server.get( "/auth/saml/callback", passport.authenticate( "saml", {failureRedirect: "/login"} ) );
+				obj.server.get( "/auth/saml/callback", redirect );
+			}
+
 			if ( config.auth.twitter.enabled ) {
 				passport.use( new TwitterStrategy( {
 						consumerKey   : config.auth.twitter.consumer_key,
@@ -329,7 +376,7 @@ function auth ( obj, config ) {
 				} )();
 			}
 
-			config.routes.get["/login"] = {login_uri: "/auth"};
+			config.routes.get["/login"] = config.auth.saml.enabled ? {login_uri: "/auth", instruction: "POST username/password to authenticate"} : {login_uri: "/auth"};
 			config.routes.get["/logout"] = function ( req, res ) {
 				if ( req.session.authorized || req.session.isAuthorized() ) {
 					req.session.destroy();

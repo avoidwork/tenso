@@ -26,10 +26,22 @@
 			"client_secret": "",
 			"scope": null
 		},
+		"oauth2": {
+			"enabled": false,
+			"auth": null,
+			"auth_url": "",
+			"token_url": "",
+			"client_id": "",
+			"client_secret": ""
+		},
 		"local": {
 			"enabled": false,
 			"auth": null,
 			"middleware": null
+		},
+		"saml": {
+			"enabled": false,
+			"auth": null
 		},
 		"twitter": {
 			"enabled": false,

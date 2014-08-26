@@ -352,35 +352,8 @@ describe("Local", function () {
 		auth: {
 			local: {
 				enabled: true,
-				auth: function ( req, res ) {
-					var args = req.body ? array.chunk( req.body.split( /&|=/ ), 2 ) : [];
-					if ( !req.session.authorized ) {
-						if ( args.length > 0 && args[0][1] == "test" && args[1][1] == "123" ) {
-							req.session.authorized = true;
-						}
-						else {
-							req.session.authorized = false;
-						}
-
-						req.session.save();
-					}
-
-					if ( req.session.authorized ) {
-						res.redirect( "/uuid" );
-					}
-					else {
-						res.error( 401, "Unauthorized" );
-					}
-				},
-				middleware: function( req, res, next ) {
-					if ( req.url !== "/login" ) {
-						if ( req.session.authorized ) {
-							next();
-						}
-						else {
-							res.error( 401, "Unauthorized" );
-						}
-					}
+				auth: function ( username, password, callback ) {
+					callback( null, {username: username, password: password} );
 				}
 			},
 			protect: ["/uuid"],
@@ -408,8 +381,8 @@ describe("Local", function () {
 			api( port )
 				.get("/login")
 				.expectStatus(200)
-				.expectValue("data.link", [])
-				.expectValue("data.result", "POST credentials to authenticate")
+				.expectValue("data.link", [ { uri: 'http://localhost:8006', rel: 'collection' }, { uri: 'http://localhost:8006/auth', rel: 'related' } ])
+				.expectValue("data.result", { instruction: 'POST username/password to authenticate' })
 				.expectValue("error", null)
 				.expectValue("status", 200)
 				.end(function(err) {

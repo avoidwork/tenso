@@ -2,6 +2,8 @@
 
 ## 0.7.0
 - Added `OAuth2`, & `SAML` authentication
+- Refactored `Local Auth` to use passport
+- Refactored `auth()` to mix stateless & stateful auth strategies the same time
 
 ## 0.6.1
 - Upgrading turtle.io to 3.0.15 for etag middleware fix (out of order execution negated it)

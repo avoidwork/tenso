@@ -353,11 +353,15 @@ describe("Local", function () {
 			local: {
 				enabled: true,
 				auth: function ( username, password, callback ) {
-					callback( null, {username: username, password: password} );
+					if ( username === "test" && password === 123 ) {
+						callback( null, {username: username, password: password} );
+					}
+					else {
+						callback( true, null );
+					}
 				}
 			},
-			protect: ["/uuid"],
-			session: {}
+			protect: ["/uuid"]
 		}
 	} );
 
@@ -416,7 +420,7 @@ describe("Local", function () {
 				.form()
 				.send({username:"test", password:123})
 				.expectStatus(302)
-				.expectHeader("Location", "/uuid")
+				.expectHeader("Location", "/")
 				.use(persistCookies)
 				.end(function(err) {
 					if (err) throw err;

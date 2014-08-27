@@ -17,19 +17,21 @@ function auth ( obj, config ) {
 	    authUris  = [],
 	    sesh, fnCookie, fnSesh, luscaCsrf, luscaCsp, luscaXframe, luscaP3p, luscaHsts, luscaXssProtection, protection, passportAuth, passportInit, passportSession;
 
-	/**
-	 * Flags the request for async auth strategies
-	 * @private
-	 */
 	function asyncFlag () {
 		arguments[0].protectAsync = true;
 		arguments[2]();
 	}
 
-	/**
-	 * Authorization guard
-	 * @private
-	 */
+	function init ( session ) {
+		passportInit = passport.initialize();
+		obj.server.use( passportInit ).blacklist( passportInit );
+
+		if ( session ) {
+			passportSession = passport.session();
+			obj.server.use( passportSession ).blacklist( passportSession );
+		}
+	}
+
 	function guard ( req, res, next ) {
 		if ( req.isAuthenticated() ) {
 			return next();
@@ -39,10 +41,6 @@ function auth ( obj, config ) {
 		}
 	}
 
-	/**
-	 * Failure redirect
-	 * @private
-	 */
 	function redirect () {
 		arguments[1].redirect( "/" );
 	}
@@ -138,14 +136,10 @@ function auth ( obj, config ) {
 	obj.server.use( protection ).blacklist( protection );
 
 	if ( stateless && !stateful ) {
-		passportInit = passport.initialize();
-		obj.server.use( passportInit ).blacklist( passportInit );
+		init( false );
 	}
-	else if ( stateful ) {
-		passportInit    = passport.initialize();
-		passportSession = passport.session();
-		obj.server.use( passportInit ).blacklist( passportInit );
-		obj.server.use( passportSession ).blacklist( passportSession );
+	else {
+		init( true );
 
 		passport.serializeUser( function ( user, done ) {
 			done( null, user );
@@ -340,7 +334,24 @@ function auth ( obj, config ) {
 			} );
 		} ) );
 
-		obj.server.post( "/login", passport.authenticate( "local" ) );
+		config.routes.post = config.routes.post || {};
+		config.routes.post["/login"] = function ( req, res ) {
+			var final, mid;
+
+			final = function () {
+				passport.authenticate( "local", {successRedirect: "/"} )( req, res, function ( e ) {
+					if ( e ) {
+						res.error( 401, "Unauthorized" );
+					}
+				} );
+			};
+
+			mid = function () {
+				passportSession( req, res, final );
+			};
+
+			passportInit( req, res, mid );
+		};
 	}
 
 	if ( config.auth.oauth2.enabled ) {

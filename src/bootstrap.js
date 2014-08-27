@@ -23,11 +23,27 @@ function bootstrap ( obj, config ) {
 		next();
 	}
 
+	function parse ( req ) {
+		var args;
+
+		if ( REGEX_BODY.test( req.method ) && REGEX_FORMENC.test( req.headers["content-type"] ) ) {
+			args     = req.body ? array.chunk( req.body.split( REGEX_BODY_SPLIT ), 2 ) : [];
+			req.body = {};
+
+			array.each( args, function ( i ) {
+				req.body[i[0]] = coerce( i[1] );
+			} );
+		}
+
+		arguments[2]();
+	}
+
 	function rateLimit ( req, res, next ) {
 		rate( obj, req, res, next );
 	}
 
 	obj.server.use( mediator ).blacklist( mediator );
+	obj.server.use( parse ).blacklist( parse );
 
 	if ( config.rate.enabled ) {
 		obj.server.use( rateLimit ).blacklist( rateLimit );

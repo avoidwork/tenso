@@ -36,8 +36,7 @@
 		},
 		"local": {
 			"enabled": false,
-			"auth": null,
-			"middleware": null
+			"auth": null
 		},
 		"saml": {
 			"enabled": false,

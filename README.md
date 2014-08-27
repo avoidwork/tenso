@@ -150,7 +150,7 @@ Google authentication (OpenID) will create `/auth`, `/auth/google`, & `/auth/goo
 ```
 
 ### LinkedIn
-LinkedIn authentication will create `/auth`, `/auth/linkedin`, & `/auth/linkedin/callback` routes. `auth(authCode, authToken, expiresIn, callback)` must execute `callback(err, user)`.
+LinkedIn authentication will create `/auth`, `/auth/linkedin`, & `/auth/linkedin/callback` routes. `auth(token, tokenSecret, profile, callback)` must execute `callback(err, user)`.
  
 ```javascript
 {
@@ -167,17 +167,34 @@ LinkedIn authentication will create `/auth`, `/auth/linkedin`, & `/auth/linkedin
 }
 ```
 
-### Twitter
-Twitter authentication will create `/auth`, `/auth/twitter`, & `/auth/twitter/callback` routes. `auth(token, tokenSecret, profile, callback)` must execute `callback(err, user)`.
+### Local
+Local authentication will create `/login`. `auth(username, password)` must execute `callback(err, user)`.
+
+```javascript
+{
+	"auth": {
+		"local": {
+			"enabled": true,
+			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
+		}
+		"protect": ["/private"]
+	}
+}
+```
+
+### OAuth2
+OAuth2 authentication will create `/auth`, `/auth/oauth2`, & `/auth/oauth2/callback` routes. `auth(accessToken, refreshToken, profile, callback)` must execute `callback(err, user)`.
  
 ```javascript
 {
 	"auth": {
-		"twitter": {
+		"oauth2": {
 			"enabled": true,
 			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
-			"consumer_key": "", /* Get this from Twitter */
-			"consumer_secret": "" /* Get this from Twitter */
+			"auth_url": "", /* Authorization URL */
+			"token_url": "", /* Token URL */
+			"client_id": "", /* Get this from Facebook */
+			"client_secret": "" /* Get this from Facebook */
 		},
 		"protect": ["/private"]
 	}
@@ -197,42 +214,35 @@ Twitter authentication will create `/auth`, `/auth/twitter`, & `/auth/twitter/ca
 }
 ```
 
-### Local
-Do not protect `/`, as it'll block the authentication end points. `local` authentication will rely on sessions, so SSL is required for production servers.
+### SAML
+SAML authentication will create `/auth`, `/auth/saml`, & `/auth/saml/callback` routes. `auth(profile, callback)` must execute `callback(err, user)`.
 
+Tensō uses [passport-saml](https://github.com/bergie/passport-saml), for configuration options please visit it's homepage.
+ 
 ```javascript
 {
 	"auth": {
-		"local": {
+		"saml": {
 			"enabled": true,
-			"auth": function ( req, res ) {
-				if ( !req.session.authorized ) {
-					if ( ... ) {
-						req.session.authorized = true;
-					}
-					else {
-						req.session.authorized = false;
-					}
+			...
+		},
+		"protect": ["/private"]
+	}
+}
+```
 
-					req.session.save();
-				}
-
-				if ( req.session.authorized ) {
-					this.redirect( req, res, "/stuff" );
-				}
-				else {
-					this.error( req, res, 401, "Unauthorized" );
-				}
-			},
-			"middleware": function( req, res, next ) {
-				if ( req.session.authorized ) {
-					next();
-				}
-				else {
-					res.redirect( "/login" );
-				}
-			}
-		}
+### Twitter
+Twitter authentication will create `/auth`, `/auth/twitter`, & `/auth/twitter/callback` routes. `auth(token, tokenSecret, profile, callback)` must execute `callback(err, user)`.
+ 
+```javascript
+{
+	"auth": {
+		"twitter": {
+			"enabled": true,
+			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
+			"consumer_key": "", /* Get this from Twitter */
+			"consumer_secret": "" /* Get this from Twitter */
+		},
 		"protect": ["/private"]
 	}
 }

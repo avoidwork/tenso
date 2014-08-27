@@ -396,8 +396,8 @@ function auth ( obj, config ) {
 			delete config.enabled;
 			delete config.path;
 
-			passport.use( new SAMLStrategy( config, function ( accessToken, refreshToken, profile, done ) {
-				config.auth.saml.auth( accessToken, refreshToken, profile, function ( err, user ) {
+			passport.use( new SAMLStrategy( config, function ( profile, done ) {
+				config.auth.saml.auth( profile, function ( err, user ) {
 					if ( err ) {
 						delete err.stack;
 						return done( err );

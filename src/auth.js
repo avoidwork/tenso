@@ -15,7 +15,7 @@ function auth ( obj, config ) {
 	    stateful  = ( async || config.auth.local.enabled || config.security.csrf ),
 	    authMap   = {},
 	    authUris  = [],
-	    sesh, fnCookie, fnSesh, luscaCsrf, luscaCsp, luscaXframe, luscaP3p, luscaHsts, luscaXssProtection, protection, passportAuth, passportInit, passportSession;
+	    keys, sesh, fnCookie, fnSesh, luscaCsrf, luscaCsp, luscaXframe, luscaP3p, luscaHsts, luscaXssProtection, protection, passportAuth, passportInit, passportSession;
 
 	function asyncFlag () {
 		arguments[0].protectAsync = true;
@@ -81,6 +81,11 @@ function auth ( obj, config ) {
 		}
 
 		authUris = array.keys( authMap );
+	}
+
+	if ( config.auth.local.enabled ) {
+		authUris.push( "/" );
+		authUris.push( "/login" );
 	}
 
 	if ( stateful ) {
@@ -150,7 +155,11 @@ function auth ( obj, config ) {
 		} );
 
 		if ( authUris.length > 0 ) {
-			config.routes.get["/auth"] = authMap;
+			keys = array.keys( authMap ).length > 0;
+
+			if ( keys ) {
+				config.routes.get["/auth"] = authMap;
+			}
 
 			( function () {
 				var regex = "(?!/auth/(";
@@ -164,7 +173,7 @@ function auth ( obj, config ) {
 				obj.server.use( regex, guard ).blacklist( guard );
 			} )();
 
-			config.routes.get["/login"]  = ( config.auth.local.enabled || config.auth.saml.enabled ) ? {login_uri: "/auth", instruction: "POST username/password to authenticate"} : {login_uri: "/auth"};
+			config.routes.get["/login"]  = ( config.auth.local.enabled || config.auth.saml.enabled ) ? ( keys ? {login_uri: "/auth", instruction: "POST username/password to authenticate"} : {instruction: "POST username/password to authenticate"} ) : {login_uri: "/auth"};
 		}
 		else if ( config.auth.local.enabled || config.auth.saml.enabled ) {
 			config.routes.get["/login"]  = {instruction: "POST username/password to authenticate"};

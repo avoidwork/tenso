@@ -36,4 +36,4 @@ var turtleio = require( "turtle.io" ),
     REGEX_GETREWRITE = /HEAD|OPTIONS/i,
     REGEX_BODY       = /POST|PUT|PATCH/i,
     REGEX_FORMENC    = /application\/x-www-form-urlencoded/,
-	REGEX_BODY_SPLIT = /&|=/;
+    REGEX_BODY_SPLIT = /&|=/;

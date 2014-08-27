@@ -367,12 +367,10 @@ describe("Local", function () {
 
 	describe("GET /uuid (invalid)", function () {
 		it("returns an 'unauthorized' error", function (done) {
-			api( port )
+			api( port, true )
 				.get("/uuid")
-				.expectStatus(401)
-				.expectValue("data", null)
-				.expectValue("error", "Unauthorized")
-				.expectValue("status", 401)
+				.expectStatus(302)
+				.expectHeader("Location", "/login")
 				.end(function(err) {
 					if (err) throw err;
 					done();

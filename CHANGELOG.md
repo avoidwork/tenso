@@ -5,6 +5,7 @@
 - Refactored `Local Auth` to use passport
 - Refactored `auth()` to mix stateless & stateful auth strategies the same time
 - Added `parse()` middleware via `bootstrap()` to coerce `req.body`
+- Created `auth.redirect` configuration option for customizing where an end user is redirected to upon successful (stateful) authentication, default is `/`
 
 ## 0.6.1
 - Upgrading turtle.io to 3.0.15 for etag middleware fix (out of order execution negated it)

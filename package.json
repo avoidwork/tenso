@@ -52,7 +52,7 @@
     "grunt-contrib-concat": "~0.5.0",
     "grunt-contrib-jshint": "~0.10.0",
     "grunt-contrib-watch": "~0.6.1",
-    "grunt-contrib-sass": "~0.7.3",
+    "grunt-contrib-sass": "~0.8.1",
     "grunt-jsdoc": "~0.5.6",
     "ink-docstrap": "~0.4.12",
     "hippie": "~0.3.0",

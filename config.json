@@ -1,6 +1,7 @@
 {
 	"auth": {
 		"protect": [],
+		"redirect": "/",
 		"basic": {
 			"enabled": false,
 			"list": []

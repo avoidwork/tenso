@@ -100,9 +100,11 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 ```
 
 ## Authentication
-The `protect` Array is the endpoints that will require authentication. Sessions are used for non `Basic` or `Bearer Token` authentication, and will have `/login`, `/logout`, & custom routes. Redis is supported for session storage.
+The `protect` Array is the endpoints that will require authentication. The `redirect` String is the end point users will be redirected to upon successfully authenticating, the default is `/`.
 
-Multiple social authentication strategies can be enabled at once.
+Sessions are used for non `Basic` or `Bearer Token` authentication, and will have `/login`, `/logout`, & custom routes. Redis is supported for session storage.
+
+Multiple authentication strategies can be enabled at once.
 
 ### Basic Auth
 ```javascript
@@ -193,8 +195,8 @@ OAuth2 authentication will create `/auth`, `/auth/oauth2`, & `/auth/oauth2/callb
 			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
 			"auth_url": "", /* Authorization URL */
 			"token_url": "", /* Token URL */
-			"client_id": "", /* Get this from Facebook */
-			"client_secret": "" /* Get this from Facebook */
+			"client_id": "", /* Get this from authorization server */
+			"client_secret": "" /* Get this from authorization server */
 		},
 		"protect": ["/private"]
 	}

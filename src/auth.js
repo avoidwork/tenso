@@ -42,7 +42,7 @@ function auth ( obj, config ) {
 	}
 
 	function redirect () {
-		arguments[1].redirect( "/" );
+		arguments[1].redirect( config.auth.redirect );
 	}
 
 	config.auth.protect = ( config.auth.protect || [] ).map( function ( i ) {
@@ -84,7 +84,7 @@ function auth ( obj, config ) {
 	}
 
 	if ( config.auth.local.enabled ) {
-		authUris.push( "/" );
+		authUris.push( config.auth.redirect );
 		authUris.push( "/login" );
 	}
 
@@ -173,9 +173,9 @@ function auth ( obj, config ) {
 				obj.server.use( regex, guard ).blacklist( guard );
 			} )();
 
-			config.routes.get["/login"]  = ( config.auth.local.enabled || config.auth.saml.enabled ) ? ( keys ? {login_uri: "/auth", instruction: "POST username/password to authenticate"} : {instruction: "POST username/password to authenticate"} ) : {login_uri: "/auth"};
+			config.routes.get["/login"]  = config.auth.local.enabled ? ( keys ? {login_uri: "/auth", instruction: "POST username/password to authenticate"} : {instruction: "POST username/password to authenticate"} ) : {login_uri: "/auth"};
 		}
-		else if ( config.auth.local.enabled || config.auth.saml.enabled ) {
+		else if ( config.auth.local.enabled ) {
 			config.routes.get["/login"]  = {instruction: "POST username/password to authenticate"};
 		}
 
@@ -184,7 +184,7 @@ function auth ( obj, config ) {
 				req.session.destroy();
 			}
 
-			res.redirect( "/" );
+			res.redirect( config.auth.redirect );
 		};
 	}
 
@@ -348,7 +348,7 @@ function auth ( obj, config ) {
 			var final, mid;
 
 			final = function () {
-				passport.authenticate( "local", {successRedirect: "/"} )( req, res, function ( e ) {
+				passport.authenticate( "local", {successRedirect: config.auth.redirect} )( req, res, function ( e ) {
 					if ( e ) {
 						res.error( 401, "Unauthorized" );
 					}
@@ -434,7 +434,7 @@ function auth ( obj, config ) {
 		obj.server.get( "/auth/twitter", asyncFlag ).blacklist( asyncFlag );
 		obj.server.get( "/auth/twitter", passport.authenticate( "twitter" ) );
 		obj.server.get( "/auth/twitter/callback", asyncFlag ).blacklist( asyncFlag );
-		obj.server.get( "/auth/twitter/callback", passport.authenticate( "twitter", {successRedirect: "/", failureRedirect: "/login"} ) );
+		obj.server.get( "/auth/twitter/callback", passport.authenticate( "twitter", {successRedirect: config.auth.redirect, failureRedirect: "/login"} ) );
 	}
 
 	return config;

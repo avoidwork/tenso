@@ -195,8 +195,9 @@ uses along with a 'cache compressed asset to disk' strategy, allowing Tensō to 
     &quot;uid&quot;: N /* Optional, system account uid to drop to after starting with elevated privileges to run on a low port */
 }</code></pre>
 <h2>Authentication</h2>
-<p>The <code>protect</code> Array is the endpoints that will require authentication. Sessions are used for non <code>Basic</code> or <code>Bearer Token</code> authentication, and will have <code>/login</code>, <code>/logout</code>, &amp; custom routes. Redis is supported for session storage.</p>
-<p>Multiple social authentication strategies can be enabled at once.</p>
+<p>The <code>protect</code> Array is the endpoints that will require authentication. The <code>redirect</code> String is the end point users will be redirected to upon successfully authenticating, the default is <code>/</code>.</p>
+<p>Sessions are used for non <code>Basic</code> or <code>Bearer Token</code> authentication, and will have <code>/login</code>, <code>/logout</code>, &amp; custom routes. Redis is supported for session storage.</p>
+<p>Multiple authentication strategies can be enabled at once.</p>
 <h3>Basic Auth</h3>
 <pre><code class="lang-javascript">{
     &quot;auth&quot;: {
@@ -232,7 +233,7 @@ uses along with a 'cache compressed asset to disk' strategy, allowing Tensō to 
     }
 }</code></pre>
 <h3>LinkedIn</h3>
-<p>LinkedIn authentication will create <code>/auth</code>, <code>/auth/linkedin</code>, &amp; <code>/auth/linkedin/callback</code> routes. <code>auth(authCode, authToken, expiresIn, callback)</code> must execute <code>callback(err, user)</code>.</p>
+<p>LinkedIn authentication will create <code>/auth</code>, <code>/auth/linkedin</code>, &amp; <code>/auth/linkedin/callback</code> routes. <code>auth(token, tokenSecret, profile, callback)</code> must execute <code>callback(err, user)</code>.</p>
 <pre><code class="lang-javascript">{
     &quot;auth&quot;: {
         &quot;linkedin&quot;: {
@@ -245,15 +246,28 @@ uses along with a 'cache compressed asset to disk' strategy, allowing Tensō to 
         &quot;protect&quot;: [&quot;/private&quot;]
     }
 }</code></pre>
-<h3>Twitter</h3>
-<p>Twitter authentication will create <code>/auth</code>, <code>/auth/twitter</code>, &amp; <code>/auth/twitter/callback</code> routes. <code>auth(token, tokenSecret, profile, callback)</code> must execute <code>callback(err, user)</code>.</p>
+<h3>Local</h3>
+<p>Local authentication will create <code>/login</code>. <code>auth(username, password)</code> must execute <code>callback(err, user)</code>.</p>
 <pre><code class="lang-javascript">{
     &quot;auth&quot;: {
-        &quot;twitter&quot;: {
+        &quot;local&quot;: {
             &quot;enabled&quot;: true,
             &quot;auth&quot;: function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
-            &quot;consumer_key&quot;: &quot;&quot;, /* Get this from Twitter */
-            &quot;consumer_secret&quot;: &quot;&quot; /* Get this from Twitter */
+        }
+        &quot;protect&quot;: [&quot;/private&quot;]
+    }
+}</code></pre>
+<h3>OAuth2</h3>
+<p>OAuth2 authentication will create <code>/auth</code>, <code>/auth/oauth2</code>, &amp; <code>/auth/oauth2/callback</code> routes. <code>auth(accessToken, refreshToken, profile, callback)</code> must execute <code>callback(err, user)</code>.</p>
+<pre><code class="lang-javascript">{
+    &quot;auth&quot;: {
+        &quot;oauth2&quot;: {
+            &quot;enabled&quot;: true,
+            &quot;auth&quot;: function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
+            &quot;auth_url&quot;: &quot;&quot;, /* Authorization URL */
+            &quot;token_url&quot;: &quot;&quot;, /* Token URL */
+            &quot;client_id&quot;: &quot;&quot;, /* Get this from authorization server */
+            &quot;client_secret&quot;: &quot;&quot; /* Get this from authorization server */
         },
         &quot;protect&quot;: [&quot;/private&quot;]
     }
@@ -268,40 +282,28 @@ uses along with a 'cache compressed asset to disk' strategy, allowing Tensō to 
         &quot;protect&quot;: [&quot;/&quot;]
     }
 }</code></pre>
-<h3>Local</h3>
-<p>Do not protect <code>/</code>, as it'll block the authentication end points. <code>local</code> authentication will rely on sessions, so SSL is required for production servers.</p>
+<h3>SAML</h3>
+<p>SAML authentication will create <code>/auth</code>, <code>/auth/saml</code>, &amp; <code>/auth/saml/callback</code> routes. <code>auth(profile, callback)</code> must execute <code>callback(err, user)</code>.</p>
+<p>Tensō uses <a href="https://github.com/bergie/passport-saml">passport-saml</a>, for configuration options please visit it's homepage.</p>
 <pre><code class="lang-javascript">{
     &quot;auth&quot;: {
-        &quot;local&quot;: {
+        &quot;saml&quot;: {
             &quot;enabled&quot;: true,
-            &quot;auth&quot;: function ( req, res ) {
-                if ( !req.session.authorized ) {
-                    if ( ... ) {
-                        req.session.authorized = true;
-                    }
-                    else {
-                        req.session.authorized = false;
-                    }
-
-                    req.session.save();
-                }
-
-                if ( req.session.authorized ) {
-                    this.redirect( req, res, &quot;/stuff&quot; );
-                }
-                else {
-                    this.error( req, res, 401, &quot;Unauthorized&quot; );
-                }
-            },
-            &quot;middleware&quot;: function( req, res, next ) {
-                if ( req.session.authorized ) {
-                    next();
-                }
-                else {
-                    res.redirect( &quot;/login&quot; );
-                }
-            }
-        }
+            ...
+        },
+        &quot;protect&quot;: [&quot;/private&quot;]
+    }
+}</code></pre>
+<h3>Twitter</h3>
+<p>Twitter authentication will create <code>/auth</code>, <code>/auth/twitter</code>, &amp; <code>/auth/twitter/callback</code> routes. <code>auth(token, tokenSecret, profile, callback)</code> must execute <code>callback(err, user)</code>.</p>
+<pre><code class="lang-javascript">{
+    &quot;auth&quot;: {
+        &quot;twitter&quot;: {
+            &quot;enabled&quot;: true,
+            &quot;auth&quot;: function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
+            &quot;consumer_key&quot;: &quot;&quot;, /* Get this from Twitter */
+            &quot;consumer_secret&quot;: &quot;&quot; /* Get this from Twitter */
+        },
         &quot;protect&quot;: [&quot;/private&quot;]
     }
 }</code></pre>
@@ -382,7 +384,7 @@ The last argument for each probe is the nanoseconds it took to execute.</p>
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a>
-		on 2014-08-24T15:49:31-04:00 using the <a
+		on 2014-08-28T07:15:32-04:00 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

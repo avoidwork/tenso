@@ -1,1 +1,8 @@
-html,body{min-height:100%}body{background:#fffff;color:#00000;font:12px Arial;margin:10px}
+html, body {
+  min-height: 100%; }
+
+body {
+  background: #fffff;
+  color: #00000;
+  font: 12px Arial;
+  margin: 10px; }

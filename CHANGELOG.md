@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.7.1
+- Modified `parse()` middleware to handle `application/json` content-type request bodies
+
 ## 0.7.0
 - Added `OAuth2`, & `SAML` authentication
 - Refactored `Local Auth` to use passport

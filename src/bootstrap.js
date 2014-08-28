@@ -24,15 +24,23 @@ function bootstrap ( obj, config ) {
 	}
 
 	function parse ( req ) {
-		var args;
+		var args, type;
 
-		if ( REGEX_BODY.test( req.method ) && REGEX_FORMENC.test( req.headers["content-type"] ) ) {
-			args     = req.body ? array.chunk( req.body.split( REGEX_BODY_SPLIT ), 2 ) : [];
-			req.body = {};
+		if ( REGEX_BODY.test( req.method ) && req.body !== undefined ) {
+			type = req.headers["content-type"];
 
-			array.each( args, function ( i ) {
-				req.body[i[0]] = coerce( i[1] );
-			} );
+			if ( REGEX_FORMENC.test( type ) ) {
+				args = req.body ? array.chunk( req.body.split( REGEX_BODY_SPLIT ), 2 ) : [];
+				req.body = {};
+
+				array.each( args, function ( i ) {
+					req.body[i[0]] = coerce( i[1] );
+				} );
+			}
+
+			if ( REGEX_JSONENC.test( type ) ) {
+				req.body = json.decode( req.body, true );
+			}
 		}
 
 		arguments[2]();

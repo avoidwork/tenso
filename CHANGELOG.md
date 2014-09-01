@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.7.2
+- Enabled `auth.linkedin.scope`; missed it
+- Removed double `blacklist()` of middleware within each authentication strategy
+
 ## 0.7.1
 - Modified `parse()` middleware to handle `application/json` content-type request bodies
 

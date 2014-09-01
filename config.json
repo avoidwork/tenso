@@ -25,7 +25,7 @@
 			"auth": null,
 			"client_id": "",
 			"client_secret": "",
-			"scope": null
+			"scope": ["r_basicprofile", "r_emailaddress"]
 		},
 		"oauth2": {
 			"enabled": false,

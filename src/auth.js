@@ -280,7 +280,7 @@ function auth ( obj, config ) {
 
 		obj.server.get( "/auth/facebook", asyncFlag ).blacklist( asyncFlag );
 		obj.server.get( "/auth/facebook", passport.authenticate( "facebook" ) );
-		obj.server.get( "/auth/facebook/callback", asyncFlag ).blacklist( asyncFlag );
+		obj.server.get( "/auth/facebook/callback", asyncFlag );
 		obj.server.get( "/auth/facebook/callback", passport.authenticate( "facebook", {failureRedirect: "/login"} ) );
 		obj.server.get( "/auth/facebook/callback", redirect );
 	}
@@ -302,7 +302,7 @@ function auth ( obj, config ) {
 
 		obj.server.get( "/auth/google", asyncFlag ).blacklist( asyncFlag );
 		obj.server.get( "/auth/google", passport.authenticate( "google" ) );
-		obj.server.get( "/auth/google/callback", asyncFlag ).blacklist( asyncFlag );
+		obj.server.get( "/auth/google/callback", asyncFlag );
 		obj.server.get( "/auth/google/callback", passport.authenticate( "google", {failureRedirect: "/login"} ) );
 		obj.server.get( "/auth/google/callback", redirect );
 	}
@@ -325,8 +325,8 @@ function auth ( obj, config ) {
 		} ) );
 
 		obj.server.get( "/auth/linkedin", asyncFlag ).blacklist( asyncFlag );
-		obj.server.get( "/auth/linkedin", passport.authenticate( "linkedin" ) );
-		obj.server.get( "/auth/linkedin/callback", asyncFlag ).blacklist( asyncFlag );
+		obj.server.get( "/auth/linkedin", passport.authenticate( "linkedin", {"scope": config.auth.linkedin.scope || ["r_basicprofile", "r_emailaddress"]} ) );
+		obj.server.get( "/auth/linkedin/callback", asyncFlag );
 		obj.server.get( "/auth/linkedin/callback", passport.authenticate( "linkedin", {failureRedirect: "/login"} ) );
 		obj.server.get( "/auth/linkedin/callback", redirect );
 	}
@@ -383,7 +383,7 @@ function auth ( obj, config ) {
 
 		obj.server.get( "/auth/oauth2", asyncFlag ).blacklist( asyncFlag );
 		obj.server.get( "/auth/oauth2", passport.authenticate( "oauth2" ) );
-		obj.server.get( "/auth/oauth2/callback", asyncFlag ).blacklist( asyncFlag );
+		obj.server.get( "/auth/oauth2/callback", asyncFlag );
 		obj.server.get( "/auth/oauth2/callback", passport.authenticate( "oauth2", {failureRedirect: "/login"} ) );
 		obj.server.get( "/auth/oauth2/callback", redirect );
 	}
@@ -410,7 +410,7 @@ function auth ( obj, config ) {
 
 		obj.server.get( "/auth/saml", asyncFlag ).blacklist( asyncFlag );
 		obj.server.get( "/auth/saml", passport.authenticate( "saml" ) );
-		obj.server.get( "/auth/saml/callback", asyncFlag ).blacklist( asyncFlag );
+		obj.server.get( "/auth/saml/callback", asyncFlag );
 		obj.server.get( "/auth/saml/callback", passport.authenticate( "saml", {failureRedirect: "/login"} ) );
 		obj.server.get( "/auth/saml/callback", redirect );
 	}
@@ -433,7 +433,7 @@ function auth ( obj, config ) {
 
 		obj.server.get( "/auth/twitter", asyncFlag ).blacklist( asyncFlag );
 		obj.server.get( "/auth/twitter", passport.authenticate( "twitter" ) );
-		obj.server.get( "/auth/twitter/callback", asyncFlag ).blacklist( asyncFlag );
+		obj.server.get( "/auth/twitter/callback", asyncFlag );
 		obj.server.get( "/auth/twitter/callback", passport.authenticate( "twitter", {successRedirect: config.auth.redirect, failureRedirect: "/login"} ) );
 	}
 

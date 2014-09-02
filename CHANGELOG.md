@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.8.0
+- Refactored `auth()` & created 'by config' end points for `Basic` & `Bearer` under `/auth`, such that they don't collide with stateful strategies
+- Updated `hypermedia()` to add a `collection` link for non `Array/Object` representations & to set a `rel` of `item` for `Array` based links, updated tests
+
 ## 0.7.2
 - Enabled `auth.linkedin.scope`; missed it
 - Removed double `blacklist()` of middleware within each authentication strategy

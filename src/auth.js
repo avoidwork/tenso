@@ -45,43 +45,22 @@ function auth ( obj, config ) {
 		arguments[1].redirect( config.auth.redirect );
 	}
 
+	obj.server.blacklist( asyncFlag );
+
 	config.auth.protect = ( config.auth.protect || [] ).map( function ( i ) {
 		return new RegExp( "^" + i !== "/login" ? i.replace( /\.\*/g, "*" ).replace( /\*/g, ".*" ) : "$", "i" );
 	} );
 
 	if ( async ) {
-		if ( config.auth.facebook.enabled ) {
-			authMap.facebook_uri = "/auth/facebook";
-			config.auth.protect.push( new RegExp( "^/auth/facebook" ) );
-		}
-
-		if ( config.auth.google.enabled ) {
-			authMap.google_uri = "/auth/google";
-			config.auth.protect.push( new RegExp( "^/auth/google" ) );
-		}
-
-		if ( config.auth.linkedin.enabled ) {
-			authMap.linkedin_uri = "/auth/linkedin";
-			config.auth.protect.push( new RegExp( "^/auth/linkedin" ) );
-		}
-
-		if ( config.auth.oauth2.enabled ) {
-			authMap.oauth2_uri = "/auth/oauth2";
-			config.auth.protect.push( new RegExp( "^/auth/oauth2" ) );
-		}
-
-		if ( config.auth.saml.enabled ) {
-			authMap.saml_uri = "/auth/saml";
-			config.auth.protect.push( new RegExp( "^/auth/saml" ) );
-		}
-
-		if ( config.auth.twitter.enabled ) {
-			authMap.twitter_uri = "/auth/twitter";
-			config.auth.protect.push( new RegExp( "^/auth/twitter" ) );
-		}
-
-		authUris = array.keys( authMap );
+		iterate( config.auth, function ( v, k ) {
+			if ( v.enabled ) {
+				authMap[k + "_uri"] = "/auth/" + k;
+				config.auth.protect.push( new RegExp( "^/auth/" + k ) );
+			}
+		} );
 	}
+
+	authUris = array.keys( authMap );
 
 	if ( config.auth.local.enabled ) {
 		authUris.push( config.auth.redirect );
@@ -225,7 +204,14 @@ function auth ( obj, config ) {
 			} ) );
 
 			passportAuth = passport.authenticate( "basic", {session: stateful} );
-			obj.server.use( passportAuth ).blacklist( passportAuth );
+
+			if ( async ) {
+				obj.server.get( "/auth/basic", passportAuth ).blacklist( passportAuth );
+				obj.server.get( "/auth/basic", redirect );
+			}
+			else {
+				obj.server.use( passportAuth ).blacklist( passportAuth );
+			}
 		} )();
 	}
 
@@ -258,7 +244,14 @@ function auth ( obj, config ) {
 			} ) );
 
 			passportAuth = passport.authenticate( "bearer", {session: stateful} );
-			obj.server.use( passportAuth ).blacklist( passportAuth );
+
+			if ( async ) {
+				obj.server.get( "/auth/bearer", passportAuth ).blacklist( passportAuth );
+				obj.server.get( "/auth/bearer", redirect );
+			}
+			else {
+				obj.server.use( passportAuth ).blacklist( passportAuth );
+			}
 		} )();
 	}
 
@@ -278,7 +271,7 @@ function auth ( obj, config ) {
 			} );
 		} ) );
 
-		obj.server.get( "/auth/facebook", asyncFlag ).blacklist( asyncFlag );
+		obj.server.get( "/auth/facebook", asyncFlag );
 		obj.server.get( "/auth/facebook", passport.authenticate( "facebook" ) );
 		obj.server.get( "/auth/facebook/callback", asyncFlag );
 		obj.server.get( "/auth/facebook/callback", passport.authenticate( "facebook", {failureRedirect: "/login"} ) );
@@ -300,7 +293,7 @@ function auth ( obj, config ) {
 			} );
 		} ) );
 
-		obj.server.get( "/auth/google", asyncFlag ).blacklist( asyncFlag );
+		obj.server.get( "/auth/google", asyncFlag );
 		obj.server.get( "/auth/google", passport.authenticate( "google" ) );
 		obj.server.get( "/auth/google/callback", asyncFlag );
 		obj.server.get( "/auth/google/callback", passport.authenticate( "google", {failureRedirect: "/login"} ) );
@@ -324,7 +317,7 @@ function auth ( obj, config ) {
 			} );
 		} ) );
 
-		obj.server.get( "/auth/linkedin", asyncFlag ).blacklist( asyncFlag );
+		obj.server.get( "/auth/linkedin", asyncFlag );
 		obj.server.get( "/auth/linkedin", passport.authenticate( "linkedin", {"scope": config.auth.linkedin.scope || ["r_basicprofile", "r_emailaddress"]} ) );
 		obj.server.get( "/auth/linkedin/callback", asyncFlag );
 		obj.server.get( "/auth/linkedin/callback", passport.authenticate( "linkedin", {failureRedirect: "/login"} ) );
@@ -381,7 +374,7 @@ function auth ( obj, config ) {
 			} );
 		} ) );
 
-		obj.server.get( "/auth/oauth2", asyncFlag ).blacklist( asyncFlag );
+		obj.server.get( "/auth/oauth2", asyncFlag );
 		obj.server.get( "/auth/oauth2", passport.authenticate( "oauth2" ) );
 		obj.server.get( "/auth/oauth2/callback", asyncFlag );
 		obj.server.get( "/auth/oauth2/callback", passport.authenticate( "oauth2", {failureRedirect: "/login"} ) );
@@ -408,7 +401,7 @@ function auth ( obj, config ) {
 			} ) );
 		} )();
 
-		obj.server.get( "/auth/saml", asyncFlag ).blacklist( asyncFlag );
+		obj.server.get( "/auth/saml", asyncFlag );
 		obj.server.get( "/auth/saml", passport.authenticate( "saml" ) );
 		obj.server.get( "/auth/saml/callback", asyncFlag );
 		obj.server.get( "/auth/saml/callback", passport.authenticate( "saml", {failureRedirect: "/login"} ) );
@@ -431,7 +424,7 @@ function auth ( obj, config ) {
 			} );
 		} ) );
 
-		obj.server.get( "/auth/twitter", asyncFlag ).blacklist( asyncFlag );
+		obj.server.get( "/auth/twitter", asyncFlag );
 		obj.server.get( "/auth/twitter", passport.authenticate( "twitter" ) );
 		obj.server.get( "/auth/twitter/callback", asyncFlag );
 		obj.server.get( "/auth/twitter/callback", passport.authenticate( "twitter", {successRedirect: config.auth.redirect, failureRedirect: "/login"} ) );

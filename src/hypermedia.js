@@ -23,6 +23,10 @@ function hypermedia ( server, req, rep, headers ) {
 		rep.data  = {link: [], result: rep.data};
 		root      = req.parsed.protocol + "//" + req.parsed.host + req.parsed.pathname;
 
+		if ( req.parsed.pathname !== "/" ) {
+			rep.data.link.push( {uri: root.replace( REGEX_COLLECTION, "$1" ), rel: "collection"} );
+		}
+
 		if ( rep.data.result instanceof Array ) {
 			if ( isNaN( page ) || page <= 0 ) {
 				page = 1;
@@ -71,7 +75,7 @@ function hypermedia ( server, req, rep, headers ) {
 					uri     = i.indexOf( "//" ) > -1 ? i : req.parsed.protocol + "//" + req.parsed.host + i;
 
 					if ( uri !== root ) {
-						rep.data.link.push( {uri: uri, rel: "related"} );
+						rep.data.link.push( {uri: uri, rel: "item"} );
 						remove.push( idx );
 					}
 				}
@@ -87,8 +91,6 @@ function hypermedia ( server, req, rep, headers ) {
 		}
 		else if ( rep.data.result instanceof Object ) {
 			keys = array.keys( rep.data.result );
-
-			rep.data.link.push( {uri: root.replace( REGEX_COLLECTION, "$1" ), rel: "collection"} );
 
 			if ( keys.length === 0 ) {
 				rep.data.result = null;

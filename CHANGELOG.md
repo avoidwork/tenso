@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.8.1
+- Fixed an oversight in two conditionals within `auth()`
+
 ## 0.8.0
 - Refactored `auth()` & created 'by config' end points for `Basic` & `Bearer` under `/auth`, such that they don't collide with stateful strategies
 - Updated `hypermedia()` to add a `collection` link for non `Array/Object` representations & to set a `rel` of `item` for `Array` based links, updated tests

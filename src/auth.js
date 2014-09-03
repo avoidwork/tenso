@@ -205,7 +205,7 @@ function auth ( obj, config ) {
 
 			passportAuth = passport.authenticate( "basic", {session: stateful} );
 
-			if ( async ) {
+			if ( async || config.auth.local.enabled ) {
 				obj.server.get( "/auth/basic", passportAuth ).blacklist( passportAuth );
 				obj.server.get( "/auth/basic", redirect );
 			}
@@ -245,7 +245,7 @@ function auth ( obj, config ) {
 
 			passportAuth = passport.authenticate( "bearer", {session: stateful} );
 
-			if ( async ) {
+			if ( async || config.auth.local.enabled ) {
 				obj.server.get( "/auth/bearer", passportAuth ).blacklist( passportAuth );
 				obj.server.get( "/auth/bearer", redirect );
 			}

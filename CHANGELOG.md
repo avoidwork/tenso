@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.8.2
+- Updating deps
+
 ## 0.8.1
 - Fixed an oversight in two conditionals within `auth()`
 

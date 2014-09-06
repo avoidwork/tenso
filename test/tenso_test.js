@@ -26,7 +26,7 @@ describe("Permissions", function () {
 				.get( "/" )
 				.expectStatus( 200 )
 				.expectHeader( "allow", "GET, HEAD, OPTIONS" )
-				.expectValue( "data.link", [{uri:"http://localhost:" + port + "/items", rel:"item"}] )
+				.expectValue( "data.link", [{uri:"http://localhost:" + port + "/items", rel:"item"}, {uri:"http://localhost:" + port + "/things", rel:"item"}] )
 				.expectValue( "data.result", null )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )
@@ -220,6 +220,22 @@ describe("Hypermedia", function () {
 
 	tenso( {port: port, routes: routes, logs: {level: "error"}} );
 
+	describe("GET /things", function () {
+		it("returns a collection of representations that has hypermedia properties", function (done) {
+			api( port )
+				.get("/things")
+				.expectStatus(200)
+				.expectValue("data.link", [{uri: "http://localhost:" + port, rel: "collection"}, {uri: "http://localhost:" + port + "/things/1", rel: "item"}, {uri: "http://localhost:" + port + "/things/2", rel: "item"}, {uri: "http://localhost:" + port + "/things/3", rel: "item"}])
+				.expectValue("data.result", [{name:"thing 1"},{name:"thing 2"},{name:"thing 3"}])
+				.expectValue("error", null)
+				.expectValue("status", 200)
+				.end(function(err) {
+					if (err) throw err;
+					done();
+				});
+		});
+	});
+
 	describe("GET /somethings/abc", function () {
 		it("returns an entity that has hypermedia properties, and data", function (done) {
 			api( port )
@@ -263,7 +279,7 @@ describe("Basic Auth", function () {
 			api( port )
 				.get( "/" )
 				.expectStatus( 200 )
-				.expectValue( "data.link", [{uri:"http://localhost:" + port + "/items", rel:"item"}] )
+				.expectValue( "data.link", [{uri:"http://localhost:" + port + "/items", rel:"item"}, {uri:"http://localhost:" + port + "/things", rel:"item"}] )
 				.expectValue( "data.result", null )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )
@@ -314,7 +330,7 @@ describe("OAuth2 Token Bearer", function () {
 				.header('Authorization', 'Bearer abc-123')
 				.get( "/" )
 				.expectStatus( 200 )
-				.expectValue( "data.link", [{uri:"http://localhost:" + port + "/items", rel:"item"}] )
+				.expectValue( "data.link", [{uri:"http://localhost:" + port + "/items", rel:"item"}, {uri:"http://localhost:" + port + "/things", rel:"item"}] )
 				.expectValue( "data.result", null )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )
@@ -456,7 +472,7 @@ describe("Rate Limiting", function () {
 				.expectStatus( 200 )
 				.expectHeader( "x-ratelimit-limit", "2" )
 				.expectHeader( "x-ratelimit-remaining", "1" )
-				.expectValue( "data.link", [{uri:"http://localhost:" + port + "/items", rel:"item"}] )
+				.expectValue( "data.link", [{uri:"http://localhost:" + port + "/items", rel:"item"}, {uri:"http://localhost:" + port + "/things", rel:"item"}] )
 				.expectValue( "data.result", null )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )
@@ -474,7 +490,7 @@ describe("Rate Limiting", function () {
 				.expectStatus( 200 )
 				.expectHeader( "x-ratelimit-limit", "2" )
 				.expectHeader( "x-ratelimit-remaining", "0" )
-				.expectValue( "data.link", [{uri:"http://localhost:" + port + "/items", rel:"item"}] )
+				.expectValue( "data.link", [{uri:"http://localhost:" + port + "/items", rel:"item"}, {uri:"http://localhost:" + port + "/things", rel:"item"}] )
 				.expectValue( "data.result", null )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )

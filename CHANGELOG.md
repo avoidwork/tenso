@@ -1,7 +1,10 @@
 # Change Log
 
+## 0.8.3
+- Fixed `hypermedia()` when dealing with collections: `Array` of `Objects` e.g. a record set, added a test
+
 ## 0.8.2
-- Updating deps
+- Updated deps
 
 ## 0.8.1
 - Fixed an oversight in two conditionals within `auth()`

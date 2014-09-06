@@ -14,7 +14,40 @@
  * @return {Undefined}      undefined
  */
 function hypermedia ( server, req, rep, headers ) {
-	var query, page, page_size, nth, root, keys, remove, rewrite;
+	var query, page, page_size, nth, root, remove, rewrite;
+
+	// Parsing the object for hypermedia properties
+	function parse ( obj, rel ) {
+		rel = rel || "related";
+
+		var keys = array.keys( obj );
+
+		if ( keys.length === 0 ) {
+			obj = null;
+		}
+		else {
+			array.each( keys, function ( i ) {
+				var collection, uri;
+
+				// If ID like keys are found, and are not URIs, they are assumed to be root collections
+				if ( REGEX_HYPERMEDIA.test( i ) ) {
+					collection = i.replace( REGEX_TRAILING, "" ).replace( REGEX_TRAILING_S, "" ) + "s";
+					uri = REGEX_SCHEME.test( obj[i] ) ? ( obj[i].indexOf( "//" ) > -1 ? obj[i] : req.parsed.protocol + "//" + req.parsed.host + obj[i] ) : ( req.parsed.protocol + "//" + req.parsed.host + "/" + collection + "/" + obj[i] );
+
+					if ( uri !== root ) {
+						rep.data.link.push( {uri: uri, rel: rel} );
+						delete obj[i];
+					}
+				}
+			} );
+
+			if ( array.keys( obj ).length === 0 ) {
+				obj = null;
+			}
+		}
+
+		return obj;
+	}
 
 	if ( rep.status >= 200 && rep.status <= 206 ) {
 		query     = req.parsed.query;
@@ -79,42 +112,25 @@ function hypermedia ( server, req, rep, headers ) {
 						remove.push( idx );
 					}
 				}
+
+				if ( i instanceof Object ) {
+					parse( i, "item" );
+				}
 			} );
 
-			array.each( remove.reverse(), function ( i ) {
-				array.remove( rep.data.result, i );
-			} );
+			// This is for collections of URIs
+			if ( remove.length > 0 ) {
+				array.each( remove.reverse(), function ( i ) {
+					array.remove( rep.data.result, i );
+				} );
+			}
 
 			if ( rewrite && rep.data.result.length === 0 ) {
 				rep.data.result = null;
 			}
 		}
 		else if ( rep.data.result instanceof Object ) {
-			keys = array.keys( rep.data.result );
-
-			if ( keys.length === 0 ) {
-				rep.data.result = null;
-			}
-			else {
-				array.each( keys, function ( i ) {
-					var collection, uri;
-
-					// If ID like keys are found, and are not URIs, they are assumed to be root collections
-					if ( REGEX_HYPERMEDIA.test( i ) ) {
-						collection = i.replace( REGEX_TRAILING, "" ).replace( REGEX_TRAILING_S, "" ) + "s";
-						uri = REGEX_SCHEME.test( rep.data.result[i] ) ? ( rep.data.result[i].indexOf( "//" ) > -1 ? rep.data.result[i] : req.parsed.protocol + "//" + req.parsed.host + rep.data.result[i] ) : ( req.parsed.protocol + "//" + req.parsed.host + "/" + collection + "/" + rep.data.result[i] );
-
-						if ( uri !== root ) {
-							rep.data.link.push( {uri: uri, rel: "related"} );
-							delete rep.data.result[i];
-						}
-					}
-				} );
-
-				if ( array.keys( rep.data.result ).length === 0 ) {
-					rep.data.result = null;
-				}
-			}
+			rep.data.result = parse( rep.data.result );
 		}
 
 		if ( rep.data.link !== undefined && rep.data.link.length > 0 ) {

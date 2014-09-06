@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.9.0
+- Made `hypermedia()` smartr by knowing when a key is an item or a related URI, & to not remove `link` keys for obvious data modeling issues!
+
 ## 0.8.3
 - Fixed `hypermedia()` when dealing with collections: `Array` of `Objects` e.g. a record set, added a test
 

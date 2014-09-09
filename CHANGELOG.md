@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.9.1
+- Upgraded deps
+
 ## 0.9.0
 - Made `hypermedia()` smartr by knowing when a key is an item or a related URI, & to not remove `link` keys for obvious data modeling issues!
 

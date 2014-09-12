@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.9.2
+- Upgraded deps, gained better CSV decoding
+
 ## 0.9.1
 - Upgraded deps
 

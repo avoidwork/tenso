@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.9.3
+- Made `hypermedia()` smartr by not mutating the result when it's an Array of URIs, for obvious data modeling issues!
+
 ## 0.9.2
 - Upgraded deps, gained better CSV decoding
 

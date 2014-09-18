@@ -27,7 +27,7 @@ describe("Permissions", function () {
 				.expectStatus( 200 )
 				.expectHeader( "allow", "GET, HEAD, OPTIONS" )
 				.expectValue( "data.link", [{uri:"http://localhost:" + port + "/items", rel:"item"}, {uri:"http://localhost:" + port + "/things", rel:"item"}] )
-				.expectValue( "data.result", null )
+				.expectValue( "data.result", ["/items", "/things"] )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )
 				.end(function(err) {
@@ -281,7 +281,7 @@ describe("Basic Auth", function () {
 				.get( "/" )
 				.expectStatus( 200 )
 				.expectValue( "data.link", [{uri:"http://localhost:" + port + "/items", rel:"item"}, {uri:"http://localhost:" + port + "/things", rel:"item"}] )
-				.expectValue( "data.result", null )
+				.expectValue( "data.result", ["/items", "/things"] )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )
 				.end( function ( err ) {
@@ -332,7 +332,7 @@ describe("OAuth2 Token Bearer", function () {
 				.get( "/" )
 				.expectStatus( 200 )
 				.expectValue( "data.link", [{uri:"http://localhost:" + port + "/items", rel:"item"}, {uri:"http://localhost:" + port + "/things", rel:"item"}] )
-				.expectValue( "data.result", null )
+				.expectValue( "data.result", ["/items", "/things"] )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )
 				.end( function ( err ) {
@@ -474,7 +474,7 @@ describe("Rate Limiting", function () {
 				.expectHeader( "x-ratelimit-limit", "2" )
 				.expectHeader( "x-ratelimit-remaining", "1" )
 				.expectValue( "data.link", [{uri:"http://localhost:" + port + "/items", rel:"item"}, {uri:"http://localhost:" + port + "/things", rel:"item"}] )
-				.expectValue( "data.result", null )
+				.expectValue( "data.result", ["/items", "/things"] )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )
 				.end( function ( err ) {
@@ -492,7 +492,7 @@ describe("Rate Limiting", function () {
 				.expectHeader( "x-ratelimit-limit", "2" )
 				.expectHeader( "x-ratelimit-remaining", "0" )
 				.expectValue( "data.link", [{uri:"http://localhost:" + port + "/items", rel:"item"}, {uri:"http://localhost:" + port + "/things", rel:"item"}] )
-				.expectValue( "data.result", null )
+				.expectValue( "data.result", ["/items", "/things"] )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )
 				.end( function ( err ) {

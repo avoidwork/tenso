@@ -15,7 +15,7 @@
  */
 function hypermedia ( server, req, rep, headers ) {
 	var seen = {},
-	    query, page, page_size, nth, root, remove, rewrite, parent;
+	    query, page, page_size, nth, root, parent;
 
 	// Parsing the object for hypermedia properties
 	function parse ( obj, rel, item_collection ) {
@@ -69,8 +69,6 @@ function hypermedia ( server, req, rep, headers ) {
 				page = 1;
 			}
 
-			rewrite = false;
-			remove  = [];
 			nth     = Math.ceil( rep.data.result.length / page_size );
 
 			if ( nth > 1 ) {
@@ -104,16 +102,14 @@ function hypermedia ( server, req, rep, headers ) {
 				} ).join( "&" );
 			}
 
-			array.each( rep.data.result, function ( i, idx ) {
+			array.each( rep.data.result, function ( i ) {
 				var uri;
 
 				if ( typeof i == "string" && REGEX_SCHEME.test( i ) ) {
-					rewrite = true;
-					uri     = i.indexOf( "//" ) > -1 ? i : req.parsed.protocol + "//" + req.parsed.host + i;
+					uri = i.indexOf( "//" ) > -1 ? i : req.parsed.protocol + "//" + req.parsed.host + i;
 
 					if ( uri !== root ) {
 						rep.data.link.push( {uri: uri, rel: "item"} );
-						remove.push( idx );
 					}
 				}
 
@@ -121,17 +117,6 @@ function hypermedia ( server, req, rep, headers ) {
 					parse( i, "item", req.parsed.pathname.replace( REGEX_TRAILING, "" ).replace( REGEX_LEADING, "" ).replace( REGEX_TRAILING_S, "" ) + "s" );
 				}
 			} );
-
-			// This is for collections of URIs
-			if ( remove.length > 0 ) {
-				array.each( remove.reverse(), function ( i ) {
-					array.remove( rep.data.result, i );
-				} );
-			}
-
-			if ( rewrite && rep.data.result.length === 0 ) {
-				rep.data.result = null;
-			}
 		}
 		else if ( rep.data.result instanceof Object ) {
 			parent = req.parsed.pathname.split( "/" ).filter( function( i ){ return i !== ""; } );

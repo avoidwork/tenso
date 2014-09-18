@@ -401,7 +401,7 @@ describe("Local", function () {
 				.get("/login")
 				.expectStatus(200)
 				.expectValue("data.link", [{uri: "http://localhost:" + port, rel: "collection"}] )
-				.expectValue("data.result", {instruction: "POST username/password to authenticate"} )
+				.expectValue("data.result", {instruction: "POST 'username' & 'password' to authenticate"} )
 				.expectValue("error", null)
 				.expectValue("status", 200)
 				.end(function(err) {

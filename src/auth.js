@@ -152,14 +152,14 @@ function auth ( obj, config ) {
 				obj.server.use( regex, guard ).blacklist( guard );
 			} )();
 
-			config.routes.get["/login"]  = config.auth.local.enabled ? ( keys ? {login_uri: "/auth", instruction: "POST username/password to authenticate"} : {instruction: "POST username/password to authenticate"} ) : {login_uri: "/auth"};
+			config.routes.get["/login"]  = config.auth.local.enabled ? ( keys ? {login_uri: "/auth", instruction: "POST 'username' & 'password' to authenticate"} : {instruction: "POST 'username' & 'password' to authenticate"} ) : {login_uri: "/auth"};
 		}
 		else if ( config.auth.local.enabled ) {
-			config.routes.get["/login"]  = {instruction: "POST username/password to authenticate"};
+			config.routes.get["/login"]  = {instruction: "POST 'username' & 'password' to authenticate"};
 		}
 
 		config.routes.get["/logout"] = function ( req, res ) {
-			if (  req.session.isAuthorized() ) {
+			if (  req.session ) {
 				req.session.destroy();
 			}
 

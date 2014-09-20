@@ -1,7 +1,10 @@
 # Change Log
 
+## 0.9.5
+- Fixed `hypermedia()` when URI has a trailing slash and is a collection, added a test
+
 ## 0.9.4
-- Changing `/logout` such that it works without being a protected route
+- Changed `/logout` such that it works without being a protected route
 
 ## 0.9.3
 - Made `hypermedia()` smartr by not mutating the result when it's an Array of URIs, for obvious data modeling issues!

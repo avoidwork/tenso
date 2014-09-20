@@ -61,7 +61,7 @@ function hypermedia ( server, req, rep, headers ) {
 		root      = req.parsed.protocol + "//" + req.parsed.host + req.parsed.pathname;
 
 		if ( req.parsed.pathname !== "/" ) {
-			rep.data.link.push( {uri: root.replace( REGEX_COLLECTION, "$1" ), rel: "collection"} );
+			rep.data.link.push( {uri: root.replace( REGEX_TRAIL_SLASH, "" ).replace( REGEX_COLLECTION, "$1" ), rel: "collection"} );
 		}
 
 		if ( rep.data.result instanceof Array ) {
@@ -114,7 +114,7 @@ function hypermedia ( server, req, rep, headers ) {
 				}
 
 				if ( i instanceof Object ) {
-					parse( i, "item", req.parsed.pathname.replace( REGEX_TRAILING, "" ).replace( REGEX_LEADING, "" ).replace( REGEX_TRAILING_S, "" ) + "s" );
+					parse( i, "item", req.parsed.pathname.replace( REGEX_TRAIL_SLASH, "" ).replace( REGEX_LEADING, "" ) );
 				}
 			} );
 		}

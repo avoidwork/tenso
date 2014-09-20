@@ -40,4 +40,5 @@ var turtleio = require( "turtle.io" ),
     REGEX_JSONENC    = /application\/json/,
     REGEX_BODY_SPLIT = /&|=/,
     REGEX_LEADING    = /.*\//,
-    REGEX_ID         = /^(_id|id)$/i;
+    REGEX_ID         = /^(_id|id)$/i,
+    REGEX_TRAIL_SLASH= /\/$/;

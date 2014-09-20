@@ -134,6 +134,22 @@ describe("Pagination", function () {
 		});
 	});
 
+	describe("GET /items/", function () {
+		it("returns page 1/3 of an array of numbers", function (done) {
+			api( port )
+				.get("/items/")
+				.expectStatus(200)
+				.expectValue("data.link", [{uri: "http://localhost:" + port, rel: "collection"}, {uri: "http://localhost:" + port + "/items/?page=3&page_size=5", rel: "last"}, {uri: "http://localhost:" + port + "/items/?page=2&page_size=5", rel: "next"}])
+				.expectValue("data.result", [1,2,3,4,5])
+				.expectValue("error", null)
+				.expectValue("status", 200)
+				.end(function(err) {
+					if (err) throw err;
+					done();
+				});
+		});
+	});
+
 	describe("GET /items", function () {
 		it("returns page 1/3 of an array of numbers", function (done) {
 			api( port )

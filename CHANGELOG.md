@@ -1,10 +1,13 @@
 # Change Log
 
+## 0.9.8
+- Refactored `Local Auth` to not redirect `CORS` requests from a browser, and return a success message
+
 ## 0.9.7
-- Updating dependencies
+- Updated dependencies
 
 ## 0.9.6
-- Updating dependencies
+- Updated dependencies
 
 ## 0.9.5
 - Fixed `hypermedia()` when URI has a trailing slash and is a collection, added a test

@@ -341,9 +341,15 @@ function auth ( obj, config ) {
 			var final, mid;
 
 			final = function () {
-				passport.authenticate( "local", {successRedirect: config.auth.redirect} )( req, res, function ( e ) {
+				passport.authenticate( "local" )( req, res, function ( e ) {
 					if ( e ) {
 						res.error( 401, "Unauthorized" );
+					}
+					else if ( req.cors && req.headers["x-requested-with"] && req.headers["x-requested-with"] === "XMLHttpRequest" ) {
+						res.respond( "Success" );
+					}
+					else {
+						res.redirect( config.auth.redirect );
 					}
 				} );
 			};

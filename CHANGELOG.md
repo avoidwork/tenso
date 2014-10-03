@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.9.6
+- Updating dependencies
+
 ## 0.9.5
 - Fixed `hypermedia()` when URI has a trailing slash and is a collection, added a test
 

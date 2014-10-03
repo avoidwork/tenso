@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.9.7
+- Updating dependencies
+
 ## 0.9.6
 - Updating dependencies
 

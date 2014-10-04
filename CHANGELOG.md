@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.9.9
+- Updated `turtle.io` to gain automatic handling of `CORS` requests from a browser
+
 ## 0.9.8
 - Refactored `Local Auth` to not redirect `CORS` requests from a browser, and return a success message
 

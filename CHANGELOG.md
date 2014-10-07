@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.9.10
+- Fixed a log error in `bootstrap()` when enabling SSL
+
 ## 0.9.9
 - Updated `turtle.io` to gain automatic handling of `CORS` requests from a browser
 

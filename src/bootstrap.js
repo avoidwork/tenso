@@ -7,6 +7,8 @@
  * @return {Object}        Tenso instance
  */
 function bootstrap ( obj, config ) {
+	var notify = false;
+
 	function mediator ( req, res, next ) {
 		res.error = function ( status, body ) {
 			obj.error( req, res, status, body );
@@ -88,13 +90,17 @@ function bootstrap ( obj, config ) {
 	// Disabling compression over SSL due to BREACH
 	if ( config.ssl.cert && config.ssl.key ) {
 		config.compress = false;
-		obj.server.log( "Compression over SSL is disabled for your protection", "debug" );
+		notify = true;
 	}
 
 	// Starting API server
 	obj.server.start( config, function ( req, res, status, msg ) {
 		error( obj.server, req, res, status, msg || obj.messages[status] );
 	} );
+
+	if ( notify ) {
+		obj.server.log( "Compression over SSL is disabled for your protection", "debug" );
+	}
 
 	return obj;
 }

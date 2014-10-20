@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.9.13
+- Updated dependencies
+
 ## 0.9.12
 - Updated dependencies
 

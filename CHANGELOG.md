@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.9.14
+- Updated dependencies to protect against POODLE
+
 ## 0.9.13
 - Updated dependencies
 

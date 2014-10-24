@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.9.15
+- Updated dependencies, disabling support for SSLv2 (also insecure)
+
 ## 0.9.14
 - Updated dependencies to protect against POODLE
 

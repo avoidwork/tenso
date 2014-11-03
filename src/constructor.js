@@ -67,7 +67,7 @@ Tenso.prototype.rate = function ( req ) {
 
 	if ( next_hour - reset >= config.reset ) {
 		reset     = state.reset     = next_hour;
-		remaining = state.remaining = limit;
+		remaining = state.remaining = limit - 1;
 	}
 	else if ( remaining > 0 ) {
 		state.remaining--;

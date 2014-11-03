@@ -2,7 +2,8 @@
 
 ## 0.9.16
 - Loosened dependency versions
-- Fixed `hypermedia()` by implementing 'X-Forwarded-Proto' header
+- Fixed `hypermedia()` by implementing the `x-forwarded-proto` header
+- Fixed the `x-ratelimit-remaining` value upon reset
 
 ## 0.9.15
 - Updated dependencies, disabling support for SSLv2 (also insecure)

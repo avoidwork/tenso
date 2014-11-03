@@ -14,7 +14,8 @@
  * @return {Undefined}      undefined
  */
 function hypermedia ( server, req, rep, headers ) {
-	var seen = {},
+	var seen     = {},
+	    protocol = req.headers["x-forwarded-proto"] ? req.headers["x-forwarded-proto"] + ":" : req.parsed.protocol,
 	    query, page, page_size, nth, root, parent;
 
 	// Parsing the object for hypermedia properties
@@ -40,7 +41,7 @@ function hypermedia ( server, req, rep, headers ) {
 						rel        = "item";
 					}
 
-					uri = REGEX_SCHEME.test( obj[i] ) ? ( obj[i].indexOf( "//" ) > -1 ? obj[i] : req.parsed.protocol + "//" + req.parsed.host + obj[i] ) : ( req.parsed.protocol + "//" + req.parsed.host + "/" + collection + "/" + obj[i] );
+					uri = REGEX_SCHEME.test( obj[i] ) ? ( obj[i].indexOf( "//" ) > -1 ? obj[i] : protocol + "//" + req.parsed.host + obj[i] ) : ( protocol + "//" + req.parsed.host + "/" + collection + "/" + obj[i] );
 
 					if ( uri !== root && !seen[uri] ) {
 						rep.data.link.push( {uri: uri, rel: rel} );
@@ -58,7 +59,7 @@ function hypermedia ( server, req, rep, headers ) {
 		page      = query.page      || 1;
 		page_size = query.page_size || server.config.pageSize || 5;
 		rep.data  = {link: [], result: rep.data};
-		root      = req.parsed.protocol + "//" + req.parsed.host + req.parsed.pathname;
+		root      = protocol + "//" + req.parsed.host + req.parsed.pathname;
 
 		if ( req.parsed.pathname !== "/" ) {
 			rep.data.link.push( {uri: root.replace( REGEX_TRAIL_SLASH, "" ).replace( REGEX_COLLECTION, "$1" ), rel: "collection"} );
@@ -69,7 +70,7 @@ function hypermedia ( server, req, rep, headers ) {
 				page = 1;
 			}
 
-			nth     = Math.ceil( rep.data.result.length / page_size );
+			nth = Math.ceil( rep.data.result.length / page_size );
 
 			if ( nth > 1 ) {
 				rep.data.result = array.limit( rep.data.result, ( page - 1 ) * page_size, page_size );
@@ -106,7 +107,7 @@ function hypermedia ( server, req, rep, headers ) {
 				var uri;
 
 				if ( typeof i == "string" && REGEX_SCHEME.test( i ) ) {
-					uri = i.indexOf( "//" ) > -1 ? i : req.parsed.protocol + "//" + req.parsed.host + i;
+					uri = i.indexOf( "//" ) > -1 ? i : protocol + "//" + req.parsed.host + i;
 
 					if ( uri !== root ) {
 						rep.data.link.push( {uri: uri, rel: "item"} );

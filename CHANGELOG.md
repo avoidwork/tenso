@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.9.18
+- Moved `rate()` into `keymaster()` such that it always executes
+
 ## 0.9.17
 - Added `rate.override` to `config` which accepts `req` & `rate`, and must return `rate`, such that rate limiting is customizable
 

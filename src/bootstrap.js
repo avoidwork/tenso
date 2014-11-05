@@ -48,16 +48,8 @@ function bootstrap ( obj, config ) {
 		arguments[2]();
 	}
 
-	function rateLimit ( req, res, next ) {
-		rate( obj, req, res, next );
-	}
-
 	obj.server.use( mediator ).blacklist( mediator );
 	obj.server.use( parse ).blacklist( parse );
-
-	if ( config.rate.enabled ) {
-		obj.server.use( rateLimit ).blacklist( rateLimit );
-	}
 
 	// Bootstrapping configuration
 	config                = auth( obj, config );

@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.9.19
+- Changed rate limiting such that it can be 'resized'
+
 ## 0.9.18
 - Moved `rate()` into `keymaster()` such that it always executes
 

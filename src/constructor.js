@@ -60,10 +60,10 @@ Tenso.prototype.rate = function ( req, fn ) {
 			reset      : next_hour,
 			time_reset : config.reset
 		};
+	}
 
-		if ( typeof fn == "function" ) {
-			this.rates[id] = fn( req, this.rates[id] );
-		}
+	if ( typeof fn == "function" ) {
+		this.rates[id] = fn( req, this.rates[id] );
 	}
 
 	state     = this.rates[id];

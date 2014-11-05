@@ -549,7 +549,7 @@ describe("Rate Limiting (Override)", function () {
 			limit: 2,
 			reset: 900,
 			override: function ( req, rate ) {
-				if ( ++i > 1 ) {
+				if ( ++i > 1 && rate.limit < 100 ) {
 					rate.limit += 100;
 					rate.remaining += 100;
 				}

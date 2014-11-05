@@ -284,6 +284,8 @@ Compression is enabled by default, for Clients that support `gzip` or `deflate`.
 ## Rate Limiting
 Rate limiting is controlled by configuration, and is disabled by default. Rate limiting is based on `token`, `session`, or `ip`, depending upon authentication method.
 
+Rate limiting can be overridden by providing an `override` function that takes `req` & `rate`, and must return (a modified) `rate`.
+
 ```javascript
 {
 	"rate": {
@@ -291,7 +293,8 @@ Rate limiting is controlled by configuration, and is disabled by default. Rate l
 		"limit": 450, /* Maximum requests allowed before `reset` */
 		"reset": 900, /* TTL in seconds */
 		"status": 429, /* Optional HTTP status */
-		"message": "Too many requests"  /* Optional error message */
+		"message": "Too many requests",  /* Optional error message */
+		"override": function ( req, rate ) { ... } /* Override the default rate limiting */
 	}
 }
 ```

@@ -41,9 +41,10 @@ Tenso.prototype.error = function ( req, res, status, arg ) {
  * @method rate
  * @memberOf Tenso
  * @param  {Object} req Client request
+ * @param  {Object} fn  [Optional] Override default rate limit
  * @return {Array}      Array of rate limit information `[valid, total, remaining, reset]`
  */
-Tenso.prototype.rate = function ( req ) {
+Tenso.prototype.rate = function ( req, fn ) {
 	var now       = new Date(),
 	    next_hour = parseInt( now.setHours( now.getHours() + 1 ) / 1000, 10 ),
 	    config    = this.server.config.rate,
@@ -54,10 +55,15 @@ Tenso.prototype.rate = function ( req ) {
 
 	if ( !this.rates[id] ) {
 		this.rates[id] = {
-			limit     : config.limit,
-			remaining : config.limit,
-			reset     : next_hour
+			limit      : config.limit,
+			remaining  : config.limit,
+			reset      : next_hour,
+			time_reset : config.reset
 		};
+
+		if ( typeof fn == "function" ) {
+			this.rates[id] = fn( req, this.rates[id] );
+		}
 	}
 
 	state     = this.rates[id];
@@ -65,7 +71,7 @@ Tenso.prototype.rate = function ( req ) {
 	remaining = state.remaining;
 	reset     = state.reset;
 
-	if ( next_hour - reset >= config.reset ) {
+	if ( next_hour - reset >= state.time_reset ) {
 		reset     = state.reset     = next_hour;
 		remaining = state.remaining = limit - 1;
 	}

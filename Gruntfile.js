@@ -110,5 +110,5 @@ module.exports = function (grunt) {
 	grunt.registerTask("test", ["jshint", "mochaTest"]);
 	grunt.registerTask("default", ["build", "test"]);
 	grunt.registerTask("validate", "validate-package");
-	grunt.registerTask("package", ["validate", "default", "test", "jsdoc"]);
+	grunt.registerTask("package", ["validate", "default", "jsdoc"]);
 };

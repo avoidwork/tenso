@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.9.17
+- Added `rate.override` to `config` which accepts `req` & `rate`, and must return `rate`, such that rate limiting is customizable
+
 ## 0.9.16
 - Loosened dependency versions
 - Fixed `hypermedia()` by implementing the `x-forwarded-proto` header

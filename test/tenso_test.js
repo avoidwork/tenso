@@ -534,6 +534,67 @@ describe("Rate Limiting", function () {
 	} );
 });
 
+describe("Rate Limiting (Override)", function () {
+	var port = 8009,
+	    i    = 1;
+
+	tenso( {
+		port: port,
+		routes: routes,
+		logs: {
+			level: "error"
+		},
+		rate: {
+			enabled: true,
+			limit: 2,
+			reset: 900,
+			override: function ( req, rate ) {
+				if ( ++i > 1 ) {
+					rate.limit += 100;
+					rate.remaining += 100;
+				}
+
+				return rate;
+			}
+		}
+	} );
+
+	describe( "GET /", function () {
+		it( "returns an array of endpoints (1/2)", function ( done ) {
+			api( port )
+				.get( "/" )
+				.expectStatus( 200 )
+				.expectHeader( "x-ratelimit-limit", "102" )
+				.expectHeader( "x-ratelimit-remaining", "101" )
+				.expectValue( "data.link", [{uri:"http://localhost:" + port + "/items", rel:"item"}, {uri:"http://localhost:" + port + "/things", rel:"item"}] )
+				.expectValue( "data.result", ["/items", "/things"] )
+				.expectValue( "error", null )
+				.expectValue( "status", 200 )
+				.end( function ( err ) {
+					if ( err ) throw err;
+					done();
+				} );
+		} );
+	} );
+
+	describe( "GET /", function () {
+		it( "returns an array of endpoints (2/2)", function ( done ) {
+			api( port )
+				.get( "/" )
+				.expectStatus( 200 )
+				.expectHeader( "x-ratelimit-limit", "102" )
+				.expectHeader( "x-ratelimit-remaining", "100" )
+				.expectValue( "data.link", [{uri:"http://localhost:" + port + "/items", rel:"item"}, {uri:"http://localhost:" + port + "/things", rel:"item"}] )
+				.expectValue( "data.result", ["/items", "/things"] )
+				.expectValue( "error", null )
+				.expectValue( "status", 200 )
+				.end( function ( err ) {
+					if ( err ) throw err;
+					done();
+				} );
+		} );
+	} );
+});
 
 describe("Request body max byte size", function () {
 	var port = 8008;

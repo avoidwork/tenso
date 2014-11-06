@@ -4,12 +4,12 @@
  * @constructor
  */
 function Tenso () {
-	this.hostname     = "";
-	this.messages     = {};
-	this.rates        = {};
-	this.server       = turtleio();
+	this.hostname = "";
+	this.messages = {};
+	this.rates = {};
+	this.server = turtleio();
 	this.server.tenso = this;
-	this.version      = "{{VERSION}}";
+	this.version = "{{VERSION}}";
 }
 
 /**
@@ -33,6 +33,8 @@ Tenso.prototype.constructor = Tenso;
  */
 Tenso.prototype.error = function ( req, res, status, arg ) {
 	this.server.error( req, res, status, arg );
+
+	return this;
 };
 
 /**
@@ -45,34 +47,34 @@ Tenso.prototype.error = function ( req, res, status, arg ) {
  * @return {Array}      Array of rate limit information `[valid, total, remaining, reset]`
  */
 Tenso.prototype.rate = function ( req, fn ) {
-	var now       = new Date(),
-	    next_hour = parseInt( now.setHours( now.getHours() + 1 ) / 1000, 10 ),
-	    config    = this.server.config.rate,
-	    regex     = /(Basic|Bearer)\s/,
-	    id        = req.headers.authorization ? req.headers.authorization.replace( regex, "" ) : req.sessionID || req.ip,
-	    valid     = true,
-	    limit, remaining, reset, state;
+	var now = new Date(),
+		next_hour = parseInt( now.setHours( now.getHours() + 1 ) / 1000, 10 ),
+		config = this.server.config.rate,
+		regex = /(Basic|Bearer)\s/,
+		id = req.headers.authorization ? req.headers.authorization.replace( regex, "" ) : req.sessionID || req.ip,
+		valid = true,
+		limit, remaining, reset, state;
 
-	if ( !this.rates[id] ) {
-		this.rates[id] = {
-			limit      : config.limit,
-			remaining  : config.limit,
-			reset      : next_hour,
-			time_reset : config.reset
+	if ( !this.rates[ id ] ) {
+		this.rates[ id ] = {
+			limit: config.limit,
+			remaining: config.limit,
+			reset: next_hour,
+			time_reset: config.reset
 		};
 	}
 
 	if ( typeof fn == "function" ) {
-		this.rates[id] = fn( req, this.rates[id] );
+		this.rates[ id ] = fn( req, this.rates[ id ] );
 	}
 
-	state     = this.rates[id];
-	limit     = state.limit;
+	state = this.rates[ id ];
+	limit = state.limit;
 	remaining = state.remaining;
-	reset     = state.reset;
+	reset = state.reset;
 
 	if ( next_hour - reset >= state.time_reset ) {
-		reset     = state.reset     = next_hour;
+		reset = state.reset = next_hour;
 		remaining = state.remaining = limit - 1;
 	}
 	else if ( remaining > 0 ) {
@@ -83,7 +85,7 @@ Tenso.prototype.rate = function ( req, fn ) {
 		valid = false;
 	}
 
-	return [valid, limit, remaining, reset];
+	return [ valid, limit, remaining, reset ];
 };
 
 /**
@@ -96,7 +98,9 @@ Tenso.prototype.rate = function ( req, fn ) {
  * @param  {Mixed}  uri Target URI
  */
 Tenso.prototype.redirect = function ( req, res, uri ) {
-	this.server.respond( req, res, this.server.messages.NO_CONTENT, this.server.codes.FOUND, {location: uri} );
+	this.server.respond( req, res, this.server.messages.NO_CONTENT, this.server.codes.FOUND, { location: uri } );
+
+	return this;
 };
 
 /**
@@ -112,15 +116,28 @@ Tenso.prototype.redirect = function ( req, res, uri ) {
  * @return {Undefined}      undefined
  */
 Tenso.prototype.respond = function ( req, res, arg, status, headers ) {
-	var ref = [headers || {}];
-
-	if ( REGEX_MODIFY.test( this.server.allows( req.parsed.pathname ) ) ) {
-		if ( this.server.config.security.csrf && res.locals[this.server.config.security.key] ) {
-			ref[0]["x-csrf-token"] = res.locals[this.server.config.security.key];
-		}
-	}
+	var ref;
 
 	if ( !res._header ) {
-		this.server.respond( req, res, hypermedia( this.server, req, response( arg, status ), ref[0] ), status, ref[0] );
+		ref = [ headers || {} ];
+
+		if ( req.protect ) {
+			if ( ref[ 0 ][ "cache-control" ] === undefined ) {
+				ref[ 0 ][ "cache-control" ] = clone( this.server.config.headers[ "cache-control" ], true );
+			}
+			if ( ref[ 0 ][ "cache-control" ].indexOf( "private " ) == -1 ) {
+				ref[ 0 ][ "cache-control" ] = "private " + ref[ 0 ][ "cache-control" ];
+			}
+		}
+
+		if ( REGEX_MODIFY.test( this.server.allows( req.parsed.pathname ) ) ) {
+			if ( this.server.config.security.csrf && res.locals[ this.server.config.security.key ] ) {
+				ref[ 0 ][ "x-csrf-token" ] = res.locals[ this.server.config.security.key ];
+			}
+		}
+
+		this.server.respond( req, res, hypermedia( this.server, req, response( arg, status ), ref[ 0 ] ), status, ref[ 0 ] );
 	}
+
+	return this;
 };

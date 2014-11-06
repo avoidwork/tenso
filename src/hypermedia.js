@@ -14,13 +14,13 @@
  * @return {Undefined}      undefined
  */
 function hypermedia ( server, req, rep, headers ) {
-	var seen     = {},
-	    protocol = req.headers["x-forwarded-proto"] ? req.headers["x-forwarded-proto"] + ":" : req.parsed.protocol,
-	    query, page, page_size, nth, root, parent;
+	var seen = {},
+		protocol = req.headers[ "x-forwarded-proto" ] ? req.headers[ "x-forwarded-proto" ] + ":" : req.parsed.protocol,
+		query, page, page_size, nth, root, parent;
 
 	// Parsing the object for hypermedia properties
 	function parse ( obj, rel, item_collection ) {
-		rel      = rel || "related";
+		rel = rel || "related";
 		var keys = array.keys( obj );
 
 		if ( keys.length === 0 ) {
@@ -34,18 +34,18 @@ function hypermedia ( server, req, rep, headers ) {
 				if ( REGEX_ID.test( i ) || REGEX_HYPERMEDIA.test( i ) ) {
 					if ( !REGEX_ID.test( i ) ) {
 						collection = i.replace( REGEX_TRAILING, "" ).replace( REGEX_TRAILING_S, "" ) + "s";
-						rel        = "related";
+						rel = "related";
 					}
 					else {
 						collection = item_collection;
-						rel        = "item";
+						rel = "item";
 					}
 
-					uri = REGEX_SCHEME.test( obj[i] ) ? ( obj[i].indexOf( "//" ) > -1 ? obj[i] : protocol + "//" + req.parsed.host + obj[i] ) : ( protocol + "//" + req.parsed.host + "/" + collection + "/" + obj[i] );
+					uri = REGEX_SCHEME.test( obj[ i ] ) ? ( obj[ i ].indexOf( "//" ) > -1 ? obj[ i ] : protocol + "//" + req.parsed.host + obj[ i ] ) : ( protocol + "//" + req.parsed.host + "/" + collection + "/" + obj[ i ] );
 
-					if ( uri !== root && !seen[uri] ) {
-						rep.data.link.push( {uri: uri, rel: rel} );
-						seen[uri] = 1;
+					if ( uri !== root && !seen[ uri ] ) {
+						rep.data.link.push( { uri: uri, rel: rel } );
+						seen[ uri ] = 1;
 					}
 				}
 			} );
@@ -55,14 +55,17 @@ function hypermedia ( server, req, rep, headers ) {
 	}
 
 	if ( rep.status >= 200 && rep.status <= 206 ) {
-		query     = req.parsed.query;
-		page      = query.page      || 1;
+		query = req.parsed.query;
+		page = query.page || 1;
 		page_size = query.page_size || server.config.pageSize || 5;
-		rep.data  = {link: [], result: rep.data};
-		root      = protocol + "//" + req.parsed.host + req.parsed.pathname;
+		rep.data = { link: [], result: rep.data };
+		root = protocol + "//" + req.parsed.host + req.parsed.pathname;
 
 		if ( req.parsed.pathname !== "/" ) {
-			rep.data.link.push( {uri: root.replace( REGEX_TRAIL_SLASH, "" ).replace( REGEX_COLLECTION, "$1" ), rel: "collection"} );
+			rep.data.link.push( {
+				uri: root.replace( REGEX_TRAIL_SLASH, "" ).replace( REGEX_COLLECTION, "$1" ),
+				rel: "collection"
+			} );
 		}
 
 		if ( rep.data.result instanceof Array ) {
@@ -78,28 +81,28 @@ function hypermedia ( server, req, rep, headers ) {
 				query.page_size = page_size;
 
 				root += "?" + array.keys( query ).map( function ( i ) {
-					return i + "=" + encodeURIComponent( query[i] );
+					return i + "=" + encodeURIComponent( query[ i ] );
 				} ).join( "&" );
 
 				if ( page > 1 ) {
-					rep.data.link.push( {uri: root.replace( "page=0", "page=1" ), rel: "first"} );
+					rep.data.link.push( { uri: root.replace( "page=0", "page=1" ), rel: "first" } );
 				}
 
 				if ( page - 1 > 1 && page <= nth ) {
-					rep.data.link.push( {uri: root.replace( "page=0", "page=" + ( page - 1 ) ), rel: "prev"} );
+					rep.data.link.push( { uri: root.replace( "page=0", "page=" + ( page - 1 ) ), rel: "prev" } );
 				}
 
 				if ( page + 1 < nth ) {
-					rep.data.link.push( {uri: root.replace( "page=0", "page=" + ( page + 1 ) ), rel: "next"} );
+					rep.data.link.push( { uri: root.replace( "page=0", "page=" + ( page + 1 ) ), rel: "next" } );
 				}
 
 				if ( nth > 0 && page !== nth ) {
-					rep.data.link.push( {uri: root.replace( "page=0", "page=" + nth ), rel: "last"} );
+					rep.data.link.push( { uri: root.replace( "page=0", "page=" + nth ), rel: "last" } );
 				}
 			}
 			else {
 				root += "?" + array.keys( query ).map( function ( i ) {
-					return i + "=" + encodeURIComponent( query[i] );
+					return i + "=" + encodeURIComponent( query[ i ] );
 				} ).join( "&" );
 			}
 
@@ -110,7 +113,7 @@ function hypermedia ( server, req, rep, headers ) {
 					uri = i.indexOf( "//" ) > -1 ? i : protocol + "//" + req.parsed.host + i;
 
 					if ( uri !== root ) {
-						rep.data.link.push( {uri: uri, rel: "item"} );
+						rep.data.link.push( { uri: uri, rel: "item" } );
 					}
 				}
 
@@ -120,7 +123,9 @@ function hypermedia ( server, req, rep, headers ) {
 			} );
 		}
 		else if ( rep.data.result instanceof Object ) {
-			parent = req.parsed.pathname.split( "/" ).filter( function( i ){ return i !== ""; } );
+			parent = req.parsed.pathname.split( "/" ).filter( function ( i ) {
+				return i !== "";
+			} );
 
 			if ( parent.length > 1 ) {
 				parent.pop();

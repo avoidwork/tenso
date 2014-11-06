@@ -7,8 +7,8 @@
  */
 function zuul ( protect ) {
 	return function zuul ( req, res, next ) {
-		var uri      = req.parsed.path,
-		    protectd = false;
+		var uri = req.parsed.path,
+			protectd = false;
 
 		array.each( protect, function ( regex ) {
 			if ( regex.test( uri ) ) {
@@ -18,7 +18,7 @@ function zuul ( protect ) {
 		} );
 
 		// Setting state so the connection can be terminated properly
-		req.protect      = protectd;
+		req.protect = protectd;
 		req.protectAsync = false;
 
 		if ( protectd && next ) {

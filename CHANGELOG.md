@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.9.21
+- Optimizing `respond()` by moving `0.9.20` into it
+- Reformatted code based on my WebStorm9 config, keeping it pretty for humans
+
 ## 0.9.20
 - Added automatic `private` directive to `cache-control` header when client is authenticated
 

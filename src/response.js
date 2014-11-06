@@ -8,7 +8,7 @@
  */
 function response ( arg, status ) {
 	var error = arg instanceof Error,
-	    rep;
+		rep;
 
 	if ( error ) {
 		if ( status === undefined ) {

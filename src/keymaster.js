@@ -9,14 +9,14 @@
  */
 function keymaster ( req, res, next ) {
 	var obj = req.server.tenso,
-	    method, result, routes, uri, valid;
+		method, result, routes, uri, valid;
 
 	// No authentication, or it's already happened
 	if ( !req.protect || !req.protectAsync || ( req.session && req.isAuthenticated() ) ) {
 		method = REGEX_GETREWRITE.test( req.method ) ? "get" : req.method.toLowerCase();
-		routes = req.server.config.routes[method] || {};
-		uri    = req.parsed.pathname;
-		valid  = false;
+		routes = req.server.config.routes[ method ] || {};
+		uri = req.parsed.pathname;
+		valid = false;
 
 		rate( obj, req, res, function () {
 			if ( uri in routes ) {

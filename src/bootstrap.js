@@ -29,14 +29,14 @@ function bootstrap ( obj, config ) {
 		var args, type;
 
 		if ( REGEX_BODY.test( req.method ) && req.body !== undefined ) {
-			type = req.headers["content-type"];
+			type = req.headers[ "content-type" ];
 
 			if ( REGEX_FORMENC.test( type ) ) {
 				args = req.body ? array.chunk( req.body.split( REGEX_BODY_SPLIT ), 2 ) : [];
 				req.body = {};
 
 				array.each( args, function ( i ) {
-					req.body[i[0]] = coerce( i[1] );
+					req.body[ i[ 0 ] ] = coerce( i[ 1 ] );
 				} );
 			}
 
@@ -45,20 +45,20 @@ function bootstrap ( obj, config ) {
 			}
 		}
 
-		arguments[2]();
+		arguments[ 2 ]();
 	}
 
 	obj.server.use( mediator ).blacklist( mediator );
 	obj.server.use( parse ).blacklist( parse );
 
 	// Bootstrapping configuration
-	config                = auth( obj, config );
-	config.headers        = config.headers || {};
+	config = auth( obj, config );
+	config.headers = config.headers || {};
 	config.headers.server = SERVER;
 
 	// Creating status > message map
 	iterate( obj.server.codes, function ( value, key ) {
-		obj.messages[value] = obj.server.messages[key];
+		obj.messages[ value ] = obj.server.messages[ key ];
 	} );
 
 	// Setting routes
@@ -66,12 +66,12 @@ function bootstrap ( obj, config ) {
 		iterate( config.routes, function ( routes, method ) {
 			iterate( routes, function ( arg, route ) {
 				if ( typeof arg == "function" ) {
-					obj.server[method]( route, function () {
+					obj.server[ method ]( route, function () {
 						arg.apply( obj, array.cast( arguments ) );
 					} );
 				}
 				else {
-					obj.server[method]( route, function ( req, res ) {
+					obj.server[ method ]( route, function ( req, res ) {
 						obj.respond( req, res, arg );
 					} );
 				}
@@ -87,25 +87,8 @@ function bootstrap ( obj, config ) {
 
 	// Starting API server
 	obj.server.start( config, function ( req, res, status, msg ) {
-		error( obj.server, req, res, status, msg || obj.messages[status] );
+		error( obj.server, req, res, status, msg || obj.messages[ status ] );
 	} );
-
-	// Intercepts all responses and decorates a private directive is user is authenticated
-	obj.respond = ( function () {
-		var fn = obj.respond;
-
-		return function ( req, res, body, status, headers ) {
-			if ( req.protect ) {
-				headers = headers || clone( obj.server.config.headers, true );
-
-				if ( headers["cache-control" ].indexOf( "private " ) == -1 ) {
-					headers["cache-control"] = "private " + headers["cache-control"];
-				}
-			}
-
-			return fn.call( obj, req, res, body, status, headers );
-		};
-	} )();
 
 	if ( notify ) {
 		obj.server.log( "Compression over SSL is disabled for your protection", "debug" );

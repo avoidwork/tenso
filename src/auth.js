@@ -7,19 +7,19 @@
  * @return {Object}        Updated Tenso configuration
  */
 function auth ( obj, config ) {
-	var ssl       = config.ssl.cert && config.ssl.key,
-	    proto     = "http" + ( ssl ? "s" : "" ),
-	    realm     = proto + "://" + ( config.hostname === "localhost" ? "127.0.0.1" : config.hostname ) + ( config.port !== 80 && config.port !== 443 ? ":" + config.port : "" ),
-	    async     = ( config.auth.facebook.enabled || config.auth.google.enabled || config.auth.linkedin.enabled || config.auth.twitter.enabled ),
-	    stateless = ( config.auth.basic.enabled || config.auth.bearer.enabled ),
-	    stateful  = ( async || config.auth.local.enabled || config.security.csrf ),
-	    authMap   = {},
-	    authUris  = [],
-	    keys, sesh, fnCookie, fnSesh, luscaCsrf, luscaCsp, luscaXframe, luscaP3p, luscaHsts, luscaXssProtection, protection, passportAuth, passportInit, passportSession;
+	var ssl = config.ssl.cert && config.ssl.key,
+		proto = "http" + ( ssl ? "s" : "" ),
+		realm = proto + "://" + ( config.hostname === "localhost" ? "127.0.0.1" : config.hostname ) + ( config.port !== 80 && config.port !== 443 ? ":" + config.port : "" ),
+		async = ( config.auth.facebook.enabled || config.auth.google.enabled || config.auth.linkedin.enabled || config.auth.twitter.enabled ),
+		stateless = ( config.auth.basic.enabled || config.auth.bearer.enabled ),
+		stateful = ( async || config.auth.local.enabled || config.security.csrf ),
+		authMap = {},
+		authUris = [],
+		keys, sesh, fnCookie, fnSesh, luscaCsrf, luscaCsp, luscaXframe, luscaP3p, luscaHsts, luscaXssProtection, protection, passportAuth, passportInit, passportSession;
 
 	function asyncFlag () {
-		arguments[0].protectAsync = true;
-		arguments[2]();
+		arguments[ 0 ].protectAsync = true;
+		arguments[ 2 ]();
 	}
 
 	function init ( session ) {
@@ -42,7 +42,7 @@ function auth ( obj, config ) {
 	}
 
 	function redirect () {
-		arguments[1].redirect( config.auth.redirect );
+		arguments[ 1 ].redirect( config.auth.redirect );
 	}
 
 	obj.server.blacklist( asyncFlag );
@@ -54,7 +54,7 @@ function auth ( obj, config ) {
 	if ( async ) {
 		iterate( config.auth, function ( v, k ) {
 			if ( v.enabled ) {
-				authMap[k + "_uri"] = "/auth/" + k;
+				authMap[ k + "_uri" ] = "/auth/" + k;
 				config.auth.protect.push( new RegExp( "^/auth/" + k ) );
 			}
 		} );
@@ -86,7 +86,7 @@ function auth ( obj, config ) {
 		obj.server.use( fnCookie ).blacklist( fnCookie );
 
 		if ( config.security.csrf ) {
-			luscaCsrf = lusca.csrf( {key: config.security.key} );
+			luscaCsrf = lusca.csrf( { key: config.security.key } );
 			obj.server.use( luscaCsrf ).blacklist( luscaCsrf );
 		}
 	}
@@ -137,10 +137,10 @@ function auth ( obj, config ) {
 			keys = array.keys( authMap ).length > 0;
 
 			if ( keys ) {
-				config.routes.get["/auth"] = authMap;
+				config.routes.get[ "/auth" ] = authMap;
 			}
 
-			( function () {
+			(function () {
 				var regex = "(?!/auth/(";
 
 				array.each( authUris, function ( i ) {
@@ -150,16 +150,19 @@ function auth ( obj, config ) {
 				regex = regex.replace( /\|$/, "" ) + ")).*$";
 
 				obj.server.use( regex, guard ).blacklist( guard );
-			} )();
+			})();
 
-			config.routes.get["/login"]  = config.auth.local.enabled ? ( keys ? {login_uri: "/auth", instruction: "POST 'username' & 'password' to authenticate"} : {instruction: "POST 'username' & 'password' to authenticate"} ) : {login_uri: "/auth"};
+			config.routes.get[ "/login" ] = config.auth.local.enabled ? ( keys ? {
+				login_uri: "/auth",
+				instruction: "POST 'username' & 'password' to authenticate"
+			} : { instruction: "POST 'username' & 'password' to authenticate" } ) : { login_uri: "/auth" };
 		}
 		else if ( config.auth.local.enabled ) {
-			config.routes.get["/login"]  = {instruction: "POST 'username' & 'password' to authenticate"};
+			config.routes.get[ "/login" ] = { instruction: "POST 'username' & 'password' to authenticate" };
 		}
 
-		config.routes.get["/logout"] = function ( req, res ) {
-			if (  req.session ) {
+		config.routes.get[ "/logout" ] = function ( req, res ) {
+			if ( req.session ) {
 				req.session.destroy();
 			}
 
@@ -172,8 +175,8 @@ function auth ( obj, config ) {
 			var x = {};
 
 			function validate ( arg, cb ) {
-				if ( x[arg] ) {
-					cb( null, x[arg] );
+				if ( x[ arg ] ) {
+					cb( null, x[ arg ] );
 				}
 				else {
 					cb( new Error( "Unauthorized" ), null );
@@ -184,7 +187,7 @@ function auth ( obj, config ) {
 				var args = i.split( ":" );
 
 				if ( args.length > 0 ) {
-					x[args[0]] = {password: args[1]};
+					x[ args[ 0 ] ] = { password: args[ 1 ] };
 				}
 			} );
 
@@ -203,7 +206,7 @@ function auth ( obj, config ) {
 				} );
 			} ) );
 
-			passportAuth = passport.authenticate( "basic", {session: stateful} );
+			passportAuth = passport.authenticate( "basic", { session: stateful } );
 
 			if ( async || config.auth.local.enabled ) {
 				obj.server.get( "/auth/basic", passportAuth ).blacklist( passportAuth );
@@ -212,11 +215,11 @@ function auth ( obj, config ) {
 			else {
 				obj.server.use( passportAuth ).blacklist( passportAuth );
 			}
-		} )();
+		})();
 	}
 
 	if ( config.auth.bearer.enabled ) {
-		( function () {
+		(function () {
 			var x = config.auth.bearer.tokens || [];
 
 			function validate ( arg, cb ) {
@@ -239,11 +242,11 @@ function auth ( obj, config ) {
 						return done( null, false );
 					}
 
-					return done( null, user, {scope: "read"} );
+					return done( null, user, { scope: "read" } );
 				} );
 			} ) );
 
-			passportAuth = passport.authenticate( "bearer", {session: stateful} );
+			passportAuth = passport.authenticate( "bearer", { session: stateful } );
 
 			if ( async || config.auth.local.enabled ) {
 				obj.server.get( "/auth/bearer", passportAuth ).blacklist( passportAuth );
@@ -252,14 +255,14 @@ function auth ( obj, config ) {
 			else {
 				obj.server.use( passportAuth ).blacklist( passportAuth );
 			}
-		} )();
+		})();
 	}
 
 	if ( config.auth.facebook.enabled ) {
 		passport.use( new FacebookStrategy( {
-			clientID    : config.auth.facebook.client_id,
+			clientID: config.auth.facebook.client_id,
 			clientSecret: config.auth.facebook.client_secret,
-			callbackURL : realm + "/auth/facebook/callback"
+			callbackURL: realm + "/auth/facebook/callback"
 		}, function ( accessToken, refreshToken, profile, done ) {
 			config.auth.facebook.auth( accessToken, refreshToken, profile, function ( err, user ) {
 				if ( err ) {
@@ -274,14 +277,14 @@ function auth ( obj, config ) {
 		obj.server.get( "/auth/facebook", asyncFlag );
 		obj.server.get( "/auth/facebook", passport.authenticate( "facebook" ) );
 		obj.server.get( "/auth/facebook/callback", asyncFlag );
-		obj.server.get( "/auth/facebook/callback", passport.authenticate( "facebook", {failureRedirect: "/login"} ) );
+		obj.server.get( "/auth/facebook/callback", passport.authenticate( "facebook", { failureRedirect: "/login" } ) );
 		obj.server.get( "/auth/facebook/callback", redirect );
 	}
 
 	if ( config.auth.google.enabled ) {
 		passport.use( new GoogleStrategy( {
 			returnURL: realm + "/auth/google/callback",
-			realm    : realm
+			realm: realm
 		}, function ( identifier, profile, done ) {
 			config.auth.google.auth.call( obj, identifier, profile, function ( err, user ) {
 				if ( err ) {
@@ -296,36 +299,36 @@ function auth ( obj, config ) {
 		obj.server.get( "/auth/google", asyncFlag );
 		obj.server.get( "/auth/google", passport.authenticate( "google" ) );
 		obj.server.get( "/auth/google/callback", asyncFlag );
-		obj.server.get( "/auth/google/callback", passport.authenticate( "google", {failureRedirect: "/login"} ) );
+		obj.server.get( "/auth/google/callback", passport.authenticate( "google", { failureRedirect: "/login" } ) );
 		obj.server.get( "/auth/google/callback", redirect );
 	}
 
 	if ( config.auth.linkedin.enabled ) {
 		passport.use( new LinkedInStrategy( {
-			consumerKey   : config.auth.linkedin.client_id,
-			consumerSecret: config.auth.linkedin.client_secret,
-			callbackURL   : realm + "/auth/linkedin/callback"
-		},
-		function ( token, tokenSecret, profile, done ) {
-			config.auth.linkedin.auth( token, tokenSecret, profile, function ( err, user ) {
-				if ( err ) {
-					delete err.stack;
-					return done( err );
-				}
+				consumerKey: config.auth.linkedin.client_id,
+				consumerSecret: config.auth.linkedin.client_secret,
+				callbackURL: realm + "/auth/linkedin/callback"
+			},
+			function ( token, tokenSecret, profile, done ) {
+				config.auth.linkedin.auth( token, tokenSecret, profile, function ( err, user ) {
+					if ( err ) {
+						delete err.stack;
+						return done( err );
+					}
 
-				done( null, user );
-			} );
-		} ) );
+					done( null, user );
+				} );
+			} ) );
 
 		obj.server.get( "/auth/linkedin", asyncFlag );
-		obj.server.get( "/auth/linkedin", passport.authenticate( "linkedin", {"scope": config.auth.linkedin.scope || ["r_basicprofile", "r_emailaddress"]} ) );
+		obj.server.get( "/auth/linkedin", passport.authenticate( "linkedin", { "scope": config.auth.linkedin.scope || [ "r_basicprofile", "r_emailaddress" ] } ) );
 		obj.server.get( "/auth/linkedin/callback", asyncFlag );
-		obj.server.get( "/auth/linkedin/callback", passport.authenticate( "linkedin", {failureRedirect: "/login"} ) );
+		obj.server.get( "/auth/linkedin/callback", passport.authenticate( "linkedin", { failureRedirect: "/login" } ) );
 		obj.server.get( "/auth/linkedin/callback", redirect );
 	}
 
 	if ( config.auth.local.enabled ) {
-		passport.use( new LocalStrategy( function( username, password, done ) {
+		passport.use( new LocalStrategy( function ( username, password, done ) {
 			config.auth.local.auth( username, password, function ( err, user ) {
 				if ( err ) {
 					delete err.stack;
@@ -337,7 +340,7 @@ function auth ( obj, config ) {
 		} ) );
 
 		config.routes.post = config.routes.post || {};
-		config.routes.post["/login"] = function ( req, res ) {
+		config.routes.post[ "/login" ] = function ( req, res ) {
 			var final, mid;
 
 			final = function () {
@@ -345,7 +348,7 @@ function auth ( obj, config ) {
 					if ( e ) {
 						res.error( 401, "Unauthorized" );
 					}
-					else if ( req.cors && req.headers["x-requested-with"] && req.headers["x-requested-with"] === "XMLHttpRequest" ) {
+					else if ( req.cors && req.headers[ "x-requested-with" ] && req.headers[ "x-requested-with" ] === "XMLHttpRequest" ) {
 						res.respond( "Success" );
 					}
 					else {
@@ -365,10 +368,10 @@ function auth ( obj, config ) {
 	if ( config.auth.oauth2.enabled ) {
 		passport.use( new OAuth2Strategy( {
 			authorizationURL: config.auth.oauth2.auth_url,
-			tokenURL        : config.auth.oauth2.token_url,
-			clientID        : config.auth.oauth2.client_id,
-			clientSecret    : config.auth.oauth2.client_secret,
-			callbackURL     : realm + "/auth/oauth2/callback"
+			tokenURL: config.auth.oauth2.token_url,
+			clientID: config.auth.oauth2.client_id,
+			clientSecret: config.auth.oauth2.client_secret,
+			callbackURL: realm + "/auth/oauth2/callback"
 		}, function ( accessToken, refreshToken, profile, done ) {
 			config.auth.oauth2.auth( accessToken, refreshToken, profile, function ( err, user ) {
 				if ( err ) {
@@ -383,12 +386,12 @@ function auth ( obj, config ) {
 		obj.server.get( "/auth/oauth2", asyncFlag );
 		obj.server.get( "/auth/oauth2", passport.authenticate( "oauth2" ) );
 		obj.server.get( "/auth/oauth2/callback", asyncFlag );
-		obj.server.get( "/auth/oauth2/callback", passport.authenticate( "oauth2", {failureRedirect: "/login"} ) );
+		obj.server.get( "/auth/oauth2/callback", passport.authenticate( "oauth2", { failureRedirect: "/login" } ) );
 		obj.server.get( "/auth/oauth2/callback", redirect );
 	}
 
 	if ( config.auth.saml.enabled ) {
-		( function () {
+		(function () {
 			var config = config.auth.saml;
 
 			config.callbackURL = realm + "/auth/saml/callback";
@@ -405,20 +408,20 @@ function auth ( obj, config ) {
 					done( null, user );
 				} );
 			} ) );
-		} )();
+		})();
 
 		obj.server.get( "/auth/saml", asyncFlag );
 		obj.server.get( "/auth/saml", passport.authenticate( "saml" ) );
 		obj.server.get( "/auth/saml/callback", asyncFlag );
-		obj.server.get( "/auth/saml/callback", passport.authenticate( "saml", {failureRedirect: "/login"} ) );
+		obj.server.get( "/auth/saml/callback", passport.authenticate( "saml", { failureRedirect: "/login" } ) );
 		obj.server.get( "/auth/saml/callback", redirect );
 	}
 
 	if ( config.auth.twitter.enabled ) {
 		passport.use( new TwitterStrategy( {
-			consumerKey   : config.auth.twitter.consumer_key,
+			consumerKey: config.auth.twitter.consumer_key,
 			consumerSecret: config.auth.twitter.consumer_secret,
-			callbackURL   : realm + "/auth/twitter/callback"
+			callbackURL: realm + "/auth/twitter/callback"
 		}, function ( token, tokenSecret, profile, done ) {
 			config.auth.twitter.auth( token, tokenSecret, profile, function ( err, user ) {
 				if ( err ) {
@@ -433,7 +436,10 @@ function auth ( obj, config ) {
 		obj.server.get( "/auth/twitter", asyncFlag );
 		obj.server.get( "/auth/twitter", passport.authenticate( "twitter" ) );
 		obj.server.get( "/auth/twitter/callback", asyncFlag );
-		obj.server.get( "/auth/twitter/callback", passport.authenticate( "twitter", {successRedirect: config.auth.redirect, failureRedirect: "/login"} ) );
+		obj.server.get( "/auth/twitter/callback", passport.authenticate( "twitter", {
+			successRedirect: config.auth.redirect,
+			failureRedirect: "/login"
+		} ) );
 	}
 
 	return config;

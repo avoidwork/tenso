@@ -7,19 +7,19 @@
  */
 function factory ( arg ) {
 	var hostname = arg ? arg.hostname || "localhost" : "localhost",
-        vhosts   = {},
-        config   = arg ? merge( clone( CONFIG, true ), arg ) : CONFIG,
-        obj;
+		vhosts = {},
+		config = arg ? merge( clone( CONFIG, true ), arg ) : CONFIG,
+		obj;
 
 	if ( !config.port ) {
 		console.error( "Invalid configuration" );
 		process.exit( 1 );
 	}
 
-	vhosts[hostname]  = "www";
-	config.root       = __dirname + "/../";
-	config.vhosts     = vhosts;
-	config["default"] = hostname;
+	vhosts[ hostname ] = "www";
+	config.root = __dirname + "/../";
+	config.vhosts = vhosts;
+	config[ "default" ] = hostname;
 
 	obj = new Tenso();
 	obj.hostname = hostname;

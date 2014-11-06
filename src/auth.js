@@ -34,7 +34,7 @@ function auth ( obj, config ) {
 
 	function guard ( req, res, next ) {
 		if ( req.isAuthenticated() ) {
-			return next();
+			rate( obj, req, res, next );
 		}
 		else {
 			res.redirect( "/login" );

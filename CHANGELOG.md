@@ -1,5 +1,8 @@
 # Change Log
 
+# 0.9.22
+- Fixing a regression of `rate()` execution against protected routes
+
 ## 0.9.21
 - Optimizing `respond()` by moving `0.9.20` into it
 - Reformatted code based on my WebStorm9 config, keeping it pretty for humans

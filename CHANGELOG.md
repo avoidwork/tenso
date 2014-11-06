@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.9.20
+- Added automatic `private` directive to `cache-control` header when client is authenticated
+
 ## 0.9.19
 - Changed rate limiting such that it can be 'resized'
 

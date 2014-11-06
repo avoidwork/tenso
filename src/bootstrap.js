@@ -11,15 +11,15 @@ function bootstrap ( obj, config ) {
 
 	function mediator ( req, res, next ) {
 		res.error = function ( status, body ) {
-			obj.error( req, res, status, body );
+			return obj.error( req, res, status, body );
 		};
 
 		res.redirect = function ( uri ) {
-			obj.redirect( req, res, uri );
+			return obj.redirect( req, res, uri );
 		};
 
 		res.respond = function ( body, status, headers ) {
-			obj.respond( req, res, body, status, headers );
+			return obj.respond( req, res, body, status, headers );
 		};
 
 		next();
@@ -89,6 +89,23 @@ function bootstrap ( obj, config ) {
 	obj.server.start( config, function ( req, res, status, msg ) {
 		error( obj.server, req, res, status, msg || obj.messages[status] );
 	} );
+
+	// Intercepts all responses and decorates a private directive is user is authenticated
+	obj.respond = ( function () {
+		var fn = obj.respond;
+
+		return function ( req, res, body, status, headers ) {
+			if ( req.protect ) {
+				headers = headers || clone( obj.server.config.headers, true );
+
+				if ( headers["cache-control" ].indexOf( "private " ) == -1 ) {
+					headers["cache-control"] = "private " + headers["cache-control"];
+				}
+			}
+
+			return fn.call( obj, req, res, body, status, headers );
+		};
+	} )();
 
 	if ( notify ) {
 		obj.server.log( "Compression over SSL is disabled for your protection", "debug" );

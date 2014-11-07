@@ -1,7 +1,8 @@
 # Change Log
 
 ## 0.9.23
-- Refactoring rate limiting to ignore `Authorization` header, as it provides an attack vector
+- Refactored `Tenso.rate()` to ignore `Authorization` header, as it provides an attack vector
+- Fixed `Tenso.rate()` by removing the `per hour` notion and implement the `seconds offset` afforded by configuration
 
 ## 0.9.22
 - Fixing a regression of `rate()` execution against protected routes

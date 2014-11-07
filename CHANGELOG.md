@@ -1,6 +1,9 @@
 # Change Log
 
-# 0.9.22
+## 0.9.23
+- Refactoring rate limiting to ignore `Authorization` header, as it provides an attack vector
+
+## 0.9.22
 - Fixing a regression of `rate()` execution against protected routes
 
 ## 0.9.21

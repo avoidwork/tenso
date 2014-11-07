@@ -48,10 +48,9 @@ Tenso.prototype.error = function ( req, res, status, arg ) {
  */
 Tenso.prototype.rate = function ( req, fn ) {
 	var now = new Date(),
-		next_hour = parseInt( now.setHours( now.getHours() + 1 ) / 1000, 10 ),
 		config = this.server.config.rate,
-		regex = /(Basic|Bearer)\s/,
-		id = req.headers.authorization ? req.headers.authorization.replace( regex, "" ) : req.sessionID || req.ip,
+		next_hour = parseInt( now.setHours( now.getHours() + 1 ) / 1000, 10 ),
+		id = req.sessionID || req.ip,
 		valid = true,
 		limit, remaining, reset, state;
 

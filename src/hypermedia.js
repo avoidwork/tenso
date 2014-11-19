@@ -33,7 +33,7 @@ function hypermedia ( server, req, rep, headers ) {
 				// If ID like keys are found, and are not URIs, they are assumed to be root collections
 				if ( REGEX_ID.test( i ) || REGEX_HYPERMEDIA.test( i ) ) {
 					if ( !REGEX_ID.test( i ) ) {
-						collection = i.replace( REGEX_TRAILING, "" ).replace( REGEX_TRAILING_S, "" ) + "s";
+						collection = i.replace( REGEX_TRAILING, "" ).replace( REGEX_TRAILING_S, "" ).replace( REGEX_TRAILING_Y, "ie" ) + "s";
 						rel = "related";
 					}
 					else {

@@ -31,6 +31,7 @@
 		REGEX_HYPERMEDIA = /[a-zA-Z]+_(guid|uuid|id|url|uri)$/,
 		REGEX_TRAILING = /_.*$/,
 		REGEX_TRAILING_S = /s$/,
+		REGEX_TRAILING_Y = /y$/,
 		REGEX_SCHEME = /^(\w+\:\/\/)|\//,
 		REGEX_COLLECTION = /(.*)(\/.*)$/,
 		REGEX_MODIFY = /DELETE|PATCH|POST|PUT/,

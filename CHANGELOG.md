@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.9.24
+- Fixing pluralization of hypermedia keys
+
 ## 0.9.23
 - Refactored `Tenso.rate()` to ignore `Authorization` header, as it provides an attack vector
 - Fixed `Tenso.rate()` by removing the `per hour` notion and implement the `seconds offset` afforded by configuration

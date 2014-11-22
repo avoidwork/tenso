@@ -79,10 +79,10 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 	"hostname": "localhost", /* Optional, default is 'localhost' */
 	"json": 2, /* Optional, default indent for 'pretty' JSON */
 	"logs": { /* Optional */
-		"level": "info",
+		"level": "debug",
 		"stdout": true,
-		"dtrace": false,
-		"syslog": false
+		"dtrace": true,
+		"syslog": true
 	},
 	"port": 8000, /* Optional, default is 8000 */
 	"routes": require( "./routes.js" ), /* Required! */
@@ -312,7 +312,7 @@ A 'max byte' limit can be enforced on all routes that handle `PATCH`, `POST`, & 
 Standard log levels are supported, and are emitted (by configuration) to `stdout` & `stderr`, & `syslog`.
 
 ## DTrace
-DTrace probes can be enabled by configuration (disabled by default). A shell script is available at `./node_modules/turtle.io/dtrace.sh` to observe the probes.
+DTrace probes can be enabled by configuration (disabled by default). A shell script is available at `./dtrace.sh` to observe the probes.
 The last argument for each probe is the nanoseconds it took to execute.
 
 ```

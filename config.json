@@ -52,6 +52,7 @@
 	},
 	"compress": true,
 	"hostname": "127.0.0.1",
+	"id": "tenso",
 	"json": 2,
 	"logs": {
 		"dtrace": false,

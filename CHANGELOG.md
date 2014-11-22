@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.9.25
+- Identifying as `tenso` in logging strategies
+- Created `dtrace.sh` to convenient probe output
+
 ## 0.9.24
 - Fixing pluralization of hypermedia keys
 

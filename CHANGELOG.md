@@ -1,21 +1,24 @@
 # Change Log
 
+## 0.9.26
+- Fixed `this.respond()` by passing a required parameter to `this.server.allows()`
+
 ## 0.9.25
-- Identifying as `tenso` in logging strategies
+- Identified as `tenso` in logging strategies
 - Created `dtrace.sh` to convenient probe output
 
 ## 0.9.24
-- Fixing pluralization of hypermedia keys
+- Fixed pluralization of hypermedia keys
 
 ## 0.9.23
 - Refactored `Tenso.rate()` to ignore `Authorization` header, as it provides an attack vector
 - Fixed `Tenso.rate()` by removing the `per hour` notion and implement the `seconds offset` afforded by configuration
 
 ## 0.9.22
-- Fixing a regression of `rate()` execution against protected routes
+- Fixed a regression of `rate()` execution against protected routes
 
 ## 0.9.21
-- Optimizing `respond()` by moving `0.9.20` into it
+- Optimized `respond()` by moving `0.9.20` into it
 - Reformatted code based on my WebStorm9 config, keeping it pretty for humans
 
 ## 0.9.20

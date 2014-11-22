@@ -128,7 +128,7 @@ Tenso.prototype.respond = function ( req, res, arg, status, headers ) {
 			}
 		}
 
-		if ( REGEX_MODIFY.test( this.server.allows( req.parsed.pathname ) ) ) {
+		if ( REGEX_MODIFY.test( this.server.allows( req.parsed.pathname, req.vhost, false ) ) ) {
 			if ( this.server.config.security.csrf && res.locals[ this.server.config.security.key ] ) {
 				ref[ 0 ][ "x-csrf-token" ] = res.locals[ this.server.config.security.key ];
 			}

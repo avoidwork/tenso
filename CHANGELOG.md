@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.9.27
+- Utilized `req.allows` in `this.respond()`
+
 ## 0.9.26
 - Fixed `this.respond()` by passing a required parameter to `this.server.allows()`
 

@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.0.0
+- Upgraded keigai & turtle.io dependencies
+
 ## 0.9.27
 - Utilized `req.allows` in `this.respond()`
 

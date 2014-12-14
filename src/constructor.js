@@ -120,10 +120,10 @@ Tenso.prototype.respond = function ( req, res, arg, status, headers ) {
 		ref = [ headers || {} ];
 
 		if ( req.protect ) {
-			if ( ref[ 0 ][ "cache-control" ] === undefined ) {
+			if ( ref[ 0 ][ "cache-control" ] === undefined && this.server.config.headers[ "cache-control" ] ) {
 				ref[ 0 ][ "cache-control" ] = clone( this.server.config.headers[ "cache-control" ], true );
 			}
-			if ( ref[ 0 ][ "cache-control" ].indexOf( "private " ) == -1 ) {
+			if ( ref[ 0 ][ "cache-control" ] !== undefined && ref[ 0 ][ "cache-control" ].indexOf( "private " ) == -1 ) {
 				ref[ 0 ][ "cache-control" ] = "private " + ref[ 0 ][ "cache-control" ];
 			}
 		}

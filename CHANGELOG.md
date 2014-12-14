@@ -2,6 +2,8 @@
 
 ## 1.0.1
 - Upgraded turtle.io for recommended fixes
+- Fixed how tests where written
+- Fixed `this.respond()` by not assuming a `cache-control` header exists
 
 ## 1.0.0
 - Upgraded keigai & turtle.io dependencies

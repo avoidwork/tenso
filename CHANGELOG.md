@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.0.1
+- Upgraded turtle.io for recommended fixes
+
 ## 1.0.0
 - Upgraded keigai & turtle.io dependencies
 

@@ -1,13 +1,11 @@
 Tensō
 =====
 
-[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/avoidwork/tenso?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![build status](https://secure.travis-ci.org/avoidwork/tenso.svg)](http://travis-ci.org/avoidwork/tenso) [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/avoidwork/tenso?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Tensō is a REST API facade for node.js, designed to simplify the implementation of APIs.
 
 Tensō will handle the serialization & creation of hypermedia links, all you have to do is give it `Arrays` or `Objects`.
-
-[![build status](https://secure.travis-ci.org/avoidwork/tenso.svg)](http://travis-ci.org/avoidwork/tenso)
 
 ## Example
 Creating an API with Tensō can be as simple as one statement.

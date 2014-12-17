@@ -12,8 +12,7 @@ function zuul ( protect ) {
 
 		array.each( protect, function ( regex ) {
 			if ( regex.test( uri ) ) {
-				protectd = true;
-				return false;
+				return !( protectd = true );
 			}
 		} );
 

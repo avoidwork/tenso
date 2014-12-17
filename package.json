@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tensō is a REST API facade for node.js, designed to simplify the implementation of APIs.",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "homepage": "http://avoidwork.github.io/tenso",
   "author": {
     "name": "Jason Mulligan",

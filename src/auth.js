@@ -33,7 +33,7 @@ function auth ( obj, config ) {
 	}
 
 	function guard ( req, res, next ) {
-		if ( req.isAuthenticated() ) {
+		if ( req.url === "/login" || req.isAuthenticated() ) {
 			rate( obj, req, res, next );
 		}
 		else {

@@ -59,7 +59,7 @@
 		"syslog": false
 	},
 	"security": {
-		"key": "_csrf",
+		"key": "x-csrf-token",
 		"csrf": false,
 		"csp": null,
 		"xframe": "",

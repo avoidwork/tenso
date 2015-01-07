@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.0.2
+- Fixed `X-CSRF-Token` header decoration on response, such that it's only applied to protected routes
+
 ## 1.0.1
 - Upgraded turtle.io for recommended fixes
 - Fixed how tests where written

@@ -128,10 +128,8 @@ Tenso.prototype.respond = function ( req, res, arg, status, headers ) {
 			}
 		}
 
-		if ( REGEX_MODIFY.test( req.allows ) ) {
-			if ( this.server.config.security.csrf && res.locals[ this.server.config.security.key ] ) {
-				ref[ 0 ][ "x-csrf-token" ] = res.locals[ this.server.config.security.key ];
-			}
+		if ( REGEX_MODIFY.test( req.allow ) && this.server.config.security.csrf && res.locals[ this.server.config.security.key ] ) {
+			ref[ 0 ][ this.server.config.security.key ] = res.locals[ this.server.config.security.key ];
 		}
 
 		this.server.respond( req, res, hypermedia( this.server, req, response( arg, status ), ref[ 0 ] ), status, ref[ 0 ] );

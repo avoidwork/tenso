@@ -28,11 +28,11 @@ function bootstrap ( obj, config ) {
 	function parse ( req ) {
 		var args, type;
 
-		if ( REGEX_BODY.test( req.method ) && req.body !== undefined ) {
+		if ( regex.body.test( req.method ) && req.body !== undefined ) {
 			type = req.headers[ "content-type" ];
 
-			if ( REGEX_FORMENC.test( type ) ) {
-				args = req.body ? array.chunk( req.body.split( REGEX_BODY_SPLIT ), 2 ) : [];
+			if ( regex.encode_form.test( type ) ) {
+				args = req.body ? array.chunk( req.body.split( regex.body_split ), 2 ) : [];
 				req.body = {};
 
 				array.each( args, function ( i ) {
@@ -40,7 +40,7 @@ function bootstrap ( obj, config ) {
 				} );
 			}
 
-			if ( REGEX_JSONENC.test( type ) ) {
+			if ( regex.encode_json.test( type ) ) {
 				req.body = json.decode( req.body, true );
 			}
 		}

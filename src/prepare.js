@@ -16,7 +16,7 @@ function prepare ( arg, error, status ) {
 
 	return {
 		data: data || null,
-		error: error ? ( error.stack || error.message || error ) : null,
+		error: error ? ( error.message || error ) : null,
 		status: status || 200
 	};
 }

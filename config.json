@@ -60,7 +60,8 @@
 	},
 	"security": {
 		"key": "x-csrf-token",
-		"csrf": false,
+		"secret": "tenso",
+		"csrf": true,
 		"csp": null,
 		"xframe": "",
 		"p3p": "",

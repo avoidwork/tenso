@@ -1,11 +1,10 @@
-var expect = require('chai').expect,
-    hippie = require( "hippie" ),
+var hippie = require( "hippie" ),
     tenso  = require( "../lib/tenso" ),
     routes = require( "./routes.js" ),
     array  = require( "keigai" ).util.array;
 
 function api ( port, not_json ) {
-	var obj = hippie().base("http://localhost:" + port)
+	var obj = hippie().base("http://localhost:" + port);
 
 	return not_json ? obj : obj.expectHeader("Content-Type", "application/json").json();
 }
@@ -15,10 +14,10 @@ function persistCookies ( opts, next ) {
 	next( opts );
 }
 
-describe("Permissions", function () {
+describe("Permissions (CSRF disabled)", function () {
 	var port = 8001;
 
-	tenso( {port: port, routes: routes, logs: {level: "error"}} );
+	tenso( {port: port, routes: routes, logs: {level: "error"}, security: {csrf: false}} );
 
 	it("GET / - returns an array of endpoints", function (done) {
 		api( port )
@@ -330,7 +329,8 @@ describe("OAuth2 Token Bearer", function () {
 } );
 
 describe("Local", function () {
-	var port = 8006;
+	var port = 8006,
+		token;
 
 	tenso( {
 		port: port,
@@ -375,6 +375,22 @@ describe("Local", function () {
 			.expectValue("data.result", {instruction: "POST 'username' & 'password' to authenticate"} )
 			.expectValue("error", null)
 			.expectValue("status", 200)
+			.end(function(err, res) {
+				if (err) throw err;
+				token = res.headers['x-csrf-token'];
+				done();
+			});
+	});
+
+	it("POST /login (invalid / no CSRF token) - returns an 'unauthorized' error", function (done) {
+		api( port )
+			.post("/login")
+			.form()
+			.send({username:"test", password:1232})
+			.expectStatus(403)
+			.expectValue("data", null)
+			.expectValue("error", "CSRF token mismatch")
+			.expectValue("status", 403)
 			.end(function(err) {
 				if (err) throw err;
 				done();
@@ -383,6 +399,7 @@ describe("Local", function () {
 
 	it("POST /login (invalid) - returns an 'unauthorized' error", function (done) {
 		api( port )
+			.header("x-csrf-token", token)
 			.post("/login")
 			.form()
 			.send({username:"test", password:1232})
@@ -396,8 +413,10 @@ describe("Local", function () {
 			});
 	});
 
+	// needs to reuse the session cookie header for identification
 	it("POST /login - redirects to a predetermined URI", function (done) {
 		api( port, true )
+			.header("x-csrf-token", token)
 			.post("/login")
 			.form()
 			.send({username:"test", password:123})
@@ -431,6 +450,7 @@ describe("Rate Limiting", function () {
 	tenso( {port: port, routes: routes, logs: {level: "error"}, rate: {enabled: true, limit: 2, reset: 900}} );
 
 	it( "GET / - returns an array of endpoints (1/2)", function ( done ) {
+		console
 		api( port )
 			.get( "/" )
 			.expectStatus( 200 )
@@ -456,7 +476,7 @@ describe("Rate Limiting", function () {
 			.expectValue( "data.result", ["/items", "/things"] )
 			.expectValue( "error", null )
 			.expectValue( "status", 200 )
-			.end( function ( err ) {
+			.end( function ( err, res, body ) {
 				if ( err ) throw err;
 				done();
 			} );

@@ -13,7 +13,7 @@ function keymaster ( req, res, next ) {
 
 	// No authentication, or it's already happened
 	if ( !req.protect || !req.protectAsync || ( req.session && req.isAuthenticated() ) ) {
-		method = REGEX_GETREWRITE.test( req.method ) ? "get" : req.method.toLowerCase();
+		method = regex.get_rewrite.test( req.method ) ? "get" : req.method.toLowerCase();
 		routes = req.server.config.routes[ method ] || {};
 		uri = req.parsed.pathname;
 		valid = false;

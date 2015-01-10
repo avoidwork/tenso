@@ -1,7 +1,9 @@
 # Change Log
 
-## 1.0.2
-- Fixed `X-CSRF-Token` header decoration on response, such that it's only applied to protected routes
+## 1.1.0
+- Upgraded turtle.io for required fix
+- Fixed `X-CSRFToken` header decoration on response, such that it's only applied to protected routes
+- Enabled `CSRF` protection by default
 
 ## 1.0.1
 - Upgraded turtle.io for recommended fixes

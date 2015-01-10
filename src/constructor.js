@@ -128,7 +128,7 @@ Tenso.prototype.respond = function ( req, res, arg, status, headers ) {
 			}
 		}
 
-		if ( REGEX_MODIFY.test( req.allow ) && this.server.config.security.csrf && res.locals[ this.server.config.security.key ] ) {
+		if ( !regex.modify.test( req.method ) && regex.modify.test( req.allow ) && this.server.config.security.csrf && res.locals[ this.server.config.security.key ] ) {
 			ref[ 0 ][ this.server.config.security.key ] = res.locals[ this.server.config.security.key ];
 		}
 

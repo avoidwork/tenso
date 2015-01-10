@@ -86,7 +86,7 @@ function auth ( obj, config ) {
 		obj.server.use( fnCookie ).blacklist( fnCookie );
 
 		if ( config.security.csrf ) {
-			luscaCsrf = lusca.csrf( { key: config.security.key } );
+			luscaCsrf = lusca.csrf( { key: config.security.key, secret: config.security.secret } );
 			obj.server.use( luscaCsrf ).blacklist( luscaCsrf );
 		}
 	}

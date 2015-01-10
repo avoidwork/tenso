@@ -31,9 +31,9 @@ function hypermedia ( server, req, rep, headers ) {
 				var collection, uri;
 
 				// If ID like keys are found, and are not URIs, they are assumed to be root collections
-				if ( REGEX_ID.test( i ) || REGEX_HYPERMEDIA.test( i ) ) {
-					if ( !REGEX_ID.test( i ) ) {
-						collection = i.replace( REGEX_TRAILING, "" ).replace( REGEX_TRAILING_S, "" ).replace( REGEX_TRAILING_Y, "ie" ) + "s";
+				if ( regex.id.test( i ) || regex.hypermedia.test( i ) ) {
+					if ( !regex.id.test( i ) ) {
+						collection = i.replace( regex.trailing, "" ).replace( regex.trailing_s, "" ).replace( regex.trailing_y, "ie" ) + "s";
 						rel = "related";
 					}
 					else {
@@ -41,7 +41,7 @@ function hypermedia ( server, req, rep, headers ) {
 						rel = "item";
 					}
 
-					uri = REGEX_SCHEME.test( obj[ i ] ) ? ( obj[ i ].indexOf( "//" ) > -1 ? obj[ i ] : protocol + "//" + req.parsed.host + obj[ i ] ) : ( protocol + "//" + req.parsed.host + "/" + collection + "/" + obj[ i ] );
+					uri = regex.scheme.test( obj[ i ] ) ? ( obj[ i ].indexOf( "//" ) > -1 ? obj[ i ] : protocol + "//" + req.parsed.host + obj[ i ] ) : ( protocol + "//" + req.parsed.host + "/" + collection + "/" + obj[ i ] );
 
 					if ( uri !== root && !seen[ uri ] ) {
 						rep.data.link.push( { uri: uri, rel: rel } );
@@ -63,7 +63,7 @@ function hypermedia ( server, req, rep, headers ) {
 
 		if ( req.parsed.pathname !== "/" ) {
 			rep.data.link.push( {
-				uri: root.replace( REGEX_TRAIL_SLASH, "" ).replace( REGEX_COLLECTION, "$1" ),
+				uri: root.replace( regex.trailing_slash, "" ).replace( regex.collection, "$1" ),
 				rel: "collection"
 			} );
 		}
@@ -109,7 +109,7 @@ function hypermedia ( server, req, rep, headers ) {
 			array.each( rep.data.result, function ( i ) {
 				var uri;
 
-				if ( typeof i == "string" && REGEX_SCHEME.test( i ) ) {
+				if ( typeof i == "string" && regex.scheme.test( i ) ) {
 					uri = i.indexOf( "//" ) > -1 ? i : protocol + "//" + req.parsed.host + i;
 
 					if ( uri !== root ) {
@@ -118,7 +118,7 @@ function hypermedia ( server, req, rep, headers ) {
 				}
 
 				if ( i instanceof Object ) {
-					parse( i, "item", req.parsed.pathname.replace( REGEX_TRAIL_SLASH, "" ).replace( REGEX_LEADING, "" ) );
+					parse( i, "item", req.parsed.pathname.replace( regex.trailing_slash, "" ).replace( regex.leading, "" ) );
 				}
 			} );
 		}

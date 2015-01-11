@@ -679,7 +679,7 @@ describe( "Rate Limiting (Override)", function () {
 describe( "Request body max byte size", function () {
 	var port = 8008;
 
-	tenso( { port: port, routes: routes, logs: { level: "error" }, maxBytes: 2 } );
+	tenso( { port: port, routes: routes, logs: { level: "error" }, maxBytes: 10 } );
 
 	it( "POST /test - returns an a result", function ( done ) {
 		get_token( port, function ( err, res ) {
@@ -691,15 +691,14 @@ describe( "Request body max byte size", function () {
 
 			api( port )
 				.post( "/test" )
+				.send( { "x": 1 } )
 				.header( csrf, token )
 				.expectStatus( 200 )
-				.json()
 				.expectValue( "data.link", [ { uri: "http://localhost:" + port, rel: "collection" } ] )
 				.expectValue( "data.result", "OK!" )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )
-				.end( function ( err, res, body ) {
-					throw JSON.stringify(body);
+				.end( function ( err ) {
 					if ( err ) throw err;
 					done();
 				} );
@@ -715,9 +714,9 @@ describe( "Request body max byte size", function () {
 			token = res.headers[ csrf ];
 
 			api( port )
-				.header( csrf, token )
 				.post( "/test" )
 				.send( { "abc": true } )
+				.header( csrf, token )
 				.expectStatus( 413 )
 				.expectValue( "data", null )
 				.expectValue( "error", "Request Entity Too Large" )

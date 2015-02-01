@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.1.1
+- Upgrading keigai, & turtle.io dependencies
+
 ## 1.1.0
 - Upgraded turtle.io for required fix
 - Fixed `X-CSRFToken` header decoration on response, such that it's only applied to protected routes

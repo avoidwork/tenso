@@ -6,8 +6,8 @@
  * @param  {Number} status HTTP status, default is `200`
  * @return {Object}        Response body
  */
-function response ( arg, status ) {
-	var error = arg instanceof Error,
+let response = ( arg, status ) => {
+	let error = arg instanceof Error,
 		rep;
 
 	if ( error ) {
@@ -16,10 +16,9 @@ function response ( arg, status ) {
 		}
 
 		rep = prepare( null, arg, status );
-	}
-	else {
+	} else {
 		rep = prepare( arg, null, status );
 	}
 
 	return rep;
-}
+};

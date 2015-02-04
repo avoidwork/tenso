@@ -7,33 +7,31 @@
  * @param  {Function} next Next middleware
  * @return {Undefined}     undefined
  */
-function keymaster ( req, res, next ) {
-	var obj = req.server.tenso,
+let keymaster = ( req, res, next ) => {
+	let obj = req.server.tenso,
 		method, result, routes, uri, valid;
 
 	// No authentication, or it's already happened
 	if ( !req.protect || !req.protectAsync || ( req.session && req.isAuthenticated() ) ) {
-		method = regex.get_rewrite.test( req.method ) ? "get" : req.method.toLowerCase();
+		method = REGEX.get_rewrite.test( req.method ) ? "get" : req.method.toLowerCase();
 		routes = req.server.config.routes[ method ] || {};
 		uri = req.parsed.pathname;
 		valid = false;
 
-		rate( obj, req, res, function () {
+		rate( obj, req, res, () => {
 			if ( uri in routes ) {
 				result = routes[ uri ];
 
 				if ( typeof result == "function" ) {
 					result.call( obj, req, res );
-				}
-				else {
+				} else {
 					obj.respond( req, res, result );
 				}
-			}
-			else {
-				iterate( routes, function ( value, key ) {
-					var regex = new RegExp( "^" + key + "$", "i" );
+			} else {
+				iterate( routes, ( value, key ) => {
+					let REGEX = new RegExp( "^" + key + "$", "i" );
 
-					if ( regex.test( uri ) ) {
+					if ( REGEX.test( uri ) ) {
 						result = value;
 
 						return false;
@@ -43,16 +41,14 @@ function keymaster ( req, res, next ) {
 				if ( result ) {
 					if ( typeof result == "function" ) {
 						result.call( obj, req, res );
-					}
-					else {
+					} else {
 						obj.respond( req, res, result );
 					}
-				}
-				else {
-					iterate( req.server.config.routes.get || {}, function ( value, key ) {
-						var regex = new RegExp( "^" + key + "$", "i" );
+				} else {
+					iterate( req.server.config.routes.get || {}, ( value, key ) => {
+						let REGEX = new RegExp( "^" + key + "$", "i" );
 
-						if ( regex.test( uri ) ) {
+						if ( REGEX.test( uri ) ) {
 							valid = true;
 
 							return false;
@@ -61,15 +57,13 @@ function keymaster ( req, res, next ) {
 
 					if ( valid ) {
 						obj.error( req, res, 405 );
-					}
-					else {
+					} else {
 						obj.error( req, res, 404 );
 					}
 				}
 			}
 		} );
-	}
-	else {
+	} else {
 		rate( obj, req, res, next );
 	}
-}
+};

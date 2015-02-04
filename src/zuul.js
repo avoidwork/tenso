@@ -5,13 +5,13 @@
  * @param {Array} protect Array of routes
  * @return {Function}    Middleware
  */
-function zuul ( protect ) {
-	return function zuul ( req, res, next ) {
-		var uri = req.parsed.path,
+let zuul = ( protect ) => {
+	return ( req, res, next ) => {
+		let uri = req.parsed.path,
 			protectd = false;
 
-		array.each( protect, function ( regex ) {
-			if ( regex.test( uri ) ) {
+		array.each( protect, ( r ) => {
+			if ( r.test( uri ) ) {
 				return !( protectd = true );
 			}
 		} );
@@ -22,9 +22,8 @@ function zuul ( protect ) {
 
 		if ( protectd && next ) {
 			next();
-		}
-		else {
+		} else {
 			keymaster( req, res );
 		}
 	};
-}
+};

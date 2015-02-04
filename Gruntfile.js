@@ -31,7 +31,17 @@ module.exports = function (grunt) {
 					"src/zuul.js",
 					"src/outro.js"
 				],
-				dest : "lib/<%= pkg.name %>.js"
+				dest : "lib/<%= pkg.name %>.es6.js"
+			}
+		},
+		"6to5": {
+			options: {
+				sourceMap: false
+			},
+			dist: {
+				files: {
+					"lib/<%= pkg.name %>.js": "lib/<%= pkg.name %>.es6.js"
+				}
 			}
 		},
 		jsdoc : {
@@ -44,12 +54,6 @@ module.exports = function (grunt) {
 				    "private"   : false
 				}
 			}
-		},
-		jshint : {
-			options : {
-				jshintrc : ".jshintrc"
-			},
-			src : "lib/<%= pkg.name %>.js"
 		},
 		mochaTest : {
 			options: {
@@ -100,16 +104,16 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-sed");
 	grunt.loadNpmTasks("grunt-jsdoc");
 	grunt.loadNpmTasks("grunt-contrib-concat");
-	grunt.loadNpmTasks("grunt-contrib-jshint");
 	grunt.loadNpmTasks("grunt-contrib-watch");
 	grunt.loadNpmTasks("grunt-contrib-sass");
 	grunt.loadNpmTasks("grunt-mocha-test");
 	grunt.loadNpmTasks("grunt-nsp-package");
+	grunt.loadNpmTasks("grunt-6to5");
 
 	// aliases
 	grunt.registerTask("build", ["concat", "sed", "sass"]);
-	grunt.registerTask("test", ["jshint", "mochaTest"]);
-	grunt.registerTask("default", ["build", "test"]);
+	grunt.registerTask("test", ["mochaTest"]);
+	grunt.registerTask("default", ["build", "6to5", "test"]);
 	grunt.registerTask("validate", "validate-package");
 	grunt.registerTask("package", ["validate", "default", "jsdoc"]);
 };

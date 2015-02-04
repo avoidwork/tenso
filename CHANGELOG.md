@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.2.0
+- Refactored to ES6, transpiled to ES5 with `6to5`
+
 ## 1.1.1
 - Upgrading keigai, & turtle.io dependencies
 

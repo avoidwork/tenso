@@ -1,9 +1,8 @@
-( function () {
-"use strict";
+const CONFIG = require( __dirname + "/../config.json" );
+const VERSION = "{{VERSION}}";
+const SERVER = "tenso/" + VERSION;
 
-var CONFIG = require( __dirname + "/../config.json" ),
-	SERVER = "tenso/{{VERSION}}",
-	keigai = require( "keigai" ),
+let keigai = require( "keigai" ),
 	util = keigai.util,
 	array = util.array,
 	clone = util.clone,

@@ -3,7 +3,7 @@
  *
  * @type Object
  */
-var regex = {
+const REGEX = {
 	body: /POST|PUT|PATCH/i,
 	body_split: /&|=/,
 	collection: /(.*)(\/.*)$/,

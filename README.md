@@ -82,7 +82,7 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 		"level": "debug",
 		"stdout": true,
 		"dtrace": true,
-		"syslog": true
+		"stack": true
 	},
 	"port": 8000, /* Optional, default is 8000 */
 	"routes": require( "./routes.js" ), /* Required! */
@@ -309,7 +309,7 @@ A 'max byte' limit can be enforced on all routes that handle `PATCH`, `POST`, & 
 ```
 
 ## Logging
-Standard log levels are supported, and are emitted (by configuration) to `stdout` & `stderr`, & `syslog`.
+Standard log levels are supported, and are emitted (by configuration) to `stdout` & `stderr`. Stack traces can be enabled.
 
 ## DTrace
 DTrace probes can be enabled by configuration (disabled by default). A shell script is available at `./dtrace.sh` to observe the probes.

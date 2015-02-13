@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.2.1
+- Updated `6to5` for better transpiling
+- Updated `turtle.io` for a significant change 'under the hood'
+
 ## 1.2.0
 - Refactored to ES6, transpiled to ES5 with `6to5`
 

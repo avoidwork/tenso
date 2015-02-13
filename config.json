@@ -56,7 +56,7 @@
 	"json": 2,
 	"logs": {
 		"dtrace": false,
-		"syslog": false
+		"stack": false
 	},
 	"security": {
 		"key": "x-csrf-token",

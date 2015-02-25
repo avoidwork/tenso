@@ -332,5 +332,5 @@ The last argument for each probe is the nanoseconds it took to execute.
 ```
 
 ## License
-Copyright (c) 2014 Jason Mulligan  
+Copyright (c) 2015 Jason Mulligan  
 Licensed under the BSD-3 license.

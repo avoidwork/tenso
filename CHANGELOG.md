@@ -1,5 +1,10 @@
 # Change Log
 
+## 1.2.2
+- Updated `babel` transpiler (renamed)
+- Updated core dependencies
+- Added `io.js` (latest stable) to travis-ci
+
 ## 1.2.1
 - Updated `6to5` for better transpiling
 - Updated `turtle.io` for a significant change 'under the hood'

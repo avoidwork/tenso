@@ -141,7 +141,7 @@ let auth = ( obj, config ) => {
 			(() => {
 				let r = "(?!/auth/(";
 
-				array.each( authUris, ( i ) => {
+				array.iterate( authUris, ( i ) => {
 					r += i.replace( "_uri", "" ) + "|";
 				} );
 
@@ -180,7 +180,7 @@ let auth = ( obj, config ) => {
 				}
 			}
 
-			array.each( config.auth.basic.list || [], ( i ) => {
+			array.iterate( config.auth.basic.list || [], ( i ) => {
 				let args = i.split( ":" );
 
 				if ( args.length > 0 ) {

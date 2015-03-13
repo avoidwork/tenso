@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.2.3
+- Updated to keigai 1.2.0
+- Implemented `array.iterate()`
+
 ## 1.2.2
 - Updated `babel` transpiler (renamed)
 - Updated core dependencies

@@ -26,7 +26,7 @@ let hypermedia = ( server, req, rep, headers ) => {
 		if ( keys.length === 0 ) {
 			obj = null;
 		} else {
-			array.each( keys, ( i ) => {
+			array.iterate( keys, ( i ) => {
 				let collection, uri;
 
 				// If ID like keys are found, and are not URIs, they are assumed to be root collections
@@ -103,7 +103,7 @@ let hypermedia = ( server, req, rep, headers ) => {
 				} ).join( "&" );
 			}
 
-			array.each( rep.data.result, ( i ) => {
+			array.iterate( rep.data.result, ( i ) => {
 				let uri;
 
 				if ( typeof i == "string" && REGEX.scheme.test( i ) ) {

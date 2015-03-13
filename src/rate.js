@@ -14,7 +14,7 @@ let rate = ( obj, req, res, next ) => {
 		results = obj.rate( req, config.override ),
 		valid = results.shift();
 
-	array.each( headers, ( i, idx ) => {
+	array.iterate( headers, ( i, idx ) => {
 		res.setHeader( i, results[ idx ] );
 	} );
 

@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.2.4
+- Updated keigai & turtle.io
+
 ## 1.2.3
 - Updated to keigai 1.2.0
 - Implemented `array.iterate()`

@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.2.5
+- Updated turtle.io
+
 ## 1.2.4
 - Updated keigai & turtle.io
 

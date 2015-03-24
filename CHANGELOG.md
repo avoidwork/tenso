@@ -1,285 +1,375 @@
 # Change Log
 
-## 1.2.5
-- Updated turtle.io
+## [Unreleased](https://github.com/avoidwork/tenso/tree/HEAD)
 
-## 1.2.4
-- Updated keigai & turtle.io
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.2.3...HEAD)
 
-## 1.2.3
-- Updated to keigai 1.2.0
-- Implemented `array.iterate()`
+**Implemented enhancements:**
 
-## 1.2.2
-- Updated `babel` transpiler (renamed)
-- Updated core dependencies
-- Added `io.js` (latest stable) to travis-ci
+- Remove redundant caching [\#23](https://github.com/avoidwork/tenso/issues/23)
 
-## 1.2.1
-- Updated `6to5` for better transpiling
-- Updated `turtle.io` for a significant change 'under the hood'
+## [1.2.3](https://github.com/avoidwork/tenso/tree/1.2.3) (2015-03-13)
 
-## 1.2.0
-- Refactored to ES6, transpiled to ES5 with `6to5`
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.2.2...1.2.3)
 
-## 1.1.1
-- Upgrading keigai, & turtle.io dependencies
+## [1.2.2](https://github.com/avoidwork/tenso/tree/1.2.2) (2015-02-25)
 
-## 1.1.0
-- Upgraded turtle.io for required fix
-- Fixed `X-CSRFToken` header decoration on response, such that it's only applied to protected routes
-- Enabled `CSRF` protection by default
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.2.1...1.2.2)
 
-## 1.0.1
-- Upgraded turtle.io for recommended fixes
-- Fixed how tests where written
-- Fixed `this.respond()` by not assuming a `cache-control` header exists
+## [1.2.1](https://github.com/avoidwork/tenso/tree/1.2.1) (2015-02-13)
 
-## 1.0.0
-- Upgraded keigai & turtle.io dependencies
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.2.0...1.2.1)
 
-## 0.9.27
-- Utilized `req.allows` in `this.respond()`
+## [1.2.0](https://github.com/avoidwork/tenso/tree/1.2.0) (2015-02-04)
 
-## 0.9.26
-- Fixed `this.respond()` by passing a required parameter to `this.server.allows()`
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.1.1...1.2.0)
 
-## 0.9.25
-- Identified as `tenso` in logging strategies
-- Created `dtrace.sh` to convenient probe output
+## [1.1.1](https://github.com/avoidwork/tenso/tree/1.1.1) (2015-02-01)
 
-## 0.9.24
-- Fixed pluralization of hypermedia keys
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.1.0...1.1.1)
 
-## 0.9.23
-- Refactored `Tenso.rate()` to ignore `Authorization` header, as it provides an attack vector
-- Fixed `Tenso.rate()` by removing the `per hour` notion and implement the `seconds offset` afforded by configuration
+## [1.1.0](https://github.com/avoidwork/tenso/tree/1.1.0) (2015-01-11)
 
-## 0.9.22
-- Fixed a regression of `rate()` execution against protected routes
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.0.1...1.1.0)
 
-## 0.9.21
-- Optimized `respond()` by moving `0.9.20` into it
-- Reformatted code based on my WebStorm9 config, keeping it pretty for humans
+**Implemented enhancements:**
 
-## 0.9.20
-- Added automatic `private` directive to `cache-control` header when client is authenticated
+- Audit CSRF implementation [\#22](https://github.com/avoidwork/tenso/issues/22)
 
-## 0.9.19
-- Changed rate limiting such that it can be 'resized'
+**Merged pull requests:**
 
-## 0.9.18
-- Moved `rate()` into `keymaster()` such that it always executes
+- Add a Gitter chat badge to README.md [\#21](https://github.com/avoidwork/tenso/pull/21) ([gitter-badger](https://github.com/gitter-badger))
 
-## 0.9.17
-- Added `rate.override` to `config` which accepts `req` & `rate`, and must return `rate`, such that rate limiting is customizable
+## [1.0.1](https://github.com/avoidwork/tenso/tree/1.0.1) (2014-12-14)
 
-## 0.9.16
-- Loosened dependency versions
-- Fixed `hypermedia()` by implementing the `x-forwarded-proto` header
-- Fixed the `x-ratelimit-remaining` value upon reset
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.0.0...1.0.1)
 
-## 0.9.15
-- Updated dependencies, disabling support for SSLv2 (also insecure)
+## [1.0.0](https://github.com/avoidwork/tenso/tree/1.0.0) (2014-12-01)
 
-## 0.9.14
-- Updated dependencies to protect against POODLE
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.27...1.0.0)
 
-## 0.9.13
-- Updated dependencies
+## [0.9.27](https://github.com/avoidwork/tenso/tree/0.9.27) (2014-11-25)
 
-## 0.9.12
-- Updated dependencies
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.26...0.9.27)
 
-## 0.9.11
-- Updated dependencies
+## [0.9.26](https://github.com/avoidwork/tenso/tree/0.9.26) (2014-11-22)
 
-## 0.9.10
-- Fixed a log error in `bootstrap()` when enabling SSL
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.25...0.9.26)
 
-## 0.9.9
-- Updated `turtle.io` to gain automatic handling of `CORS` requests from a browser
+## [0.9.25](https://github.com/avoidwork/tenso/tree/0.9.25) (2014-11-22)
 
-## 0.9.8
-- Refactored `Local Auth` to not redirect `CORS` requests from a browser, and return a success message
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.24...0.9.25)
 
-## 0.9.7
-- Updated dependencies
-
-## 0.9.6
-- Updated dependencies
+## [0.9.24](https://github.com/avoidwork/tenso/tree/0.9.24) (2014-11-19)
 
-## 0.9.5
-- Fixed `hypermedia()` when URI has a trailing slash and is a collection, added a test
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.23...0.9.24)
 
-## 0.9.4
-- Changed `/logout` such that it works without being a protected route
+## [0.9.23](https://github.com/avoidwork/tenso/tree/0.9.23) (2014-11-07)
 
-## 0.9.3
-- Made `hypermedia()` smartr by not mutating the result when it's an Array of URIs, for obvious data modeling issues!
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.22...0.9.23)
 
-## 0.9.2
-- Upgraded deps, gained better CSV decoding
+## [0.9.22](https://github.com/avoidwork/tenso/tree/0.9.22) (2014-11-06)
 
-## 0.9.1
-- Upgraded deps
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.21...0.9.22)
 
-## 0.9.0
-- Made `hypermedia()` smartr by knowing when a key is an item or a related URI, & to not remove `link` keys for obvious data modeling issues!
+## [0.9.21](https://github.com/avoidwork/tenso/tree/0.9.21) (2014-11-06)
 
-## 0.8.3
-- Fixed `hypermedia()` when dealing with collections: `Array` of `Objects` e.g. a record set, added a test
-
-## 0.8.2
-- Updated deps
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.20...0.9.21)
 
-## 0.8.1
-- Fixed an oversight in two conditionals within `auth()`
-
-## 0.8.0
-- Refactored `auth()` & created 'by config' end points for `Basic` & `Bearer` under `/auth`, such that they don't collide with stateful strategies
-- Updated `hypermedia()` to add a `collection` link for non `Array/Object` representations & to set a `rel` of `item` for `Array` based links, updated tests
-
-## 0.7.2
-- Enabled `auth.linkedin.scope`; missed it
-- Removed double `blacklist()` of middleware within each authentication strategy
-
-## 0.7.1
-- Modified `parse()` middleware to handle `application/json` content-type request bodies
-
-## 0.7.0
-- Added `OAuth2`, & `SAML` authentication
-- Refactored `Local Auth` to use passport
-- Refactored `auth()` to mix stateless & stateful auth strategies the same time
-- Added `parse()` middleware via `bootstrap()` to coerce `req.body`
-- Created `auth.redirect` configuration option for customizing where an end user is redirected to upon successful (stateful) authentication, default is `/`
-
-## 0.6.1
-- Upgrading turtle.io to 3.0.15 for etag middleware fix (out of order execution negated it)
-
-## 0.6.0
-- Moved `mediator()` middleware out of `auth()` and into `bootstrap()`
-- Fixed redundant variable initialization in `Tenso.prototype.rate()`
-- Added CSS map file
-- Refactored `auth()` to be DRYer, and enabled support for multiple social authentication strategies
-
-## 0.5.2
-- Updated `hypermedia()` to apply the same logic to Entity reps, updated tests
-
-## 0.5.1
-- Changed `data.result` to `null` if all content is lifted into `data.link`, updated tests
+## [0.9.20](https://github.com/avoidwork/tenso/tree/0.9.20) (2014-11-06)
 
-## 0.5.0
-- URIs (relative or absolute) in `data.result[]` are treated as hypermedia and lifted in `data.link`, updated tests
-- Added an `Allow` header assertion to the permission test
-- Pagination is only decorated if the result exceeds the page size
-
-## 0.4.4
-- Fixed blacklisting of middleware within `auth()`, & `bootstrap()`
-- Fixed `keymaster()` for `HEAD` & `OPTIONS` requests
-- Upgraded turtle.io to 3.0.14
-- Set session cookie flag to avoid warning messages during tests
-
-## 0.4.3
-- Upgrading turtle.io to 3.0.13 & blacklisting all authentication middleware
-
-## 0.4.2
-- Added lusca for security, enabling CSRF by default
-- Added grunt-nsp-package for module vulnerability scanning during `package` task
-
-## 0.4.1
-- Fixed an edge case in `hypermedia()` such that the `URI` is not lifted into the `links` Array via automagic, updated test
-- Updated `hypermedia()` to add a `collection` link for an `Entity` representation _[RFC6573]_, updated test
-- Cached `RegExp` invariants
-
-## 0.4.0
-- Added `Facebook`, `Google`, `LinkedIn`, & `Twitter` authentication via `passport`
-- Fixed the `RegExp` used to retrieve the rate limit id from the `authorization` header
-- Moved authentication gateway middleware into `zuul()`, & fixed what it tests
-- Fixed `prepare()` by cloning the response body
-- Changed default host to `127.0.0.1`
-- Decorating `req.protect` & `req.protectAsync` from `zuul()` and various authentication strategies
-- Upgrading turtle.io to 3.0.10 for middleware pipeline & misc fixes to make it play nice with passport.js
-- Added support for Redis as a session store
-
-## 0.3.6
-- Upgraded turtle.io to 2.3.0
-- Refactored `Basic Auth` to use `passport`
-
-## 0.3.5
-- Fixed tests
-
-## 0.3.4
-- Updating `config.json` with more options of `turtle.io`
-- Upgrading turtle.io to gain `accept: application/json; indent=n` driven pretty JSON
-
-## 0.3.3
-- Correcting the wildcard handling (forgot a case)
-
-## 0.3.2
-- Disabled compression when SSL is enabled
-- Fixed wildcards in `protect` Array under `auth`
-
-## 0.3.1
-- Added `maxBytes` configuration flag to enforce limits on `PATCH`, `POST`, & `PUT` requests, added a test
-- Set `maxBytes` to a default of 1 MB
-- Upgraded turtle.io to 2.2.4
-
-## 0.3.0
-- Added rate limiting
-- Reverted a change to the Grunt file, such that 'test' runs jshint & mocha tests
-- Updating turtle.io to 2.2.3 for a middleware fix
-- Creating `Tenso.rates` to store rate limiting data
-- Creating `Tenso.rates()` to be called from `rate()` middleware
-
-## 0.2.0
-- Created `Tenso.redirect(req, res, uri)`, & `Tenso.error(req, res, status, arg)`
-- Added `local` authentication, which is controlled by config
-- Added `express-session` as a dependency, and enabled sessions
-- Updated turtle.io to gain `res.redirect()`
-
-## 0.1.1
-- Decorating `hostname` on Tenso instance
-- Removed temp function that made it into a release
-- Refactored tests to use multiple servers
-- Added tests for authentications
-
-## 0.1.0
-- Added OAuth2 Bearer Token authentication, tokens are expected to be updated 'by reference' (tbd)
-- Updated keigai to 0.6.1 to fix a string escape function
-- Updated turtle.io to 2.1.18 to fix middleware problem
-
-## 0.0.10
-- Fixing `hypermedia()` by ensuring no `link` Objects when a collection is empty, added a test
-
-## 0.0.9
-- Fixing `hypermedia()` URI reconstruction by encoding the query string values, added a test
-
-## 0.0.8
-- Fixing `hypermedia()` to deal with an out of bounds `page`, added a test
-
-## 0.0.7
-- Added hippie functional tests
-- Updated turtle.io dependency to fix a permission error
-
-## 0.0.6
-- Changing the default hypermedia link rel to `related` for a more generic implied relationship
-
-## 0.0.5
-- Implementing hypermedia & automagic pagination
-
-## 0.0.4
-- Implementing a clean Basic Auth (by config)
-
-## 0.0.3
-- Updated `turtle.io` to 2.1.9 to gain customization of JSON formatting
-- Updated routing such that handlers execute with the context of the Tensō instance
-- Created `Tenso.prototype.respond()` to provide a very simple method for creating a response from custom routes
-- Updated README with more content
-- Updated default HTML page when no routes are loaded
-
-## 0.0.2
-- Initial implementation of routing via external module
-
-## 0.0.1
-- Empty module, reserving the name
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.19...0.9.20)
+
+## [0.9.19](https://github.com/avoidwork/tenso/tree/0.9.19) (2014-11-05)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.18...0.9.19)
+
+## [0.9.18](https://github.com/avoidwork/tenso/tree/0.9.18) (2014-11-05)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.17...0.9.18)
+
+## [0.9.17](https://github.com/avoidwork/tenso/tree/0.9.17) (2014-11-05)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.16...0.9.17)
+
+**Implemented enhancements:**
+
+- Needs rate limiting tiers [\#19](https://github.com/avoidwork/tenso/issues/19)
+
+## [0.9.16](https://github.com/avoidwork/tenso/tree/0.9.16) (2014-11-03)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.15...0.9.16)
+
+**Implemented enhancements:**
+
+- Add `X-CSRFToken` to CORS 'allowed' header [\#16](https://github.com/avoidwork/tenso/issues/16)
+
+**Fixed bugs:**
+
+- Implement `X-Forwarded-Proto` header in `hypermedia\(\)` [\#18](https://github.com/avoidwork/tenso/issues/18)
+
+- Rate limiting count is off by 1 when returning with a valid session [\#17](https://github.com/avoidwork/tenso/issues/17)
+
+## [0.9.15](https://github.com/avoidwork/tenso/tree/0.9.15) (2014-10-24)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.14...0.9.15)
+
+## [0.9.14](https://github.com/avoidwork/tenso/tree/0.9.14) (2014-10-23)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.13...0.9.14)
+
+**Implemented enhancements:**
+
+- Needs kerberos support [\#11](https://github.com/avoidwork/tenso/issues/11)
+
+## [0.9.13](https://github.com/avoidwork/tenso/tree/0.9.13) (2014-10-20)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.12...0.9.13)
+
+## [0.9.12](https://github.com/avoidwork/tenso/tree/0.9.12) (2014-10-16)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.11...0.9.12)
+
+## [0.9.11](https://github.com/avoidwork/tenso/tree/0.9.11) (2014-10-09)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.10...0.9.11)
+
+## [0.9.10](https://github.com/avoidwork/tenso/tree/0.9.10) (2014-10-07)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.9...0.9.10)
+
+## [0.9.9](https://github.com/avoidwork/tenso/tree/0.9.9) (2014-10-04)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.8...0.9.9)
+
+## [0.9.8](https://github.com/avoidwork/tenso/tree/0.9.8) (2014-10-04)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.7...0.9.8)
+
+## [0.9.7](https://github.com/avoidwork/tenso/tree/0.9.7) (2014-10-03)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.6...0.9.7)
+
+## [0.9.6](https://github.com/avoidwork/tenso/tree/0.9.6) (2014-10-03)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.5...0.9.6)
+
+## [0.9.5](https://github.com/avoidwork/tenso/tree/0.9.5) (2014-09-20)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.4...0.9.5)
+
+## [0.9.4](https://github.com/avoidwork/tenso/tree/0.9.4) (2014-09-18)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.3...0.9.4)
+
+## [0.9.3](https://github.com/avoidwork/tenso/tree/0.9.3) (2014-09-18)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.2...0.9.3)
+
+## [0.9.2](https://github.com/avoidwork/tenso/tree/0.9.2) (2014-09-12)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.1...0.9.2)
+
+## [0.9.1](https://github.com/avoidwork/tenso/tree/0.9.1) (2014-09-09)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.9.0...0.9.1)
+
+## [0.9.0](https://github.com/avoidwork/tenso/tree/0.9.0) (2014-09-06)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.8.3...0.9.0)
+
+## [0.8.3](https://github.com/avoidwork/tenso/tree/0.8.3) (2014-09-06)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.8.2...0.8.3)
+
+## [0.8.2](https://github.com/avoidwork/tenso/tree/0.8.2) (2014-09-06)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.8.1...0.8.2)
+
+## [0.8.1](https://github.com/avoidwork/tenso/tree/0.8.1) (2014-09-03)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.8.0...0.8.1)
+
+## [0.8.0](https://github.com/avoidwork/tenso/tree/0.8.0) (2014-09-03)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.7.2...0.8.0)
+
+**Closed issues:**
+
+- "/auth/linkedin" Does not redirect to linkedin. [\#15](https://github.com/avoidwork/tenso/issues/15)
+
+## [0.7.2](https://github.com/avoidwork/tenso/tree/0.7.2) (2014-09-01)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.7.1...0.7.2)
+
+## [0.7.1](https://github.com/avoidwork/tenso/tree/0.7.1) (2014-08-28)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.7.0...0.7.1)
+
+## [0.7.0](https://github.com/avoidwork/tenso/tree/0.7.0) (2014-08-28)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.6.1...0.7.0)
+
+**Implemented enhancements:**
+
+- Callback URIs for auth strategies should all for custom redirects [\#14](https://github.com/avoidwork/tenso/issues/14)
+
+- Refactor `auth\(\)` to support a mix of 'stateless' & 'stateful' strategies [\#13](https://github.com/avoidwork/tenso/issues/13)
+
+- Needs SAML support [\#12](https://github.com/avoidwork/tenso/issues/12)
+
+- Needs generic OAuth2 support [\#10](https://github.com/avoidwork/tenso/issues/10)
+
+## [0.6.1](https://github.com/avoidwork/tenso/tree/0.6.1) (2014-08-25)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.6.0...0.6.1)
+
+**Closed issues:**
+
+- Each auth strategy contain unique paths to protect [\#9](https://github.com/avoidwork/tenso/issues/9)
+
+## [0.6.0](https://github.com/avoidwork/tenso/tree/0.6.0) (2014-08-24)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.5.2...0.6.0)
+
+**Closed issues:**
+
+- This is not an issue but a comment [\#8](https://github.com/avoidwork/tenso/issues/8)
+
+## [0.5.2](https://github.com/avoidwork/tenso/tree/0.5.2) (2014-08-21)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.5.1...0.5.2)
+
+## [0.5.1](https://github.com/avoidwork/tenso/tree/0.5.1) (2014-08-21)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.5.0...0.5.1)
+
+## [0.5.0](https://github.com/avoidwork/tenso/tree/0.5.0) (2014-08-21)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.4.4...0.5.0)
+
+## [0.4.4](https://github.com/avoidwork/tenso/tree/0.4.4) (2014-08-19)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.4.3...0.4.4)
+
+**Closed issues:**
+
+- Passport middleware isn't blacklisted in `auth\(\)` [\#7](https://github.com/avoidwork/tenso/issues/7)
+
+- keymaster\(\) has a logical flaw when handling HEAD or OPTIONS requests [\#6](https://github.com/avoidwork/tenso/issues/6)
+
+- 404 on OPTIONS [\#5](https://github.com/avoidwork/tenso/issues/5)
+
+## [0.4.3](https://github.com/avoidwork/tenso/tree/0.4.3) (2014-08-19)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.4.2...0.4.3)
+
+## [0.4.2](https://github.com/avoidwork/tenso/tree/0.4.2) (2014-08-16)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.4.1...0.4.2)
+
+## [0.4.1](https://github.com/avoidwork/tenso/tree/0.4.1) (2014-08-16)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.4.0...0.4.1)
+
+## [0.4.0](https://github.com/avoidwork/tenso/tree/0.4.0) (2014-08-15)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.3.6...0.4.0)
+
+## [0.3.6](https://github.com/avoidwork/tenso/tree/0.3.6) (2014-08-08)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.3.5...0.3.6)
+
+## [0.3.5](https://github.com/avoidwork/tenso/tree/0.3.5) (2014-08-07)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.3.4...0.3.5)
+
+**Fixed bugs:**
+
+- Middleware that executes `this.respond\(\)` sends erroneous response [\#3](https://github.com/avoidwork/tenso/issues/3)
+
+## [0.3.4](https://github.com/avoidwork/tenso/tree/0.3.4) (2014-08-07)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.3.3...0.3.4)
+
+**Implemented enhancements:**
+
+- Pretty JSON output should be customizable via the `Accept` header [\#4](https://github.com/avoidwork/tenso/issues/4)
+
+## [0.3.3](https://github.com/avoidwork/tenso/tree/0.3.3) (2014-08-07)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.3.2...0.3.3)
+
+## [0.3.2](https://github.com/avoidwork/tenso/tree/0.3.2) (2014-08-07)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.3.1...0.3.2)
+
+**Implemented enhancements:**
+
+- Compression should be disable if SSL is enabled [\#2](https://github.com/avoidwork/tenso/issues/2)
+
+**Fixed bugs:**
+
+- Routes with wildcards/\* do not get handled properly [\#1](https://github.com/avoidwork/tenso/issues/1)
+
+## [0.3.1](https://github.com/avoidwork/tenso/tree/0.3.1) (2014-08-06)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.3.0...0.3.1)
+
+## [0.3.0](https://github.com/avoidwork/tenso/tree/0.3.0) (2014-08-05)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.2.0...0.3.0)
+
+## [0.2.0](https://github.com/avoidwork/tenso/tree/0.2.0) (2014-08-05)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.1.1...0.2.0)
+
+## [0.1.1](https://github.com/avoidwork/tenso/tree/0.1.1) (2014-08-04)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.1.0...0.1.1)
+
+## [0.1.0](https://github.com/avoidwork/tenso/tree/0.1.0) (2014-08-03)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.0.10...0.1.0)
+
+## [0.0.10](https://github.com/avoidwork/tenso/tree/0.0.10) (2014-08-03)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.0.9...0.0.10)
+
+## [0.0.9](https://github.com/avoidwork/tenso/tree/0.0.9) (2014-08-03)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.0.8...0.0.9)
+
+## [0.0.8](https://github.com/avoidwork/tenso/tree/0.0.8) (2014-08-03)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.0.7...0.0.8)
+
+## [0.0.7](https://github.com/avoidwork/tenso/tree/0.0.7) (2014-08-03)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.0.6...0.0.7)
+
+## [0.0.6](https://github.com/avoidwork/tenso/tree/0.0.6) (2014-08-02)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.0.5...0.0.6)
+
+## [0.0.5](https://github.com/avoidwork/tenso/tree/0.0.5) (2014-08-02)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.0.4...0.0.5)
+
+## [0.0.4](https://github.com/avoidwork/tenso/tree/0.0.4) (2014-08-02)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.0.3...0.0.4)
+
+## [0.0.3](https://github.com/avoidwork/tenso/tree/0.0.3) (2014-08-02)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.0.2...0.0.3)
+
+## [0.0.2](https://github.com/avoidwork/tenso/tree/0.0.2) (2014-08-02)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/0.0.1...0.0.2)
+
+## [0.0.1](https://github.com/avoidwork/tenso/tree/0.0.1) (2014-08-02)
+
+
+
+\* *This Change Log was automatically generated by [github_changelog_generator](https://github.com/skywinder/Github-Changelog-Generator)*

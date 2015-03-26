@@ -1,8 +1,16 @@
 # Change Log
 
-## [Unreleased](https://github.com/avoidwork/tenso/tree/HEAD)
+## [1.2.6](https://github.com/avoidwork/tenso/tree/1.2.6) (2015-03-26)
 
-[Full Changelog](https://github.com/avoidwork/tenso/compare/1.2.3...HEAD)
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.2.5...1.2.6)
+
+## [1.2.5](https://github.com/avoidwork/tenso/tree/1.2.5) (2015-03-20)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.2.4...1.2.5)
+
+## [1.2.4](https://github.com/avoidwork/tenso/tree/1.2.4) (2015-03-19)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.2.3...1.2.4)
 
 **Implemented enhancements:**
 

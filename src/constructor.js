@@ -146,6 +146,10 @@ class Tenso {
 		if ( !res._header ) {
 			ref = [ headers || {} ];
 
+			if ( res._headers ) {
+				merge( ref[ 0 ], res._headers );
+			}
+
 			if ( req.protect ) {
 				if ( ref[ 0 ][ "cache-control" ] === undefined && this.server.config.headers[ "cache-control" ] ) {
 					ref[ 0 ][ "cache-control" ] = clone( this.server.config.headers[ "cache-control" ], true );

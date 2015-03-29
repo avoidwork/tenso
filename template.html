@@ -36,9 +36,12 @@
     .code {
       font-family: monospace, "Lucida Console", Monaco, "Courier New", Courier
     }
-    span.space {
+    .spaces {
       display: inline-block;
-      width: 0.55em;
+      width: 1.1em;
+    }
+    .item {
+      font-weight: bold;
     }
   </style>
 </head>
@@ -52,7 +55,7 @@
       <div class="pure-u-24-24">
         <h2>{{url}}</h2>
       </div>
-      <div class="pure-u-6-24">
+      <div class="pure-u-8-24">
         <table class="pure-table pure-table-striped">
           <thead>
             <tr>
@@ -66,7 +69,7 @@
         </table>
       </div>
       <div class="pure-u-1-24"></div>
-      <div class="pure-u-17-24">
+      <div class="pure-u-15-24">
         <div class="code">
 <pre><code>{{body}}</code></pre>
         </div>
@@ -80,19 +83,47 @@
   <script src="http://cdn.keigai.io/keigai.min.js" type="application/javascript"></script>
   <script type="application/javascript">
     ( function ( keigai ) {
-      var $ = keigai.util.$;
-      var render = keigai.util.render;
+      var util = keigai.util;
+      var $ = util.$;
+      var array = util.array;
+      var render = util.render;
       var code = $( "code" )[ 0 ];
 
       render( function () {
-        var ncode;
+        var html = code.innerHTML,
+            matches, replaces;
 
-        code.parentNode.parentNode.innerHTML = code.innerHTML
-                .replace( /\n/g, "<br>" )
-                .replace( /\s/g, "<span class='space'></span>" );
+        matches = array.unique( html.match( /([^\s*]+)/g )
+                .filter( function ( i ){
+                  return !/(\{|\[|\]|\})/.test( i );
+                } ) );
 
-        ncode = $( ".code" )[0];
-        debugger;
+        replaces = matches.map( function ( i, idx ){
+          if ( i.indexOf( '"' ) > -1 ) {
+            return i.replace( /(\".*\")/, "<span class='item'>$1</span>" );
+          } else {
+            return i;
+          }
+        } );
+
+        array.iterate( matches, function ( i, idx ) {
+          html = html.replace( new RegExp( i, "g" ), replaces[ idx ] )
+        } );
+
+        code.parentNode.parentNode.innerHTML = html
+                .replace( /\n/g, "<br>\n" )
+                .replace(/(\s{2,2})/g, "<span class='spaces'></span>")
+
+        array.iterate( $( '.item', $( ".code" )[0] ), function ( i ) {
+          var html = i.innerHTML,
+              val = html.replace( /(^\"|\"$)/g, "" );
+
+          if ( val.indexOf( "://" ) > -1 ) {
+            html = html.replace( val, "<a href='" + val + "'>" + val + "</a>");
+          }
+
+          i.innerHTML = html;
+        } );
       } );
     } ) ( keigai );
   </script>

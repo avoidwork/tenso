@@ -102,7 +102,7 @@ class Tenso {
 	 * @param  {Object} headers HTTP response headers
 	 * @return {String}         HTTP response body
 	 */
-	render ( req, arg, headers, status ) {
+	render ( req, arg, headers ) {
 		let accept = req.headers.accept || "application/json";
 		let accepts = string.explode( accept, ";" );
 		let format = "json";
@@ -160,9 +160,10 @@ class Tenso {
 				ref[ 0 ][ this.server.config.security.key ] = res.locals[ this.server.config.security.key ];
 			}
 
+			status = status || 200;
 			ref[ 0 ] = this.server.headers( req, ref[ 0 ], status );
 
-			this.server.respond( req, res, this.render( req, hypermedia( this.server, req, response( arg, status ), ref[ 0 ] ), ref[ 0 ], status ), status, ref[ 0 ] );
+			this.server.respond( req, res, this.render( req, hypermedia( this.server, req, response( arg, status ), ref[ 0 ] ), ref[ 0 ] ), status, ref[ 0 ] );
 		}
 
 		return this;

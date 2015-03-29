@@ -115,7 +115,7 @@ class Tenso {
 
 		headers["content-type"] = renderers[ format ].header;
 
-		return renderers[ format ].fn( arg );
+		return renderers[ format ].fn( arg, req.allow );
 	}
 
 	/**

@@ -5,7 +5,8 @@
  */
 let renderers = {
 	html: {
-		fn: function ( arg ) {
+		fn: function ( arg, allow ) {
+			console.log(allow);
 			return arg;
 		},
 		header: "text/html"

@@ -6,8 +6,10 @@
 let renderers = {
 	html: {
 		fn: function ( arg, req, headers, tpl ) {
+			var protocol = req.headers[ "x-forwarded-proto" ] ? req.headers[ "x-forwarded-proto" ] + ":" : req.parsed.protocol;
+
 			return ( tpl || "" )
-				.replace( "{{url}}", req.parsed.href )
+				.replace( "{{url}}", req.parsed.href.replace( req.parsed.protocol, protocol ) )
 				.replace( "{{headers}}", Object.keys( headers ).map( function ( i ) {
 					return "<tr><td>"+ i + "</td><td>"+ sanitize( headers[ i ] ) + "</td></tr>";
 				} ).join( "\n" ) )

@@ -86,7 +86,9 @@ let bootstrap = ( obj, config ) => {
 
 	// Starting API server
 	obj.server.start( config, ( req, res, status, msg ) => {
-		error( obj.server, req, res, status, msg || obj.messages[ status ] );
+		var err = msg instanceof Error ? msg : new Error( msg || obj.messages[ status ] );
+
+		error( obj, req, res, status, err, obj );
 	} );
 
 	if ( notify ) {

@@ -5,5 +5,5 @@
  * @return {Undefined} undefined
  */
 let error = ( server, req, res, status, err ) => {
-	server.respond( req, res, prepare( null, err, status ), status );
+	server.respond( req, res, err, status );
 };

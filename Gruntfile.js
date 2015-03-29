@@ -27,6 +27,7 @@ module.exports = function (grunt) {
 					"src/keymaster.js",
 					"src/prepare.js",
 					"src/rate.js",
+					"src/renderers.js",
 					"src/response.js",
 					"src/zuul.js",
 					"src/outro.js"

@@ -93,6 +93,32 @@ class Tenso {
 	}
 
 	/**
+	 * Renders a response body, defaults to JSON
+	 *
+	 * @method render
+	 * @memberOf Tenso
+	 * @param  {Object} req     Client request
+	 * @param  {Object} arg     HTTP response body
+	 * @param  {Object} headers HTTP response headers
+	 * @return {String}         HTTP response body
+	 */
+	render ( req, arg, headers ) {
+		let accept = req.headers.accept || "application/json";
+		let format = "json";
+
+		array.iterate( this.server.config.renderers || [], function ( i ) {
+			if ( accept.indexOf( i ) > -1 ) {
+				format = i;
+				return false;
+			}
+		} );
+
+		headers["content-type"] = renderers[ format ].header;
+
+		return renderers[ format ].fn( arg );
+	}
+
+	/**
 	 * Sends a response to the Client
 	 *
 	 * @method respond
@@ -124,7 +150,7 @@ class Tenso {
 				ref[ 0 ][ this.server.config.security.key ] = res.locals[ this.server.config.security.key ];
 			}
 
-			this.server.respond( req, res, hypermedia( this.server, req, response( arg, status ), ref[ 0 ] ), status, ref[ 0 ] );
+			this.server.respond( req, res, this.render( req, hypermedia( this.server, req, response( arg, status ), ref[ 0 ] ), ref[ 0 ] ), status, ref[ 0 ] );
 		}
 
 		return this;

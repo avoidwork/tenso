@@ -11,7 +11,7 @@
  * @param  {Object} req     Client request
  * @param  {Object} rep     Serialized representation
  * @param  {Object} headers HTTP response headers
- * @return {Undefined}      undefined
+ * @return {Object}         HTTP response body
  */
 let hypermedia = ( server, req, rep, headers ) => {
 	let seen = {},

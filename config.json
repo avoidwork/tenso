@@ -58,6 +58,12 @@
 		"dtrace": false,
 		"stack": false
 	},
+	"renderers": [
+		"html",
+		"yaml",
+		"xml",
+		"json"
+	],
 	"security": {
 		"key": "x-csrf-token",
 		"secret": "tenso",

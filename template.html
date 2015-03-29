@@ -25,16 +25,20 @@
     article {
       padding: 25px;
     }
-    pre {
-      padding: 0px;
-      margin: 0px;
-    }
+    pre,
     code {
-      margin: 0px;
       padding: 0px;
+      margin: 0px;
     }
     footer {
       margin: 50px 25px;
+    }
+    .code {
+      font-family: monospace, "Lucida Console", Monaco, "Courier New", Courier
+    }
+    span.space {
+      display: inline-block;
+      width: 0.55em;
     }
   </style>
 </head>
@@ -63,7 +67,9 @@
       </div>
       <div class="pure-u-1-24"></div>
       <div class="pure-u-17-24">
+        <div class="code">
 <pre><code>{{body}}</code></pre>
+        </div>
       </div>
     </div>
   </article>
@@ -71,6 +77,24 @@
     <div>Copyright &copy; {{year}} <a href="http://avoidwork.com">Jason Mulligan</a><br />
       <a href="http://avoidwork.github.io/tenso">Tensō</a> {{version}}</div>
   </footer>
-  <script src="http://cdn.keigai.io/keigai.min.js" async="true"></script>
+  <script src="http://cdn.keigai.io/keigai.min.js" type="application/javascript"></script>
+  <script type="application/javascript">
+    ( function ( keigai ) {
+      var $ = keigai.util.$;
+      var render = keigai.util.render;
+      var code = $( "code" )[ 0 ];
+
+      render( function () {
+        var ncode;
+
+        code.parentNode.parentNode.innerHTML = code.innerHTML
+                .replace( /\n/g, "<br>" )
+                .replace( /\s/g, "<span class='space'></span>" );
+
+        ncode = $( ".code" )[0];
+        debugger;
+      } );
+    } ) ( keigai );
+  </script>
 </body>
 </html>

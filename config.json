@@ -59,10 +59,10 @@
 		"stack": false
 	},
 	"renderers": [
+		"json",
 		"html",
 		"yaml",
-		"xml",
-		"json"
+		"xml"
 	],
 	"security": {
 		"key": "x-csrf-token",

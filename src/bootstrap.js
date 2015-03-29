@@ -25,6 +25,7 @@ let bootstrap = ( obj, config ) => {
 		next();
 	}
 
+
 	let parse = ( req, res, next ) => {
 		let args, type;
 

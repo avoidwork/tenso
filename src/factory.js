@@ -17,10 +17,10 @@ let factory = ( arg ) => {
 	}
 
 	vhosts[ hostname ] = "www";
-	config.root = __dirname + "/../";
+	config.root = path.join( __dirname, ".." );
 	config.vhosts = vhosts;
 	config[ "default" ] = hostname;
-
+	config.template = fs.readFileSync( path.join( config.root, "template.html" ), { encoding: "utf8" } );
 	obj = new Tenso();
 	obj.hostname = hostname;
 

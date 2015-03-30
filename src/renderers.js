@@ -10,7 +10,7 @@ let renderers = {
 
 			return ( tpl || "" )
 				.replace( "{{url}}", req.parsed.href.replace( req.parsed.protocol, protocol ) )
-				.replace( "{{headers}}", Object.keys( headers ).map( function ( i ) {
+				.replace( "{{headers}}", Object.keys( headers ).sort( array.sort ).map( function ( i ) {
 					return "<tr><td>"+ i + "</td><td>"+ sanitize( headers[ i ] ) + "</td></tr>";
 				} ).join( "\n" ) )
 				.replace( "{{body}}", JSON.stringify( arg, null, 2 ) )

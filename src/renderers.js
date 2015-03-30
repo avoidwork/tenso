@@ -13,8 +13,10 @@ let renderers = {
 				.replace( "{{headers}}", Object.keys( headers ).sort( array.sort ).map( function ( i ) {
 					return "<tr><td>"+ i + "</td><td>"+ sanitize( headers[ i ] ) + "</td></tr>";
 				} ).join( "\n" ) )
+				.replace( "{{formats}}", req.server.config.renderers.map( function ( i ) {
+					return "<option value='"+ i + "'>"+ i.toUpperCase() + "</option>";
+				} ).join( "\n" ) )
 				.replace( "{{body}}", JSON.stringify( arg, null, 2 ) )
-				.replace( "{{formats}}", JSON.stringify( req.server.config.renderers, null, 2 ) )
 				.replace( "{{year}}", new Date().getFullYear() )
 				.replace( "{{version}}", "{{VERSION}}" );
 		},

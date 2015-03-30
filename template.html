@@ -72,7 +72,15 @@
 
         h2 {
             font-size: 1.8em;
+        }
+
+        formset,
+        h2 {
             margin-bottom: 25px;
+        }
+
+        formset {
+            display: block;
         }
 
         header {
@@ -191,6 +199,11 @@
 </header>
 <article>
     <h2 class="overflow">{{url}}</h2>
+    <formset>
+        <select id="formats">
+            {{formats}}
+        </select>
+    </formset>
     <div>
         <div class="float">
             <table>
@@ -230,7 +243,13 @@
         var array = util.array;
         var render = util.render;
         var code = $( "code" )[ 0 ];
-        var formats = {{formats}};
+        var formats = $( "#formats" )[0];
+        var observable = util.observer();
+
+        observable.hook( formats, "select" );
+        observable.on( "select", function ( e ) {
+            debugger;
+        } );
 
         render( function () {
             var html = code.innerHTML,

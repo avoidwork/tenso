@@ -436,48 +436,37 @@
     a {
       color: #1badd1;
     }
+
     a:hover {
       color: #1b7498;
     }
+
     h1, h2, h3, h4, h5, h6 {
       margin: 0px;
     }
+
     h2 {
       margin-bottom: 25px;
     }
+
     header {
       color: #fff;
       background: #1badd1;
-      padding: 25px;
     }
+
+    header,
     article {
       padding: 25px;
     }
+
     pre,
     code {
       padding: 0px;
       margin: 0px;
     }
+
     footer {
       margin: 50px 25px;
-    }
-    .code {
-      font-family: monospace, "Lucida Console", Monaco, "Courier New", Courier
-    }
-    .spaces {
-      display: inline-block;
-      width: 1.1em;
-    }
-    .item {
-      font-weight: bold;
-    }
-    .float {
-      display: inline-block;
-      width: 33%;
-      vertical-align: top;
-    }
-    .float:last-child {
-      width: 66%;
     }
 
     table {
@@ -510,6 +499,35 @@
       border-right: 1px solid #ccc;
     }
 
+    .code {
+      font-family: monospace, "Lucida Console", Monaco, "Courier New", Courier
+    }
+
+    .spaces {
+      display: inline-block;
+      width: 1.1em;
+    }
+
+    .item {
+      font-weight: bold;
+    }
+
+    .float {
+      display: inline-block;
+      width: 33%;
+      vertical-align: top;
+    }
+
+    .float:last-child {
+      width: 66%;
+    }
+
+    .overflow {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     @media (max-width: 899px) {
       .float {
         display: block !important;
@@ -523,6 +541,14 @@
       table {
         margin: 0px !important;
       }
+
+      header,
+      article {
+        padding: 10px;
+      }
+      footer {
+        margin: 50px 10px;
+      }
     }
 
     @media (min-width: 900px) and (max-width: 1280px) {
@@ -535,27 +561,26 @@
 
 <body>
   <header>
-    <h1>Tensō Browsable API</h1>
+    <h1 class="overflow">Tensō Browsable API</h1>
   </header>
   <article>
-      <h2>{{url}}</h2>
-      <div>
-        <div class="float">
-          <table>
-            <thead>
-              <tr>
-                <th>Header</th>
-                <th>Value</th>
-              </tr>
-            </thead>
-            <tbody>
-            {{headers}}
-            </tbody>
-          </table>
-        </div>
-        <div class="code float">
+    <h2 class="overflow">{{url}}</h2>
+    <div>
+      <div class="float">
+        <table>
+          <thead>
+            <tr>
+              <th>Header</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+          {{headers}}
+          </tbody>
+        </table>
+      </div>
+      <div class="code float">
 <pre><code>{{body}}</code></pre>
-        </div>
       </div>
     </div>
   </article>

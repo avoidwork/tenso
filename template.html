@@ -242,13 +242,13 @@
             $ = util.$,
             array = util.array,
             element = util.element,
-            code = $( "code" )[ 0],
-            formats = $( "select" )[0],
+            code = $( "code" )[ 0 ],
+            formats = $( "select" )[ 0 ],
             observable = util.observer();
 
         observable.hook( formats, "change" );
         observable.on( "change", function () {
-            var value = element.val( formats),
+            var value = element.val( formats ),
                 parsed = keigai.util.parse();
 
             // This shouldn't happen, but lets assume it does...
@@ -292,7 +292,7 @@
                     .replace( /\n/g, "<br>\n" )
                     .replace(/(\s{2,2})/g, "<span class='spaces'></span>")
 
-            array.iterate( $( '.item', $( ".code" )[0] ), function ( i ) {
+            array.iterate( $( '.item' ), function ( i ) {
                 var html = i.innerHTML,
                         val = html.replace( /(^\"|\"$)/g, "" );
 

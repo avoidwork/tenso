@@ -59,8 +59,8 @@
 		"stack": false
 	},
 	"renderers": [
-		"json",
 		"html",
+		"json",
 		"yaml",
 		"xml"
 	],

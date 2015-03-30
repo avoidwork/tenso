@@ -14,6 +14,7 @@ let renderers = {
 					return "<tr><td>"+ i + "</td><td>"+ sanitize( headers[ i ] ) + "</td></tr>";
 				} ).join( "\n" ) )
 				.replace( "{{body}}", JSON.stringify( arg, null, 2 ) )
+				.replace( "{{formats}}", JSON.stringify( req.server.config.renderers, null, 2 ) )
 				.replace( "{{year}}", new Date().getFullYear() )
 				.replace( "{{version}}", "{{VERSION}}" );
 		},

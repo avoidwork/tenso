@@ -66,7 +66,7 @@ let bootstrap = ( obj, config ) => {
 	if ( config.routes instanceof Object ) {
 		iterate( config.routes, ( routes, method ) => {
 			iterate( routes, ( arg, route ) => {
-				if ( typeof arg == "function" ) {
+				if ( typeof arg === "function" ) {
 					obj.server[ method ]( route, (...args) => {
 						arg.apply( obj, args );
 					} );

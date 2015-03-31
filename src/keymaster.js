@@ -22,7 +22,7 @@ let keymaster = ( req, res, next ) => {
 			if ( uri in routes ) {
 				result = routes[ uri ];
 
-				if ( typeof result == "function" ) {
+				if ( typeof result === "function" ) {
 					result.call( obj, req, res );
 				} else {
 					obj.respond( req, res, result );
@@ -39,7 +39,7 @@ let keymaster = ( req, res, next ) => {
 				} );
 
 				if ( result ) {
-					if ( typeof result == "function" ) {
+					if ( typeof result === "function" ) {
 						result.call( obj, req, res );
 					} else {
 						obj.respond( req, res, result );

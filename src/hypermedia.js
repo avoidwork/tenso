@@ -106,7 +106,7 @@ let hypermedia = ( server, req, rep, headers ) => {
 			array.iterate( rep.data.result, ( i ) => {
 				let uri;
 
-				if ( typeof i == "string" && REGEX.scheme.test( i ) ) {
+				if ( typeof i === "string" && REGEX.scheme.test( i ) ) {
 					uri = i.indexOf( "//" ) > -1 ? i : protocol + "//" + req.parsed.host + i;
 
 					if ( uri !== root ) {

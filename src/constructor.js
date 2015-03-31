@@ -54,7 +54,7 @@ class Tenso {
 			};
 		}
 
-		if ( typeof fn == "function" ) {
+		if ( typeof fn === "function" ) {
 			this.rates[ id ] = fn( req, this.rates[ id ] );
 		}
 
@@ -155,7 +155,7 @@ class Tenso {
 					ref[ 0 ][ "cache-control" ] = clone( this.server.config.headers[ "cache-control" ], true );
 				}
 
-				if ( ref[ 0 ][ "cache-control" ] !== undefined && ref[ 0 ][ "cache-control" ].indexOf( "private " ) == -1 ) {
+				if ( ref[ 0 ][ "cache-control" ] !== undefined && ref[ 0 ][ "cache-control" ].indexOf( "private " ) === -1 ) {
 					ref[ 0 ][ "cache-control" ] = "private " + ref[ 0 ][ "cache-control" ];
 				}
 			}

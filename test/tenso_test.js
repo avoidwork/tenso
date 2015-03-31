@@ -19,6 +19,8 @@ function get_token ( port, fn, url ) {
 	return api( port ).get( url || "/login" ).end( fn );
 }
 
+process.setMaxListeners(0);
+
 describe( "Permissions (CSRF disabled)", function () {
 	var port = 8001;
 
@@ -726,5 +728,80 @@ describe( "Request body max byte size", function () {
 					done();
 				} );
 		}, "/test" );
+	} );
+} );
+
+describe( "Renderers", function () {
+	var port = 8010;
+
+	tenso( { port: port, routes: routes, logs: { level: "error" } } );
+
+	it( "GET HTML (header)", function ( done ) {
+		api( port, true )
+			.get( "/" )
+			.header( "accept", "text/html" )
+			.expectStatus( 200 )
+			.expectHeader( "Content-Type", "text/html" )
+			.end( function ( err ) {
+				if ( err ) throw err;
+				done();
+			} );
+	} );
+
+	it( "GET HTML (query string)", function ( done ) {
+		api( port, true )
+			.get( "/?format=html" )
+			.expectStatus( 200 )
+			.expectHeader( "Content-Type", "text/html" )
+			.end( function ( err ) {
+				if ( err ) throw err;
+				done();
+			} );
+	} );
+
+	it( "GET YAML (header)", function ( done ) {
+		api( port, true )
+			.get( "/" )
+			.header( "accept", "application/yaml" )
+			.expectStatus( 200 )
+			.expectHeader( "Content-Type", "application/yaml" )
+			.end( function ( err ) {
+				if ( err ) throw err;
+				done();
+			} );
+	} );
+
+	it( "GET YAML (query string)", function ( done ) {
+		api( port, true )
+			.get( "/?format=yaml" )
+			.expectStatus( 200 )
+			.expectHeader( "Content-Type", "application/yaml" )
+			.end( function ( err ) {
+				if ( err ) throw err;
+				done();
+			} );
+	} );
+
+	it( "GET XML (header)", function ( done ) {
+		api( port, true )
+			.get( "/" )
+			.header( "accept", "application/xml" )
+			.expectStatus( 200 )
+			.expectHeader( "Content-Type", "application/xml" )
+			.end( function ( err ) {
+				if ( err ) throw err;
+				done();
+			} );
+	} );
+
+	it( "GET XML (query string)", function ( done ) {
+		api( port, true )
+			.get( "/?format=xml" )
+			.expectStatus( 200 )
+			.expectHeader( "Content-Type", "application/xml" )
+			.end( function ( err ) {
+				if ( err ) throw err;
+				done();
+			} );
 	} );
 } );

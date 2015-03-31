@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tensō is a REST API facade for node.js, designed to simplify the implementation of APIs.",
-  "version": "1.3.16",
+  "version": "1.3.17",
   "homepage": "http://avoidwork.github.io/tenso",
   "author": {
     "name": "Jason Mulligan",
@@ -43,7 +43,7 @@
     "passport-oauth2": "~1.1.2",
     "passport-saml": "~0.9.1",
     "passport-twitter": "~1.0.2",
-    "turtle.io": "~3.2.16",
+    "turtle.io": "~3.2.17",
     "yamljs": "^0.2.1"
   },
   "devDependencies": {

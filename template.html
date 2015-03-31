@@ -204,7 +204,8 @@
 			cursor: pointer;
 		}
 
-		#io p {
+		#methods,
+		#body {
 			margin-bottom: 25px;
 		}
 
@@ -287,8 +288,7 @@
 							{{methods}}
 						</select>
 						<fieldset id="body">
-							<p>JSON is required</p>
-							<textarea></textarea>
+							<textarea placeholder="JSON is required"></textarea>
 						</fieldset>
 						<button type="submit">Submit</button> <button type="reset">Reset</button>
 					</form>
@@ -369,6 +369,23 @@
 		} );
 
 		render( function () {
+			var del = /DELETE/,
+				body = $( "#body" )[ 0 ],
+				reset = $( "button[type='reset']" )[ 0 ],
+				methods, observable;
+
+			function toggle ( type ) {
+				render( function () {
+					if ( del.test( type ) ) {
+						element.addClass( body, "hidden" );
+						element.addClass( reset, "hidden" );
+					} else {
+						element.removeClass( body, "hidden" );
+						element.removeClass( reset, "hidden" );
+					}
+				} );
+			}
+
 			// Changing <pre> into selectable Elements
 			code.parentNode.parentNode.innerHTML = html
 					.replace( /\n/g, "<br>\n" )
@@ -387,6 +404,8 @@
 			} );
 
 			if ( csrf ) {
+				methods = $( "#methods" );
+				observable = util.observer();
 				nav = $( "#io nav" )[0];
 
 				// Toggling IO nav
@@ -413,12 +432,22 @@
 					} );
 				} );
 
+				// Reacting to a method change
+				observable.hook( methods, "change" );
+				observable.on( "change", function ( e ) {
+					util.stop( e );
+					toggle( element.val( util.target( e ) ) );
+				} );
+
 				// Intercepting form submission
 				observable.hook( $( "#io form" )[0], "submit" );
 				observable.on( "submit", function ( e ) {
 					util.stop( e );
 					debugger;
 				} );
+
+				// Initial render
+				toggle( element.val( methods ) );
 			}
 		} );
 	} ) ( keigai );

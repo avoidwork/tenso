@@ -645,7 +645,7 @@
 						}
 					}
 
-					request( parsed.href, method, payload, { "x-csrf-token": csrf, "content-type": "application/json" } ).then( function ( arg ) {
+					request( parsed.href, method, payload, { "accept": "application/json", "content-type": "application/json", "x-csrf-token": csrf } ).then( function ( arg ) {
 						humane.success( "Success!" );
 
 						render( function () {

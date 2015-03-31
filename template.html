@@ -527,8 +527,8 @@
 		}
 
 		// Setting up humane
-		humane.error = humane.spawn({ addnCls: 'humane-jackedup-error', timeout: 5000 });
-		humane.success = humane.spawn({ addnCls: 'humane-jackedup-success', timeout: 5000 });
+		humane.error = humane.spawn({ addnCls: 'humane-jackedup-error', timeout: 3000 });
+		humane.success = humane.spawn({ addnCls: 'humane-jackedup-success', timeout: 3000 });
 
 		// Resetting for someone returning to the HTML renderer from another format
 		element.val( formats, "html" );
@@ -560,6 +560,12 @@
 				form = $( "#io form" )[ 0 ],
 				reset = $( "button[type='reset']" )[ 0 ],
 				methods, observable, result, resultCode;
+
+			function clear () {
+				element.addClass( result, "hidden" );
+				result.querySelector( ".code" ).innerHTML = "<pre><code></code></pre>";
+				resultCode = result.querySelector( "code" );
+			}
 
 			function toggle ( type ) {
 				render( function () {
@@ -618,10 +624,7 @@
 				observable.hook( form, "submit" );
 
 				observable.on( "reset", function ( e ) {
-					render( function () {
-						element.addClass( result, "hidden" );
-						resultCode.innerHTML = "";
-					} );
+					render( clear );
 				} );
 
 				observable.on( "submit", function ( e ) {
@@ -629,11 +632,7 @@
 						payload;
 
 					util.stop( e );
-
-					render( function () {
-						element.addClass( result, "hidden" );
-						resultCode.innerHTML = "";
-					} );
+					render( clear );
 
 					if ( !del.test( method ) ) {
 						payload = element.val( $( "textarea" )[ 0 ] ) || "";

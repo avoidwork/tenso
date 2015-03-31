@@ -18,7 +18,14 @@ let renderers = {
 				} ).join( "\n" ) )
 				.replace( "{{body}}", JSON.stringify( arg, null, 2 ) )
 				.replace( "{{year}}", new Date().getFullYear() )
-				.replace( "{{version}}", "{{VERSION}}" );
+				.replace( "{{version}}", "{{VERSION}}" )
+				.replace( "{{allow}}", headers[ "allow" ] )
+				.replace( "{{methods}}", string.explode( headers[ "allow" ].replace( "GET, HEAD, OPTIONS", "" ) ).filter( function ( i ) {
+					return i !== "";
+				} ).map( function ( i ) {
+					return "<option value='" + i + "'>"+ i + "</option>";
+				} ).join( "\n" ) )
+				.replace( "{{csrf}}", headers[ "x-csrf-token" ] || "" );
 		},
 		header: "text/html"
 	},

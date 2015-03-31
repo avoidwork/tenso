@@ -138,6 +138,12 @@
 			border-right: 1px solid #ccc;
 		}
 
+		textarea {
+			width: 100%;
+			display: inline-block;
+			height: 400px;
+		}
+
 		.code {
 			font-family: monospace, "Lucida Console", Monaco, "Courier New", Courier
 		}
@@ -165,6 +171,41 @@
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
+		}
+
+		.hidden {
+			display: none;
+		}
+
+		nav {
+			border-bottom: 1px solid #ccc;
+			margin-bottom: 10px;
+		}
+
+		nav ul li {
+			display: inline-block;
+			font-weight: bold;
+			margin-bottom: 10px;
+		}
+
+		nav ul li:first-child {
+			margin-right: 25px;
+		}
+
+		nav ul li a {
+			font-weight: normal;
+		}
+
+		nav ul li a.active {
+			font-weight: bold;
+		}
+
+		nav ul li a:hover {
+			cursor: pointer;
+		}
+
+		#io p {
+			margin-bottom: 25px;
 		}
 
 		@media (max-width: 899px) {
@@ -228,8 +269,31 @@
 				</tbody>
 			</table>
 		</div>
-		<div class="code float">
-			<pre><code>{{body}}</code></pre>
+		<div id="io" class="float">
+			<nav class="hidden">
+				<ul>
+					<li><a class="active" data-type="code">Response</a></li>
+					<li><a data-type="form">Send Request</a></li>
+				</ul>
+			</nav>
+			<div>
+				<div class="code">
+					<pre><code>{{body}}</code></pre>
+				</div>
+				<div class="form hidden">
+					<form>
+						<label for="methods">Method</label>
+						<select id="methods">
+							{{methods}}
+						</select>
+						<fieldset id="body">
+							<p>JSON is required</p>
+							<textarea></textarea>
+						</fieldset>
+						<button type="submit">Submit</button> <button type="reset">Reset</button>
+					</form>
+				</div>
+			</div>
 		</div>
 	</div>
 </article>
@@ -252,9 +316,15 @@
 			$ = util.$,
 			array = util.array,
 			element = util.element,
+			render = util.render,
 			code = $( "code" )[ 0 ],
 			formats = $( "select" )[ 0 ],
-			observable = util.observer();
+			observable = util.observer(),
+			parsed = keigai.util.parse(),
+			allows = "{{allow}}",
+			csrf = "{{csrf}}",
+			html = code.innerHTML,
+			matches, nav, replaces;
 
 		// Resetting for someone returning to the HTML renderer from another format
 		element.val( formats, "html" );
@@ -262,8 +332,7 @@
 		// Hooking into the input
 		observable.hook( formats, "change" );
 		observable.on( "change", function () {
-			var value = element.val( formats ),
-				parsed = keigai.util.parse();
+			var value = element.val( formats );
 
 			// This shouldn't happen, but lets assume it does...
 			if ( value === "html" ) {
@@ -281,31 +350,31 @@
 			}
 		} );
 
-		util.render( function () {
-			var html = code.innerHTML,
-				matches, replaces;
+		// Preparing to change <pre> into Elements
+		matches = array.unique( html.match( /([^\s*]+)/g )
+				.filter( function ( i ){
+					return !/(\{|\[|\]|\})/.test( i );
+				} ) );
 
-			matches = array.unique( html.match( /([^\s*]+)/g )
-					.filter( function ( i ){
-						return !/(\{|\[|\]|\})/.test( i );
-					} ) );
+		replaces = matches.map( function ( i ){
+			if ( i.indexOf( '"' ) > -1 ) {
+				return i.replace( /(\".*\")/, "<span class='item'>$1</span>" );
+			} else {
+				return i;
+			}
+		} );
 
-			replaces = matches.map( function ( i ){
-				if ( i.indexOf( '"' ) > -1 ) {
-					return i.replace( /(\".*\")/, "<span class='item'>$1</span>" );
-				} else {
-					return i;
-				}
-			} );
+		array.iterate( matches, function ( i, idx ) {
+			html = html.replace( new RegExp( i, "g" ), replaces[ idx ] )
+		} );
 
-			array.iterate( matches, function ( i, idx ) {
-				html = html.replace( new RegExp( i, "g" ), replaces[ idx ] )
-			} );
-
+		render( function () {
+			// Changing <pre> into selectable Elements
 			code.parentNode.parentNode.innerHTML = html
 					.replace( /\n/g, "<br>\n" )
-					.replace(/(\s{2,2})/g, "<span class='spaces'></span>")
+					.replace(/(\s{2,2})/g, "<span class='spaces'></span>" );
 
+			// Changing URIs into anchors
 			array.iterate( $( '.item' ), function ( i ) {
 				var html = i.innerHTML,
 						val = html.replace( /(^\"|\"$)/g, "" );
@@ -316,6 +385,41 @@
 
 				i.innerHTML = html;
 			} );
+
+			if ( csrf ) {
+				nav = $( "#io nav" )[0];
+
+				// Toggling IO nav
+				element.removeClass( nav, "hidden" );
+
+				// Enabling navigation
+				observable.hook( nav, "click" );
+				observable.on( "click", function ( e ) {
+					var anchor = util.target( e ),
+						type = element.data( anchor, "type" ),
+						target = $( "#io ." + type )[0];
+
+					util.stop( e );
+
+					if ( element.hasClass( target, "active" ) ) {
+						return;
+					}
+
+					render( function () {
+						element.addClass( anchor, "active" );
+						element.removeClass( ( anchor.parentNode.nextElementSibling || anchor.parentNode.previousElementSibling ).childNodes[ 0 ], "active" );
+						element.removeClass( target, "hidden" );
+						element.addClass( ( target.nextElementSibling || target.previousElementSibling ), "hidden" );
+					} );
+				} );
+
+				// Intercepting form submission
+				observable.hook( $( "#io form" )[0], "submit" );
+				observable.on( "submit", function ( e ) {
+					util.stop( e );
+					debugger;
+				} );
+			}
 		} );
 	} ) ( keigai );
 </script>

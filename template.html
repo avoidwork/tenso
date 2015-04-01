@@ -561,6 +561,7 @@ var f=new RegExp(c,"i"),g=e?"":utility.walk(b.data,d);return e&&f.test(b.key)||f
 
 		render( function () {
 			var del = /DELETE/,
+				a = /A/,
 				body = $( "#body" )[ 0 ],
 				form = $( "#io form" )[ 0 ],
 				reset = $( "button[type='reset']" )[ 0 ],
@@ -604,7 +605,7 @@ var f=new RegExp(c,"i"),g=e?"":utility.walk(b.data,d);return e&&f.test(b.key)||f
 
 					util.stop( e );
 
-					if ( anchor.nodeName !== "A" ) {
+					if ( !a.test( anchor.nodeName ) ) {
 						return;
 					}
 

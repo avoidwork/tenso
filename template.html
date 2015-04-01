@@ -181,6 +181,7 @@
 		/** Custom styles */
 		body {
 			font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+			font-size: 16px;
 		}
 
 		a {
@@ -202,7 +203,7 @@
 
 		form,
 		h2 {
-			margin-bottom: 25px;
+			margin-bottom: 1.4em;
 		}
 
 		form {
@@ -218,9 +219,12 @@
 			background: #1badd1;
 		}
 
-		header,
+		header {
+			padding: 1.4em;
+		}
+
 		article {
-			padding: 25px;
+			margin: 1.4em;
 		}
 
 		pre,
@@ -230,12 +234,14 @@
 		}
 
 		footer {
-			margin: 50px 25px;
+			margin: 2.8em 1.4em;
 		}
 
 		table {
 			border: 1px solid #ccc;
 			margin-right: 1em;
+			table-layout: fixed;
+			width: 100%;
 		}
 
 		th,
@@ -243,6 +249,9 @@
 			text-align: left;
 			padding: 0.4em;
 			border-bottom: 1px solid #ccc;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
 		}
 
 		th {
@@ -284,12 +293,16 @@
 
 		.float {
 			display: inline-block;
-			width: 33%;
+			width: 40%;
 			vertical-align: top;
 		}
 
+		.float:first-child {
+			margin-right: 3%;
+		}
+
 		.float:last-child {
-			width: 66%;
+			width: 50%;
 		}
 
 		.overflow {
@@ -304,17 +317,17 @@
 
 		nav {
 			border-bottom: 1px solid #ccc;
-			margin-bottom: 10px;
+			margin-bottom: 0.6em;
 		}
 
 		nav ul li {
 			display: inline-block;
 			font-weight: bold;
-			margin-bottom: 10px;
+			margin-bottom: 0.6em;
 		}
 
 		nav ul li:first-child {
-			margin-right: 25px;
+			margin-right: 1.4em;
 		}
 
 		nav ul li a {
@@ -354,26 +367,21 @@
 
 			.float:first-child {
 				margin-bottom: 25px;
+				margin-right: 0 !important;
 			}
 
 			table {
 				margin: 0 !important;
 			}
 
-			header,
-			article {
-				padding: 10px;
-                width: 100%;
-                display: block;
-			}
 			footer {
 				margin: 50px 10px;
 			}
 		}
 
-		@media (min-width: 900px) and (max-width: 1440px) {
+		@media (min-width: 900px) and (max-width: 1280px) {
 			.float {
-				width: 49% !important;
+				width: 48% !important;
 			}
 		}
 	</style>

@@ -476,9 +476,9 @@ var f=new RegExp(c,"i"),g=e?"":utility.walk(b.data,d);return e&&f.test(b.key)||f
 			array = util.array,
 			element = util.element,
 			json= util.json,
+			regex = util.regex,
 			render = util.render,
 			request = util.request,
-			string = util.string,
 			code = $( "code" )[ 0 ],
 			formats = $( "select" )[ 0 ],
 			observable = util.observer(),
@@ -649,9 +649,17 @@ var f=new RegExp(c,"i"),g=e?"":utility.walk(b.data,d);return e&&f.test(b.key)||f
 					if ( !del.test( method ) ) {
 						payload = element.val( $( "textarea" )[ 0 ] ) || "";
 
-						if ( typeof payload === "string" && ( string.isEmpty( payload ) || /^(\[|\{)/.test( payload ) ) ) {
+						try {
+							// Handles Arrays, Objects & Primitives
+							if ( regex.json_wrap.test( payload ) ) {
+								payload = JSON.stringify( payload );
+							}
+
+							payload = JSON.stringify( JSON.parse( payload ) );
+						}
+						catch ( e )  {
 							humane.error( "Invalid JSON" );
-							console.error( new Error( "Invalid JSON" ) );
+							console.error( e.stack );
 							return;
 						}
 					}

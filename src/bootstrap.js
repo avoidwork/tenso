@@ -42,7 +42,7 @@ let bootstrap = ( obj, config ) => {
 			}
 
 			if ( REGEX.encode_json.test( type ) ) {
-				req.body = json.decode( req.body, true );
+				req.body = json.decode( req.body, true ) || req.body;
 			}
 		}
 

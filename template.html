@@ -657,7 +657,7 @@
 							element.removeClass( result, "hidden" );
 						} );
 					}, function ( e ) {
-						var data = JSON.parse( e.message ) || { error: "An error has occurred" };
+						var data = json.decode( e.message, true ) || { error: e.message || "An error has occurred" };
 
 						humane.error( data.error );
 						render( function () {

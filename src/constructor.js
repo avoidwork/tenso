@@ -85,6 +85,7 @@ class Tenso {
 	 * @param  {Object} req Client request
 	 * @param  {Object} res Client response
 	 * @param  {Mixed}  uri Target URI
+	 * @return {Object} {@link Tenso}
 	 */
 	redirect ( req, res, uri ) {
 		this.server.respond( req, res, this.server.messages.NO_CONTENT, this.server.codes.FOUND, { location: uri } );
@@ -129,6 +130,23 @@ class Tenso {
 	}
 
 	/**
+	 * Registers a renderer
+	 *
+	 * @method renderer
+	 * @memberOf Tenso
+	 * @param {String}   name     Name of the renderer, e.g. "html"
+	 * @param {Function} fn       Function accepts `arg, req, headers, template`
+	 * @param {String}   mimetype Content-Type value
+	 * @return {Object}           {@link Tenso}
+	 */
+	renderer ( name, fn, mimetype ) {
+		renderers[ name ] = { fn: fn, header: mimetype };
+		array.add( this.server.config.renderers, name );
+
+		return this;
+	}
+
+	/**
 	 * Sends a response to the Client
 	 *
 	 * @method respond
@@ -138,7 +156,7 @@ class Tenso {
 	 * @param  {Mixed}  arg     Response body
 	 * @param  {Number} status  Response status
 	 * @param  {Object} headers Response headers
-	 * @return {Undefined}      undefined
+	 * @return {Object}         {@link Tenso}
 	 */
 	respond ( req, res, arg, status, headers ) {
 		let ref;

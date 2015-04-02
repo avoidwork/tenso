@@ -732,9 +732,10 @@ describe( "Request body max byte size", function () {
 } );
 
 describe( "Renderers", function () {
-	var port = 8010;
+	var port = 8010, server;
 
-	tenso( { port: port, routes: routes, logs: { level: "error" } } );
+	server = tenso( { port: port, routes: routes, logs: { level: "error" } } );
+	server.renderer( "custom", function ( arg ) { return arg; }, "application/json");
 
 	it( "GET CSV (header)", function ( done ) {
 		api( port, true )
@@ -822,6 +823,29 @@ describe( "Renderers", function () {
 			.get( "/?format=xml" )
 			.expectStatus( 200 )
 			.expectHeader( "Content-Type", "application/xml" )
+			.end( function ( err ) {
+				if ( err ) throw err;
+				done();
+			} );
+	} );
+
+	it( "GET Custom (header)", function ( done ) {
+		api( port, true )
+			.get( "/" )
+			.header( "accept", "application/custom" )
+			.expectStatus( 200 )
+			.expectHeader( "Content-Type", "application/json" )
+			.end( function ( err ) {
+				if ( err ) throw err;
+				done();
+			} );
+	} );
+
+	it( "GET Custom (query string)", function ( done ) {
+		api( port, true )
+			.get( "/?format=custom" )
+			.expectStatus( 200 )
+			.expectHeader( "Content-Type", "application/json" )
 			.end( function ( err ) {
 				if ( err ) throw err;
 				done();

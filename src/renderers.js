@@ -4,6 +4,13 @@
  * @type {Object}
  */
 let renderers = {
+	csv: {
+		fn: function ( arg, req ) {
+			req.headers.accept = "text/csv";
+			return arg.data.result;
+		},
+		header: "text/csv"
+	},
 	html: {
 		fn: function ( arg, req, headers, tpl ) {
 			var protocol = req.headers[ "x-forwarded-proto" ] ? req.headers[ "x-forwarded-proto" ] + ":" : req.parsed.protocol;

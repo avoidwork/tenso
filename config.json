@@ -60,6 +60,7 @@
 	},
 	"renderers": [
 		"html",
+		"csv",
 		"json",
 		"yaml",
 		"xml"

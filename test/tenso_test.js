@@ -736,6 +736,29 @@ describe( "Renderers", function () {
 
 	tenso( { port: port, routes: routes, logs: { level: "error" } } );
 
+	it( "GET CSV (header)", function ( done ) {
+		api( port, true )
+			.get( "/" )
+			.header( "accept", "text/csv" )
+			.expectStatus( 200 )
+			.expectHeader( "Content-Type", "text/csv" )
+			.end( function ( err ) {
+				if ( err ) throw err;
+				done();
+			} );
+	} );
+
+	it( "GET CSV (query string)", function ( done ) {
+		api( port, true )
+			.get( "/?format=csv" )
+			.expectStatus( 200 )
+			.expectHeader( "Content-Type", "text/csv" )
+			.end( function ( err ) {
+				if ( err ) throw err;
+				done();
+			} );
+	} );
+
 	it( "GET HTML (header)", function ( done ) {
 		api( port, true )
 			.get( "/" )

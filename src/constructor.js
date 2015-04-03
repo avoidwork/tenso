@@ -108,10 +108,10 @@ class Tenso {
 		let accepts = string.explode( accept, ";" );
 		let format = "json";
 
-		array.iterate( this.server.config.renderers || [], function ( i ) {
+		array.each( this.server.config.renderers || [], function ( i ) {
 			var found = false;
 
-			array.iterate( accepts, function ( x ) {
+			array.each( accepts, function ( x ) {
 				if ( x.indexOf( i ) > -1 ) {
 					format = i;
 					found = true;

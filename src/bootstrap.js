@@ -36,7 +36,7 @@ let bootstrap = ( obj, config ) => {
 				args = req.body ? array.chunk( req.body.split( REGEX.body_split ), 2 ) : [];
 				req.body = {};
 
-				array.iterate( args, ( i ) => {
+				array.each( args, ( i ) => {
 					req.body[ i[ 0 ] ] = coerce( i[ 1 ] );
 				} );
 			}

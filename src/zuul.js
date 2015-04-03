@@ -10,7 +10,7 @@ let zuul = ( protect ) => {
 		let uri = req.parsed.path,
 			protectd = false;
 
-		array.iterate( protect, ( r ) => {
+		array.each( protect, ( r ) => {
 			if ( r.test( uri ) ) {
 				return !( protectd = true );
 			}

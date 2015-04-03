@@ -26,6 +26,8 @@ describe( "Pagination", function () {
 
 	tenso( { port: port, routes: routes, logs: { level: "error" } } );
 
+	this.timeout(5000);
+
 	it( "GET /empty - returns an empty array", function ( done ) {
 		api( port )
 			.get( "/empty" )
@@ -169,6 +171,8 @@ describe( "Hypermedia", function () {
 
 	tenso( { port: port, routes: routes, logs: { level: "error" } } );
 
+	this.timeout(5000);
+
 	it( "GET /things - returns a collection of representations that has hypermedia properties", function ( done ) {
 		api( port )
 			.get( "/things" )
@@ -252,6 +256,8 @@ describe( "Rate Limiting", function () {
 
 	tenso( { port: port, routes: routes, logs: { level: "error" }, rate: { enabled: true, limit: 2, reset: 900 } } );
 
+	this.timeout(5000);
+
 	it( "GET / - returns an array of endpoints (1/2)", function ( done ) {
 		console
 		api( port )
@@ -330,6 +336,8 @@ describe( "Rate Limiting (Override)", function () {
 		}
 	} );
 
+	this.timeout(5000);
+
 	it( "GET / - returns an array of endpoints (1/2)", function ( done ) {
 		api( port )
 			.get( "/" )
@@ -373,6 +381,8 @@ describe( "Request body max byte size", function () {
 	var port = 8008;
 
 	tenso( { port: port, routes: routes, logs: { level: "error" }, maxBytes: 10 } );
+
+	this.timeout(5000);
 
 	it( "POST /test - returns an a result", function ( done ) {
 		get_token( port, function ( err, res ) {

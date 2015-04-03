@@ -23,6 +23,8 @@ describe( "Renderers", function () {
 	server = tenso( { port: port, routes: routes, logs: { level: "error" } } );
 	server.renderer( "custom", function ( arg ) { return arg; }, "application/json");
 
+	this.timeout(5000);
+
 	it( "GET CSV (header)", function ( done ) {
 		api( port, true )
 			.get( "/" )

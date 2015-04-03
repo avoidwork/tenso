@@ -26,6 +26,8 @@ describe( "Permissions (CSRF disabled)", function () {
 
 	tenso( { port: port, routes: routes, logs: { level: "error" }, security: { csrf: false } } );
 
+	this.timeout(5000);
+
 	it( "GET / - returns an array of endpoints", function ( done ) {
 		api( port )
 			.get( "/" )
@@ -120,6 +122,8 @@ describe( "Basic Auth", function () {
 		auth: { basic: { enabled: true, list: [ "test:123" ] }, protect: [ "/uuid" ] }
 	} );
 
+	this.timeout(5000);
+
 	it( "GET / - returns links", function ( done ) {
 		api( port )
 			.get( "/" )
@@ -171,6 +175,8 @@ describe( "OAuth2 Token Bearer", function () {
 		logs: { level: "error" },
 		auth: { bearer: { enabled: true, tokens: [ "abc-123" ] }, protect: [ "/" ] }
 	} );
+
+	this.timeout(5000);
 
 	it( "GET / - returns an array of endpoints (authorized)", function ( done ) {
 		api( port )
@@ -227,6 +233,8 @@ describe( "Local", function () {
 			protect: [ "/uuid" ]
 		}
 	} );
+
+	this.timeout(5000);
 
 	it( "GET /uuid (invalid) - returns an 'unauthorized' error", function ( done ) {
 		api( port, true )

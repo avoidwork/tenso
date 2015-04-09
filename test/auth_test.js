@@ -266,7 +266,7 @@ describe( "Local", function () {
 			.send( { username: "test", password: 1232 } )
 			.expectStatus( 403 )
 			.expectValue( "data", null )
-			.expectValue( "error", "CSRF token mismatch" )
+			.expectValue( "error", "CSRF token missing" )
 			.expectValue( "status", 403 )
 			.end( function ( err ) {
 				if ( err ) throw err;

@@ -19,8 +19,6 @@ function get_token ( port, fn, url ) {
 	return api( port ).get( url || "/login" ).end( fn );
 }
 
-process.setMaxListeners(0);
-
 describe( "Permissions (CSRF disabled)", function () {
 	var port = 8001;
 

@@ -97,5 +97,6 @@
 		"status": 429,
 		"message": "Too many requests",
 		"override": null
-	}
+	},
+	"title": "Tensō Browsable API"
 }

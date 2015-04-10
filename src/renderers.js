@@ -16,6 +16,7 @@ let renderers = {
 			var protocol = req.headers[ "x-forwarded-proto" ] ? req.headers[ "x-forwarded-proto" ] + ":" : req.parsed.protocol;
 
 			return ( tpl || "" )
+				.replace( /\{\{title\}\}/g, req.server.config.title )
 				.replace( "{{url}}", req.parsed.href.replace( req.parsed.protocol, protocol ) )
 				.replace( "{{headers}}", Object.keys( headers ).sort( array.sort ).map( function ( i ) {
 					return "<tr><td>"+ i + "</td><td>"+ sanitize( headers[ i ] ) + "</td></tr>";

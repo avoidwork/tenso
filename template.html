@@ -507,18 +507,12 @@
 			var matches, replaces;
 
 			// Preparing to change <pre> into Elements
-			matches = array.unique( html.match( /([^\s*]+)/g )
-					.filter( function ( i ) {
-						return !/(\{|\[|\]|\})/.test( i );
-					} ) );
+			matches = array.unique( html.match( /([^\s*]+)/g ).filter( function ( i ) {
+				return !/(\{|\[|\]|\})/.test( i ) && /\"/.test( i );
+			} ) );
 
 			replaces = matches.map( function ( i ) {
-				if ( i.indexOf( '"' ) > -1 ) {
-					return i.replace( /(\".*\")/, "<span class='item'>$1</span>" );
-				}
-				else {
-					return i;
-				}
+				return i.replace( /(\".*\")/, "<span class='item'>$1</span>" );
 			} );
 
 			array.each( matches, function ( i, idx ) {

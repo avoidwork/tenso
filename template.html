@@ -488,27 +488,27 @@
 <script type="application/javascript">
 	(function ( keigai ) {
 		var util = keigai.util,
-				$ = util.$,
-				array = util.array,
-				element = util.element,
-				json = util.json,
-				regex = util.regex,
-				render = util.render,
-				request = util.request,
-				string = util.string,
-				code = $( "code" )[ 0 ],
-				formats = $( "select" )[ 0 ],
-				observable = util.observer(),
-				parsed = keigai.util.parse(),
-				csrf = "{{csrf}}",
-				nav;
+			$ = util.$,
+			array = util.array,
+			element = util.element,
+			json = util.json,
+			regex = util.regex,
+			render = util.render,
+			request = util.request,
+			string = util.string,
+			code = $( "code" )[ 0 ],
+			formats = $( "select" )[ 0 ],
+			observable = util.observer(),
+			parsed = keigai.util.parse(),
+			csrf = "{{csrf}}",
+			nav;
 
 		// Stage 1 of prettifying a <code>
 		function prepare ( html ) {
 			var keys, matches, replaces;
 
 			// Preparing to change <pre> into Elements
-			keys = html.match(/\".*":/g);
+			keys = html.match( /\".*":/g );
 			matches = keys.concat( html.match( /:\s(\".*\"|\d{3,3}|null)/g ) );
 			replaces = matches.map( function ( i ) {
 				if ( keys.indexOf( i ) > -1 ) {
@@ -539,7 +539,7 @@
 					val = html.replace( /(^\"|\"$)/g, "" );
 
 				if ( val.indexOf( "://" ) > -1 ) {
-					html = html.replace( val, "<a href='" + val + "'>" + val + "</a>" );
+					html = html.replace( val, "<a href='" + val + "' title='View " + val + "'>" + val + "</a>" );
 				}
 
 				i.innerHTML = html;
@@ -578,11 +578,11 @@
 
 		render( function () {
 			var del = /DELETE/,
-					a = /A/,
-					body = $( "#body" )[ 0 ],
-					form = $( "#io form" )[ 0 ],
-					reset = $( "button[type='reset']" )[ 0 ],
-					methods, observable, result, resultCode;
+				a = /A/,
+				body = $( "#body" )[ 0 ],
+				form = $( "#io form" )[ 0 ],
+				reset = $( "button[type='reset']" )[ 0 ],
+				methods, observable, result, resultCode;
 
 			function clear () {
 				element.addClass( result, "hidden" );
@@ -619,7 +619,7 @@
 				observable.hook( nav, "click" );
 				observable.on( "click", function ( e ) {
 					var anchor = util.target( e ),
-							type, target;
+						type, target;
 
 					util.stop( e );
 
@@ -653,13 +653,13 @@
 				observable.hook( form, "reset" );
 				observable.hook( form, "submit" );
 
-				observable.on( "reset", function ( e ) {
+				observable.on( "reset", function () {
 					render( clear );
 				} );
 
 				observable.on( "submit", function ( e ) {
 					var method = element.val( methods ),
-							payload;
+						payload;
 
 					util.stop( e );
 					render( clear );

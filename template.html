@@ -287,7 +287,7 @@
 			width: 1.1em;
 		}
 
-		.item {
+		.key {
 			font-weight: bold;
 		}
 
@@ -495,6 +495,7 @@
 				regex = util.regex,
 				render = util.render,
 				request = util.request,
+				string = util.string,
 				code = $( "code" )[ 0 ],
 				formats = $( "select" )[ 0 ],
 				observable = util.observer(),
@@ -504,19 +505,22 @@
 
 		// Stage 1 of prettifying a <code>
 		function prepare ( html ) {
-			var matches, replaces;
+			var keys, matches, replaces;
 
 			// Preparing to change <pre> into Elements
-			matches = array.unique( html.match( /([^\s*]+)/g ).filter( function ( i ) {
-				return !/(\{|\[|\]|\})/.test( i ) && /\"/.test( i );
-			} ) );
-
+			keys = html.match(/\".*":/g);
+			matches = keys.concat( html.match( /:\s(\".*\"|\d{3,3}|null)/g ) );
 			replaces = matches.map( function ( i ) {
-				return i.replace( /(\".*\")/, "<span class='item'>$1</span>" );
+				if ( keys.indexOf( i ) > -1 ) {
+					return i.replace( /(\".*\")/, "<span class='key'>$1</span>" );
+				}
+				else {
+					return i.replace( /(\".*\"|\d{3,3}|null)/, "<span class='item'>$1</span>" );
+				}
 			} );
 
 			array.each( matches, function ( i, idx ) {
-				html = html.replace( new RegExp( i, "g" ), replaces[ idx ] )
+				html = html.replace( new RegExp( string.escape( i ), "g" ), replaces[ idx ] )
 			} );
 
 			return html;
@@ -532,7 +536,7 @@
 			// Changing URIs into anchors
 			array.each( $( ".item" ), function ( i ) {
 				var html = i.innerHTML,
-						val = html.replace( /(^\"|\"$)/g, "" );
+					val = html.replace( /(^\"|\"$)/g, "" );
 
 				if ( val.indexOf( "://" ) > -1 ) {
 					html = html.replace( val, "<a href='" + val + "'>" + val + "</a>" );

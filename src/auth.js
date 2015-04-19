@@ -20,7 +20,7 @@ let auth = ( obj, config ) => {
 	let asyncFlag = ( req, res, next ) => {
 		req.protectAsync = true;
 		next();
-	}
+	};
 
 	let init = ( session ) => {
 		passportInit = passport.initialize();
@@ -30,7 +30,7 @@ let auth = ( obj, config ) => {
 			passportSession = passport.session();
 			obj.server.use( passportSession ).blacklist( passportSession );
 		}
-	}
+	};
 
 	let guard = ( req, res, next ) => {
 		if ( req.url === "/login" || req.isAuthenticated() ) {
@@ -38,11 +38,11 @@ let auth = ( obj, config ) => {
 		} else {
 			res.redirect( "/login" );
 		}
-	}
+	};
 
 	let redirect = ( req, res ) => {
 		res.redirect( config.auth.redirect );
-	}
+	};
 
 	obj.server.blacklist( asyncFlag );
 
@@ -178,7 +178,7 @@ let auth = ( obj, config ) => {
 				} else {
 					cb( new Error( "Unauthorized" ), null );
 				}
-			}
+			};
 
 			array.each( config.auth.basic.list || [], ( i ) => {
 				let args = i.split( ":" );
@@ -224,7 +224,7 @@ let auth = ( obj, config ) => {
 				} else {
 					cb( new Error( "Unauthorized" ), null );
 				}
-			}
+			};
 
 			passport.use( new BearerStrategy( ( token, done ) => {
 				validate( token, ( err, user ) => {

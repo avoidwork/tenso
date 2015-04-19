@@ -23,7 +23,7 @@ let bootstrap = ( obj, config ) => {
 		};
 
 		next();
-	}
+	};
 
 
 	let parse = ( req, res, next ) => {
@@ -47,7 +47,7 @@ let bootstrap = ( obj, config ) => {
 		}
 
 		next();
-	}
+	};
 
 	obj.server.use( mediator ).blacklist( mediator );
 	obj.server.use( parse ).blacklist( parse );

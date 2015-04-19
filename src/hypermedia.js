@@ -50,7 +50,7 @@ let hypermedia = ( server, req, rep, headers ) => {
 		}
 
 		return obj;
-	}
+	};
 
 	if ( rep.status >= 200 && rep.status <= 206 ) {
 		query = req.parsed.query;

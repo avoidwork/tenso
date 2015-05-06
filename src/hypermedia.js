@@ -67,40 +67,42 @@ let hypermedia = ( server, req, rep, headers ) => {
 		}
 
 		if ( rep.data.result instanceof Array ) {
-			if ( isNaN( page ) || page <= 0 ) {
-				page = 1;
-			}
-
-			nth = Math.ceil( rep.data.result.length / page_size );
-
-			if ( nth > 1 ) {
-				rep.data.result = array.limit( rep.data.result, ( page - 1 ) * page_size, page_size );
-				query.page = 0;
-				query.page_size = page_size;
-
-				root += "?" + array.keys( query ).map( ( i ) => {
-					return i + "=" + encodeURIComponent( query[ i ] );
-				} ).join( "&" );
-
-				if ( page > 1 ) {
-					rep.data.link.push( { uri: root.replace( "page=0", "page=1" ), rel: "first" } );
+			if ( req.method === "GET" ) {
+				if ( isNaN( page ) || page <= 0 ) {
+					page = 1;
 				}
 
-				if ( page - 1 > 1 && page <= nth ) {
-					rep.data.link.push( { uri: root.replace( "page=0", "page=" + ( page - 1 ) ), rel: "prev" } );
-				}
+				nth = Math.ceil( rep.data.result.length / page_size );
 
-				if ( page + 1 < nth ) {
-					rep.data.link.push( { uri: root.replace( "page=0", "page=" + ( page + 1 ) ), rel: "next" } );
-				}
+				if ( nth > 1 ) {
+					rep.data.result = array.limit( rep.data.result, ( page - 1 ) * page_size, page_size );
+					query.page = 0;
+					query.page_size = page_size;
 
-				if ( nth > 0 && page !== nth ) {
-					rep.data.link.push( { uri: root.replace( "page=0", "page=" + nth ), rel: "last" } );
+					root += "?" + array.keys( query ).map( ( i ) => {
+							return i + "=" + encodeURIComponent( query[ i ] );
+						} ).join( "&" );
+
+					if ( page > 1 ) {
+						rep.data.link.push( { uri: root.replace( "page=0", "page=1" ), rel: "first" } );
+					}
+
+					if ( page - 1 > 1 && page <= nth ) {
+						rep.data.link.push( { uri: root.replace( "page=0", "page=" + ( page - 1 ) ), rel: "prev" } );
+					}
+
+					if ( page + 1 < nth ) {
+						rep.data.link.push( { uri: root.replace( "page=0", "page=" + ( page + 1 ) ), rel: "next" } );
+					}
+
+					if ( nth > 0 && page !== nth ) {
+						rep.data.link.push( { uri: root.replace( "page=0", "page=" + nth ), rel: "last" } );
+					}
+				} else {
+					root += "?" + array.keys( query ).map( ( i ) => {
+							return i + "=" + encodeURIComponent( query[ i ] );
+						} ).join( "&" );
 				}
-			} else {
-				root += "?" + array.keys( query ).map( ( i ) => {
-					return i + "=" + encodeURIComponent( query[ i ] );
-				} ).join( "&" );
 			}
 
 			array.each( rep.data.result, ( i ) => {

@@ -668,18 +668,20 @@
 					if ( !del.test( method ) ) {
 						payload = element.val( $( "textarea" )[ 0 ] ) || "";
 
-						try {
-							// Handles Arrays, Objects & Primitives
-							if ( regex.json_wrap.test( payload ) ) {
-								payload = JSON.stringify( payload );
-							}
+						if ( payload !== "" ) {
+							try {
+								// Handles Arrays, Objects & Primitives
+								if ( regex.json_wrap.test( payload ) ) {
+									payload = JSON.stringify( payload );
+								}
 
-							payload = JSON.stringify( JSON.parse( payload ) );
-						}
-						catch ( e ) {
-							humane.error( "Invalid JSON" );
-							console.error( e.stack );
-							return;
+								payload = JSON.stringify( JSON.parse( payload ) );
+							}
+							catch ( e ) {
+								humane.error( "Invalid JSON" );
+								console.error( e.stack );
+								return;
+							}
 						}
 					}
 

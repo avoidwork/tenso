@@ -95,12 +95,12 @@ let auth = ( obj, config ) => {
 		obj.server.use( luscaCsp ).blacklist( luscaCsp );
 	}
 
-	if ( !string.isEmpty( config.security.xframe ) ) {
+	if ( !string.isEmpty( config.security.xframe || "" ) ) {
 		luscaXframe = lusca.xframe( config.security.xframe );
 		obj.server.use( luscaXframe ).blacklist( luscaXframe );
 	}
 
-	if ( !string.isEmpty( config.security.p3p ) ) {
+	if ( !string.isEmpty( config.security.p3p || "" ) ) {
 		luscaP3p = lusca.p3p( config.security.p3p );
 		obj.server.use( luscaP3p ).blacklist( luscaP3p );
 	}

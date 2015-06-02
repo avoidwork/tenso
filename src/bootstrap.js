@@ -63,21 +63,19 @@ let bootstrap = ( obj, config ) => {
 	} );
 
 	// Setting routes
-	if ( config.routes instanceof Object ) {
-		iterate( config.routes, ( routes, method ) => {
-			iterate( routes, ( arg, route ) => {
-				if ( typeof arg === "function" ) {
-					obj.server[ method ]( route, (...args) => {
-						arg.apply( obj, args );
-					} );
-				} else {
-					obj.server[ method ]( route, ( req, res ) => {
-						obj.respond( req, res, arg );
-					} );
-				}
-			} );
+	iterate( config.routes, ( routes, method ) => {
+		iterate( routes, ( arg, route ) => {
+			if ( typeof arg === "function" ) {
+				obj.server[ method ]( route, (...args) => {
+					arg.apply( obj, args );
+				} );
+			} else {
+				obj.server[ method ]( route, ( req, res ) => {
+					obj.respond( req, res, arg );
+				} );
+			}
 		} );
-	}
+	} );
 
 	// Disabling compression over SSL due to BREACH
 	if ( config.ssl.cert && config.ssl.key ) {

@@ -77,7 +77,7 @@
 	},
 	"maxBytes": 1048576,
 	"port": 8000,
-	"routes": null,
+	"routes": {},
 	"session" : {
 		"secret": null,
 		"store": "memory",

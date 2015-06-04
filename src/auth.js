@@ -22,6 +22,14 @@ let auth = ( obj, config ) => {
 		next();
 	};
 
+	let bypass = function ( req, res, next ) {
+		if ( config.auth.unprotect.filter( function ( i ) { return i.test( req.url ); } ).length === 0 ) {
+			next();
+		} else {
+			keymaster( req, res );
+		}
+	};
+
 	let init = ( session ) => {
 		passportInit = passport.initialize();
 		obj.server.use( passportInit ).blacklist( passportInit );
@@ -46,7 +54,11 @@ let auth = ( obj, config ) => {
 
 	obj.server.blacklist( asyncFlag );
 
-	config.auth.protect = ( config.auth.protect || [] ).map( ( i ) => {
+	config.auth.protect = ( config.auth.protect || [] ).map( i => {
+		return new RegExp( "^" + i !== "/login" ? i.replace( /\.\*/g, "*" ).replace( /\*/g, ".*" ) : "$", "i" );
+	} );
+
+	config.auth.unprotect = ( config.auth.unprotect || [] ).map( i => {
 		return new RegExp( "^" + i !== "/login" ? i.replace( /\.\*/g, "*" ).replace( /\*/g, ".*" ) : "$", "i" );
 	} );
 
@@ -83,6 +95,7 @@ let auth = ( obj, config ) => {
 
 		obj.server.use( fnSesh ).blacklist( fnSesh );
 		obj.server.use( fnCookie ).blacklist( fnCookie );
+		obj.server.use( bypass ).blacklist( bypass );
 
 		if ( config.security.csrf ) {
 			luscaCsrf = lusca.csrf( { key: config.security.key, secret: config.security.secret } );

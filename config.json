@@ -1,6 +1,7 @@
 {
 	"auth": {
 		"protect": [],
+		"unprotect": [],
 		"redirect": "/",
 		"basic": {
 			"enabled": false,

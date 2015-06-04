@@ -5,7 +5,7 @@
  * @param {Object} arg [Optional] Configuration
  * @return {Object}    Tenso instance
  */
-let factory = ( arg ) => {
+function factory ( arg ) {
 	let hostname = arg ? arg.hostname || "localhost" : "localhost",
 		vhosts = {},
 		config = arg ? merge( clone( CONFIG, true ), arg ) : CONFIG,
@@ -25,4 +25,4 @@ let factory = ( arg ) => {
 	obj.hostname = hostname;
 
 	return bootstrap( obj, config );
-};
+}

@@ -6,7 +6,7 @@
  * @param  {Object} config Tenso configuration
  * @return {Object}        Updated Tenso configuration
  */
-let auth = ( obj, config ) => {
+function auth ( obj, config ) {
 	let ssl = config.ssl.cert && config.ssl.key,
 		proto = "http" + ( ssl ? "s" : "" ),
 		realm = proto + "://" + ( config.hostname === "localhost" ? "127.0.0.1" : config.hostname ) + ( config.port !== 80 && config.port !== 443 ? ":" + config.port : "" ),
@@ -17,20 +17,29 @@ let auth = ( obj, config ) => {
 		authUris = [],
 		keys, sesh, fnCookie, fnSesh, luscaCsrf, luscaCsp, luscaXframe, luscaP3p, luscaHsts, luscaXssProtection, protection, passportAuth, passportInit, passportSession;
 
-	let asyncFlag = ( req, res, next ) => {
+	function asyncFlag ( req, res, next ) {
 		req.protectAsync = true;
 		next();
-	};
+	}
 
-	let bypass = function ( req, res, next ) {
-		if ( config.auth.unprotect.filter( function ( i ) { return i.test( req.url ); } ).length === 0 ) {
+	function bypass ( req, res, next ) {
+		if ( config.auth.unprotect.filter( function ( i ) { return i.test( req.url ); } ).length > 0 ) {
+			req.protect = false;
+			req.unprotect = true;
+		}
+
+		next();
+	}
+
+	function csrfWrapper ( req, res, next ) {
+		if ( req.unprotect ) {
 			next();
 		} else {
-			keymaster( req, res );
+			luscaCsrf( req, res, next );
 		}
-	};
+	}
 
-	let init = ( session ) => {
+	function init ( session ) {
 		passportInit = passport.initialize();
 		obj.server.use( passportInit ).blacklist( passportInit );
 
@@ -40,7 +49,7 @@ let auth = ( obj, config ) => {
 		}
 	};
 
-	let guard = ( req, res, next ) => {
+	function guard ( req, res, next ) {
 		if ( req.url === "/login" || req.isAuthenticated() ) {
 			rate( obj, req, res, next );
 		} else {
@@ -48,22 +57,22 @@ let auth = ( obj, config ) => {
 		}
 	};
 
-	let redirect = ( req, res ) => {
+	function redirect ( req, res ) {
 		res.redirect( config.auth.redirect );
 	};
 
 	obj.server.blacklist( asyncFlag );
 
-	config.auth.protect = ( config.auth.protect || [] ).map( i => {
+	config.auth.protect = ( config.auth.protect || [] ).map( function ( i ) {
 		return new RegExp( "^" + i !== "/login" ? i.replace( /\.\*/g, "*" ).replace( /\*/g, ".*" ) : "$", "i" );
 	} );
 
-	config.auth.unprotect = ( config.auth.unprotect || [] ).map( i => {
+	config.auth.unprotect = ( config.auth.unprotect || [] ).map( function ( i ) {
 		return new RegExp( "^" + i !== "/login" ? i.replace( /\.\*/g, "*" ).replace( /\*/g, ".*" ) : "$", "i" );
 	} );
 
 	if ( async ) {
-		iterate( config.auth, ( v, k ) => {
+		iterate( config.auth, function ( v, k ) {
 			if ( v.enabled ) {
 				authMap[ k + "_uri" ] = "/auth/" + k;
 				config.auth.protect.push( new RegExp( "^/auth/" + k ) );
@@ -99,7 +108,7 @@ let auth = ( obj, config ) => {
 
 		if ( config.security.csrf ) {
 			luscaCsrf = lusca.csrf( { key: config.security.key, secret: config.security.secret } );
-			obj.server.use( luscaCsrf ).blacklist( luscaCsrf );
+			obj.server.use( csrfWrapper ).blacklist( csrfWrapper );
 		}
 	}
 
@@ -136,11 +145,11 @@ let auth = ( obj, config ) => {
 	} else {
 		init( true );
 
-		passport.serializeUser( ( user, done ) => {
+		passport.serializeUser( function ( user, done ) {
 			done( null, user );
 		} );
 
-		passport.deserializeUser( ( obj, done ) => {
+		passport.deserializeUser( function ( obj, done ) {
 			done( null, obj );
 		} );
 
@@ -151,17 +160,17 @@ let auth = ( obj, config ) => {
 				config.routes.get[ "/auth" ] = authMap;
 			}
 
-			(() => {
+			( function () {
 				let r = "(?!/auth/(";
 
-				array.each( authUris, ( i ) => {
+				array.each( authUris, function ( i ) {
 					r += i.replace( "_uri", "" ) + "|";
 				} );
 
 				r = r.replace( /\|$/, "" ) + ")).*$";
 
 				obj.server.use( r, guard ).blacklist( guard );
-			})();
+			} )();
 
 			config.routes.get[ "/login" ] = config.auth.local.enabled ? ( keys ? {
 				login_uri: "/auth",
@@ -172,7 +181,7 @@ let auth = ( obj, config ) => {
 			config.routes.get[ "/login" ] = { instruction: "POST 'username' & 'password' to authenticate" };
 		}
 
-		config.routes.get[ "/logout" ] = ( req, res ) => {
+		config.routes.get[ "/logout" ] = function ( req, res ) {
 			if ( req.session ) {
 				req.session.destroy();
 			}
@@ -182,18 +191,18 @@ let auth = ( obj, config ) => {
 	}
 
 	if ( config.auth.basic.enabled ) {
-		(() => {
+		( function () {
 			let x = {};
 
-			let validate = ( arg, cb ) => {
+			function validate ( arg, cb ) {
 				if ( x[ arg ] ) {
 					cb( null, x[ arg ] );
 				} else {
 					cb( new Error( "Unauthorized" ), null );
 				}
-			};
+			}
 
-			array.each( config.auth.basic.list || [], ( i ) => {
+			array.each( config.auth.basic.list || [], function ( i ) {
 				let args = i.split( ":" );
 
 				if ( args.length > 0 ) {
@@ -201,8 +210,8 @@ let auth = ( obj, config ) => {
 				}
 			} );
 
-			passport.use( new BasicStrategy( ( username, password, done ) => {
-				validate( username, ( err, user ) => {
+			passport.use( new BasicStrategy( function ( username, password, done ) {
+				validate( username, function ( err, user ) {
 					if ( err ) {
 						delete err.stack;
 						return done( err );
@@ -224,14 +233,14 @@ let auth = ( obj, config ) => {
 			} else {
 				obj.server.use( passportAuth ).blacklist( passportAuth );
 			}
-		})();
+		} )();
 	}
 
 	if ( config.auth.bearer.enabled ) {
-		(() => {
+		( function () {
 			let x = config.auth.bearer.tokens || [];
 
-			let validate = ( arg, cb ) => {
+			function validate ( arg, cb ) {
 				if ( array.contains( x, arg ) ) {
 					cb( null, arg );
 				} else {
@@ -239,8 +248,8 @@ let auth = ( obj, config ) => {
 				}
 			};
 
-			passport.use( new BearerStrategy( ( token, done ) => {
-				validate( token, ( err, user ) => {
+			passport.use( new BearerStrategy( function ( token, done ) {
+				validate( token, function ( err, user ) {
 					if ( err ) {
 						delete err.stack;
 						return done( err );
@@ -270,8 +279,8 @@ let auth = ( obj, config ) => {
 			clientID: config.auth.facebook.client_id,
 			clientSecret: config.auth.facebook.client_secret,
 			callbackURL: realm + "/auth/facebook/callback"
-		}, ( accessToken, refreshToken, profile, done ) => {
-			config.auth.facebook.auth( accessToken, refreshToken, profile, ( err, user ) => {
+		}, function ( accessToken, refreshToken, profile, done ) {
+			config.auth.facebook.auth( accessToken, refreshToken, profile, function ( err, user ) {
 				if ( err ) {
 					delete err.stack;
 					return done( err );
@@ -292,8 +301,8 @@ let auth = ( obj, config ) => {
 		passport.use( new GoogleStrategy( {
 			returnURL: realm + "/auth/google/callback",
 			realm: realm
-		}, ( identifier, profile, done ) => {
-			config.auth.google.auth.call( obj, identifier, profile, ( err, user ) => {
+		}, function ( identifier, profile, done ) {
+			config.auth.google.auth.call( obj, identifier, profile, function ( err, user ) {
 				if ( err ) {
 					delete err.stack;
 					return done( err );
@@ -315,9 +324,8 @@ let auth = ( obj, config ) => {
 				consumerKey: config.auth.linkedin.client_id,
 				consumerSecret: config.auth.linkedin.client_secret,
 				callbackURL: realm + "/auth/linkedin/callback"
-			},
-			( token, tokenSecret, profile, done ) => {
-				config.auth.linkedin.auth( token, tokenSecret, profile, ( err, user ) => {
+			}, function ( token, tokenSecret, profile, done ) {
+				config.auth.linkedin.auth( token, tokenSecret, profile, function ( err, user ) {
 					if ( err ) {
 						delete err.stack;
 						return done( err );
@@ -335,8 +343,8 @@ let auth = ( obj, config ) => {
 	}
 
 	if ( config.auth.local.enabled ) {
-		passport.use( new LocalStrategy( ( username, password, done ) => {
-			config.auth.local.auth( username, password, ( err, user ) => {
+		passport.use( new LocalStrategy( function ( username, password, done ) {
+			config.auth.local.auth( username, password, function ( err, user ) {
 				if ( err ) {
 					delete err.stack;
 					return done( err );
@@ -347,11 +355,9 @@ let auth = ( obj, config ) => {
 		} ) );
 
 		config.routes.post = config.routes.post || {};
-		config.routes.post[ "/login" ] = ( req, res ) => {
-			let final, mid;
-
-			final = () => {
-				passport.authenticate( "local" )( req, res, ( e ) => {
+		config.routes.post[ "/login" ] = function ( req, res ) {
+			function final () {
+				passport.authenticate( "local" )( req, res, function ( e ) {
 					if ( e ) {
 						res.error( 401, "Unauthorized" );
 					}
@@ -361,11 +367,11 @@ let auth = ( obj, config ) => {
 						res.redirect( config.auth.redirect );
 					}
 				} );
-			};
+			}
 
-			mid = () => {
+			function mid () {
 				passportSession( req, res, final );
-			};
+			}
 
 			passportInit( req, res, mid );
 		};
@@ -378,8 +384,8 @@ let auth = ( obj, config ) => {
 			clientID: config.auth.oauth2.client_id,
 			clientSecret: config.auth.oauth2.client_secret,
 			callbackURL: realm + "/auth/oauth2/callback"
-		}, ( accessToken, refreshToken, profile, done ) => {
-			config.auth.oauth2.auth( accessToken, refreshToken, profile, ( err, user ) => {
+		}, function ( accessToken, refreshToken, profile, done ) {
+			config.auth.oauth2.auth( accessToken, refreshToken, profile, function ( err, user ) {
 				if ( err ) {
 					delete err.stack;
 					return done( err );
@@ -397,15 +403,15 @@ let auth = ( obj, config ) => {
 	}
 
 	if ( config.auth.saml.enabled ) {
-		(() => {
+		( function () {
 			let config = config.auth.saml;
 
 			config.callbackURL = realm + "/auth/saml/callback";
 			delete config.enabled;
 			delete config.path;
 
-			passport.use( new SAMLStrategy( config, ( profile, done ) => {
-				config.auth.saml.auth( profile, ( err, user ) => {
+			passport.use( new SAMLStrategy( config, function ( profile, done ) {
+				config.auth.saml.auth( profile, function ( err, user ) {
 					if ( err ) {
 						delete err.stack;
 						return done( err );
@@ -414,7 +420,7 @@ let auth = ( obj, config ) => {
 					done( null, user );
 				} );
 			} ) );
-		})();
+		} )();
 
 		obj.server.get( "/auth/saml", asyncFlag );
 		obj.server.get( "/auth/saml", passport.authenticate( "saml" ) );
@@ -428,8 +434,8 @@ let auth = ( obj, config ) => {
 			consumerKey: config.auth.twitter.consumer_key,
 			consumerSecret: config.auth.twitter.consumer_secret,
 			callbackURL: realm + "/auth/twitter/callback"
-		}, ( token, tokenSecret, profile, done ) => {
-			config.auth.twitter.auth( token, tokenSecret, profile, ( err, user ) => {
+		}, function ( token, tokenSecret, profile, done ) {
+			config.auth.twitter.auth( token, tokenSecret, profile, function ( err, user ) {
 				if ( err ) {
 					delete err.stack;
 					return done( err );
@@ -449,4 +455,4 @@ let auth = ( obj, config ) => {
 	}
 
 	return config;
-};
+}

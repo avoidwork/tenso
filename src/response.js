@@ -6,7 +6,7 @@
  * @param  {Number} status HTTP status, default is `200`
  * @return {Object}        Response body
  */
-let response = ( arg, status ) => {
+function response ( arg, status ) {
 	let error = arg instanceof Error,
 		rep;
 
@@ -21,4 +21,4 @@ let response = ( arg, status ) => {
 	}
 
 	return rep;
-};
+}

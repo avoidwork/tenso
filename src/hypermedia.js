@@ -13,20 +13,20 @@
  * @param  {Object} headers HTTP response headers
  * @return {Object}         HTTP response body
  */
-let hypermedia = ( server, req, rep, headers ) => {
+function hypermedia ( server, req, rep, headers ) {
 	let seen = {},
 		protocol = req.headers[ "x-forwarded-proto" ] ? req.headers[ "x-forwarded-proto" ] + ":" : req.parsed.protocol,
 		query, page, page_size, nth, root, parent;
 
 	// Parsing the object for hypermedia properties
-	let parse = ( obj, rel, item_collection ) => {
+	function parse ( obj, rel, item_collection ) {
 		rel = rel || "related";
 		let keys = array.keys( obj );
 
 		if ( keys.length === 0 ) {
 			obj = null;
 		} else {
-			array.each( keys, ( i ) => {
+			array.each( keys, function ( i ) {
 				let collection, uri;
 
 				// If ID like keys are found, and are not URIs, they are assumed to be root collections
@@ -79,7 +79,7 @@ let hypermedia = ( server, req, rep, headers ) => {
 					query.page = 0;
 					query.page_size = page_size;
 
-					root += "?" + array.keys( query ).map( ( i ) => {
+					root += "?" + array.keys( query ).map( function ( i ) {
 							return i + "=" + encodeURIComponent( query[ i ] );
 						} ).join( "&" );
 
@@ -99,13 +99,13 @@ let hypermedia = ( server, req, rep, headers ) => {
 						rep.data.link.push( { uri: root.replace( "page=0", "page=" + nth ), rel: "last" } );
 					}
 				} else {
-					root += "?" + array.keys( query ).map( ( i ) => {
+					root += "?" + array.keys( query ).map( function ( i ) {
 							return i + "=" + encodeURIComponent( query[ i ] );
 						} ).join( "&" );
 				}
 			}
 
-			array.each( rep.data.result, ( i ) => {
+			array.each( rep.data.result, function ( i ) {
 				let uri;
 
 				if ( typeof i === "string" && REGEX.scheme.test( i ) ) {
@@ -122,7 +122,7 @@ let hypermedia = ( server, req, rep, headers ) => {
 			} );
 		}
 		else if ( rep.data.result instanceof Object ) {
-			parent = req.parsed.pathname.split( "/" ).filter( ( i ) => {
+			parent = req.parsed.pathname.split( "/" ).filter( function ( i ) {
 				return i !== "";
 			} );
 
@@ -134,11 +134,11 @@ let hypermedia = ( server, req, rep, headers ) => {
 		}
 
 		if ( rep.data.link !== undefined && rep.data.link.length > 0 ) {
-			headers.link = array.keySort( rep.data.link, "rel, uri" ).map( ( i ) => {
+			headers.link = array.keySort( rep.data.link, "rel, uri" ).map( function ( i ) {
 				return "<" + i.uri + ">; rel=\"" + i.rel + "\"";
 			} ).join( ", " );
 		}
 	}
 
 	return rep;
-};
+}

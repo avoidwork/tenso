@@ -7,7 +7,7 @@
  * @param  {Function} next Next middleware
  * @return {Undefined}     undefined
  */
-let keymaster = ( req, res, next ) => {
+function keymaster ( req, res, next ) {
 	let obj = req.server.tenso,
 		method, result, routes, uri, valid;
 
@@ -18,7 +18,7 @@ let keymaster = ( req, res, next ) => {
 		uri = req.parsed.pathname;
 		valid = false;
 
-		rate( obj, req, res, () => {
+		rate( obj, req, res, function () {
 			if ( uri in routes ) {
 				result = routes[ uri ];
 
@@ -28,7 +28,7 @@ let keymaster = ( req, res, next ) => {
 					obj.respond( req, res, result );
 				}
 			} else {
-				iterate( routes, ( value, key ) => {
+				iterate( routes, function ( value, key ) {
 					let REGEX = new RegExp( "^" + key + "$", "i" );
 
 					if ( REGEX.test( uri ) ) {
@@ -45,7 +45,7 @@ let keymaster = ( req, res, next ) => {
 						obj.respond( req, res, result );
 					}
 				} else {
-					iterate( req.server.config.routes.get || {}, ( value, key ) => {
+					iterate( req.server.config.routes.get || {}, function ( value, key ) {
 						let REGEX = new RegExp( "^" + key + "$", "i" );
 
 						if ( REGEX.test( uri ) ) {
@@ -66,4 +66,4 @@ let keymaster = ( req, res, next ) => {
 	} else {
 		rate( obj, req, res, next );
 	}
-};
+}

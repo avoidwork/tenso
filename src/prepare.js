@@ -7,7 +7,7 @@
  * @param  {Number} status HTTP status code
  * @return {Object}        Standardized response body
  */
-let prepare = ( arg, error, status ) => {
+function prepare ( arg, error, status ) {
 	let data = clone( arg, true );
 
 	if ( arg !== null ) {
@@ -19,4 +19,4 @@ let prepare = ( arg, error, status ) => {
 		error: error ? ( error.message || error ) : null,
 		status: status || 200
 	};
-};
+}

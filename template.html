@@ -444,6 +444,7 @@
 							</div>
 						</div>
 					</form>
+					<div id="allow" class="hidden">{{allow}}</div>
 				</div>
 			</div>
 		</div>
@@ -605,7 +606,7 @@
 
 			prettify( code );
 
-			if ( /PATCH|POST|PUT/.test( $( "#methods" )[ 0 ].innerText ) ) {
+			if ( /(DELETE|PATCH|POST|PUT)/.test( $( "#allow" )[ 0 ].innerText ) ) {
 				methods = $( "#methods" );
 				observable = util.observer();
 				nav = $( "#io nav" )[ 0 ];

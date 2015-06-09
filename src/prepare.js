@@ -8,7 +8,7 @@
  * @return {Object}        Standardized response body
  */
 function prepare ( arg, error, status ) {
-	let data = clone( arg, true );
+	let data = clone( arg );
 
 	if ( arg !== null ) {
 		error = null;
@@ -17,6 +17,7 @@ function prepare ( arg, error, status ) {
 	return {
 		data: data || null,
 		error: error ? ( error.message || error ) : null,
+		links: [],
 		status: status || 200
 	};
 }

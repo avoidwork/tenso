@@ -47,7 +47,7 @@ function auth ( obj, config ) {
 			passportSession = passport.session();
 			obj.server.use( passportSession ).blacklist( passportSession );
 		}
-	};
+	}
 
 	function guard ( req, res, next ) {
 		if ( req.url === "/login" || req.isAuthenticated() ) {
@@ -55,11 +55,11 @@ function auth ( obj, config ) {
 		} else {
 			res.redirect( "/login" );
 		}
-	};
+	}
 
 	function redirect ( req, res ) {
 		res.redirect( config.auth.redirect );
-	};
+	}
 
 	obj.server.blacklist( asyncFlag );
 

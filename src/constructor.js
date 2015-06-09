@@ -170,7 +170,7 @@ class Tenso {
 
 			if ( req.protect ) {
 				if ( ref[ 0 ][ "cache-control" ] === undefined && this.server.config.headers[ "cache-control" ] ) {
-					ref[ 0 ][ "cache-control" ] = clone( this.server.config.headers[ "cache-control" ], true );
+					ref[ 0 ][ "cache-control" ] = clone( this.server.config.headers[ "cache-control" ] );
 				}
 
 				if ( ref[ 0 ][ "cache-control" ] !== undefined && ref[ 0 ][ "cache-control" ].indexOf( "private " ) === -1 ) {

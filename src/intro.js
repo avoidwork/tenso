@@ -5,7 +5,6 @@ const SERVER = "tenso/" + VERSION;
 let keigai = require( "keigai" ),
 	util = keigai.util,
 	array = util.array,
-	clone = util.clone,
 	coerce = util.coerce,
 	iterate = util.iterate,
 	json = util.json,

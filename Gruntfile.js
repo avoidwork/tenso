@@ -21,6 +21,7 @@ module.exports = function (grunt) {
 					"src/constructor.js",
 					"src/auth.js",
 					"src/bootstrap.js",
+					"src/clone.js",
 					"src/error.js",
 					"src/factory.js",
 					"src/hypermedia.js",

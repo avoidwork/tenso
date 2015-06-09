@@ -8,7 +8,7 @@
 function factory ( arg ) {
 	let hostname = arg ? arg.hostname || "localhost" : "localhost",
 		vhosts = {},
-		config = arg ? merge( clone( CONFIG, true ), arg ) : CONFIG,
+		config = arg ? merge( clone( CONFIG ), arg ) : CONFIG,
 		obj;
 
 	if ( !config.port ) {

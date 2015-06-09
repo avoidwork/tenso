@@ -113,7 +113,7 @@ Sessions are used for non `Basic` or `Bearer Token` authentication, and will hav
 Multiple authentication strategies can be enabled at once.
 
 ### Basic Auth
-```json
+```
 {
 	"auth": {
 		"basic": {
@@ -128,7 +128,7 @@ Multiple authentication strategies can be enabled at once.
 ### Facebook
 Facebook authentication will create `/auth`, `/auth/facebook`, & `/auth/facebook/callback` routes. `auth(accessToken, refreshToken, profile, callback)` must execute `callback(err, user)`.
  
-```json
+```
 {
 	"auth": {
 		"facebook": {
@@ -145,7 +145,7 @@ Facebook authentication will create `/auth`, `/auth/facebook`, & `/auth/facebook
 ### Google
 Google authentication (OpenID) will create `/auth`, `/auth/google`, & `/auth/google/callback` routes. `auth(identifier, profile, callback)` must execute `callback(err, user)`.
  
-```json
+```
 {
 	"auth": {
 		"google": {
@@ -160,7 +160,7 @@ Google authentication (OpenID) will create `/auth`, `/auth/google`, & `/auth/goo
 ### LinkedIn
 LinkedIn authentication will create `/auth`, `/auth/linkedin`, & `/auth/linkedin/callback` routes. `auth(token, tokenSecret, profile, callback)` must execute `callback(err, user)`.
  
-```json
+```
 {
 	"auth": {
 		"linkedin": {
@@ -178,7 +178,7 @@ LinkedIn authentication will create `/auth`, `/auth/linkedin`, & `/auth/linkedin
 ### Local
 Local authentication will create `/login`. `auth(username, password)` must execute `callback(err, user)`.
 
-```json
+```
 {
 	"auth": {
 		"local": {
@@ -193,7 +193,7 @@ Local authentication will create `/login`. `auth(username, password)` must execu
 ### OAuth2
 OAuth2 authentication will create `/auth`, `/auth/oauth2`, & `/auth/oauth2/callback` routes. `auth(accessToken, refreshToken, profile, callback)` must execute `callback(err, user)`.
  
-```json
+```
 {
 	"auth": {
 		"oauth2": {
@@ -210,7 +210,7 @@ OAuth2 authentication will create `/auth`, `/auth/oauth2`, & `/auth/oauth2/callb
 ```
 
 ### Oauth2 Bearer Token
-```json
+```
 {
 	"auth": {
 		"bearer": {
@@ -227,7 +227,7 @@ SAML authentication will create `/auth`, `/auth/saml`, & `/auth/saml/callback` r
 
 Tensō uses [passport-saml](https://github.com/bergie/passport-saml), for configuration options please visit it's homepage.
  
-```json
+```
 {
 	"auth": {
 		"saml": {
@@ -242,7 +242,7 @@ Tensō uses [passport-saml](https://github.com/bergie/passport-saml), for config
 ### Twitter
 Twitter authentication will create `/auth`, `/auth/twitter`, & `/auth/twitter/callback` routes. `auth(token, tokenSecret, profile, callback)` must execute `callback(err, user)`.
  
-```json
+```
 {
 	"auth": {
 		"twitter": {
@@ -261,7 +261,7 @@ Sessions can use a memory (default) or redis store. Memory will limit your sessi
 
 If the session `secret` is not provided, a version 4 `UUID` will be used.
 
-```json
+```
 {
 	"session" : {
 		"secret": "my secret",
@@ -278,7 +278,7 @@ If the session `secret` is not provided, a version 4 `UUID` will be used.
 ## Security
 Tensō uses [lusca](https://github.com/krakenjs/lusca#api) for security as a middleware. Please see it's documentation for how to configure it; each method & argument is a key:value pair for `security`.
 
-```json
+```
 {
 	"security": { ... }
 }
@@ -292,7 +292,7 @@ Rate limiting is controlled by configuration, and is disabled by default. Rate l
 
 Rate limiting can be overridden by providing an `override` function that takes `req` & `rate`, and must return (a modified) `rate`.
 
-```json
+```
 {
 	"rate": {
 		"enabled": true,
@@ -308,7 +308,7 @@ Rate limiting can be overridden by providing an `override` function that takes `
 ## Limiting upload size
 A 'max byte' limit can be enforced on all routes that handle `PATCH`, `POST`, & `PUT` requests. The default limit is 1 MB (1048576 b).
 
-```json
+```
 {
 	"maxBytes": 5242880
 }

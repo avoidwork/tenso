@@ -10,7 +10,7 @@ Tensō will handle the serialization & creation of hypermedia links, all you hav
 ## Example
 Creating an API with Tensō can be as simple as one statement.
 
-```javascript
+```json
 require( "tenso" )( {routes: require( __dirname + "/routes.js" )} );
 ```
 
@@ -21,7 +21,7 @@ Route handlers have the context of the Tensō server, i.e. `this` will allow you
 
 The following example will create GET routes that will return an empty `Array` at `/`, an `Error` at `/reports/tps`, & a version 4 UUID at `/uuid`.
 
-```javascript
+```json
 var uuid = require( "keigai" ).util.uuid;
 
 module.exports.get = {
@@ -40,14 +40,14 @@ module.exports.get = {
 Tensō decorates `req` with "helpers" such as `req.ip`, & `req.parsed`. `PATCH`, `PUT`, & `POST` payloads are available as `req.body`. Sessions are available as `req.session` when using `local` authentication.
 
 ## Responses
-Responses will have a standard shape, and will be utf-8 by default. The result, and hypermedia will be in `data`. Hypermedia (pagination, links, etc.) will be in `data.link:[ {"uri": "...", "rel": "..."}, ...]`, & pagination will also be present via the `Link` HTTP header.
-The result will be in `data.result`.
+Responses will have a standard shape, and will be utf-8 by default. The result, and hypermedia will be in `data`. Hypermedia (pagination, links, etc.) will be in `links:[ {"uri": "...", "rel": "..."}, ...]`, & pagination will also be present via the `Link` HTTP header.
 
 ```json
 {
-  "data": {{ `null` or `{link: [], result: ?}` }},
-  "error": {{ `null` or an `Error` stack trace / message }},
-  "status": {{ HTTP status code }}
+  "data": "`null` or ?",
+  "error": "`null` or an `Error` stack trace / message",
+  "links": [],
+  "status": 200
 }
 ```
 
@@ -75,33 +75,33 @@ Caching can be disabled by setting the `cache-control` header to a "private" or 
 ## Configuration
 This is a sample configuration for Tensō, without authentication or SSL. This would be ideal for development, but not production! Enabling SSL is as easy as providing file paths for the two keys.
 
-```javascript
+```json
 {
-	"auth": /* Optional, see Authentication section */
+	"auth": {}, /* Optional, see Authentication section */
 	"cache": 1000, /* Optional, size of Etag LRU cache */
 	"compress": false, /* Optional, enabled by default, disabled with SSL */
-	"headers": { ... }, /* Optional, custom headers */
+	"headers": {}, /* Optional, custom headers */
 	"hostname": "localhost", /* Optional, default is 'localhost' */
 	"json": 2, /* Optional, default indent for 'pretty' JSON */
-	"logs": { /* Optional */
-		"level": "debug",
-		"stdout": true,
-		"dtrace": true,
-		"stack": true
+	"logs": {
+		"level": "info", /* Optional */
+		"stdout": true, /* Optional */
+		"dtrace": false, /* Optional */
+		"stack": true /* Optional */
 	},
-	"port": 8000, /* Optional, default is 8000 */
-	"routes": require( "./routes.js" ), /* Required! */
+	"port": 8000, /* Optional */
+	"routes": require("./routes.js"), /* Required! */
 	"session": { /* Optional */
 		"secret": null,
 		"store": "memory", /* "memory" or "redis" */
-		"redis": /* See connect-redis for options */
+		"redis": {} /* See connect-redis for options */
 	},
 	"ssl": { /* Optional */
 		"cert": null,
 		"key": null
 	},
 	"title": "My API", /* Page title for browsable API */
-	"uid": N /* Optional, system account uid to drop to after starting with elevated privileges to run on a low port */
+	"uid": 33 /* Optional, system account uid to drop to after starting with elevated privileges to run on a low port */
 }
 ```
 
@@ -113,7 +113,7 @@ Sessions are used for non `Basic` or `Bearer Token` authentication, and will hav
 Multiple authentication strategies can be enabled at once.
 
 ### Basic Auth
-```javascript
+```json
 {
 	"auth": {
 		"basic": {
@@ -128,7 +128,7 @@ Multiple authentication strategies can be enabled at once.
 ### Facebook
 Facebook authentication will create `/auth`, `/auth/facebook`, & `/auth/facebook/callback` routes. `auth(accessToken, refreshToken, profile, callback)` must execute `callback(err, user)`.
  
-```javascript
+```json
 {
 	"auth": {
 		"facebook": {
@@ -145,7 +145,7 @@ Facebook authentication will create `/auth`, `/auth/facebook`, & `/auth/facebook
 ### Google
 Google authentication (OpenID) will create `/auth`, `/auth/google`, & `/auth/google/callback` routes. `auth(identifier, profile, callback)` must execute `callback(err, user)`.
  
-```javascript
+```json
 {
 	"auth": {
 		"google": {
@@ -160,7 +160,7 @@ Google authentication (OpenID) will create `/auth`, `/auth/google`, & `/auth/goo
 ### LinkedIn
 LinkedIn authentication will create `/auth`, `/auth/linkedin`, & `/auth/linkedin/callback` routes. `auth(token, tokenSecret, profile, callback)` must execute `callback(err, user)`.
  
-```javascript
+```json
 {
 	"auth": {
 		"linkedin": {
@@ -178,7 +178,7 @@ LinkedIn authentication will create `/auth`, `/auth/linkedin`, & `/auth/linkedin
 ### Local
 Local authentication will create `/login`. `auth(username, password)` must execute `callback(err, user)`.
 
-```javascript
+```json
 {
 	"auth": {
 		"local": {
@@ -193,7 +193,7 @@ Local authentication will create `/login`. `auth(username, password)` must execu
 ### OAuth2
 OAuth2 authentication will create `/auth`, `/auth/oauth2`, & `/auth/oauth2/callback` routes. `auth(accessToken, refreshToken, profile, callback)` must execute `callback(err, user)`.
  
-```javascript
+```json
 {
 	"auth": {
 		"oauth2": {
@@ -210,7 +210,7 @@ OAuth2 authentication will create `/auth`, `/auth/oauth2`, & `/auth/oauth2/callb
 ```
 
 ### Oauth2 Bearer Token
-```javascript
+```json
 {
 	"auth": {
 		"bearer": {
@@ -227,7 +227,7 @@ SAML authentication will create `/auth`, `/auth/saml`, & `/auth/saml/callback` r
 
 Tensō uses [passport-saml](https://github.com/bergie/passport-saml), for configuration options please visit it's homepage.
  
-```javascript
+```json
 {
 	"auth": {
 		"saml": {
@@ -242,7 +242,7 @@ Tensō uses [passport-saml](https://github.com/bergie/passport-saml), for config
 ### Twitter
 Twitter authentication will create `/auth`, `/auth/twitter`, & `/auth/twitter/callback` routes. `auth(token, tokenSecret, profile, callback)` must execute `callback(err, user)`.
  
-```javascript
+```json
 {
 	"auth": {
 		"twitter": {
@@ -261,7 +261,7 @@ Sessions can use a memory (default) or redis store. Memory will limit your sessi
 
 If the session `secret` is not provided, a version 4 `UUID` will be used.
 
-```javascript
+```json
 {
 	"session" : {
 		"secret": "my secret",
@@ -278,7 +278,7 @@ If the session `secret` is not provided, a version 4 `UUID` will be used.
 ## Security
 Tensō uses [lusca](https://github.com/krakenjs/lusca#api) for security as a middleware. Please see it's documentation for how to configure it; each method & argument is a key:value pair for `security`.
 
-```javascript
+```json
 {
 	"security": { ... }
 }
@@ -292,7 +292,7 @@ Rate limiting is controlled by configuration, and is disabled by default. Rate l
 
 Rate limiting can be overridden by providing an `override` function that takes `req` & `rate`, and must return (a modified) `rate`.
 
-```javascript
+```json
 {
 	"rate": {
 		"enabled": true,
@@ -308,7 +308,7 @@ Rate limiting can be overridden by providing an `override` function that takes `
 ## Limiting upload size
 A 'max byte' limit can be enforced on all routes that handle `PATCH`, `POST`, & `PUT` requests. The default limit is 1 MB (1048576 b).
 
-```javascript
+```json
 {
 	"maxBytes": 5242880
 }

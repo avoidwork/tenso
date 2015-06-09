@@ -10,8 +10,8 @@ Tensō will handle the serialization & creation of hypermedia links, all you hav
 ## Example
 Creating an API with Tensō can be as simple as one statement.
 
-```json
-require( "tenso" )( {routes: require( __dirname + "/routes.js" )} );
+```javascript
+require("tenso")({routes: require(__dirname+"/routes.js")});
 ```
 
 ### Creating Routes
@@ -21,7 +21,7 @@ Route handlers have the context of the Tensō server, i.e. `this` will allow you
 
 The following example will create GET routes that will return an empty `Array` at `/`, an `Error` at `/reports/tps`, & a version 4 UUID at `/uuid`.
 
-```json
+```javascript
 var uuid = require( "keigai" ).util.uuid;
 
 module.exports.get = {
@@ -75,7 +75,7 @@ Caching can be disabled by setting the `cache-control` header to a "private" or 
 ## Configuration
 This is a sample configuration for Tensō, without authentication or SSL. This would be ideal for development, but not production! Enabling SSL is as easy as providing file paths for the two keys.
 
-```json
+```
 {
 	"auth": {}, /* Optional, see Authentication section */
 	"cache": 1000, /* Optional, size of Etag LRU cache */

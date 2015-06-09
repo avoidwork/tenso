@@ -31,11 +31,11 @@ describe( "Permissions (CSRF disabled)", function () {
 			.get( "/" )
 			.expectStatus( 200 )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
-			.expectValue( "data.link", [ {
+			.expectValue( "links", [ {
 				uri: "http://localhost:" + port + "/items",
 				rel: "item"
 			}, { uri: "http://localhost:" + port + "/things", rel: "item" } ] )
-			.expectValue( "data.result", [ "/items", "/things" ] )
+			.expectValue( "data", [ "/items", "/things" ] )
 			.expectValue( "error", null )
 			.expectValue( "status", 200 )
 			.end( function ( err ) {
@@ -126,11 +126,11 @@ describe( "Basic Auth", function () {
 		api( port )
 			.get( "/" )
 			.expectStatus( 200 )
-			.expectValue( "data.link", [ {
+			.expectValue( "links", [ {
 				uri: "http://localhost:" + port + "/items",
 				rel: "item"
 			}, { uri: "http://localhost:" + port + "/things", rel: "item" } ] )
-			.expectValue( "data.result", [ "/items", "/things" ] )
+			.expectValue( "data", [ "/items", "/things" ] )
 			.expectValue( "error", null )
 			.expectValue( "status", 200 )
 			.end( function ( err ) {
@@ -144,7 +144,7 @@ describe( "Basic Auth", function () {
 			.auth( 'test', '123' )
 			.get( "/uuid" )
 			.expectStatus( 200 )
-			.expectValue( "data.link", [ { uri: "http://localhost:" + port, rel: "collection" } ] )
+			.expectValue( "links", [ { uri: "http://localhost:" + port, rel: "collection" } ] )
 			.expectValue( "error", null )
 			.expectValue( "status", 200 )
 			.end( function ( err ) {
@@ -181,11 +181,11 @@ describe( "OAuth2 Token Bearer", function () {
 			.header( 'Authorization', 'Bearer abc-123' )
 			.get( "/" )
 			.expectStatus( 200 )
-			.expectValue( "data.link", [ {
+			.expectValue( "links", [ {
 				uri: "http://localhost:" + port + "/items",
 				rel: "item"
 			}, { uri: "http://localhost:" + port + "/things", rel: "item" } ] )
-			.expectValue( "data.result", [ "/items", "/things" ] )
+			.expectValue( "data", [ "/items", "/things" ] )
 			.expectValue( "error", null )
 			.expectValue( "status", 200 )
 			.end( function ( err ) {
@@ -249,8 +249,8 @@ describe( "Local", function () {
 		api( port )
 			.get( "/login" )
 			.expectStatus( 200 )
-			.expectValue( "data.link", [ { uri: "http://localhost:" + port, rel: "collection" } ] )
-			.expectValue( "data.result", { instruction: "POST 'username' & 'password' to authenticate" } )
+			.expectValue( "links", [ { uri: "http://localhost:" + port, rel: "collection" } ] )
+			.expectValue( "data", { instruction: "POST 'username' & 'password' to authenticate" } )
 			.expectValue( "error", null )
 			.expectValue( "status", 200 )
 			.end( function ( err ) {
@@ -326,7 +326,7 @@ describe( "Local", function () {
 		api( port )
 			.get( "/uuid" )
 			.expectStatus( 200 )
-			.expectValue( "data.link", [ { uri: "http://localhost:" + port, rel: "collection" } ] )
+			.expectValue( "links", [ { uri: "http://localhost:" + port, rel: "collection" } ] )
 			.expectValue( "error", null )
 			.expectValue( "status", 200 )
 			.end( function ( err ) {

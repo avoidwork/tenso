@@ -1,7 +1,7 @@
 var uuid = require( "keigai" ).util.uuid;
  
 module.exports.get = {
-    "/": ["/login", "/reports", "/uuid"],
+    "/": ["login", "reports", "uuid"],
     "/login": "POST to login",
     "/reports": ["tps"],
     "/reports/tps": function ( req, res ) {

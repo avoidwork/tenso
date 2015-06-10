@@ -25,15 +25,15 @@ The following example will create GET routes that will return an empty `Array` a
 var uuid = require( "keigai" ).util.uuid;
 
 module.exports.get = {
-	"/": ["/reports", "/uuid"],
-	"/reports": ["/reports/tps"],
+	"/": ["reports", "uuid"],
+	"/reports": ["tps"],
 	"/reports/tps": function ( req, res ) {
 		res.error( 785, Error( "TPS Cover Sheet not attached" ) );
 	},
 	"/uuid": function ( req, res ) {
 		res.respond( uuid(), 200, {"cache-control": "no-cache"} );
 	}
-}
+};
 ```
 
 ### Request Helpers

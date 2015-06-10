@@ -39,7 +39,7 @@ function hypermedia ( server, req, rep, headers ) {
 						rel = "item";
 					}
 
-					uri = REGEX.scheme.test( obj[ i ] ) ? ( obj[ i ].indexOf( "//" ) > -1 ? obj[ i ] : protocol + "//" + req.parsed.host + obj[ i ] ) : ( protocol + "//" + req.parsed.host + "/" + collection + "/" + obj[ i ] );
+					uri = REGEX.scheme.test( obj[ i ] ) ? obj[ i ] : ( "/" + collection + "/" + obj[ i ] );
 
 					if ( uri !== root && !seen[ uri ] ) {
 						rep.links.push( { uri: uri, rel: rel } );
@@ -56,11 +56,11 @@ function hypermedia ( server, req, rep, headers ) {
 		query = req.parsed.query;
 		page = query.page || 1;
 		page_size = query.page_size || server.config.pageSize || 5;
-		root = protocol + "//" + req.parsed.host + req.parsed.pathname;
+		root = req.parsed.pathname;
 
 		if ( req.parsed.pathname !== "/" ) {
 			rep.links.push( {
-				uri: root.replace( REGEX.trailing_slash, "" ).replace( REGEX.collection, "$1" ),
+				uri: root.replace( REGEX.trailing_slash, "" ).replace( REGEX.collection, "$1" ) || "/",
 				rel: "collection"
 			} );
 		}
@@ -108,10 +108,8 @@ function hypermedia ( server, req, rep, headers ) {
 				let uri;
 
 				if ( typeof i === "string" && REGEX.scheme.test( i ) ) {
-					uri = i.indexOf( "//" ) > -1 ? i : protocol + "//" + req.parsed.host + i;
-
-					if ( uri !== root ) {
-						rep.links.push( { uri: uri, rel: "item" } );
+					if ( i !== root ) {
+						rep.links.push( { uri: i, rel: "item" } );
 					}
 				}
 

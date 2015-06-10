@@ -85,7 +85,7 @@ function bootstrap ( obj, config ) {
 
 	// Starting API server
 	obj.server.start( config, function ( req, res, status, msg ) {
-		var stat = status instanceof Error ? parseInt ( status.message, 10 ) : status,
+		let stat = status instanceof Error ? parseInt ( status.message, 10 ) : status,
 			err = msg instanceof Error ? msg : new Error( msg || obj.messages[ stat ] );
 
 		error( obj, req, res, stat, err, obj );

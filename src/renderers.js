@@ -13,7 +13,7 @@ let renderers = {
 	},
 	html: {
 		fn: function ( arg, req, headers, tpl ) {
-			var protocol = req.headers[ "x-forwarded-proto" ] ? req.headers[ "x-forwarded-proto" ] + ":" : req.parsed.protocol;
+			let protocol = req.headers[ "x-forwarded-proto" ] ? req.headers[ "x-forwarded-proto" ] + ":" : req.parsed.protocol;
 
 			return ( tpl || "" )
 				.replace( /\{\{title\}\}/g, req.server.config.title )

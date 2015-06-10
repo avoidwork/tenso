@@ -15,7 +15,7 @@
  */
 function hypermedia ( server, req, rep, headers ) {
 	let seen = {},
-		protocol = req.headers[ "x-forwarded-proto" ] ? req.headers[ "x-forwarded-proto" ] + ":" : req.parsed.protocol,
+		collection = req.parsed.pathname,
 		query, page, page_size, nth, root, parent;
 
 	// Parsing the object for hypermedia properties
@@ -105,12 +105,8 @@ function hypermedia ( server, req, rep, headers ) {
 			}
 
 			array.each( rep.data, function ( i ) {
-				let uri;
-
-				if ( typeof i === "string" && REGEX.scheme.test( i ) ) {
-					if ( i !== root ) {
-						rep.links.push( { uri: i, rel: "item" } );
-					}
+				if ( typeof i === "string" && i !== collection ) {
+					rep.links.push( { uri: i.indexOf( "//" ) > -1 || i.indexOf( "/" ) === 0 ? i : ( collection + "/" + i ), rel: "item" } );
 				}
 
 				if ( i instanceof Object ) {

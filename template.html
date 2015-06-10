@@ -525,7 +525,7 @@
 			matches = keys.concat( html.match( /:\s(\".*\"|\d{3,3}|null)/g ) );
 			replaces = matches.map( function ( i ) {
 				if ( keys.indexOf( i ) > -1 ) {
-					return i.replace( /(\".*\")/, "<span class='key'>$1</span>" );
+					return i.replace( /(\"(.*)\")/, "<span class='key $2'>$1</span>" );
 				}
 				else {
 					return i.replace( /(\".*\"|\d{3,3}|null)/, "<span class='item'>$1</span>" );
@@ -551,7 +551,7 @@
 				var html = i.innerHTML,
 					val = html.replace( /(^\"|\"$)/g, "" );
 
-				if ( val.indexOf( "://" ) > -1 ) {
+				if ( val.indexOf( "/" ) === 0 || val.indexOf( "//" ) > -1 ) {
 					html = html.replace( val, "<a href='" + val + "' title='View " + val + "'>" + val + "</a>" );
 				}
 

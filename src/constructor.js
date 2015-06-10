@@ -109,7 +109,7 @@ class Tenso {
 		let format = "json";
 
 		array.each( this.server.config.renderers || [], function ( i ) {
-			var found = false;
+			let found = false;
 
 			array.each( accepts, function ( x ) {
 				if ( x.indexOf( i ) > -1 ) {

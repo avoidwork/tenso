@@ -36,6 +36,12 @@ module.exports.get = {
 };
 ```
 
+#### Protected Routes
+Protected routes are routes that require authorization for access, and will redirect to authentication end points if needed.
+
+#### Unprotected Routes
+Unprotected routes are routes that do not require authorization for access, and will exit the authorization pipeline early to avoid rate limiting, csrf tokens, & other security measures. It akin to a DMZ, _you_ **must** secure these end points with alternative methods if accepting input!
+
 ### Request Helpers
 Tensō decorates `req` with "helpers" such as `req.ip`, & `req.parsed`. `PATCH`, `PUT`, & `POST` payloads are available as `req.body`. Sessions are available as `req.session` when using `local` authentication.
 

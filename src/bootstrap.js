@@ -52,7 +52,7 @@ function bootstrap (obj, config) {
 	obj.server.use(parse).blacklist(parse);
 
 	// Bootstrapping configuration
-	config = auth(obj, config);
+	auth(obj, config);
 	config.headers = config.headers || {};
 	config.headers.server = SERVER;
 

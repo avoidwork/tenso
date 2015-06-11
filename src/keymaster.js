@@ -12,7 +12,7 @@ function keymaster (req, res, next) {
 		method, result, routes, uri, valid;
 
 	// No authentication, or it's already happened
-	if (!req.protect || !req.protectAsync || ( req.session && req.isAuthenticated() )) {
+	if (!req.protect || !req.protectAsync || (req.session && req.isAuthenticated())) {
 		method = REGEX.get_rewrite.test(req.method) ? "get" : req.method.toLowerCase();
 		routes = req.server.config.routes[method] || {};
 		uri = req.parsed.pathname;
@@ -29,9 +29,7 @@ function keymaster (req, res, next) {
 				}
 			} else {
 				iterate(routes, function (value, key) {
-					let REGEX = new RegExp("^" + key + "$", "i");
-
-					if (REGEX.test(uri)) {
+					if (new RegExp("^" + key + "$", "i").test(uri)) {
 						result = value;
 
 						return false;
@@ -46,9 +44,7 @@ function keymaster (req, res, next) {
 					}
 				} else {
 					iterate(req.server.config.routes.get || {}, function (value, key) {
-						let REGEX = new RegExp("^" + key + "$", "i");
-
-						if (REGEX.test(uri)) {
+						if (new RegExp("^" + key + "$", "i").test(uri)) {
 							valid = true;
 
 							return false;

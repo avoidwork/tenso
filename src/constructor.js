@@ -64,7 +64,7 @@ class Tenso {
 		reset = state.reset;
 
 		if (seconds >= reset) {
-			reset = state.reset = ( seconds + config.reset );
+			reset = state.reset = (seconds + config.reset);
 			remaining = state.remaining = limit - 1;
 		} else if (remaining > 0) {
 			state.remaining--;
@@ -158,7 +158,8 @@ class Tenso {
 	 * @return {Object}         {@link Tenso}
 	 */
 	respond (req, res, arg, status, headers) {
-		let ref;
+		let resStatus = status || 200,
+			ref;
 
 		if (!res._header) {
 			ref = [headers || {}];
@@ -181,10 +182,9 @@ class Tenso {
 				ref[0][this.server.config.security.key] = res.locals[this.server.config.security.key];
 			}
 
-			status = status || 200;
-			ref[0] = this.server.headers(req, ref[0], status);
+			ref[0] = this.server.headers(req, ref[0], resStatus);
 
-			this.server.respond(req, res, this.render(req, hypermedia(this.server, req, response(arg, status), ref[0]), ref[0]), status, ref[0]);
+			this.server.respond(req, res, this.render(req, hypermedia(this.server, req, response(arg, resStatus), ref[0]), ref[0]), resStatus, ref[0]);
 		}
 
 		return this;

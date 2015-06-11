@@ -8,11 +8,11 @@
  */
 function auth (obj, config) {
 	let ssl = config.ssl.cert && config.ssl.key,
-		proto = "http" + ( ssl ? "s" : "" ),
-		realm = proto + "://" + ( config.hostname === "localhost" ? "127.0.0.1" : config.hostname ) + ( config.port !== 80 && config.port !== 443 ? ":" + config.port : "" ),
-		async = ( config.auth.facebook.enabled || config.auth.google.enabled || config.auth.linkedin.enabled || config.auth.twitter.enabled ),
-		stateless = ( config.auth.basic.enabled || config.auth.bearer.enabled ),
-		stateful = ( async || config.auth.local.enabled || config.security.csrf ),
+		proto = "http" + (ssl ? "s" : ""),
+		realm = proto + "://" + (config.hostname === "localhost" ? "127.0.0.1" : config.hostname) + (config.port !== 80 && config.port !== 443 ? ":" + config.port : ""),
+		async = (config.auth.facebook.enabled || config.auth.google.enabled || config.auth.linkedin.enabled || config.auth.twitter.enabled),
+		stateless = (config.auth.basic.enabled || config.auth.bearer.enabled),
+		stateful = (async || config.auth.local.enabled || config.security.csrf),
 		authMap = {},
 		authUris = [],
 		keys, sesh, fnCookie, fnSesh, luscaCsrf, luscaCsp, luscaXframe, luscaP3p, luscaHsts, luscaXssProtection, protection, passportAuth, passportInit, passportSession;
@@ -41,11 +41,11 @@ function auth (obj, config) {
 		}
 	}
 
-	function init (session) {
+	function init (sess) {
 		passportInit = passport.initialize();
 		obj.server.use(passportInit).blacklist(passportInit);
 
-		if (session) {
+		if (sess) {
 			passportSession = passport.session();
 			obj.server.use(passportSession).blacklist(passportSession);
 		}
@@ -65,11 +65,11 @@ function auth (obj, config) {
 
 	obj.server.blacklist(asyncFlag);
 
-	config.auth.protect = ( config.auth.protect || [] ).map(function (i) {
+	config.auth.protect = (config.auth.protect || []).map(function (i) {
 		return new RegExp("^" + i !== "/login" ? i.replace(/\.\*/g, "*").replace(/\*/g, ".*") : "$", "i");
 	});
 
-	config.auth.unprotect = ( config.auth.unprotect || [] ).map(function (i) {
+	config.auth.unprotect = (config.auth.unprotect || []).map(function (i) {
 		return new RegExp("^" + i !== "/login" ? i.replace(/\.\*/g, "*").replace(/\*/g, ".*") : "$", "i");
 	});
 
@@ -151,8 +151,8 @@ function auth (obj, config) {
 			done(null, user);
 		});
 
-		passport.deserializeUser(function (obj, done) {
-			done(null, obj);
+		passport.deserializeUser(function (arg, done) {
+			done(null, arg);
 		});
 
 		if (authUris.length > 0) {
@@ -172,12 +172,12 @@ function auth (obj, config) {
 				r = r.replace(/\|$/, "") + ")).*$";
 
 				obj.server.use(r, guard).blacklist(guard);
-			})();
+			}());
 
-			config.routes.get["/login"] = config.auth.local.enabled ? ( keys ? {
+			config.routes.get["/login"] = config.auth.local.enabled ? (keys ? {
 				login_uri: "/auth",
 				instruction: "POST 'username' & 'password' to authenticate"
-			} : {instruction: "POST 'username' & 'password' to authenticate"} ) : {login_uri: "/auth"};
+			} : {instruction: "POST 'username' & 'password' to authenticate"}) : {login_uri: "/auth"};
 		} else if (config.auth.local.enabled) {
 			config.routes.get["/login"] = {instruction: "POST 'username' & 'password' to authenticate"};
 		}
@@ -234,7 +234,7 @@ function auth (obj, config) {
 			} else {
 				obj.server.use(passportAuth).blacklist(passportAuth);
 			}
-		})();
+		}());
 	}
 
 	if (config.auth.bearer.enabled) {
@@ -247,7 +247,7 @@ function auth (obj, config) {
 				} else {
 					cb(new Error("Unauthorized"), null);
 				}
-			};
+			}
 
 			passport.use(new BearerStrategy(function (token, done) {
 				validate(token, function (err, user) {
@@ -272,7 +272,7 @@ function auth (obj, config) {
 			} else {
 				obj.server.use(passportAuth).blacklist(passportAuth);
 			}
-		})();
+		}());
 	}
 
 	if (config.auth.facebook.enabled) {
@@ -361,8 +361,7 @@ function auth (obj, config) {
 				passport.authenticate("local")(req, res, function (e) {
 					if (e) {
 						res.error(401, "Unauthorized");
-					}
-					else if (req.cors && req.headers["x-requested-with"] && req.headers["x-requested-with"] === "XMLHttpRequest") {
+					} else if (req.cors && req.headers["x-requested-with"] && req.headers["x-requested-with"] === "XMLHttpRequest") {
 						res.respond("Success");
 					} else {
 						res.redirect(config.auth.redirect);
@@ -405,13 +404,13 @@ function auth (obj, config) {
 
 	if (config.auth.saml.enabled) {
 		(function () {
-			let config = config.auth.saml;
+			let arg = config.auth.saml;
 
-			config.callbackURL = realm + "/auth/saml/callback";
-			delete config.enabled;
-			delete config.path;
+			arg.callbackURL = realm + "/auth/saml/callback";
+			delete arg.enabled;
+			delete arg.path;
 
-			passport.use(new SAMLStrategy(config, function (profile, done) {
+			passport.use(new SAMLStrategy(arg, function (profile, done) {
 				config.auth.saml.auth(profile, function (err, user) {
 					if (err) {
 						delete err.stack;
@@ -421,7 +420,7 @@ function auth (obj, config) {
 					done(null, user);
 				});
 			}));
-		})();
+		}());
 
 		obj.server.get("/auth/saml", asyncFlag);
 		obj.server.get("/auth/saml", passport.authenticate("saml"));

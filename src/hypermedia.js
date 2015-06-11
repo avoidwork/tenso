@@ -20,36 +20,39 @@ function hypermedia (server, req, rep, headers) {
 
 	// Parsing the object for hypermedia properties
 	function parse (obj, rel, item_collection) {
-		rel = rel || "related";
-		let keys = array.keys(obj);
+		let keys = array.keys(obj),
+			lrel = rel || "related",
+			result;
 
 		if (keys.length === 0) {
-			obj = null;
+			result = null;
 		} else {
 			array.each(keys, function (i) {
-				let collection, uri;
+				let lcollection, uri;
 
 				// If ID like keys are found, and are not URIs, they are assumed to be root collections
 				if (REGEX.id.test(i) || REGEX.hypermedia.test(i)) {
 					if (!REGEX.id.test(i)) {
-						collection = i.replace(REGEX.trailing, "").replace(REGEX.trailing_s, "").replace(REGEX.trailing_y, "ie") + "s";
-						rel = "related";
+						lcollection = i.replace(REGEX.trailing, "").replace(REGEX.trailing_s, "").replace(REGEX.trailing_y, "ie") + "s";
+						lrel = "related";
 					} else {
-						collection = item_collection;
-						rel = "item";
+						lcollection = item_collection;
+						lrel = "item";
 					}
 
-					uri = REGEX.scheme.test(obj[i]) ? obj[i] : ( "/" + collection + "/" + obj[i] );
+					uri = REGEX.scheme.test(obj[i]) ? obj[i] : ("/" + lcollection + "/" + obj[i]);
 
 					if (uri !== root && !seen[uri]) {
-						rep.links.push({uri: uri, rel: rel});
+						rep.links.push({uri: uri, rel: lrel});
 						seen[uri] = 1;
 					}
 				}
 			});
+
+			result = obj;
 		}
 
-		return obj;
+		return result;
 	}
 
 	if (rep.status >= 200 && rep.status <= 206) {
@@ -74,7 +77,7 @@ function hypermedia (server, req, rep, headers) {
 				nth = Math.ceil(rep.data.length / page_size);
 
 				if (nth > 1) {
-					rep.data = array.limit(rep.data, ( page - 1 ) * page_size, page_size);
+					rep.data = array.limit(rep.data, (page - 1) * page_size, page_size);
 					query.page = 0;
 					query.page_size = page_size;
 
@@ -87,11 +90,11 @@ function hypermedia (server, req, rep, headers) {
 					}
 
 					if (page - 1 > 1 && page <= nth) {
-						rep.links.push({uri: root.replace("page=0", "page=" + ( page - 1 )), rel: "prev"});
+						rep.links.push({uri: root.replace("page=0", "page=" + (page - 1)), rel: "prev"});
 					}
 
 					if (page + 1 < nth) {
-						rep.links.push({uri: root.replace("page=0", "page=" + ( page + 1 )), rel: "next"});
+						rep.links.push({uri: root.replace("page=0", "page=" + (page + 1)), rel: "next"});
 					}
 
 					if (nth > 0 && page !== nth) {
@@ -106,7 +109,7 @@ function hypermedia (server, req, rep, headers) {
 
 			array.each(rep.data, function (i) {
 				if (typeof i === "string" && i !== collection) {
-					rep.links.push({uri: i.indexOf("//") > -1 || i.indexOf("/") === 0 ? i : ( collection + "/" + i ).replace(/^\/\//, "/"), rel: "item"});
+					rep.links.push({uri: i.indexOf("//") > -1 || i.indexOf("/") === 0 ? i : (collection + "/" + i).replace(/^\/\//, "/"), rel: "item"});
 				}
 
 				if (i instanceof Object) {

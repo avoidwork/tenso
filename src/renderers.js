@@ -15,7 +15,7 @@ let renderers = {
 		fn: function (arg, req, headers, tpl) {
 			let protocol = req.headers["x-forwarded-proto"] ? req.headers["x-forwarded-proto"] + ":" : req.parsed.protocol;
 
-			return ( tpl || "" )
+			return (tpl || "")
 				.replace(/\{\{title\}\}/g, req.server.config.title)
 				.replace("{{url}}", req.parsed.href.replace(req.parsed.protocol, protocol))
 				.replace("{{headers}}", Object.keys(headers).sort(array.sort).map(function (i) {
@@ -27,8 +27,8 @@ let renderers = {
 				.replace("{{body}}", JSON.stringify(arg, null, 2))
 				.replace("{{year}}", new Date().getFullYear())
 				.replace("{{version}}", "{{VERSION}}")
-				.replace("{{allow}}", headers["allow"])
-				.replace("{{methods}}", string.explode(headers["allow"].replace("GET, HEAD, OPTIONS", "")).filter(function (i) {
+				.replace("{{allow}}", headers.allow)
+				.replace("{{methods}}", string.explode(headers.allow.replace("GET, HEAD, OPTIONS", "")).filter(function (i) {
 					return i !== "";
 				}).map(function (i) {
 					return "<option value='" + i + "'>" + i + "</option>";

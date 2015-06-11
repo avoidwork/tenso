@@ -18,20 +18,20 @@ module.exports = function (grunt) {
 				src : [
 					"src/intro.js",
 					"src/regex.js",
-					"src/constructor.js",
+					"src/sanitize.js",
+					"src/renderers.js",
+					"src/error.js",
+					"src/zuul.js",
 					"src/auth.js",
 					"src/bootstrap.js",
 					"src/clone.js",
-					"src/error.js",
-					"src/factory.js",
 					"src/hypermedia.js",
 					"src/keymaster.js",
 					"src/prepare.js",
-					"src/sanitize.js",
 					"src/rate.js",
-					"src/renderers.js",
 					"src/response.js",
-					"src/zuul.js",
+					"src/constructor.js",
+					"src/factory.js",
 					"src/outro.js"
 				],
 				dest : "lib/<%= pkg.name %>.es6.js"
@@ -46,6 +46,9 @@ module.exports = function (grunt) {
 					"lib/<%= pkg.name %>.js": "lib/<%= pkg.name %>.es6.js"
 				}
 			}
+		},
+		eslint: {
+			target: ["lib/<%= pkg.name %>.es6.js"]
 		},
 		jsdoc : {
 			dist : {
@@ -112,10 +115,11 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-mocha-test");
 	grunt.loadNpmTasks("grunt-nsp-package");
 	grunt.loadNpmTasks("grunt-babel");
+	grunt.loadNpmTasks("grunt-eslint");
 
 	// aliases
 	grunt.registerTask("build", ["concat", "sed", "sass", "babel"]);
-	grunt.registerTask("test", ["mochaTest"]);
+	grunt.registerTask("test", ["eslint", "mochaTest"]);
 	grunt.registerTask("default", ["build", "test"]);
 	grunt.registerTask("validate", "validate-package");
 	grunt.registerTask("package", ["validate", "default", "jsdoc"]);

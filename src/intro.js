@@ -1,3 +1,5 @@
+"use strict";
+
 const CONFIG = require(__dirname + "/../config.json");
 const VERSION = "{{VERSION}}";
 const SERVER = "tenso/" + VERSION;

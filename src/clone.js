@@ -5,6 +5,6 @@
  * @param {Mixed} arg To be cloned
  * @returns {Mixed}   Clone of `arg`
  */
-function clone ( arg ) {
-	return JSON.parse( JSON.stringify( arg ) );
+function clone (arg) {
+	return JSON.parse(JSON.stringify(arg));
 }

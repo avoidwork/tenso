@@ -7,10 +7,10 @@
  * @param  {Number} status HTTP status code
  * @return {Object}        Standardized response body
  */
-function prepare ( arg, error, status ) {
-	let data = clone( arg );
+function prepare (arg, error, status) {
+	let data = clone(arg);
 
-	if ( arg !== null ) {
+	if (arg !== null) {
 		error = null;
 	}
 

@@ -8,19 +8,19 @@
  * @param  {Function} next Next middleware
  * @return {Undefined}     undefined
  */
-function rate ( obj, req, res, next ) {
-	let headers = [ "x-ratelimit-limit", "x-ratelimit-remaining", "x-ratelimit-reset" ],
+function rate (obj, req, res, next) {
+	let headers = ["x-ratelimit-limit", "x-ratelimit-remaining", "x-ratelimit-reset"],
 		config = obj.server.config.rate,
-		results = obj.rate( req, config.override ),
+		results = obj.rate(req, config.override),
 		valid = results.shift();
 
-	array.each( headers, function ( i, idx ) {
-		res.setHeader( i, results[ idx ] );
-	} );
+	array.each(headers, function (i, idx) {
+		res.setHeader(i, results[idx]);
+	});
 
-	if ( valid ) {
+	if (valid) {
 		next();
 	} else {
-		obj.error( req, res, config.status || 429, config.message || "Too Many Requests" );
+		obj.error(req, res, config.status || 429, config.message || "Too Many Requests");
 	}
 }

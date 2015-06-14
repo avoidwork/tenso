@@ -38,7 +38,7 @@
     "passport-oauth2": "~1.1.2",
     "passport-saml": "~0.9.1",
     "passport-twitter": "~1.0.2",
-    "turtle.io": "~4.0.8",
+    "turtle.io": "~4.0.9",
     "yamljs": "^0.2.1"
   },
   "devDependencies": {

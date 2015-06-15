@@ -13,130 +13,135 @@
  * @param  {Object} headers HTTP response headers
  * @return {Object}         HTTP response body
  */
-function hypermedia ( server, req, rep, headers ) {
+function hypermedia (server, req, rep, headers) {
 	let seen = {},
-		protocol = req.headers[ "x-forwarded-proto" ] ? req.headers[ "x-forwarded-proto" ] + ":" : req.parsed.protocol,
+		collection = req.parsed.pathname,
 		query, page, page_size, nth, root, parent;
 
 	// Parsing the object for hypermedia properties
-	function parse ( obj, rel, item_collection ) {
-		rel = rel || "related";
-		let keys = array.keys( obj );
+	function parse (obj, rel, item_collection) {
+		let keys = array.keys(obj),
+			lrel = rel || "related",
+			result;
 
-		if ( keys.length === 0 ) {
-			obj = null;
+		if (keys.length === 0) {
+			result = null;
 		} else {
-			array.each( keys, function ( i ) {
-				let collection, uri;
+			array.each(keys, function (i) {
+				let lcollection, uri;
 
 				// If ID like keys are found, and are not URIs, they are assumed to be root collections
-				if ( REGEX.id.test( i ) || REGEX.hypermedia.test( i ) ) {
-					if ( !REGEX.id.test( i ) ) {
-						collection = i.replace( REGEX.trailing, "" ).replace( REGEX.trailing_s, "" ).replace( REGEX.trailing_y, "ie" ) + "s";
-						rel = "related";
+				if (REGEX.id.test(i) || REGEX.hypermedia.test(i)) {
+					if (!REGEX.id.test(i)) {
+						lcollection = i.replace(REGEX.trailing, "").replace(REGEX.trailing_s, "").replace(REGEX.trailing_y, "ie") + "s";
+						lrel = "related";
 					} else {
-						collection = item_collection;
-						rel = "item";
+						lcollection = item_collection;
+						lrel = "item";
 					}
 
-					uri = REGEX.scheme.test( obj[ i ] ) ? ( obj[ i ].indexOf( "//" ) > -1 ? obj[ i ] : protocol + "//" + req.parsed.host + obj[ i ] ) : ( protocol + "//" + req.parsed.host + "/" + collection + "/" + obj[ i ] );
+					uri = REGEX.scheme.test(obj[i]) ? obj[i] : ("/" + lcollection + "/" + obj[i]);
 
-					if ( uri !== root && !seen[ uri ] ) {
-						rep.data.link.push( { uri: uri, rel: rel } );
-						seen[ uri ] = 1;
+					if (uri !== root && !seen[uri]) {
+						seen[uri] = 1;
+
+						if (server.allowed("get", uri, req.vhost)) {
+							rep.links.push({uri: uri, rel: lrel});
+						}
 					}
 				}
-			} );
+			});
+
+			result = obj;
 		}
 
-		return obj;
-	};
+		return result;
+	}
 
-	if ( rep.status >= 200 && rep.status <= 206 ) {
+	if (rep.status >= 200 && rep.status <= 206) {
 		query = req.parsed.query;
 		page = query.page || 1;
 		page_size = query.page_size || server.config.pageSize || 5;
-		rep.data = { link: [], result: rep.data };
-		root = protocol + "//" + req.parsed.host + req.parsed.pathname;
+		root = req.parsed.pathname;
 
-		if ( req.parsed.pathname !== "/" ) {
-			rep.data.link.push( {
-				uri: root.replace( REGEX.trailing_slash, "" ).replace( REGEX.collection, "$1" ),
+		if (req.parsed.pathname !== "/") {
+			rep.links.push({
+				uri: root.replace(REGEX.trailing_slash, "").replace(REGEX.collection, "$1") || "/",
 				rel: "collection"
-			} );
+			});
 		}
 
-		if ( rep.data.result instanceof Array ) {
-			if ( req.method === "GET" ) {
-				if ( isNaN( page ) || page <= 0 ) {
+		if (rep.data instanceof Array) {
+			if (req.method === "GET") {
+				if (isNaN(page) || page <= 0) {
 					page = 1;
 				}
 
-				nth = Math.ceil( rep.data.result.length / page_size );
+				nth = Math.ceil(rep.data.length / page_size);
 
-				if ( nth > 1 ) {
-					rep.data.result = array.limit( rep.data.result, ( page - 1 ) * page_size, page_size );
+				if (nth > 1) {
+					rep.data = array.limit(rep.data, (page - 1) * page_size, page_size);
 					query.page = 0;
 					query.page_size = page_size;
 
-					root += "?" + array.keys( query ).map( function ( i ) {
-							return i + "=" + encodeURIComponent( query[ i ] );
-						} ).join( "&" );
+					root += "?" + array.keys(query).map(function (i) {
+							return i + "=" + encodeURIComponent(query[i]);
+						}).join("&");
 
-					if ( page > 1 ) {
-						rep.data.link.push( { uri: root.replace( "page=0", "page=1" ), rel: "first" } );
+					if (page > 1) {
+						rep.links.push({uri: root.replace("page=0", "page=1"), rel: "first"});
 					}
 
-					if ( page - 1 > 1 && page <= nth ) {
-						rep.data.link.push( { uri: root.replace( "page=0", "page=" + ( page - 1 ) ), rel: "prev" } );
+					if (page - 1 > 1 && page <= nth) {
+						rep.links.push({uri: root.replace("page=0", "page=" + (page - 1)), rel: "prev"});
 					}
 
-					if ( page + 1 < nth ) {
-						rep.data.link.push( { uri: root.replace( "page=0", "page=" + ( page + 1 ) ), rel: "next" } );
+					if (page + 1 < nth) {
+						rep.links.push({uri: root.replace("page=0", "page=" + (page + 1)), rel: "next"});
 					}
 
-					if ( nth > 0 && page !== nth ) {
-						rep.data.link.push( { uri: root.replace( "page=0", "page=" + nth ), rel: "last" } );
+					if (nth > 0 && page !== nth) {
+						rep.links.push({uri: root.replace("page=0", "page=" + nth), rel: "last"});
 					}
 				} else {
-					root += "?" + array.keys( query ).map( function ( i ) {
-							return i + "=" + encodeURIComponent( query[ i ] );
-						} ).join( "&" );
+					root += "?" + array.keys(query).map(function (i) {
+							return i + "=" + encodeURIComponent(query[i]);
+						}).join("&");
 				}
 			}
 
-			array.each( rep.data.result, function ( i ) {
-				let uri;
+			array.each(rep.data, function (i) {
+				var li = i.toString(),
+					uri;
 
-				if ( typeof i === "string" && REGEX.scheme.test( i ) ) {
-					uri = i.indexOf( "//" ) > -1 ? i : protocol + "//" + req.parsed.host + i;
+				if (li !== collection) {
+					uri = li.indexOf("//") > -1 || li.indexOf("/") === 0 ? li : (collection + "/" + li).replace(/^\/\//, "/");
 
-					if ( uri !== root ) {
-						rep.data.link.push( { uri: uri, rel: "item" } );
+					if (server.allowed("get", uri, req.vhost)) {
+						rep.links.push({uri: uri, rel: "item"});
 					}
 				}
 
-				if ( i instanceof Object ) {
-					parse( i, "item", req.parsed.pathname.replace( REGEX.trailing_slash, "" ).replace( REGEX.leading, "" ) );
+				if (i instanceof Object) {
+					parse(i, "item", req.parsed.pathname.replace(REGEX.trailing_slash, "").replace(REGEX.leading, ""));
 				}
-			} );
-		}
-		else if ( rep.data.result instanceof Object ) {
-			parent = req.parsed.pathname.split( "/" ).filter( function ( i ) {
+			});
+		} else if (rep.data instanceof Object) {
+			parent = req.parsed.pathname.split("/").filter(function (i) {
 				return i !== "";
-			} );
+			});
 
-			if ( parent.length > 1 ) {
+			if (parent.length > 1) {
 				parent.pop();
 			}
 
-			rep.data.result = parse( rep.data.result, undefined, array.last( parent ) );
+			rep.data = parse(rep.data, undefined, array.last(parent));
 		}
 
-		if ( rep.data.link !== undefined && rep.data.link.length > 0 ) {
-			headers.link = array.keySort( rep.data.link, "rel, uri" ).map( function ( i ) {
+		if (rep.links.length > 0) {
+			headers.link = array.keySort(rep.links, "rel, uri").map(function (i) {
 				return "<" + i.uri + ">; rel=\"" + i.rel + "\"";
-			} ).join( ", " );
+			}).join(", ");
 		}
 	}
 

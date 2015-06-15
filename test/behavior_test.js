@@ -30,8 +30,8 @@ describe( "Pagination", function () {
 		api( port )
 			.get( "/empty" )
 			.expectStatus( 200 )
-			.expectValue( "data.link", [ { uri: "http://localhost:" + port, rel: "collection" } ] )
-			.expectValue( "data.result", [] )
+			.expectValue( "links", [ { uri: "/", rel: "collection" } ] )
+			.expectValue( "data", [] )
 			.expectValue( "error", null )
 			.expectValue( "status", 200 )
 			.end( function ( err ) {
@@ -44,14 +44,14 @@ describe( "Pagination", function () {
 		api( port )
 			.get( "/items/" )
 			.expectStatus( 200 )
-			.expectValue( "data.link", [ {
-				uri: "http://localhost:" + port,
+			.expectValue( "links", [ {
+				uri: "/",
 				rel: "collection"
 			}, {
-				uri: "http://localhost:" + port + "/items/?page=3&page_size=5",
+				uri: "/items/?page=3&page_size=5",
 				rel: "last"
-			}, { uri: "http://localhost:" + port + "/items/?page=2&page_size=5", rel: "next" } ] )
-			.expectValue( "data.result", [ 1, 2, 3, 4, 5 ] )
+			}, { uri: "/items/?page=2&page_size=5", rel: "next" } ] )
+			.expectValue( "data", [ 1, 2, 3, 4, 5 ] )
 			.expectValue( "error", null )
 			.expectValue( "status", 200 )
 			.end( function ( err ) {
@@ -64,14 +64,14 @@ describe( "Pagination", function () {
 		api( port )
 			.get( "/items" )
 			.expectStatus( 200 )
-			.expectValue( "data.link", [ {
-				uri: "http://localhost:" + port,
+			.expectValue( "links", [ {
+				uri: "/",
 				rel: "collection"
 			}, {
-				uri: "http://localhost:" + port + "/items?page=3&page_size=5",
+				uri: "/items?page=3&page_size=5",
 				rel: "last"
-			}, { uri: "http://localhost:" + port + "/items?page=2&page_size=5", rel: "next" } ] )
-			.expectValue( "data.result", [ 1, 2, 3, 4, 5 ] )
+			}, { uri: "/items?page=2&page_size=5", rel: "next" } ] )
+			.expectValue( "data", [ 1, 2, 3, 4, 5 ] )
 			.expectValue( "error", null )
 			.expectValue( "status", 200 )
 			.end( function ( err ) {
@@ -84,14 +84,14 @@ describe( "Pagination", function () {
 		api( port )
 			.get( "/items?page=2&page_size=5" )
 			.expectStatus( 200 )
-			.expectValue( "data.link", [ {
-				uri: "http://localhost:" + port,
+			.expectValue( "links", [ {
+				uri: "/",
 				rel: "collection"
 			}, {
-				uri: "http://localhost:" + port + "/items?page=1&page_size=5",
+				uri: "/items?page=1&page_size=5",
 				rel: "first"
-			}, { uri: "http://localhost:" + port + "/items?page=3&page_size=5", rel: "last" } ] )
-			.expectValue( "data.result", [ 6, 7, 8, 9, 10 ] )
+			}, { uri: "/items?page=3&page_size=5", rel: "last" } ] )
+			.expectValue( "data", [ 6, 7, 8, 9, 10 ] )
 			.expectValue( "error", null )
 			.expectValue( "status", 200 )
 			.end( function ( err ) {
@@ -104,14 +104,14 @@ describe( "Pagination", function () {
 		api( port )
 			.get( "/items?page=3&page_size=5" )
 			.expectStatus( 200 )
-			.expectValue( "data.link", [ {
-				uri: "http://localhost:" + port,
+			.expectValue( "links", [ {
+				uri: "/",
 				rel: "collection"
 			}, {
-				uri: "http://localhost:" + port + "/items?page=1&page_size=5",
+				uri: "/items?page=1&page_size=5",
 				rel: "first"
-			}, { uri: "http://localhost:" + port + "/items?page=2&page_size=5", rel: "prev" } ] )
-			.expectValue( "data.result", [ 11, 12, 13, 14, 15 ] )
+			}, { uri: "/items?page=2&page_size=5", rel: "prev" } ] )
+			.expectValue( "data", [ 11, 12, 13, 14, 15 ] )
 			.expectValue( "error", null )
 			.expectValue( "status", 200 )
 			.end( function ( err ) {
@@ -124,14 +124,14 @@ describe( "Pagination", function () {
 		api( port )
 			.get( "/items?page=4&page_size=5" )
 			.expectStatus( 200 )
-			.expectValue( "data.link", [ {
-				uri: "http://localhost:" + port,
+			.expectValue( "links", [ {
+				uri: "/",
 				rel: "collection"
 			}, {
-				uri: "http://localhost:" + port + "/items?page=1&page_size=5",
+				uri: "/items?page=1&page_size=5",
 				rel: "first"
-			}, { uri: "http://localhost:" + port + "/items?page=3&page_size=5", rel: "last" } ] )
-			.expectValue( "data.result", [] )
+			}, { uri: "/items?page=3&page_size=5", rel: "last" } ] )
+			.expectValue( "data", [] )
 			.expectValue( "error", null )
 			.expectValue( "status", 200 )
 			.end( function ( err ) {
@@ -144,17 +144,17 @@ describe( "Pagination", function () {
 		api( port )
 			.get( "/items?email=user@domain.com" )
 			.expectStatus( 200 )
-			.expectValue( "data.link", [ {
-				uri: "http://localhost:" + port,
+			.expectValue( "links", [ {
+				uri: "/",
 				rel: "collection"
 			}, {
-				uri: "http://localhost:" + port + "/items?email=user%40domain.com&page=3&page_size=5",
+				uri: "/items?email=user%40domain.com&page=3&page_size=5",
 				rel: "last"
 			}, {
-				uri: "http://localhost:" + port + "/items?email=user%40domain.com&page=2&page_size=5",
+				uri: "/items?email=user%40domain.com&page=2&page_size=5",
 				rel: "next"
 			} ] )
-			.expectValue( "data.result", [ 1, 2, 3, 4, 5 ] )
+			.expectValue( "data", [ 1, 2, 3, 4, 5 ] )
 			.expectValue( "error", null )
 			.expectValue( "status", 200 )
 			.end( function ( err ) {
@@ -175,21 +175,11 @@ describe( "Hypermedia", function () {
 		api( port )
 			.get( "/things" )
 			.expectStatus( 200 )
-			.expectValue( "data.link", [ {
-				uri: "http://localhost:" + port,
+			.expectValue( "links", [ {
+				uri: "/",
 				rel: "collection"
-			}, {
-				uri: "http://localhost:" + port + "/things/1",
-				rel: "item"
-			}, {
-				uri: "http://localhost:" + port + "/things/2",
-				rel: "item"
-			}, {
-				uri: "http://localhost:" + port + "/things/3",
-				rel: "item"
-			}, { uri: "http://localhost:" + port + "/users/1", rel: "related" },
-				{ uri: "http://localhost:" + port + "/users/2", rel: "related" } ] )
-			.expectValue( "data.result", [ { id: 1, name: "thing 1", user_id: 1 }, {
+			} ] )
+			.expectValue( "data", [ { id: 1, name: "thing 1", user_id: 1 }, {
 				id: 2,
 				name: "thing 2",
 				user_id: 1
@@ -206,14 +196,11 @@ describe( "Hypermedia", function () {
 		api( port )
 			.get( "/somethings/abc" )
 			.expectStatus( 200 )
-			.expectValue( "data.link", [ {
-				uri: "http://localhost:" + port + "/somethings",
+			.expectValue( "links", [ {
+				uri: "/somethings",
 				rel: "collection"
-			}, { uri: "http://localhost:" + port + "/users/123", rel: "related" }, {
-				uri: "http://source.tld",
-				rel: "related"
-			} ] )
-			.expectValue( "data.result", {
+			}, { uri: "/users/123", rel: "related" } ] )
+			.expectValue( "data", {
 				_id: "abc",
 				user_id: 123,
 				title: "This is a title",
@@ -232,14 +219,11 @@ describe( "Hypermedia", function () {
 		api( port )
 			.get( "/somethings/def" )
 			.expectStatus( 200 )
-			.expectValue( "data.link", [ {
-				uri: "http://localhost:" + port + "/somethings",
+			.expectValue( "links", [ {
+				uri: "/somethings",
 				rel: "collection"
-			}, { uri: "http://localhost:" + port + "/users/123", rel: "related" }, {
-				uri: "http://source.tld",
-				rel: "related"
-			} ] )
-			.expectValue( "data.result", { _id: "def", user_id: 123, source_url: "http://source.tld" } )
+			}, { uri: "/users/123", rel: "related" } ] )
+			.expectValue( "data", { _id: "def", user_id: 123, source_url: "http://source.tld" } )
 			.expectValue( "error", null )
 			.expectValue( "status", 200 )
 			.end( function ( err ) {
@@ -263,11 +247,11 @@ describe( "Rate Limiting", function () {
 			.expectStatus( 200 )
 			.expectHeader( "x-ratelimit-limit", "2" )
 			.expectHeader( "x-ratelimit-remaining", "1" )
-			.expectValue( "data.link", [ {
-				uri: "http://localhost:" + port + "/items",
+			.expectValue( "links", [ {
+				uri: "/items",
 				rel: "item"
-			}, { uri: "http://localhost:" + port + "/things", rel: "item" } ] )
-			.expectValue( "data.result", [ "/items", "/things" ] )
+			}, { uri: "/things", rel: "item" } ] )
+			.expectValue( "data", [ "/items", "/things" ] )
 			.expectValue( "error", null )
 			.expectValue( "status", 200 )
 			.end( function ( err ) {
@@ -282,11 +266,11 @@ describe( "Rate Limiting", function () {
 			.expectStatus( 200 )
 			.expectHeader( "x-ratelimit-limit", "2" )
 			.expectHeader( "x-ratelimit-remaining", "0" )
-			.expectValue( "data.link", [ {
-				uri: "http://localhost:" + port + "/items",
+			.expectValue( "links", [ {
+				uri: "/items",
 				rel: "item"
-			}, { uri: "http://localhost:" + port + "/things", rel: "item" } ] )
-			.expectValue( "data.result", [ "/items", "/things" ] )
+			}, { uri: "/things", rel: "item" } ] )
+			.expectValue( "data", [ "/items", "/things" ] )
 			.expectValue( "error", null )
 			.expectValue( "status", 200 )
 			.end( function ( err ) {
@@ -342,11 +326,11 @@ describe( "Rate Limiting (Override)", function () {
 			.expectStatus( 200 )
 			.expectHeader( "x-ratelimit-limit", "102" )
 			.expectHeader( "x-ratelimit-remaining", "101" )
-			.expectValue( "data.link", [ {
-				uri: "http://localhost:" + port + "/items",
+			.expectValue( "links", [ {
+				uri: "/items",
 				rel: "item"
-			}, { uri: "http://localhost:" + port + "/things", rel: "item" } ] )
-			.expectValue( "data.result", [ "/items", "/things" ] )
+			}, { uri: "/things", rel: "item" } ] )
+			.expectValue( "data", [ "/items", "/things" ] )
 			.expectValue( "error", null )
 			.expectValue( "status", 200 )
 			.end( function ( err ) {
@@ -361,11 +345,11 @@ describe( "Rate Limiting (Override)", function () {
 			.expectStatus( 200 )
 			.expectHeader( "x-ratelimit-limit", "102" )
 			.expectHeader( "x-ratelimit-remaining", "100" )
-			.expectValue( "data.link", [ {
-				uri: "http://localhost:" + port + "/items",
+			.expectValue( "links", [ {
+				uri: "/items",
 				rel: "item"
-			}, { uri: "http://localhost:" + port + "/things", rel: "item" } ] )
-			.expectValue( "data.result", [ "/items", "/things" ] )
+			}, { uri: "/things", rel: "item" } ] )
+			.expectValue( "data", [ "/items", "/things" ] )
 			.expectValue( "error", null )
 			.expectValue( "status", 200 )
 			.end( function ( err ) {
@@ -395,8 +379,8 @@ describe( "Request body max byte size", function () {
 				.send( { "x": 1 } )
 				.header( csrf, token )
 				.expectStatus( 200 )
-				.expectValue( "data.link", [ { uri: "http://localhost:" + port, rel: "collection" } ] )
-				.expectValue( "data.result", "OK!" )
+				.expectValue( "links", [ { uri: "/", rel: "collection" } ] )
+				.expectValue( "data", "OK!" )
 				.expectValue( "error", null )
 				.expectValue( "status", 200 )
 				.end( function ( err ) {

@@ -5,25 +5,25 @@
  * @param {Array} protect Array of routes
  * @return {Function}    Middleware
  */
-function zuul ( protect ) {
-	return function ( req, res, next ) {
+function zuul (protect) {
+	return function (req, res, next) {
 		let uri = req.parsed.path,
 			protectd = false;
 
-		array.each( protect, function ( r ) {
-			if ( r.test( uri ) ) {
-				return !( protectd = true );
+		array.each(protect, function (r) {
+			if (r.test(uri)) {
+				return !(protectd = true);
 			}
-		} );
+		});
 
 		// Setting state so the connection can be terminated properly
 		req.protect = protectd;
 		req.protectAsync = false;
 
-		if ( protectd && next ) {
+		if (protectd && next) {
 			next();
 		} else {
-			keymaster( req, res );
+			keymaster(req, res);
 		}
 	};
 }

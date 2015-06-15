@@ -239,7 +239,6 @@
 		}
 
 		table {
-			border: 1px solid #ccc;
 			margin-right: 1em;
 			table-layout: fixed;
 			width: 100%;
@@ -249,14 +248,28 @@
 		td {
 			text-align: left;
 			padding: 0.4em;
-			border-bottom: 1px solid #ccc;
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
 		}
 
-		th {
-			background-color: #ccc;
+		th, button {
+			background-color: #808080;
+			color: #ffffff;
+		}
+
+		button {
+			border: 0;
+			padding: 0.4em;
+		}
+		
+		button:hover {
+			cursor: pointer;
+		}
+
+		button:active {
+			background: #ccc;
+			color: #000000;
 		}
 
 		tbody tr:nth-child(odd) {
@@ -270,7 +283,6 @@
 		th:first-child,
 		td:first-child {
 			width: 25%;
-			border-right: 1px solid #ccc;
 		}
 
 		textarea {
@@ -513,7 +525,7 @@
 			matches = keys.concat( html.match( /:\s(\".*\"|\d{3,3}|null)/g ) );
 			replaces = matches.map( function ( i ) {
 				if ( keys.indexOf( i ) > -1 ) {
-					return i.replace( /(\".*\")/, "<span class='key'>$1</span>" );
+					return i.replace( /(\"(.*)\")/, "<span class='key $2'>$1</span>" );
 				}
 				else {
 					return i.replace( /(\".*\"|\d{3,3}|null)/, "<span class='item'>$1</span>" );
@@ -539,7 +551,7 @@
 				var html = i.innerHTML,
 					val = html.replace( /(^\"|\"$)/g, "" );
 
-				if ( val.indexOf( "://" ) > -1 ) {
+				if ( val.indexOf( "/" ) === 0 || val.indexOf( "//" ) > -1 ) {
 					html = html.replace( val, "<a href='" + val + "' title='View " + val + "'>" + val + "</a>" );
 				}
 

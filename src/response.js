@@ -6,19 +6,19 @@
  * @param  {Number} status HTTP status, default is `200`
  * @return {Object}        Response body
  */
-function response ( arg, status ) {
-	let error = arg instanceof Error,
-		rep;
+function response (arg, status) {
+	let err = arg instanceof Error,
+		result;
 
-	if ( error ) {
-		if ( status === undefined ) {
-			throw new Error( "Invalid arguments" );
+	if (err) {
+		if (status === undefined) {
+			throw new Error("Invalid arguments");
 		}
 
-		rep = prepare( null, arg, status );
+		result = prepare(null, arg, status);
 	} else {
-		rep = prepare( arg, null, status );
+		result = prepare(arg, null, status);
 	}
 
-	return rep;
+	return result;
 }

@@ -97,6 +97,8 @@ function auth (obj, config) {
 		authUris.push("/login");
 	}
 
+	obj.server.use(valid).blacklist(valid);
+
 	if (stateful) {
 		sesh = {
 			secret: config.session.secret || uuid(),
@@ -114,7 +116,6 @@ function auth (obj, config) {
 
 		obj.server.use(fnSesh).blacklist(fnSesh);
 		obj.server.use(fnCookie).blacklist(fnCookie);
-		obj.server.use(valid).blacklist(valid);
 		obj.server.use(bypass).blacklist(bypass);
 
 		if (config.security.csrf) {

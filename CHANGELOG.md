@@ -1,5 +1,243 @@
 # Change Log
 
+## [2.0.0](https://github.com/avoidwork/tenso/tree/2.0.0) (2015-06-15)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.6.1...2.0.0)
+
+**Implemented enhancements:**
+
+- Hypermedia should not generate links past leafs [\#46](https://github.com/avoidwork/tenso/issues/46)
+
+- Admin dashboard [\#44](https://github.com/avoidwork/tenso/issues/44)
+
+- Hypermedia generation should be a little closer to a faux spec [\#43](https://github.com/avoidwork/tenso/issues/43)
+
+**Fixed bugs:**
+
+- Rate limiting should run a head of route validation [\#49](https://github.com/avoidwork/tenso/issues/49)
+
+- Erroneous 403 response when 405 is expected [\#48](https://github.com/avoidwork/tenso/issues/48)
+
+**Merged pull requests:**
+
+- 2.0 [\#45](https://github.com/avoidwork/tenso/pull/45) ([avoidwork](https://github.com/avoidwork))
+
+## [1.6.1](https://github.com/avoidwork/tenso/tree/1.6.1) (2015-06-07)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.6.0...1.6.1)
+
+## [1.6.0](https://github.com/avoidwork/tenso/tree/1.6.0) (2015-06-04)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.5.2...1.6.0)
+
+## [1.5.2](https://github.com/avoidwork/tenso/tree/1.5.2) (2015-06-02)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.5.1...1.5.2)
+
+## [1.5.1](https://github.com/avoidwork/tenso/tree/1.5.1) (2015-05-25)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.5.0...1.5.1)
+
+**Fixed bugs:**
+
+- An empty request body should be allowed in the browsable interface [\#42](https://github.com/avoidwork/tenso/issues/42)
+
+## [1.5.0](https://github.com/avoidwork/tenso/tree/1.5.0) (2015-05-25)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.4.9...1.5.0)
+
+**Fixed bugs:**
+
+- `hypermedia\(\)` paginates POST responses [\#41](https://github.com/avoidwork/tenso/issues/41)
+
+## [1.4.9](https://github.com/avoidwork/tenso/tree/1.4.9) (2015-04-19)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.4.8...1.4.9)
+
+## [1.4.8](https://github.com/avoidwork/tenso/tree/1.4.8) (2015-04-15)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.4.7...1.4.8)
+
+## [1.4.7](https://github.com/avoidwork/tenso/tree/1.4.7) (2015-04-14)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.4.6...1.4.7)
+
+## [1.4.6](https://github.com/avoidwork/tenso/tree/1.4.6) (2015-04-14)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.4.5...1.4.6)
+
+## [1.4.5](https://github.com/avoidwork/tenso/tree/1.4.5) (2015-04-14)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.4.4...1.4.5)
+
+## [1.4.4](https://github.com/avoidwork/tenso/tree/1.4.4) (2015-04-14)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.4.3...1.4.4)
+
+**Fixed bugs:**
+
+- Browsable API `prepare\(\)` doesn't handle meta characters properly [\#40](https://github.com/avoidwork/tenso/issues/40)
+
+## [1.4.3](https://github.com/avoidwork/tenso/tree/1.4.3) (2015-04-10)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.4.2...1.4.3)
+
+## [1.4.2](https://github.com/avoidwork/tenso/tree/1.4.2) (2015-04-09)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.4.1...1.4.2)
+
+**Implemented enhancements:**
+
+- Needs pass through support of non-JSON friendly response bodies [\#39](https://github.com/avoidwork/tenso/issues/39)
+
+- Need custom parsers [\#32](https://github.com/avoidwork/tenso/issues/32)
+
+## [1.4.1](https://github.com/avoidwork/tenso/tree/1.4.1) (2015-04-03)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.4.0...1.4.1)
+
+## [1.4.0](https://github.com/avoidwork/tenso/tree/1.4.0) (2015-04-02)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.21...1.4.0)
+
+**Implemented enhancements:**
+
+- Needs a CSV renderer [\#38](https://github.com/avoidwork/tenso/issues/38)
+
+- Browsable API "send" button doesn't work on an iPad [\#34](https://github.com/avoidwork/tenso/issues/34)
+
+- Need custom renderers [\#31](https://github.com/avoidwork/tenso/issues/31)
+
+## [1.3.21](https://github.com/avoidwork/tenso/tree/1.3.21) (2015-04-01)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.20...1.3.21)
+
+**Fixed bugs:**
+
+- Media queries need to be tweaked [\#37](https://github.com/avoidwork/tenso/issues/37)
+
+- Cannot read property 'x-csrf-token' of undefined [\#36](https://github.com/avoidwork/tenso/issues/36)
+
+## [1.3.20](https://github.com/avoidwork/tenso/tree/1.3.20) (2015-04-01)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.19...1.3.20)
+
+## [1.3.19](https://github.com/avoidwork/tenso/tree/1.3.19) (2015-04-01)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.18...1.3.19)
+
+**Fixed bugs:**
+
+- Browsable API response error handling is brittle [\#35](https://github.com/avoidwork/tenso/issues/35)
+
+## [1.3.18](https://github.com/avoidwork/tenso/tree/1.3.18) (2015-03-31)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.17...1.3.18)
+
+**Implemented enhancements:**
+
+- Browsable API needs implement other methods [\#24](https://github.com/avoidwork/tenso/issues/24)
+
+## [1.3.17](https://github.com/avoidwork/tenso/tree/1.3.17) (2015-03-31)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.16...1.3.17)
+
+## [1.3.16](https://github.com/avoidwork/tenso/tree/1.3.16) (2015-03-30)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.15...1.3.16)
+
+## [1.3.15](https://github.com/avoidwork/tenso/tree/1.3.15) (2015-03-30)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.14...1.3.15)
+
+## [1.3.14](https://github.com/avoidwork/tenso/tree/1.3.14) (2015-03-30)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.13...1.3.14)
+
+## [1.3.13](https://github.com/avoidwork/tenso/tree/1.3.13) (2015-03-30)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.12...1.3.13)
+
+## [1.3.12](https://github.com/avoidwork/tenso/tree/1.3.12) (2015-03-30)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.11...1.3.12)
+
+## [1.3.11](https://github.com/avoidwork/tenso/tree/1.3.11) (2015-03-30)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.10...1.3.11)
+
+## [1.3.10](https://github.com/avoidwork/tenso/tree/1.3.10) (2015-03-30)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.9...1.3.10)
+
+## [1.3.9](https://github.com/avoidwork/tenso/tree/1.3.9) (2015-03-30)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.8...1.3.9)
+
+## [1.3.8](https://github.com/avoidwork/tenso/tree/1.3.8) (2015-03-30)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.7...1.3.8)
+
+**Fixed bugs:**
+
+- Browsable API interface is not responsive [\#28](https://github.com/avoidwork/tenso/issues/28)
+
+## [1.3.7](https://github.com/avoidwork/tenso/tree/1.3.7) (2015-03-30)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.6...1.3.7)
+
+**Implemented enhancements:**
+
+- Browsable API headers not in alphabetical order [\#30](https://github.com/avoidwork/tenso/issues/30)
+
+## [1.3.6](https://github.com/avoidwork/tenso/tree/1.3.6) (2015-03-30)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.5...1.3.6)
+
+## [1.3.5](https://github.com/avoidwork/tenso/tree/1.3.5) (2015-03-30)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.4...1.3.5)
+
+**Fixed bugs:**
+
+- Response should not be cachable if `x-ratelimit-limit` is set [\#29](https://github.com/avoidwork/tenso/issues/29)
+
+## [1.3.4](https://github.com/avoidwork/tenso/tree/1.3.4) (2015-03-29)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.3...1.3.4)
+
+**Implemented enhancements:**
+
+- Browsable API is missing 'already decorated' response headers [\#27](https://github.com/avoidwork/tenso/issues/27)
+
+**Fixed bugs:**
+
+- Browsable API is missing 'already decorated' response headers [\#27](https://github.com/avoidwork/tenso/issues/27)
+
+## [1.3.3](https://github.com/avoidwork/tenso/tree/1.3.3) (2015-03-29)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.2...1.3.3)
+
+**Fixed bugs:**
+
+- Browsable API URL header has wrong protocol [\#26](https://github.com/avoidwork/tenso/issues/26)
+
+## [1.3.2](https://github.com/avoidwork/tenso/tree/1.3.2) (2015-03-29)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.1...1.3.2)
+
+**Implemented enhancements:**
+
+- Browsable API needs to support HTTP/HTTPS [\#25](https://github.com/avoidwork/tenso/issues/25)
+
+**Fixed bugs:**
+
+- Browsable API needs to support HTTP/HTTPS [\#25](https://github.com/avoidwork/tenso/issues/25)
+
+## [1.3.1](https://github.com/avoidwork/tenso/tree/1.3.1) (2015-03-29)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/1.3.0...1.3.1)
+
 ## [1.3.0](https://github.com/avoidwork/tenso/tree/1.3.0) (2015-03-29)
 
 [Full Changelog](https://github.com/avoidwork/tenso/compare/1.2.6...1.3.0)

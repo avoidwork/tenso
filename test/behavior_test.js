@@ -178,17 +178,7 @@ describe( "Hypermedia", function () {
 			.expectValue( "links", [ {
 				uri: "/",
 				rel: "collection"
-			}, {
-				uri: "/things/1",
-				rel: "item"
-			}, {
-				uri: "/things/2",
-				rel: "item"
-			}, {
-				uri: "/things/3",
-				rel: "item"
-			}, { uri: "/users/1", rel: "related" },
-				{ uri: "/users/2", rel: "related" } ] )
+			} ] )
 			.expectValue( "data", [ { id: 1, name: "thing 1", user_id: 1 }, {
 				id: 2,
 				name: "thing 2",
@@ -209,10 +199,7 @@ describe( "Hypermedia", function () {
 			.expectValue( "links", [ {
 				uri: "/somethings",
 				rel: "collection"
-			}, { uri: "/users/123", rel: "related" }, {
-				uri: "http://source.tld",
-				rel: "related"
-			} ] )
+			}, { uri: "/users/123", rel: "related" } ] )
 			.expectValue( "data", {
 				_id: "abc",
 				user_id: 123,
@@ -235,10 +222,7 @@ describe( "Hypermedia", function () {
 			.expectValue( "links", [ {
 				uri: "/somethings",
 				rel: "collection"
-			}, { uri: "/users/123", rel: "related" }, {
-				uri: "http://source.tld",
-				rel: "related"
-			} ] )
+			}, { uri: "/users/123", rel: "related" } ] )
 			.expectValue( "data", { _id: "def", user_id: 123, source_url: "http://source.tld" } )
 			.expectValue( "error", null )
 			.expectValue( "status", 200 )

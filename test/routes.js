@@ -10,7 +10,9 @@ module.exports.get = {
 		this.respond( req, res, uuid() );
 	},
 	"/somethings/abc": {"_id": "abc", "user_id": 123, "title": "This is a title", "body": "Where is my body?", "source_url": "http://source.tld"},
-	"/somethings/def": {"_id": "def", "user_id": 123, "source_url": "http://source.tld"}
+	"/somethings/def": {"_id": "def", "user_id": 123, "source_url": "http://source.tld"},
+	"/users": [123],
+	"/users/123": {"_id":123, firstName: "Jason", lastName: "Mulligan"}
 }
 
 module.exports.post = {

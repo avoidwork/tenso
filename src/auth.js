@@ -63,6 +63,14 @@ function auth (obj, config) {
 		res.redirect(config.auth.redirect);
 	}
 
+	function valid (req, res, next) {
+		if (req.allow.indexOf(req.method) > -1) {
+			next();
+		} else {
+			next(new Error(405));
+		}
+	}
+
 	obj.server.blacklist(asyncFlag);
 
 	config.auth.protect = (config.auth.protect || []).map(function (i) {
@@ -106,6 +114,7 @@ function auth (obj, config) {
 
 		obj.server.use(fnSesh).blacklist(fnSesh);
 		obj.server.use(fnCookie).blacklist(fnCookie);
+		obj.server.use(valid).blacklist(valid);
 		obj.server.use(bypass).blacklist(bypass);
 
 		if (config.security.csrf) {

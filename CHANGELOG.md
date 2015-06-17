@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.0.1](https://github.com/avoidwork/tenso/tree/2.0.1) (2015-06-17)
+
+[Full Changelog](https://github.com/avoidwork/tenso/compare/2.0.0...2.0.1)
+
 ## [2.0.0](https://github.com/avoidwork/tenso/tree/2.0.0) (2015-06-15)
 
 [Full Changelog](https://github.com/avoidwork/tenso/compare/1.6.1...2.0.0)

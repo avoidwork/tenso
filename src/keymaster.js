@@ -23,23 +23,31 @@ function keymaster (req, res, next) {
 
 				if (typeof result === "function") {
 					result.call(obj, req, res);
+					next();
 				} else {
-					obj.respond(req, res, result);
+					obj.respond(req, res, result).then(function () {
+						next();
+					}, function (e) {
+						next(e);
+					});
 				}
 			} else {
 				iterate(routes, function (value, key) {
 					if (new RegExp("^" + key + "$", "i").test(uri)) {
-						result = value;
-
-						return false;
+						return !(result = value);
 					}
 				});
 
 				if (result) {
 					if (typeof result === "function") {
 						result.call(obj, req, res);
+						next();
 					} else {
-						obj.respond(req, res, result);
+						obj.respond(req, res, result).then(function () {
+							next();
+						}, function (e) {
+							next(e);
+						});
 					}
 				} else {
 					obj.error(req, res, 404);

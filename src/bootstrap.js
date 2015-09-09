@@ -9,7 +9,7 @@
 function bootstrap (obj, config) {
 	let notify = false;
 
-	function mediator (req, res, next) {
+	function decorate (req, res, next) {
 		res.error = function (status, body) {
 			return obj.error(req, res, status, body);
 		};
@@ -19,6 +19,10 @@ function bootstrap (obj, config) {
 		};
 
 		res.respond = function (body, status, headers) {
+			return obj.respond(req, res, body, status, headers);
+		};
+
+		res.send = function (body, status, headers) {
 			return obj.respond(req, res, body, status, headers);
 		};
 
@@ -48,7 +52,7 @@ function bootstrap (obj, config) {
 		next();
 	}
 
-	obj.server.use(mediator).blacklist(mediator);
+	obj.server.use(decorate).blacklist(decorate);
 	obj.server.use(parse).blacklist(parse);
 
 	// Bootstrapping configuration

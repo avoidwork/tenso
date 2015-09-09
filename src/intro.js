@@ -5,6 +5,7 @@ const VERSION = "{{VERSION}}";
 const SERVER = "tenso/" + VERSION;
 
 let keigai = require("keigai"),
+	deferred = require("tiny-defer"),
 	util = keigai.util,
 	array = util.array,
 	coerce = util.coerce,

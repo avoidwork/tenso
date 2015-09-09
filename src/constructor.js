@@ -155,10 +155,11 @@ class Tenso {
 	 * @param  {Mixed}  arg     Response body
 	 * @param  {Number} status  Response status
 	 * @param  {Object} headers Response headers
-	 * @return {Object}         {@link Tenso}
+	 * @return {Object}         Defer
 	 */
 	respond (req, res, arg, status, headers) {
 		let resStatus = status || 200,
+			defer = deferred(),
 			ref;
 
 		if (!res._header) {
@@ -183,9 +184,15 @@ class Tenso {
 			}
 
 			ref[0] = this.server.headers(req, ref[0], resStatus);
-			this.server.respond(req, res, this.render(req, hypermedia(this.server, req, response(arg, resStatus), ref[0]), ref[0]), resStatus, ref[0]);
+			this.server.respond(req, res, this.render(req, hypermedia(this.server, req, response(arg, resStatus), ref[0]), ref[0]), resStatus, ref[0]).then(function () {
+				defer.resolve(true);
+			}, function (e) {
+				defer.reject(e);
+			});
+		} else {
+			defer.resolve(true);
 		}
 
-		return this;
+		return defer.promise;
 	}
 }

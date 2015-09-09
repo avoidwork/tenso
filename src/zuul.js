@@ -23,7 +23,7 @@ function zuul (protect) {
 		if (protectd && next) {
 			next();
 		} else {
-			keymaster(req, res);
+			keymaster(req, res, next);
 		}
 	};
 }

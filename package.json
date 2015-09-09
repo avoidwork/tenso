@@ -40,7 +40,7 @@
     "passport-twitter": "~1.0.2",
     "retsu": "^1.1.0",
     "tiny-defer": "^1.0.2",
-    "turtle.io": "~4.0.15",
+    "turtle.io": "~4.1.1",
     "yamljs": "^0.2.1"
   },
   "devDependencies": {

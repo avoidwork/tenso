@@ -23,7 +23,6 @@ function keymaster (req, res, next) {
 
 				if (typeof result === "function") {
 					result.call(obj, req, res);
-					next();
 				} else {
 					obj.respond(req, res, result).then(function () {
 						next();

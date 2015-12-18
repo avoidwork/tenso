@@ -156,7 +156,7 @@ function auth (obj, config) {
 		});
 	}
 
-	authUris = array.keys(authMap);
+	authUris = Object.keys(authMap);
 
 	if (config.auth.local.enabled) {
 		authUris.push(config.auth.redirect);
@@ -232,7 +232,7 @@ function auth (obj, config) {
 		});
 
 		if (authUris.length > 0) {
-			keys = array.keys(authMap).length > 0;
+			keys = Object.keys(authMap).length > 0;
 
 			if (keys) {
 				config.routes.get["/auth"] = authMap;
@@ -667,7 +667,7 @@ function hypermedia (server, req, rep, headers) {
 
 	// Parsing the object for hypermedia properties
 	function marshal (obj, rel, item_collection) {
-		let keys = array.keys(obj),
+		let keys = Object.keys(obj),
 			lrel = rel || "related",
 			result;
 
@@ -731,7 +731,7 @@ function hypermedia (server, req, rep, headers) {
 					query.page = 0;
 					query.page_size = page_size;
 
-					root += "?" + array.keys(query).map(function (i) {
+					root += "?" + Object.keys(query).map(function (i) {
 							return i + "=" + encodeURIComponent(query[i]);
 						}).join("&");
 
@@ -751,7 +751,7 @@ function hypermedia (server, req, rep, headers) {
 						rep.links.push({uri: root.replace("page=0", "page=" + nth), rel: "last"});
 					}
 				} else {
-					root += "?" + array.keys(query).map(function (i) {
+					root += "?" + Object.keys(query).map(function (i) {
 							return i + "=" + encodeURIComponent(query[i]);
 						}).join("&");
 				}

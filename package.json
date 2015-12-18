@@ -12,7 +12,7 @@
     "url": "https://github.com/avoidwork/tenso/issues"
   },
   "license": "BSD-3-Clause",
-  "main": "lib/tenso",
+  "main": "lib/index",
   "engines": {
     "node": ">=4.0.0"
   },

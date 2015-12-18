@@ -1,5 +1,6 @@
 module.exports = function (grunt) {
 	grunt.initConfig({
+		pkg : grunt.file.readJSON("package.json"),
 		babel: {
 			options: {
 				sourceMap: false,
@@ -43,7 +44,7 @@ module.exports = function (grunt) {
 			version : {
 				pattern : "{{VERSION}}",
 				replacement : "<%= pkg.version %>",
-				path : ["<%= concat.dist.dest %>"]
+				path : ["lib/renderers.js", "lib/tenso.js", "lib/utility.js"]
 			}
 		},
 		watch : {
@@ -77,5 +78,5 @@ module.exports = function (grunt) {
 
 	// aliases
 	grunt.registerTask("test", ["eslint", "mochaTest", "nsp"]);
-	grunt.registerTask("default", ["sass", "eslint", "babel", "mochaTest", "nsp"]);
+	grunt.registerTask("default", ["sass", "eslint", "babel", "sed", "mochaTest", "nsp"]);
 };

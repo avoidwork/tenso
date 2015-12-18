@@ -72,12 +72,17 @@
 		"secret": "tenso",
 		"csrf": true,
 		"csp": null,
-		"xframe": "",
+		"xframe": "SAMEORIGIN",
 		"p3p": "",
-		"hsts": null,
-		"xssProtection": null
+		"hsts": {
+			"maxAge": 31536000,
+			"includeSubDomains": true,
+			"preload": true
+		},
+		"xssProtection": true
 	},
 	"serializers": [
+		"application/json",
 		"tenso"
 	],
 	"maxBytes": 1048576,

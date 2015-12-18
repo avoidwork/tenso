@@ -9,11 +9,11 @@ let renderers = require(path.join(__dirname, "renderers")),
 	serializers = require(path.join(__dirname, "serializers"));
 
 class Tenso {
-	constructor () {
+	constructor (config) {
 		this.hostname = "";
 		this.messages = {};
 		this.rates = {};
-		this.server = turtleio();
+		this.server = turtleio(config);
 		this.server.tenso = this;
 		this.version = "{{VERSION}}";
 	}
@@ -180,6 +180,6 @@ class Tenso {
 	}
 }
 
-module.exports = function () {
-	return new Tenso();
+module.exports = function (config) {
+	return new Tenso(config);
 };

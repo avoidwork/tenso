@@ -180,4 +180,6 @@ class Tenso {
 	}
 }
 
-module.exports = Tenso;
+module.exports = function () {
+	return new Tenso();
+};

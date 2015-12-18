@@ -1,4 +1,4 @@
-var uuid = require("keigai" ).util.uuid;
+var uuid = require("tiny-uuid4" );
 
 module.exports.get = {
 	"/": ["/items", "/things"],

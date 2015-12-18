@@ -1,7 +1,7 @@
 var hippie = require( "hippie" ),
 	tenso = require( "../lib/tenso" ),
 	routes = require( "./routes.js" ),
-	array = require( "keigai" ).util.array,
+	array = require( "retsu" ),
 	csrf = 'x-csrf-token';
 
 function persistCookies ( opts, next ) {

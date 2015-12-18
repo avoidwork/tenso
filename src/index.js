@@ -2,7 +2,7 @@ const fs = require("fs"),
 	path = require("path"),
 	root = path.join(__dirname, ".."),
 	cfg = require(path.join(root, "config.json")),
-	Tenso = require(path.join(__dirname, "tenso.js")),
+	tenso = require(path.join(__dirname, "tenso.js")),
 	utility = require(path.join(__dirname, "utility.js"));
 
 function factory (arg) {
@@ -21,7 +21,7 @@ function factory (arg) {
 	config.vhosts = vhosts;
 	config.default = hostname;
 	config.template = fs.readFileSync(path.join(config.root, "template.html"), {encoding: "utf8"});
-	obj = new Tenso();
+	obj = tenso();
 	obj.hostname = hostname;
 
 	return utility.bootstrap(obj, config);

@@ -1,7 +1,8 @@
-const path = require("path"),
+const fs = require("fs"),
+	path = require("path"),
 	root = path.join(__dirname, ".."),
 	cfg = require(path.join(root, "config.json")),
-	Tenso = require(path.join(__dirname, "tenso.js"));
+	Tenso = require(path.join(__dirname, "tenso.js")),
 	utility = require(path.join(__dirname, "utility.js"));
 
 function factory (arg) {

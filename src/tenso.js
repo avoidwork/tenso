@@ -1,3 +1,13 @@
+const path = require("path"),
+	array = require("retsu"),
+	turtleio = require("turtle.io"),
+	deferred = require("tiny-defer"),
+	regex = require(path.join(__dirname, "regex")),
+	utility = require(path.join(__dirname, "utility"));
+
+let renderers = require(path.join(__dirname, "renderers")),
+	serializers = require(path.join(__dirname, "serializers"));
+
 class Tenso {
 	constructor () {
 		this.hostname = "";
@@ -5,7 +15,7 @@ class Tenso {
 		this.rates = {};
 		this.server = turtleio();
 		this.server.tenso = this;
-		this.version = VERSION;
+		this.version = "{{VERSION}}";
 	}
 
 	error (req, res, status, arg) {
@@ -40,7 +50,7 @@ class Tenso {
 		reset = state.reset;
 
 		if (seconds >= reset) {
-			reset = state.reset = (seconds + config.reset);
+			reset = state.reset = seconds + config.reset;
 			remaining = state.remaining = limit - 1;
 		} else if (remaining > 0) {
 			state.remaining--;
@@ -60,7 +70,7 @@ class Tenso {
 
 	render (req, arg, headers) {
 		let accept = req.parsed.query.format || req.headers.accept || "application/json",
-			accepts = string.explode(accept, ";"),
+			accepts = utility.explode(accept, ";"),
 			format = "json";
 
 		array.each(this.server.config.renderers || [], function (i) {
@@ -99,12 +109,12 @@ class Tenso {
 			ref = [headers || {}];
 
 			if (res._headers) {
-				merge(ref[0], res._headers);
+				utility.merge(ref[0], res._headers);
 			}
 
 			if (req.protect) {
 				if (ref[0]["cache-control"] === undefined && this.server.config.headers["cache-control"]) {
-					ref[0]["cache-control"] = clone(this.server.config.headers["cache-control"]);
+					ref[0]["cache-control"] = utility.clone(this.server.config.headers["cache-control"]);
 				}
 
 				if (ref[0]["cache-control"] !== undefined && ref[0]["cache-control"].indexOf("private ") === -1) {
@@ -112,12 +122,12 @@ class Tenso {
 				}
 			}
 
-			if (!REGEX.modify.test(req.method) && REGEX.modify.test(req.allow) && this.server.config.security.csrf && res.locals[this.server.config.security.key]) {
+			if (!regex.modify.test(req.method) && regex.modify.test(req.allow) && this.server.config.security.csrf && res.locals[this.server.config.security.key]) {
 				ref[0][this.server.config.security.key] = res.locals[this.server.config.security.key];
 			}
 
 			ref[0] = this.server.headers(req, ref[0], resStatus);
-			this.server.respond(req, res, this.render(req, hypermedia(this.server, req, response(arg, resStatus), ref[0]), ref[0]), resStatus, ref[0]).then(function () {
+			this.server.respond(req, res, this.render(req, utility.hypermedia(this.server, req, this.serialize(req, arg, resStatus), ref[0]), ref[0]), resStatus, ref[0]).then(function () {
 				defer.resolve(true);
 			}, function (e) {
 				defer.reject(e);
@@ -128,10 +138,46 @@ class Tenso {
 
 		return defer.promise;
 	}
+
+	serialize (req, arg, status = 200) {
+		let format = "application/json",
+			accept = req.parsed.query.format || req.headers.accept || format,
+			accepts = utility.explode(accept, ";"),
+			errz = arg instanceof Error,
+			result, serializer;
+
+		array.each(this.server.config.serializers || [], function (i) {
+			let found = false;
+
+			array.each(accepts, function (x) {
+				if (x.indexOf(i) > -1) {
+					format = i;
+					return !(found = true);
+				}
+			});
+
+			if (found) {
+				return false;
+			}
+		});
+
+		serializer = serializers[format] || serializers.tenso;
+
+		if (errz) {
+			result = serializer(null, arg, status < 400 ? 500 : status);
+		} else {
+			result = serializer(arg, null, status);
+		}
+
+		return result;
+	}
+
+	serializer (mime, fn) {
+		serializers[mime] = fn;
+		array.add(this.server.config.serializers, mime);
+
+		return this;
+	}
 }
 
 module.exports = Tenso;
-
-/*function error (server, req, res, status, err) {
-	server.respond(req, res, err, status);
-}*/

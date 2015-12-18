@@ -1,6 +1,8 @@
 const array = require("retsu"),
 	xml = require("tiny-xml"),
-	yaml = require("yamljs");
+	yaml = require("yamljs"),
+	path = require("path"),
+	utility = require(path.join(__dirname, "utility.js"));
 
 function sanitize (arg) {
 	let output = arg;
@@ -39,7 +41,7 @@ let renderers = {
 				.replace("{{year}}", new Date().getFullYear())
 				.replace("{{version}}", "{{VERSION}}")
 				.replace("{{allow}}", headers.allow)
-				.replace("{{methods}}", string.explode(headers.allow.replace("GET, HEAD, OPTIONS", "")).filter(function (i) {
+				.replace("{{methods}}", utility.explode(headers.allow.replace("GET, HEAD, OPTIONS", "")).filter(function (i) {
 					return i !== "";
 				}).map(function (i) {
 					return "<option value='" + i + "'>" + i + "</option>";
@@ -68,4 +70,4 @@ let renderers = {
 	}
 };
 
-modules.export = renderers;
+module.exports = renderers;

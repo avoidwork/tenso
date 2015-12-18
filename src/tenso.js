@@ -1,9 +1,4 @@
 class Tenso {
-	/**
-	 * Tenso
-	 *
-	 * @constructor
-	 */
 	constructor () {
 		this.hostname = "";
 		this.messages = {};
@@ -13,31 +8,12 @@ class Tenso {
 		this.version = VERSION;
 	}
 
-	/**
-	 * Sends an Error to the Client
-	 *
-	 * @method redirect
-	 * @memberOf Tenso
-	 * @param  {Object} req    Client request
-	 * @param  {Object} res    Client response
-	 * @param  {Number} status Response status
-	 * @param  {Object} arg    Response body
-	 */
 	error (req, res, status, arg) {
 		this.server.error(req, res, status, arg);
 
 		return this;
 	}
 
-	/**
-	 * Returns rate limit information for Client request
-	 *
-	 * @method rate
-	 * @memberOf Tenso
-	 * @param  {Object} req Client request
-	 * @param  {Object} fn  [Optional] Override default rate limit
-	 * @return {Array}      Array of rate limit information `[valid, total, remaining, reset]`
-	 */
 	rate (req, fn) {
 		let config = this.server.config.rate,
 			id = req.sessionID || req.ip,
@@ -76,36 +52,16 @@ class Tenso {
 		return [valid, limit, remaining, reset];
 	}
 
-	/**
-	 * Redirects the Client
-	 *
-	 * @method redirect
-	 * @memberOf Tenso
-	 * @param  {Object} req Client request
-	 * @param  {Object} res Client response
-	 * @param  {Mixed}  uri Target URI
-	 * @return {Object} {@link Tenso}
-	 */
-	redirect (req, res, uri) {
-		this.server.respond(req, res, this.server.messages.NO_CONTENT, this.server.codes.FOUND, {location: uri});
+	redirect (req, res, uri, perm = false) {
+		this.server.respond(req, res, this.server.messages.NO_CONTENT, this.server.codes[!perm ? "FOUND" : "MOVED"], {location: uri});
 
 		return this;
 	}
 
-	/**
-	 * Renders a response body, defaults to JSON
-	 *
-	 * @method render
-	 * @memberOf Tenso
-	 * @param  {Object} req     Client request
-	 * @param  {Object} arg     HTTP response body
-	 * @param  {Object} headers HTTP response headers
-	 * @return {String}         HTTP response body
-	 */
 	render (req, arg, headers) {
-		let accept = req.parsed.query.format || req.headers.accept || "application/json";
-		let accepts = string.explode(accept, ";");
-		let format = "json";
+		let accept = req.parsed.query.format || req.headers.accept || "application/json",
+			accepts = string.explode(accept, ";"),
+			format = "json";
 
 		array.each(this.server.config.renderers || [], function (i) {
 			let found = false;
@@ -113,8 +69,7 @@ class Tenso {
 			array.each(accepts, function (x) {
 				if (x.indexOf(i) > -1) {
 					format = i;
-					found = true;
-					return false;
+					return !(found = true);
 				}
 			});
 
@@ -128,16 +83,6 @@ class Tenso {
 		return renderers[format].fn(arg, req, headers, format === "html" ? this.server.config.template : undefined);
 	}
 
-	/**
-	 * Registers a renderer
-	 *
-	 * @method renderer
-	 * @memberOf Tenso
-	 * @param {String}   name     Name of the renderer, e.g. "html"
-	 * @param {Function} fn       Function accepts `arg, req, headers, template`
-	 * @param {String}   mimetype Content-Type value
-	 * @return {Object}           {@link Tenso}
-	 */
 	renderer (name, fn, mimetype) {
 		renderers[name] = {fn: fn, header: mimetype};
 		array.add(this.server.config.renderers, name);
@@ -145,18 +90,6 @@ class Tenso {
 		return this;
 	}
 
-	/**
-	 * Sends a response to the Client
-	 *
-	 * @method respond
-	 * @memberOf Tenso
-	 * @param  {Object} req     Client request
-	 * @param  {Object} res     Client response
-	 * @param  {Mixed}  arg     Response body
-	 * @param  {Number} status  Response status
-	 * @param  {Object} headers Response headers
-	 * @return {Object}         Defer
-	 */
 	respond (req, res, arg, status, headers) {
 		let resStatus = status || 200,
 			defer = deferred(),
@@ -196,3 +129,9 @@ class Tenso {
 		return defer.promise;
 	}
 }
+
+module.exports = Tenso;
+
+/*function error (server, req, res, status, err) {
+	server.respond(req, res, err, status);
+}*/

@@ -1,11 +1,419 @@
-/**
- * Setups up authentication
- *
- * @method auth
- * @param  {Object} obj    Tenso instance
- * @param  {Object} config Tenso configuration
- * @return {Object}        Updated Tenso configuration
- */
+const path = require("path"),
+	array = require("retsu"),
+	regex = require(path.join(__dirname, "regex.js")),
+	url = require("url"),
+	session = require("express-session"),
+	cookie = require("cookie-parser"),
+	lusca = require("lusca"),
+	passport = require("passport"),
+	BasicStrategy = require("passport-http").BasicStrategy,
+	BearerStrategy = require("passport-http-bearer").Strategy,
+	FacebookStrategy = require("passport-facebook").Strategy,
+	GoogleStrategy = require("passport-google").Strategy,
+	LinkedInStrategy = require("passport-linkedin").Strategy,
+	LocalStrategy = require("passport-local").Strategy,
+	OAuth2Strategy = require("passport-oauth2").Strategy,
+	SAMLStrategy = require("passport-saml").Strategy,
+	TwitterStrategy = require("passport-twitter").Strategy,
+	RedisStore = require("connect-redis")(session),
+	serializers = require(path.join(__dirname, "serializers.js")),
+	serializer = serializers[serializers.default];
+
+function trim (obj) {
+	return obj.replace(/^(\s+|\t+|\n+)|(\s+|\t+|\n+)$/g, "");
+}
+
+function explode (obj, arg = ",") {
+	return trim(obj).split(new RegExp("\\s*" + arg + "\\s*"));
+}
+
+function escape (arg) {
+	return arg.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&");
+}
+
+function capitalize (obj, all = false) {
+	let result;
+
+	if (all) {
+		result = explode(obj, " ").map(capitalize).join(" ");
+	} else {
+		result = obj.charAt(0).toUpperCase() + obj.slice(1);
+	}
+
+	return result;
+}
+
+function clone (arg) {
+	return JSON.parse(JSON.stringify(arg));
+}
+
+function coerce (value) {
+	let tmp;
+
+	if (value === null || value === undefined) {
+		return undefined;
+	} else if (value === "true") {
+		return true;
+	} else if (value === "false") {
+		return false;
+	} else if (value === "null") {
+		return null;
+	} else if (value === "undefined") {
+		return undefined;
+	} else if (value === "") {
+		return value;
+	} else if (!isNaN(tmp = Number(value))) {
+		return tmp;
+	} else if (regex.json_wrap.test(value)) {
+		return JSON.parse(value);
+	} else {
+		return value;
+	}
+}
+
+function contains (haystack, needle) {
+	return haystack.indexOf(needle) > -1;
+}
+
+function bootstrap (obj, config) {
+	let notify = false;
+
+	function decorate (req, res, next) {
+		res.error = function (status, body) {
+			return obj.error(req, res, status, body);
+		};
+
+		res.redirect = function (uri, perm = true) {
+			return obj.redirect(req, res, uri, undefined, perm);
+		};
+
+		res.respond = function (body, status, headers) {
+			return obj.respond(req, res, body, status, headers);
+		};
+
+		res.send = function (body, status, headers) {
+			return obj.respond(req, res, body, status, headers);
+		};
+
+		next();
+	}
+
+	function parse (req, res, next) {
+		let args, type;
+
+		if (REGEX.body.test(req.method) && req.body !== undefined) {
+			type = req.headers["content-type"];
+
+			if (REGEX.encode_form.test(type)) {
+				args = req.body ? array.chunk(req.body.split(REGEX.body_split), 2) : [];
+				req.body = {};
+
+				array.each(args, function (i) {
+					req.body[i[0]] = coerce(i[1]);
+				});
+			}
+
+			if (REGEX.encode_json.test(type)) {
+				req.body = json.decode(req.body, true) || req.body;
+			}
+		}
+
+		next();
+	}
+
+	obj.server.use(decorate).blacklist(decorate);
+	obj.server.use(parse).blacklist(parse);
+
+	// Bootstrapping configuration
+	auth(obj, config);
+	config.headers = config.headers || {};
+	config.headers.server = "tenso/{{VERSION}}";
+
+	// Creating status > message map
+	iterate(obj.server.codes, function (value, key) {
+		obj.messages[value] = obj.server.messages[key];
+	});
+
+	// Setting routes
+	iterate(config.routes, function (routes, method) {
+		iterate(routes, function (arg, route) {
+			if (typeof arg === "function") {
+				obj.server[method](route, function (...args) {
+					arg.apply(obj, args);
+				});
+			} else {
+				obj.server[method](route, function (req, res) {
+					obj.respond(req, res, arg);
+				});
+			}
+		});
+	});
+
+	// Disabling compression over SSL due to BREACH
+	if (config.ssl.cert && config.ssl.key) {
+		config.compress = false;
+		notify = true;
+	}
+
+	// Starting API server
+	obj.server.start(config, function (req, res, status, msg) {
+		let stat = status instanceof Error ? parseInt(status.message, 10) : status,
+			err = msg instanceof Error ? msg : new Error(msg || obj.messages[stat]);
+
+		error(obj, req, res, stat, err, obj);
+	});
+
+	if (notify) {
+		obj.server.log("Compression over SSL is disabled for your protection", "debug");
+	}
+
+	return obj;
+}
+
+function hypermedia (server, req, rep, headers) {
+	let seen = {},
+		collection = req.parsed.pathname,
+		query, page, page_size, nth, root, parent;
+
+	// Parsing the object for hypermedia properties
+	function parse (obj, rel, item_collection) {
+		let keys = array.keys(obj),
+			lrel = rel || "related",
+			result;
+
+		if (keys.length === 0) {
+			result = null;
+		} else {
+			array.each(keys, function (i) {
+				let lcollection, uri;
+
+				// If ID like keys are found, and are not URIs, they are assumed to be root collections
+				if (REGEX.id.test(i) || REGEX.hypermedia.test(i)) {
+					if (!REGEX.id.test(i)) {
+						lcollection = i.replace(REGEX.trailing, "").replace(REGEX.trailing_s, "").replace(REGEX.trailing_y, "ie") + "s";
+						lrel = "related";
+					} else {
+						lcollection = item_collection;
+						lrel = "item";
+					}
+
+					uri = REGEX.scheme.test(obj[i]) ? obj[i] : ("/" + lcollection + "/" + obj[i]);
+
+					if (uri !== root && !seen[uri]) {
+						seen[uri] = 1;
+
+						if (server.allowed("get", uri, req.vhost)) {
+							rep.links.push({uri: uri, rel: lrel});
+						}
+					}
+				}
+			});
+
+			result = obj;
+		}
+
+		return result;
+	}
+
+	if (rep.status >= 200 && rep.status <= 206) {
+		query = req.parsed.query;
+		page = query.page || 1;
+		page_size = query.page_size || server.config.pageSize || 5;
+		root = req.parsed.pathname;
+
+		if (req.parsed.pathname !== "/") {
+			rep.links.push({
+				uri: root.replace(REGEX.trailing_slash, "").replace(REGEX.collection, "$1") || "/",
+				rel: "collection"
+			});
+		}
+
+		if (rep.data instanceof Array) {
+			if (req.method === "GET") {
+				if (isNaN(page) || page <= 0) {
+					page = 1;
+				}
+
+				nth = Math.ceil(rep.data.length / page_size);
+
+				if (nth > 1) {
+					rep.data = array.limit(rep.data, (page - 1) * page_size, page_size);
+					query.page = 0;
+					query.page_size = page_size;
+
+					root += "?" + array.keys(query).map(function (i) {
+							return i + "=" + encodeURIComponent(query[i]);
+						}).join("&");
+
+					if (page > 1) {
+						rep.links.push({uri: root.replace("page=0", "page=1"), rel: "first"});
+					}
+
+					if (page - 1 > 1 && page <= nth) {
+						rep.links.push({uri: root.replace("page=0", "page=" + (page - 1)), rel: "prev"});
+					}
+
+					if (page + 1 < nth) {
+						rep.links.push({uri: root.replace("page=0", "page=" + (page + 1)), rel: "next"});
+					}
+
+					if (nth > 0 && page !== nth) {
+						rep.links.push({uri: root.replace("page=0", "page=" + nth), rel: "last"});
+					}
+				} else {
+					root += "?" + array.keys(query).map(function (i) {
+							return i + "=" + encodeURIComponent(query[i]);
+						}).join("&");
+				}
+			}
+
+			array.each(rep.data, function (i) {
+				var li = i.toString(),
+					uri;
+
+				if (li !== collection) {
+					uri = li.indexOf("//") > -1 || li.indexOf("/") === 0 ? li : (collection + "/" + li).replace(/^\/\//, "/");
+
+					if (server.allowed("get", uri, req.vhost)) {
+						rep.links.push({uri: uri, rel: "item"});
+					}
+				}
+
+				if (i instanceof Object) {
+					parse(i, "item", req.parsed.pathname.replace(REGEX.trailing_slash, "").replace(REGEX.leading, ""));
+				}
+			});
+		} else if (rep.data instanceof Object) {
+			parent = req.parsed.pathname.split("/").filter(function (i) {
+				return i !== "";
+			});
+
+			if (parent.length > 1) {
+				parent.pop();
+			}
+
+			rep.data = parse(rep.data, undefined, array.last(parent));
+		}
+
+		if (rep.links.length > 0) {
+			headers.link = array.keySort(rep.links, "rel, uri").map(function (i) {
+				return "<" + i.uri + ">; rel=\"" + i.rel + "\"";
+			}).join(", ");
+		}
+	}
+
+	return rep;
+}
+
+function isEmpty (obj) {
+	return trim(obj) === "";
+}
+
+function iterate (obj, fn) {
+	if (obj instanceof Object) {
+		Object.keys(obj).forEach(function (i) {
+			fn.call(obj, obj[i], i);
+		});
+	} else {
+		obj.forEach(fn);
+	}
+}
+
+function merge (a, b) {
+	if (a instanceof Object && b instanceof Object) {
+		Object.keys(b).forEach(function (i) {
+			if (a[i] instanceof Object && b[i] instanceof Object) {
+				a[i] = merge(a[i], b[i]);
+			} else if (a[i] instanceof Array && b[i] instanceof Array) {
+				a[i] = a[i].concat(b[i]);
+			} else {
+				a[i] = b[i];
+			}
+		});
+	} else if (a instanceof Array && b instanceof Array) {
+		a = a.concat(b);
+	} else {
+		a = b;
+	}
+
+	return a;
+}
+
+function queryString (qstring = "") {
+	let obj = {};
+	let aresult = qstring.split("?");
+	let result;
+
+	if (aresult.length > 1) {
+		aresult.shift();
+	}
+
+	result = aresult.join("?");
+	result.split("&").forEach(function (prop) {
+		let aitem = prop.replace(/\+/g, " ").split("=");
+		let item;
+
+		if (aitem.length > 2) {
+			item = [aitem.shift(), aitem.join("=")];
+		} else {
+			item = aitem;
+		}
+
+		if (isEmpty(item[0])) {
+			return;
+		}
+
+		if (item[1] === undefined) {
+			item[1] = "";
+		} else {
+			item[1] = coerce(decodeURIComponent(item[1]));
+		}
+
+		if (obj[item[0]] === undefined) {
+			obj[item[0]] = item[1];
+		} else if (obj[item[0]] instanceof Array === false) {
+			obj[item[0]] = [obj[item[0]]];
+			obj[item[0]].push(item[1]);
+		} else {
+			obj[item[0]].push(item[1]);
+		}
+	});
+
+	return obj;
+}
+
+function parse (uri) {
+	let luri = uri;
+	let idxAscii, idxQ, parsed;
+
+	if (luri === undefined || luri === null) {
+		luri = "";
+	} else {
+		idxAscii = luri.indexOf("%3F");
+		idxQ = luri.indexOf("?");
+
+		switch (true) {
+			case idxQ === -1 && idxAscii > -1:
+			case idxAscii < idxQ:
+				luri = luri.replace("%3F", "?");
+				break;
+			default:
+				void 0;
+		}
+	}
+
+	parsed = url.parse(luri);
+	parsed.query = parsed.search ? queryString(parsed.search) : {};
+
+	iterate(parsed, function (v, k) {
+		if (v === null) {
+			parsed[k] = "";
+		}
+	});
+
+	return parsed;
+}
+
 function auth (obj, config) {
 	let ssl = config.ssl.cert && config.ssl.key,
 		proto = "http" + (ssl ? "s" : ""),
@@ -466,3 +874,42 @@ function auth (obj, config) {
 
 	return config;
 }
+
+function response (arg, status) {
+	let err = arg instanceof Error,
+		result;
+
+	if (err) {
+		if (status === undefined) {
+			throw new Error("Invalid arguments");
+		}
+
+		result = serializer(null, arg, status);
+	} else {
+		result = serializer(arg, null, status);
+	}
+
+	return result;
+}
+
+
+
+module.exports = {
+	auth: auth,
+	bootstrap: bootstrap,
+	capitalize: capitalize,
+	clone: clone,
+	coerce: coerce,
+	contains: contains,
+	explode: explode,
+	escape: escape,
+	hypermedia: hypermedia,
+	isEmpty: isEmpty,
+	iterate: iterate,
+	merge: merge,
+	queryString: queryString,
+	parse: parse,
+	response: response,
+	trim: trim,
+	xml: xml
+};

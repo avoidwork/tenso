@@ -69,6 +69,9 @@ module.exports = function (grunt) {
 				src : ["test/*_test.js"]
 			}
 		},
+		nsp: {
+			package: grunt.file.readJSON("package.json")
+		},
 		sass: {
 			dist: {
 				options : {

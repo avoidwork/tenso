@@ -1,9 +1,4 @@
-/**
- * RegExp cache
- *
- * @type Object
- */
-const REGEX = {
+const regex = {
 	body: /POST|PUT|PATCH/i,
 	body_split: /&|=/,
 	collection: /(.*)(\/.*)$/,
@@ -20,3 +15,5 @@ const REGEX = {
 	trailing_slash: /\/$/,
 	trailing_y: /y$/
 };
+
+modules.export = regex;

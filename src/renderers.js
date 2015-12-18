@@ -1,8 +1,19 @@
-/**
- * Renderers
- *
- * @type {Object}
- */
+const array = require("retsu"),
+	xml = require("tiny-xml"),
+	yaml = require("yamljs");
+
+function sanitize (arg) {
+	let output = arg;
+
+	if (typeof arg === "string") {
+		[["<", "&lt;"], [">", "&gt;"]].forEach(function (i) {
+			output = output.replace(new RegExp(i[0], "g"), i[1]);
+		});
+	}
+
+	return output;
+}
+
 let renderers = {
 	csv: {
 		fn: function (arg, req) {
@@ -56,3 +67,5 @@ let renderers = {
 		header: "application/xml"
 	}
 };
+
+modules.export = renderers;

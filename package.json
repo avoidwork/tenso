@@ -38,6 +38,7 @@
     "retsu": "^2.0.0",
     "tiny-defer": "^1.0.4",
     "tiny-uuid4": "^1.0.0",
+    "tiny-xml": "^1.0.2",
     "turtle.io": "^5.0.3",
     "yamljs": "^0.2.4"
   },

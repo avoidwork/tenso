@@ -89,14 +89,14 @@ class Tenso {
 			}
 		});
 
-		renderer = renderers.types.get(format);
+		renderer = renderers.get(renderers.has(format) ? format : "json");
 		headers["content-type"] = renderer.header;
 
 		return renderer.fn(arg, req, headers, format === "html" ? this.server.config.template : undefined);
 	}
 
 	renderer (name, fn, mimetype) {
-		renderers.register(name, {fn: fn, header: mimetype});
+		renderers.set(name, {fn: fn, header: mimetype});
 		array.add(this.server.config.renderers, name);
 
 		return this;
@@ -161,7 +161,7 @@ class Tenso {
 			}
 		});
 
-		serializer = serializers.types.get(serializers.types.has(format) ? format : "tenso");
+		serializer = serializers.get(serializers.has(format) ? format : "tenso");
 
 		if (errz) {
 			result = serializer(null, arg, status < 400 ? 500 : status);
@@ -173,7 +173,7 @@ class Tenso {
 	}
 
 	serializer (mime, fn) {
-		serializers.register(mime, fn);
+		serializers.set(mime, fn);
 		array.add(this.server.config.serializers, mime);
 
 		return this;

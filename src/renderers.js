@@ -6,10 +6,6 @@ const array = require("retsu"),
 
 let renderers = new Map();
 
-function register (name, arg) {
-	renderers.set(name, arg);
-}
-
 function sanitize (arg) {
 	let output = arg;
 
@@ -22,7 +18,7 @@ function sanitize (arg) {
 	return output;
 }
 
-register("csv", {
+renderers.set("csv", {
 	fn: function (arg, req) {
 		req.headers.accept = "text/csv";
 		return arg.data.result;
@@ -30,7 +26,7 @@ register("csv", {
 	header: "text/csv"
 });
 
-register("html", {
+renderers.set("html", {
 	fn: function (arg, req, headers, tpl) {
 		let protocol = req.headers["x-forwarded-proto"] ? req.headers["x-forwarded-proto"] + ":" : req.parsed.protocol;
 
@@ -57,28 +53,25 @@ register("html", {
 	header: "text/html"
 });
 
-register("json", {
+renderers.set("json", {
 	fn: function (arg) {
 		return arg;
 	},
 	header: "application/json"
 });
 
-register("yaml", {
+renderers.set("yaml", {
 	fn: function (arg) {
 		return yaml.stringify(arg, 4);
 	},
 	header: "application/yaml"
 });
 
-register("xml", {
+renderers.set("xml", {
 	fn: function (arg) {
 		return xml.serialize(arg);
 	},
 	header: "application/xml"
 });
 
-module.exports = {
-	register: register,
-	types: renderers
-};
+module.exports = renderers;

@@ -40,7 +40,7 @@ describe("Renderers", function () {
 
 	it("GET CSV (query string)", function (done) {
 		api(port, true)
-			.get("/?format=csv")
+			.get("/?format=text/csv")
 			.expectStatus(200)
 			.expectHeader("Content-Type", "text/csv")
 			.end(function (err) {
@@ -63,7 +63,7 @@ describe("Renderers", function () {
 
 	it("GET HTML (query string)", function (done) {
 		api(port, true)
-			.get("/?format=html")
+			.get("/?format=text/html")
 			.expectStatus(200)
 			.expectHeader("Content-Type", "text/html")
 			.end(function (err) {
@@ -86,7 +86,7 @@ describe("Renderers", function () {
 
 	it("GET YAML (query string)", function (done) {
 		api(port, true)
-			.get("/?format=yaml")
+			.get("/?format=application/yaml")
 			.expectStatus(200)
 			.expectHeader("Content-Type", "application/yaml")
 			.end(function (err) {
@@ -109,7 +109,7 @@ describe("Renderers", function () {
 
 	it("GET XML (query string)", function (done) {
 		api(port, true)
-			.get("/?format=xml")
+			.get("/?format=application/xml")
 			.expectStatus(200)
 			.expectHeader("Content-Type", "application/xml")
 			.end(function (err) {
@@ -132,7 +132,7 @@ describe("Renderers", function () {
 
 	it("GET Custom (query string)", function (done) {
 		api(port, true)
-			.get("/?format=custom")
+			.get("/?format=application/custom")
 			.expectStatus(200)
 			.expectHeader("Content-Type", "application/json")
 			.end(function (err) {

@@ -9,6 +9,7 @@ const regex = {
 	id: /^(_id|id)$/i,
 	json_wrap: /^[\[\{]/,
 	leading: /.*\//,
+	mimetype: /;.*/,
 	modify: /DELETE|PATCH|POST|PUT/,
 	scheme: /^(\w+\:\/\/)|\//,
 	trailing: /_.*$/,

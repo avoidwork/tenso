@@ -11,6 +11,5 @@ function tenso (arg, err, status) {
 }
 
 serializers.set("application/json", tenso);
-serializers.set("tenso", tenso);
 
 module.exports = serializers;

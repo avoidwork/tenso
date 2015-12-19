@@ -60,13 +60,6 @@
 		"dtrace": false,
 		"stack": false
 	},
-	"renderers": [
-		"html",
-		"csv",
-		"json",
-		"yaml",
-		"xml"
-	],
 	"security": {
 		"key": "x-csrf-token",
 		"secret": "tenso",
@@ -81,10 +74,6 @@
 		},
 		"xssProtection": true
 	},
-	"serializers": [
-		"application/json",
-		"tenso"
-	],
 	"maxBytes": 1048576,
 	"port": 8000,
 	"routes": {},

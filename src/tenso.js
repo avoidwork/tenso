@@ -69,35 +69,32 @@ class Tenso {
 	}
 
 	render (req, arg, headers) {
-		let accept = req.parsed.query.format || req.headers.accept || "application/json",
-			accepts = utility.explode(accept, ";"),
-			format = "json",
+		let format = "application/json",
+			accepts = utility.explode(req.parsed.query.format || req.headers.accept || format, ","),
 			renderer;
 
-		array.each(this.server.config.renderers || [], function (i) {
-			let found = false;
+		array.each(accepts, function (i) {
+			let mimetype = i.replace(regex.mimetype, ""),
+				found = false;
 
-			array.each(accepts, function (x) {
-				if (x.indexOf(i) > -1) {
-					format = i;
-					return !(found = true);
-				}
-			});
+			if (renderers.has(mimetype)) {
+				found = true;
+				format = mimetype;
+			}
 
 			if (found) {
 				return false;
 			}
 		});
 
-		renderer = renderers.get(renderers.has(format) ? format : "json");
-		headers["content-type"] = renderer.header;
+		renderer = renderers.get(format);
+		headers["content-type"] = format;
 
-		return renderer.fn(arg, req, headers, format === "html" ? this.server.config.template : undefined);
+		return renderer(arg, req, headers, format === "text/html" ? this.server.config.template : undefined);
 	}
 
-	renderer (name, fn, mimetype) {
-		renderers.set(name, {fn: fn, header: mimetype});
-		array.add(this.server.config.renderers, name);
+	renderer (mimetype, fn) {
+		renderers.set(mimetype, fn);
 
 		return this;
 	}
@@ -141,27 +138,25 @@ class Tenso {
 
 	serialize (req, arg, status = 200) {
 		let format = "application/json",
-			accept = req.parsed.query.format || req.headers.accept || format,
-			accepts = utility.explode(accept, ";"),
+			accepts = utility.explode(req.parsed.query.format || req.headers.accept || format, ","),
 			errz = arg instanceof Error,
 			result, serializer;
 
-		array.each(this.server.config.serializers || [], function (i) {
-			let found = false;
+		array.each(accepts, function (i) {
+			let mimetype = i.replace(regex.mimetype, ""),
+				found = false;
 
-			array.each(accepts, function (x) {
-				if (x.indexOf(i) > -1) {
-					format = i;
-					return !(found = true);
-				}
-			});
+			if (serializers.has(mimetype)) {
+				found = true;
+				format = mimetype;
+			}
 
 			if (found) {
 				return false;
 			}
 		});
 
-		serializer = serializers.get(serializers.has(format) ? format : "tenso");
+		serializer = serializers.get(format);
 
 		if (errz) {
 			result = serializer(null, arg, status < 400 ? 500 : status);
@@ -172,9 +167,8 @@ class Tenso {
 		return result;
 	}
 
-	serializer (mime, fn) {
-		serializers.set(mime, fn);
-		array.add(this.server.config.serializers, mime);
+	serializer (mimetype, fn) {
+		serializers.set(mimetype, fn);
 
 		return this;
 	}

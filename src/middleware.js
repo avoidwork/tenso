@@ -172,13 +172,15 @@ function zuul (req, res, next) {
 	req.protect = protectd;
 	req.protectAsync = false;
 
-	if (protectd && next) {
-		next();
-	} else {
-		rate(req, res, function () {
+	rate(req, res, function (e) {
+		if (e) {
+			next(e);
+		} else if (protectd) {
+			next();
+		} else {
 			keymaster(req, res, next);
-		});
-	}
+		}
+	});
 }
 
 function valid (req, res, next) {

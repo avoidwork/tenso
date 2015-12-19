@@ -287,11 +287,9 @@ describe("Rate Limiting", function () {
 			.get("/")
 			.expectStatus(429)
 			.expectValue("data", null)
-			.expectValue("error", "Too many requests")
+			.expectValue("error", "Too Many Requests")
 			.expectValue("status", 429)
-			.end(function (err, res, body) {
-				console.log(res.headers);
-				console.log(body);
+			.end(function (err) {
 				if (err) throw err;
 				done();
 			});

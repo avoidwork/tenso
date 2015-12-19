@@ -95,7 +95,7 @@ function keymaster (req, res, next) {
 
 	// No authentication, or it's already happened
 	if (!req.protect || !req.protectAsync || authd) {
-		method = regex.get_rewrite.test(req.method) ? "GET" : req.method;
+		method = regex.get_rewrite.test(req.method) ? "get" : req.method.toLowerCase();
 		routes = req.server.config.routes[method] || {};
 		uri = req.parsed.pathname;
 

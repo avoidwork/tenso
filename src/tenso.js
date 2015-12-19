@@ -128,12 +128,10 @@ class Tenso {
 
 			ref[0] = this.server.headers(req, ref[0], resStatus);
 			this.server.respond(req, res, this.render(req, utility.hypermedia(this.server, req, this.serialize(req, arg, resStatus), ref[0]), ref[0]), resStatus, ref[0]).then(function () {
-				defer.resolve(true);
-			}, function (e) {
-				defer.reject(e);
-			});
+				defer.resolve();
+			}, defer.reject);
 		} else {
-			defer.resolve(true);
+			defer.resolve();
 		}
 
 		return defer.promise;

@@ -535,7 +535,9 @@ function bootstrap (obj, config) {
 				});
 			} else {
 				obj.server[method](route, function (req, res) {
-					res.send(arg);
+					if (!res._header) {
+						res.send(arg);
+					}
 				});
 			}
 		});
@@ -552,7 +554,7 @@ function bootstrap (obj, config) {
 		let stat = status instanceof Error ? parseInt(status.message, 10) : status,
 			err = msg instanceof Error ? msg : new Error(msg || obj.messages[stat]);
 
-		obj.error(req, res, stat, err);
+		obj.respond(req, res, err, status);
 	});
 
 	if (notify) {

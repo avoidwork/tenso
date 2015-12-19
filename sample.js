@@ -1,6 +1,6 @@
 require("./lib/index")({
 	logs: {
-		level: "error",
+		level: "info",
 		stderr: true
 	},
 	auth: {

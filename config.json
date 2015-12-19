@@ -60,22 +60,19 @@
 		"dtrace": false,
 		"stack": false
 	},
-	"renderers": [
-		"html",
-		"csv",
-		"json",
-		"yaml",
-		"xml"
-	],
 	"security": {
 		"key": "x-csrf-token",
 		"secret": "tenso",
 		"csrf": true,
 		"csp": null,
-		"xframe": "",
+		"xframe": "SAMEORIGIN",
 		"p3p": "",
-		"hsts": null,
-		"xssProtection": null
+		"hsts": {
+			"maxAge": 31536000,
+			"includeSubDomains": true,
+			"preload": true
+		},
+		"xssProtection": true
 	},
 	"maxBytes": 1048576,
 	"port": 8000,

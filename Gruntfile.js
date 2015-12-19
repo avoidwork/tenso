@@ -1,65 +1,23 @@
 module.exports = function (grunt) {
 	grunt.initConfig({
 		pkg : grunt.file.readJSON("package.json"),
-		concat : {
-			options : {
-				banner : "/**\n" +
-				         " * <%= pkg.description %>\n" +
-				         " *\n" +
-				         " * @author <%= pkg.author.name %> <<%= pkg.author.email %>>\n" +
-				         " * @copyright <%= grunt.template.today('yyyy') %> <%= pkg.author.name %>\n" +
-				         " * @license <%= pkg.license %>\n" +
-				         " * @link <%= pkg.homepage %>\n" +
-				         " * @module <%= pkg.name %>\n" +
-				         " * @version <%= pkg.version %>\n" +
-				         " */\n"
-			},
-			dist : {
-				src : [
-					"src/intro.js",
-					"src/regex.js",
-					"src/sanitize.js",
-					"src/renderers.js",
-					"src/error.js",
-					"src/zuul.js",
-					"src/auth.js",
-					"src/bootstrap.js",
-					"src/clone.js",
-					"src/hypermedia.js",
-					"src/keymaster.js",
-					"src/prepare.js",
-					"src/rate.js",
-					"src/response.js",
-					"src/constructor.js",
-					"src/factory.js",
-					"src/outro.js"
-				],
-				dest : "lib/<%= pkg.name %>.es6.js"
-			}
-		},
 		babel: {
 			options: {
-				sourceMap: false
+				sourceMap: false,
+				presets: ["babel-preset-es2015"]
 			},
 			dist: {
-				files: {
-					"lib/<%= pkg.name %>.js": "lib/<%= pkg.name %>.es6.js"
-				}
+				files: [{
+					expand: true,
+					cwd: 'src',
+					src: ['*.js'],
+					dest: 'lib',
+					ext: '.js'
+				}]
 			}
 		},
 		eslint: {
-			target: ["lib/<%= pkg.name %>.es6.js"]
-		},
-		jsdoc : {
-			dist : {
-				src: ["lib/<%= pkg.name %>.js", "README.md"],
-				options: {
-				    destination : "doc",
-				    template    : "node_modules/ink-docstrap/template",
-				    configure   : "docstrap.json",
-				    "private"   : false
-				}
-			}
+			target: ["src/*.js"]
 		},
 		mochaTest : {
 			options: {
@@ -68,6 +26,9 @@ module.exports = function (grunt) {
 			test : {
 				src : ["test/*_test.js"]
 			}
+		},
+		nsp: {
+			package: grunt.file.readJSON("package.json")
 		},
 		sass: {
 			dist: {
@@ -83,44 +44,40 @@ module.exports = function (grunt) {
 			version : {
 				pattern : "{{VERSION}}",
 				replacement : "<%= pkg.version %>",
-				path : ["<%= concat.dist.dest %>"]
+				path : ["lib/renderers.js", "lib/tenso.js", "lib/utility.js"]
 			}
 		},
 		watch : {
 			js : {
-				files : "<%= concat.dist.src %>",
-				tasks : "default"
+				files : ["lib/*.js"],
+				tasks : "build"
 			},
 			pkg: {
 				files : "package.json",
-				tasks : "default"
+				tasks : "build"
 			},
 			readme : {
 				files : "README.md",
-				tasks : "default"
+				tasks : "build"
 			},
 			sass: {
 				files : "sass/style.scss",
-				tasks : "default"
+				tasks : "build"
 			}
 		}
 	});
 
 	// tasks
-	grunt.loadNpmTasks("grunt-sed");
-	grunt.loadNpmTasks("grunt-jsdoc");
-	grunt.loadNpmTasks("grunt-contrib-concat");
-	grunt.loadNpmTasks("grunt-contrib-watch");
-	grunt.loadNpmTasks("grunt-contrib-sass");
-	grunt.loadNpmTasks("grunt-mocha-test");
-	grunt.loadNpmTasks("grunt-nsp-package");
 	grunt.loadNpmTasks("grunt-babel");
 	grunt.loadNpmTasks("grunt-eslint");
+	grunt.loadNpmTasks("grunt-mocha-test");
+	grunt.loadNpmTasks("grunt-nsp");
+	grunt.loadNpmTasks("grunt-sed");
+	grunt.loadNpmTasks("grunt-contrib-watch");
+	grunt.loadNpmTasks("grunt-contrib-sass");
 
 	// aliases
-	grunt.registerTask("build", ["concat", "sed", "sass", "babel"]);
-	grunt.registerTask("test", ["eslint", "mochaTest"]);
+	grunt.registerTask("test", ["eslint", "mochaTest", "nsp"]);
+	grunt.registerTask("build", ["sass", "babel", "sed"]);
 	grunt.registerTask("default", ["build", "test"]);
-	grunt.registerTask("validate", "validate-package");
-	grunt.registerTask("package", ["validate", "default", "jsdoc"]);
 };

@@ -1,3 +1,10 @@
+let serializers = new Map();
+
+function register (name, arg) {
+	serializers.set(name, arg);
+}
+
+/** Default serializer */
 function tenso (arg, err, status) {
 	return {
 		data: arg !== null ? arg : null,
@@ -7,9 +14,10 @@ function tenso (arg, err, status) {
 	};
 }
 
-let serializers = {
-	"application/json": tenso,
-	tenso: tenso
-};
+register("application/json", tenso);
+register("tenso", tenso);
 
-module.exports = serializers;
+module.exports = {
+	register: register,
+	types: serializers
+};

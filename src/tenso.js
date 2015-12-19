@@ -71,7 +71,8 @@ class Tenso {
 	render (req, arg, headers) {
 		let accept = req.parsed.query.format || req.headers.accept || "application/json",
 			accepts = utility.explode(accept, ";"),
-			format = "json";
+			format = "json",
+			renderer;
 
 		array.each(this.server.config.renderers || [], function (i) {
 			let found = false;
@@ -88,13 +89,14 @@ class Tenso {
 			}
 		});
 
-		headers["content-type"] = renderers[format].header;
+		renderer = renderers.types.get(format);
+		headers["content-type"] = renderer.header;
 
-		return renderers[format].fn(arg, req, headers, format === "html" ? this.server.config.template : undefined);
+		return renderer.fn(arg, req, headers, format === "html" ? this.server.config.template : undefined);
 	}
 
 	renderer (name, fn, mimetype) {
-		renderers[name] = {fn: fn, header: mimetype};
+		renderers.register(name, {fn: fn, header: mimetype});
 		array.add(this.server.config.renderers, name);
 
 		return this;
@@ -159,7 +161,7 @@ class Tenso {
 			}
 		});
 
-		serializer = serializers[format] || serializers.tenso;
+		serializer = serializers.types.get(serializers.types.has(format) ? format : "tenso");
 
 		if (errz) {
 			result = serializer(null, arg, status < 400 ? 500 : status);
@@ -171,7 +173,7 @@ class Tenso {
 	}
 
 	serializer (mime, fn) {
-		serializers[mime] = fn;
+		serializers.register(mime, fn);
 		array.add(this.server.config.serializers, mime);
 
 		return this;

@@ -1,5 +1,5 @@
 var hippie = require( "hippie" ),
-	tenso = require( "../lib/tenso" ),
+	tenso = require( "../lib/index" ),
 	routes = require( "./routes.js" ),
 	array = require( "retsu" ),
 	csrf = 'x-csrf-token';
@@ -404,7 +404,7 @@ describe( "Request body max byte size", function () {
 				.header( csrf, token )
 				.expectStatus( 413 )
 				.expectValue( "data", null )
-				.expectValue( "error", "Request Entity Too Large" )
+				.expectValue( "error", "Payload Too Large" )
 				.expectValue( "status", 413 )
 				.end( function ( err ) {
 					if ( err ) throw err;

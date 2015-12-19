@@ -1,8 +1,7 @@
 const path = require("path"),
 	array = require("retsu"),
 	regex = require(path.join(__dirname, "regex.js")),
-	shared = require(path.join(__dirname, "shared.js")),
-	utility = require(path.join(__dirname, "utility.js"));
+	shared = require(path.join(__dirname, "shared.js"));
 
 const rateHeaders = [
 	"x-ratelimit-limit",

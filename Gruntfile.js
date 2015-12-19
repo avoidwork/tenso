@@ -79,5 +79,5 @@ module.exports = function (grunt) {
 	// aliases
 	grunt.registerTask("test", ["eslint", "mochaTest", "nsp"]);
 	grunt.registerTask("build", ["sass", "babel", "sed"]);
-	grunt.registerTask("default", ["sass", "eslint", "babel", "sed", "mochaTest", "nsp"]);
+	grunt.registerTask("default", ["build", "test"]);
 };

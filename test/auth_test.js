@@ -1,8 +1,11 @@
 var hippie = require( "hippie" ),
+	emitter = require("events"),
 	tenso = require( "../lib/index" ),
 	routes = require( "./routes.js" ),
 	array = require( "retsu" ),
 	csrf = 'x-csrf-token';
+
+process.setMaxListeners(0);
 
 function persistCookies ( opts, next ) {
 	opts.jar = true;

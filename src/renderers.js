@@ -52,7 +52,7 @@ renderers.set("application/javascript", function (arg, req, headers) {
 	req.headers.accept = "application/javascript";
 	headers["content-type"] = "application/javascript";
 
-	return (req.parsed.query.callback || "callback") + "(" + JSON.stringify(arg) + ");";
+	return (req.parsed.query.callback || "callback") + "(" + JSON.stringify(arg, null, 0) + ");";
 });
 
 renderers.set("application/json", function (arg) {

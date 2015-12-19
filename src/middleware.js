@@ -134,6 +134,30 @@ function keymaster (req, res, next) {
 	}
 }
 
+
+function rate (req, res, next) {
+	let config, good, results, server;
+
+	if (req.unprotect) {
+		next();
+	} else {
+		server = req.server;
+		config = server.config.rate;
+		results = server.tenso.rate(req, config.override);
+		good = results.shift();
+
+		rateHeaders.forEach(function (i, idx) {
+			res.setHeader(i, results[idx]);
+		});
+
+		if (good) {
+			next();
+		} else {
+			next(new Error(config.status || 429));
+		}
+	}
+}
+
 function zuul (req, res, next) {
 	let uri = req.parsed.path,
 		protectd = false;
@@ -151,31 +175,9 @@ function zuul (req, res, next) {
 	if (protectd && next) {
 		next();
 	} else {
-		keymaster(req, res, next);
-	}
-}
-
-function rate (req, res, next) {
-	let config, good, obj, results, server;
-
-	if (req.unprotect) {
-		next();
-	} else {
-		server = req.server;
-		obj = server.tenso;
-		config = server.config.rate;
-		results = obj.rate(req, config.override);
-		good = results.shift();
-
-		rateHeaders.forEach(function (i, idx) {
-			res.setHeader(i, results[idx]);
+		rate(req, res, function () {
+			keymaster(req, res, next);
 		});
-
-		if (good) {
-			next();
-		} else {
-			next(new Error(config.status || 429));
-		}
 	}
 }
 

@@ -246,11 +246,13 @@ describe("Rate Limiting", function () {
 			.expectStatus(200)
 			.expectHeader("x-ratelimit-limit", "2")
 			.expectHeader("x-ratelimit-remaining", "1")
-			.expectValue("links", [{
-				uri: "/items",
-				rel: "item"
-			}, {uri: "/things", rel: "item"}])
-			.expectValue("data", ["/items", "/things"])
+			.expectValue("links", [{uri: "/empty", rel: "item"},
+				{uri: "/items", rel: "item"},
+				{uri: "/somethings", rel: "item"},
+				{uri: "/test", rel: "item"},
+				{uri: "/things", rel: "item"},
+				{uri: "/?page=2&page_size=5", rel: "last"}])
+			.expectValue("data", ["empty", "items", "somethings", "test", "things"])
 			.expectValue("error", null)
 			.expectValue("status", 200)
 			.end(function (err) {
@@ -265,11 +267,13 @@ describe("Rate Limiting", function () {
 			.expectStatus(200)
 			.expectHeader("x-ratelimit-limit", "2")
 			.expectHeader("x-ratelimit-remaining", "0")
-			.expectValue("links", [{
-				uri: "/items",
-				rel: "item"
-			}, {uri: "/things", rel: "item"}])
-			.expectValue("data", ["/items", "/things"])
+			.expectValue("links", [{uri: "/empty", rel: "item"},
+				{uri: "/items", rel: "item"},
+				{uri: "/somethings", rel: "item"},
+				{uri: "/test", rel: "item"},
+				{uri: "/things", rel: "item"},
+				{uri: "/?page=2&page_size=5", rel: "last"}])
+			.expectValue("data", ["empty", "items", "somethings", "test", "things"])
 			.expectValue("error", null)
 			.expectValue("status", 200)
 			.end(function (err) {
@@ -285,7 +289,9 @@ describe("Rate Limiting", function () {
 			.expectValue("data", null)
 			.expectValue("error", "Too many requests")
 			.expectValue("status", 429)
-			.end(function (err) {
+			.end(function (err, res, body) {
+				console.log(res.headers);
+				console.log(body);
 				if (err) throw err;
 				done();
 			});
@@ -325,11 +331,13 @@ describe("Rate Limiting (Override)", function () {
 			.expectStatus(200)
 			.expectHeader("x-ratelimit-limit", "102")
 			.expectHeader("x-ratelimit-remaining", "101")
-			.expectValue("links", [{
-				uri: "/items",
-				rel: "item"
-			}, {uri: "/things", rel: "item"}])
-			.expectValue("data", ["/items", "/things"])
+			.expectValue("links", [{uri: "/empty", rel: "item"},
+				{uri: "/items", rel: "item"},
+				{uri: "/somethings", rel: "item"},
+				{uri: "/test", rel: "item"},
+				{uri: "/things", rel: "item"},
+				{uri: "/?page=2&page_size=5", rel: "last"}])
+			.expectValue("data", ["empty", "items", "somethings", "test", "things"])
 			.expectValue("error", null)
 			.expectValue("status", 200)
 			.end(function (err) {
@@ -344,11 +352,13 @@ describe("Rate Limiting (Override)", function () {
 			.expectStatus(200)
 			.expectHeader("x-ratelimit-limit", "102")
 			.expectHeader("x-ratelimit-remaining", "100")
-			.expectValue("links", [{
-				uri: "/items",
-				rel: "item"
-			}, {uri: "/things", rel: "item"}])
-			.expectValue("data", ["/items", "/things"])
+			.expectValue("links", [{uri: "/empty", rel: "item"},
+				{uri: "/items", rel: "item"},
+				{uri: "/somethings", rel: "item"},
+				{uri: "/test", rel: "item"},
+				{uri: "/things", rel: "item"},
+				{uri: "/?page=2&page_size=5", rel: "last"}])
+			.expectValue("data", ["empty", "items", "somethings", "test", "things"])
 			.expectValue("error", null)
 			.expectValue("status", 200)
 			.end(function (err) {

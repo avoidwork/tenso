@@ -610,7 +610,6 @@ function parse (uri) {
 	if (luri === undefined || luri === null) {
 		luri = "";
 	} else {
-		console.log(luri);
 		idxAscii = luri.indexOf("%3F");
 		idxQ = luri.indexOf("?");
 

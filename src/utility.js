@@ -318,13 +318,13 @@ function auth (obj, config) {
 				});
 			}));
 
-			middleware.passportAuth = passport.authenticate("bearer", {session: stateful});
+			passportAuth = passport.authenticate("bearer", {session: stateful});
 
 			if (async || config.auth.local.enabled) {
-				obj.server.get("/auth/bearer", middleware.passportAuth).blacklist(middleware.passportAuth);
+				obj.server.get("/auth/bearer", passportAuth).blacklist(passportAuth);
 				obj.server.get("/auth/bearer", redirect);
 			} else {
-				obj.server.use(middleware.passportAuth).blacklist(middleware.passportAuth);
+				obj.server.use(passportAuth).blacklist(passportAuth);
 			}
 		}());
 	}
@@ -424,10 +424,10 @@ function auth (obj, config) {
 			}
 
 			function mid () {
-				middleware.passportSession(req, res, final);
+				passportSession(req, res, final);
 			}
 
-			middleware.passportInit(req, res, mid);
+			passportInit(req, res, mid);
 		};
 	}
 

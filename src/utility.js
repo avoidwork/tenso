@@ -1,5 +1,6 @@
 const path = require("path"),
 	array = require("retsu"),
+	keysort = require("keysort"),
 	url = require("url"),
 	session = require("express-session"),
 	cookie = require("cookie-parser"),
@@ -7,6 +8,7 @@ const path = require("path"),
 	uuid = require("tiny-uuid4"),
 	middleware = require(path.join(__dirname, "middleware.js")),
 	regex = require(path.join(__dirname, "regex.js")),
+	shared = require(path.join(__dirname, "shared.js")),
 	passport = require("passport"),
 	BasicStrategy = require("passport-http").BasicStrategy,
 	BearerStrategy = require("passport-http-bearer").Strategy,
@@ -47,46 +49,12 @@ function clone (arg) {
 	return JSON.parse(JSON.stringify(arg));
 }
 
-function coerce (value) {
-	let tmp;
-
-	if (value === null || value === undefined) {
-		return undefined;
-	} else if (value === "true") {
-		return true;
-	} else if (value === "false") {
-		return false;
-	} else if (value === "null") {
-		return null;
-	} else if (value === "undefined") {
-		return undefined;
-	} else if (value === "") {
-		return value;
-	} else if (!isNaN(tmp = Number(value))) {
-		return tmp;
-	} else if (regex.json_wrap.test(value)) {
-		return JSON.parse(value);
-	} else {
-		return value;
-	}
-}
-
 function contains (haystack, needle) {
 	return haystack.indexOf(needle) > -1;
 }
 
 function isEmpty (obj) {
 	return trim(obj) === "";
-}
-
-function iterate (obj, fn) {
-	if (obj instanceof Object) {
-		Object.keys(obj).forEach(function (i) {
-			fn.call(obj, obj[i], i);
-		});
-	} else {
-		obj.forEach(fn);
-	}
 }
 
 function merge (a, b) {
@@ -118,15 +86,24 @@ function auth (obj, config) {
 		stateful = (async || config.auth.local.enabled || config.security.csrf) !== false,
 		authMap = {},
 		authUris = [],
-		keys, sesh;
+		keys, sesh, fnCookie, fnSession, luscaCsp, luscaCsrf, luscaXframe, luscaP3p, luscaHsts, luscaXssProtection, passportAuth,
+		passportInit, passportSession;
+
+	function csrfWrapper (req, res, next) {
+		if (req.unprotect) {
+			next();
+		} else {
+			luscaCsrf(req, res, next);
+		}
+	}
 
 	function init (sess) {
-		middleware.passportInit = passport.initialize();
-		obj.server.use(middleware.passportInit).blacklist(middleware.passportInit);
+		passportInit = passport.initialize();
+		obj.server.use(passportInit).blacklist(passportInit);
 
 		if (sess) {
-			middleware.passportSession = passport.session();
-			obj.server.use(middleware.passportSession).blacklist(middleware.passportSession);
+			passportSession = passport.session();
+			obj.server.use(passportSession).blacklist(passportSession);
 		}
 	}
 
@@ -148,7 +125,7 @@ function auth (obj, config) {
 	});
 
 	if (async) {
-		iterate(config.auth, function (v, k) {
+		shared.iterate(config.auth, function (v, k) {
 			if (v.enabled) {
 				authMap[k + "_uri"] = "/auth/" + k;
 				config.auth.protect.push(new RegExp("^/auth/" + k));
@@ -177,42 +154,42 @@ function auth (obj, config) {
 			sesh.store = new RedisStore(config.session.redis);
 		}
 
-		middleware.cookie = cookie();
-		middleware.session = session(sesh);
+		fnCookie = cookie();
+		fnSession = session(sesh);
 
-		obj.server.use(middleware.session).blacklist(middleware.session);
-		obj.server.use(middleware.cookie).blacklist(middleware.cookie);
+		obj.server.use(fnSession).blacklist(fnSession);
+		obj.server.use(fnCookie).blacklist(fnCookie);
 		obj.server.use(middleware.bypass).blacklist(middleware.bypass);
 
 		if (config.security.csrf) {
-			middleware.luscaCsrf = lusca.csrf({key: config.security.key, secret: config.security.secret});
-			obj.server.use(middleware.csrfWrapper).blacklist(middleware.csrfWrapper);
+			luscaCsrf = lusca.csrf({key: config.security.key, secret: config.security.secret});
+			obj.server.use(csrfWrapper).blacklist(csrfWrapper);
 		}
 	}
 
 	if (config.security.csp instanceof Object) {
-		middleware.luscaCsp = lusca.csp(config.security.csp);
-		obj.server.use(middleware.luscaCsp).blacklist(middleware.luscaCsp);
+		luscaCsp = lusca.csp(config.security.csp);
+		obj.server.use(luscaCsp).blacklist(luscaCsp);
 	}
 
 	if (!isEmpty(config.security.xframe || "")) {
-		middleware.luscaXframe = lusca.xframe(config.security.xframe);
-		obj.server.use(middleware.luscaXframe).blacklist(middleware.luscaXframe);
+		luscaXframe = lusca.xframe(config.security.xframe);
+		obj.server.use(luscaXframe).blacklist(luscaXframe);
 	}
 
 	if (!isEmpty(config.security.p3p || "")) {
-		middleware.luscaP3p = lusca.p3p(config.security.p3p);
-		obj.server.use(middleware.luscaP3p).blacklist(middleware.luscaP3p);
+		luscaP3p = lusca.p3p(config.security.p3p);
+		obj.server.use(luscaP3p).blacklist(luscaP3p);
 	}
 
 	if (config.security.hsts instanceof Object) {
-		middleware.luscaHsts = lusca.hsts(config.security.hsts);
-		obj.server.use(middleware.luscaHsts).blacklist(middleware.luscaHsts);
+		luscaHsts = lusca.hsts(config.security.hsts);
+		obj.server.use(luscaHsts).blacklist(luscaHsts);
 	}
 
 	if (config.security.xssProtection instanceof Object) {
-		middleware.luscaXssProtection = lusca.xssProtection(config.security.xssProtection);
-		obj.server.use(middleware.luscaXssProtection).blacklist(middleware.luscaXssProtection);
+		luscaXssProtection = lusca.xssProtection(config.security.xssProtection);
+		obj.server.use(luscaXssProtection).blacklist(luscaXssProtection);
 	}
 
 	// Can fork to `middleware.keymaster()`
@@ -303,13 +280,13 @@ function auth (obj, config) {
 				});
 			}));
 
-			middleware.passportAuth = passport.authenticate("basic", {session: stateful});
+			passportAuth = passport.authenticate("basic", {session: stateful});
 
 			if (async || config.auth.local.enabled) {
-				obj.server.get("/auth/basic", middleware.passportAuth).blacklist(middleware.passportAuth);
+				obj.server.get("/auth/basic", passportAuth).blacklist(passportAuth);
 				obj.server.get("/auth/basic", redirect);
 			} else {
-				obj.server.use(middleware.passportAuth).blacklist(middleware.passportAuth);
+				obj.server.use(passportAuth).blacklist(passportAuth);
 			}
 		}());
 	}
@@ -545,20 +522,20 @@ function bootstrap (obj, config) {
 	config.headers.server = "tenso/{{VERSION}}";
 
 	// Creating status > message map
-	iterate(obj.server.codes, function (value, key) {
+	shared.iterate(obj.server.codes, function (value, key) {
 		obj.messages[value] = obj.server.messages[key];
 	});
 
 	// Setting routes
-	iterate(config.routes, function (routes, method) {
-		iterate(routes, function (arg, route) {
+	shared.iterate(config.routes, function (routes, method) {
+		shared.iterate(routes, function (arg, route) {
 			if (typeof arg === "function") {
 				obj.server[method](route, function (...args) {
 					arg.apply(obj, args);
 				});
 			} else {
 				obj.server[method](route, function (req, res) {
-					obj.respond(req, res, arg);
+					res.send(arg);
 				});
 			}
 		});
@@ -612,7 +589,7 @@ function queryString (qstring = "") {
 		if (item[1] === undefined) {
 			item[1] = "";
 		} else {
-			item[1] = coerce(decodeURIComponent(item[1]));
+			item[1] = shared.coerce(decodeURIComponent(item[1]));
 		}
 
 		if (obj[item[0]] === undefined) {
@@ -651,7 +628,7 @@ function parse (uri) {
 	parsed = url.parse(luri);
 	parsed.query = parsed.search ? queryString(parsed.search) : {};
 
-	iterate(parsed, function (v, k) {
+	shared.iterate(parsed, function (v, k) {
 		if (v === null) {
 			parsed[k] = "";
 		}
@@ -786,7 +763,7 @@ function hypermedia (server, req, rep, headers) {
 		}
 
 		if (rep.links.length > 0) {
-			headers.link = array.keySort(rep.links, "rel, uri").map(function (i) {
+			headers.link = keysort(rep.links, "rel, uri").map(function (i) {
 				return "<" + i.uri + ">; rel=\"" + i.rel + "\"";
 			}).join(", ");
 		}
@@ -800,13 +777,11 @@ module.exports = {
 	bootstrap: bootstrap,
 	capitalize: capitalize,
 	clone: clone,
-	coerce: coerce,
 	contains: contains,
 	explode: explode,
 	escape: escape,
 	hypermedia: hypermedia,
 	isEmpty: isEmpty,
-	iterate: iterate,
 	merge: merge,
 	queryString: queryString,
 	parse: parse,

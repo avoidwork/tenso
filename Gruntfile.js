@@ -49,20 +49,20 @@ module.exports = function (grunt) {
 		},
 		watch : {
 			js : {
-				files : "<%= concat.dist.src %>",
-				tasks : "default"
+				files : ["lib/*.js"],
+				tasks : "build"
 			},
 			pkg: {
 				files : "package.json",
-				tasks : "default"
+				tasks : "build"
 			},
 			readme : {
 				files : "README.md",
-				tasks : "default"
+				tasks : "build"
 			},
 			sass: {
 				files : "sass/style.scss",
-				tasks : "default"
+				tasks : "build"
 			}
 		}
 	});
@@ -78,5 +78,6 @@ module.exports = function (grunt) {
 
 	// aliases
 	grunt.registerTask("test", ["eslint", "mochaTest", "nsp"]);
+	grunt.registerTask("build", ["sass", "babel", "sed"]);
 	grunt.registerTask("default", ["sass", "eslint", "babel", "sed", "mochaTest", "nsp"]);
 };

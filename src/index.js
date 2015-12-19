@@ -5,8 +5,6 @@ const fs = require("fs"),
 	tenso = require(path.join(__dirname, "tenso.js")),
 	utility = require(path.join(__dirname, "utility.js"));
 
-console.log(cfg);
-
 function factory (arg) {
 	let hostname = arg ? arg.hostname || "localhost" : "localhost",
 		vhosts = {},
@@ -23,10 +21,12 @@ function factory (arg) {
 	config.vhosts = vhosts;
 	config.default = hostname;
 	config.template = fs.readFileSync(path.join(config.root, "template.html"), {encoding: "utf8"});
-	obj = tenso(config);
+	obj = tenso();
 	obj.hostname = hostname;
+	utility.bootstrap(obj, config);
+	obj.server.start(config);
 
-	return utility.bootstrap(obj, config);
+	return obj;
 }
 
 module.exports = factory;

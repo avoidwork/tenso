@@ -1,10 +1,8 @@
 const path = require("path"),
 	array = require("retsu"),
 	regex = require(path.join(__dirname, "regex.js")),
+	shared = require(path.join(__dirname, "shared.js")),
 	utility = require(path.join(__dirname, "utility.js"));
-
-let cookie, session, luscaCsp, luscaCsrf, luscaXframe, luscaP3p, luscaHsts, luscaXssProtection, passportAuth,
-	passportInit, passportSession;
 
 const rateHeaders = [
 	"x-ratelimit-limit",
@@ -44,7 +42,7 @@ function asyncFlag (req, res, next) {
 }
 
 function bypass (req, res, next) {
-	let pass = req.server.tenso.config.auth.unprotect.filter(function (i) {
+	let pass = req.server.config.auth.unprotect.filter(function (i) {
 			return i.test(req.url);
 		}).length > 0;
 
@@ -53,14 +51,6 @@ function bypass (req, res, next) {
 	}
 
 	next();
-}
-
-function csrfWrapper (req, res, next) {
-	if (req.unprotect) {
-		next();
-	} else {
-		luscaCsrf(req, res, next);
-	}
 }
 
 function guard (req, res, next) {
@@ -82,7 +72,7 @@ function parse (req, res, next) {
 			req.body = {};
 
 			array.each(args, function (i) {
-				req.body[i[0]] = utility.coerce(i[1]);
+				req.body[i[0]] = shared.coerce(i[1]);
 			});
 		}
 
@@ -105,7 +95,7 @@ function keymaster (req, res, next) {
 
 	// No authentication, or it's already happened
 	if (!req.protect || !req.protectAsync || authd) {
-		method = regex.get_rewrite.test(req.method) ? "get" : req.method.toLowerCase();
+		method = regex.get_rewrite.test(req.method) ? "GET" : req.method;
 		routes = req.server.config.routes[method] || {};
 		uri = req.parsed.pathname;
 
@@ -116,10 +106,12 @@ function keymaster (req, res, next) {
 				result.call(obj, req, res);
 				next();
 			} else {
-				res.send(result).then(next, next);
+				res.send(result).then(function () {
+					next();
+				}, next);
 			}
 		} else {
-			utility.iterate(routes, function (value, key) {
+			shared.iterate(routes, function (value, key) {
 				if (new RegExp("^" + key + "$", "i").test(uri)) {
 					return !(result = value);
 				}
@@ -130,7 +122,9 @@ function keymaster (req, res, next) {
 					result.call(obj, req, res);
 					next();
 				} else {
-					res.send(result).then(next, next);
+					res.send(result).then(function () {
+						next();
+					}, next);
 				}
 			} else {
 				next(new Error(404));
@@ -145,7 +139,7 @@ function zuul (req, res, next) {
 	let uri = req.parsed.path,
 		protectd = false;
 
-	array.each(req.server.tenso.protect, function (r) {
+	array.each(req.server.config.auth.protect, function (r) {
 		if (r.test(uri)) {
 			return !(protectd = true);
 		}
@@ -191,22 +185,10 @@ function valid (req, res, next) {
 module.exports = {
 	asyncFlag: asyncFlag,
 	bypass: bypass,
-	cookie: cookie,
-	csrfWrapper: csrfWrapper,
 	decorate: decorate,
 	guard: guard,
-	luscaCsp: luscaCsp,
-	luscaCsrf: luscaCsrf,
-	luscaXframe: luscaXframe,
-	luscaP3p: luscaP3p,
-	luscaHsts: luscaHsts,
-	luscaXssProtection: luscaXssProtection,
-	passportAuth: passportAuth,
-	passportInit: passportInit,
-	passportSession: passportSession,
 	parse: parse,
 	rate: rate,
-	session: session,
 	valid: valid,
 	zuul: zuul
 };

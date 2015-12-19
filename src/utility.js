@@ -219,8 +219,6 @@ function auth (obj, config) {
 				});
 
 				r = r.replace(/\|$/, "") + ")).*$";
-
-				obj.server.use(r, middleware.rate).blacklist(middleware.rate);
 				obj.server.use(r, middleware.guard).blacklist(middleware.guard);
 			}());
 

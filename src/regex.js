@@ -7,6 +7,7 @@ const regex = {
 	get_rewrite: /HEAD|OPTIONS/i,
 	hypermedia: /[a-zA-Z]+_(guid|uuid|id|url|uri)$/,
 	id: /^(_id|id)$/i,
+	json_wrap: /^[\[\{]/,
 	leading: /.*\//,
 	modify: /DELETE|PATCH|POST|PUT/,
 	scheme: /^(\w+\:\/\/)|\//,

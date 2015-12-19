@@ -64,7 +64,7 @@ let renderers = {
 	},
 	xml: {
 		fn: function (arg) {
-			return xml.encode(arg);
+			return xml.serialize(arg);
 		},
 		header: "application/xml"
 	}

@@ -290,8 +290,6 @@ describe("Local", function () {
 
 			token = res.headers[csrf];
 
-			console.log(token);
-
 			api(port, true)
 				.header(csrf, token)
 				.header("accept", "application/json")

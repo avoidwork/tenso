@@ -17,5 +17,5 @@ require("./lib/index")({
 		},
 		protect: ["/uuid"]
 	},
-	routes: require(__dirname + "/routes.js")
+	routes: require(__dirname + "/test/routes.js")
 });

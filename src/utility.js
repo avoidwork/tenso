@@ -49,10 +49,6 @@ function clone (arg) {
 	return JSON.parse(JSON.stringify(arg));
 }
 
-function contains (haystack, needle) {
-	return haystack.indexOf(needle) > -1;
-}
-
 function isEmpty (obj) {
 	return trim(obj) === "";
 }
@@ -614,6 +610,7 @@ function parse (uri) {
 	if (luri === undefined || luri === null) {
 		luri = "";
 	} else {
+		console.log(luri);
 		idxAscii = luri.indexOf("%3F");
 		idxQ = luri.indexOf("?");
 
@@ -753,7 +750,7 @@ function hypermedia (server, req, rep, headers) {
 				}
 
 				if (i instanceof Object) {
-					parse(i, "item", req.parsed.pathname.replace(regex.trailing_slash, "").replace(regex.leading, ""));
+					marshal(i, "item", req.parsed.pathname.replace(regex.trailing_slash, "").replace(regex.leading, ""));
 				}
 			});
 		} else if (rep.data instanceof Object) {
@@ -783,7 +780,6 @@ module.exports = {
 	bootstrap: bootstrap,
 	capitalize: capitalize,
 	clone: clone,
-	contains: contains,
 	explode: explode,
 	escape: escape,
 	hypermedia: hypermedia,

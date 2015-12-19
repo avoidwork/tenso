@@ -642,7 +642,7 @@ function parse (uri) {
 function hypermedia (server, req, rep, headers) {
 	let seen = {},
 		collection = req.parsed.pathname,
-		query, page, page_size, nth, root, parent;
+		query, page, page_size, nth, root, proot, parent;
 
 	// Parsing the object for hypermedia properties
 	function marshal (obj, rel, item_collection) {
@@ -671,7 +671,7 @@ function hypermedia (server, req, rep, headers) {
 					if (uri !== root && !seen[uri]) {
 						seen[uri] = 1;
 
-						if (server.allowed("get", uri, req.vhost)) {
+						if (server.allowed("GET", uri, req.vhost)) {
 							rep.links.push({uri: uri, rel: lrel});
 						}
 					}
@@ -684,19 +684,23 @@ function hypermedia (server, req, rep, headers) {
 		return result;
 	}
 
-	if (rep.status >= 200 && rep.status <= 206) {
-		query = req.parsed.query;
-		page = query.page || 1;
-		page_size = query.page_size || server.config.pageSize || 5;
-		root = req.parsed.pathname;
+	query = req.parsed.query;
+	page = query.page || 1;
+	page_size = query.page_size || server.config.pageSize || 5;
+	root = req.parsed.pathname;
 
-		if (req.parsed.pathname !== "/") {
+	if (req.parsed.pathname !== "/") {
+		proot = root.replace(regex.trailing_slash, "").replace(regex.collection, "$1") || "/";
+
+		if (server.allows(proot, "GET", req.vhost)) {
 			rep.links.push({
-				uri: root.replace(regex.trailing_slash, "").replace(regex.collection, "$1") || "/",
+				uri: proot,
 				rel: "collection"
 			});
 		}
+	}
 
+	if (rep.status >= 200 && rep.status <= 206) {
 		if (rep.data instanceof Array) {
 			if (req.method === "GET") {
 				if (isNaN(page) || page <= 0) {
@@ -743,7 +747,7 @@ function hypermedia (server, req, rep, headers) {
 				if (li !== collection) {
 					uri = li.indexOf("//") > -1 || li.indexOf("/") === 0 ? li : (collection + "/" + li).replace(/^\/\//, "/");
 
-					if (server.allowed("get", uri, req.vhost)) {
+					if (server.allowed("GET", uri, req.vhost)) {
 						rep.links.push({uri: uri, rel: "item"});
 					}
 				}

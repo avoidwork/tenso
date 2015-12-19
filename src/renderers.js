@@ -33,8 +33,8 @@ renderers.set("text/html", function (arg, req, headers, tpl) {
 		.replace("{{headers}}", Object.keys(headers).sort(array.sort).map(function (i) {
 			return "<tr><td>" + i + "</td><td>" + sanitize(headers[i]) + "</td></tr>";
 		}).join("\n"))
-		.replace("{{formats}}", req.server.config.renderers.map(function (i) {
-			return "<option value='" + i + "'>" + i.toUpperCase() + "</option>";
+		.replace("{{formats}}", "<option value=''></option>" + Array.from(renderers.keys()).filter(function (i) { return i.indexOf("html") === -1; }).map(function (i) {
+			return "<option value='" + i + "'>" + i.replace(/^.*\//, "").toUpperCase() + "</option>";
 		}).join("\n"))
 		.replace("{{body}}", JSON.stringify(arg, null, 2))
 		.replace("{{year}}", new Date().getFullYear())

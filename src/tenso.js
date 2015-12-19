@@ -19,9 +19,7 @@ class Tenso {
 	}
 
 	error (req, res, status, arg) {
-		this.server.error(req, res, status, arg);
-
-		return this;
+		return this.server.error(req, res, status, arg);
 	}
 
 	rate (req, fn) {
@@ -63,9 +61,7 @@ class Tenso {
 	}
 
 	redirect (req, res, uri, perm = false) {
-		this.server.respond(req, res, this.server.messages.NO_CONTENT, this.server.codes[!perm ? "FOUND" : "MOVED"], {location: uri});
-
-		return this;
+		return this.server.respond(req, res, this.server.messages.NO_CONTENT, this.server.codes[!perm ? "FOUND" : "MOVED"], {location: uri});
 	}
 
 	render (req, arg, headers) {

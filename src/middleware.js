@@ -156,20 +156,26 @@ function zuul (req, res, next) {
 }
 
 function rate (req, res, next) {
-	let server = req.server,
-		obj = server.tenso,
-		config = server.config.rate,
-		results = obj.rate(req, config.override),
-		good = results.shift();
+	let config, good, obj, results, server;
 
-	rateHeaders.forEach(function (i, idx) {
-		res.setHeader(i, results[idx]);
-	});
-
-	if (good) {
+	if (req.unprotect) {
 		next();
 	} else {
-		next(new Error(config.status || 429));
+		server = req.server;
+		obj = server.tenso;
+		config = server.config.rate;
+		results = obj.rate(req, config.override);
+		good = results.shift();
+
+		rateHeaders.forEach(function (i, idx) {
+			res.setHeader(i, results[idx]);
+		});
+
+		if (good) {
+			next();
+		} else {
+			next(new Error(config.status || 429));
+		}
 	}
 }
 

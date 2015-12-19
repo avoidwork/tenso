@@ -49,6 +49,56 @@ describe("Renderers", function () {
 			});
 	});
 
+	it("GET JSONP (header)", function (done) {
+		api(port, true)
+			.get("/")
+			.header("accept", "application/javascript")
+			.expectStatus(200)
+			.expectHeader("Content-Type", "application/javascript")
+			.expectBody(/^callback\(/)
+			.end(function (err) {
+				if (err) throw err;
+				done();
+			});
+	});
+
+	it("GET JSONP (query string)", function (done) {
+		api(port, true)
+			.get("/?format=application/javascript")
+			.expectStatus(200)
+			.expectHeader("Content-Type", "application/javascript")
+			.expectBody(/^callback\(/)
+			.end(function (err) {
+				if (err) throw err;
+				done();
+			});
+	});
+
+	it("GET JSONP (header - custom callback)", function (done) {
+		api(port, true)
+			.get("/?callback=custom")
+			.header("accept", "application/javascript")
+			.expectStatus(200)
+			.expectHeader("Content-Type", "application/javascript")
+			.expectBody(/^custom\(/)
+			.end(function (err) {
+				if (err) throw err;
+				done();
+			});
+	});
+
+	it("GET JSONP (query string - custom callback)", function (done) {
+		api(port, true)
+			.get("/?format=application/javascript&callback=custom")
+			.expectStatus(200)
+			.expectHeader("Content-Type", "application/javascript")
+			.expectBody(/^custom\(/)
+			.end(function (err) {
+				if (err) throw err;
+				done();
+			});
+	});
+
 	it("GET HTML (header)", function (done) {
 		api(port, true)
 			.get("/")

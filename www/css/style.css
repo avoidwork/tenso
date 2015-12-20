@@ -1,2 +1,12 @@
-html,body{min-height:100%}body{background:#fffff;color:#00000;font:12px Arial;margin:10px}
+html,
+body {
+  min-height: 100%; }
+
+body {
+  background: #ffffff;
+  color: black;
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+  font-size: 12px;
+  margin: 10px; }
+
 /*# sourceMappingURL=style.css.map */

@@ -22,7 +22,7 @@ Route handlers have the context of the Tensō server, i.e. `this` will allow you
 The following example will create GET routes that will return an empty `Array` at `/`, an `Error` at `/reports/tps`, & a version 4 UUID at `/uuid`.
 
 ```javascript
-var uuid = require( "tiny-uuid4" );
+var uuid = require("tiny-uuid4");
 
 module.exports.get = {
 	"/": ["reports", "uuid"],

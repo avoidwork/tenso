@@ -22,16 +22,16 @@ Route handlers have the context of the Tensō server, i.e. `this` will allow you
 The following example will create GET routes that will return an empty `Array` at `/`, an `Error` at `/reports/tps`, & a version 4 UUID at `/uuid`.
 
 ```javascript
-var uuid = require( "keigai" ).util.uuid;
+var uuid = require( "tiny-uuid4" );
 
 module.exports.get = {
 	"/": ["reports", "uuid"],
 	"/reports": ["tps"],
-	"/reports/tps": function ( req, res ) {
-		res.error( 785, Error( "TPS Cover Sheet not attached" ) );
+	"/reports/tps": function (req, res) {
+		res.error(785, Error("TPS Cover Sheet not attached"));
 	},
-	"/uuid": function ( req, res ) {
-		res.respond( uuid(), 200, {"cache-control": "no-cache"} );
+	"/uuid": function (req, res) {
+		res.send(uuid(), 200, {"cache-control": "no-cache"});
 	}
 };
 ```
@@ -329,7 +329,6 @@ The last argument for each probe is the nanoseconds it took to execute.
 
 ```
 "allowed",        "char *", "char *", "char *", "int"
-"allows",         "char *", "char *", "int"
 "compress",       "char *", "char *", "int"
 "compression",    "char *", "int"
 "error",          "char *", "char *", "int",    "char *", "int"

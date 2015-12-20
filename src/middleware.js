@@ -103,11 +103,8 @@ function keymaster (req, res, next) {
 
 			if (typeof result === "function") {
 				result.call(obj, req, res);
-				next();
 			} else {
-				res.send(result).then(function () {
-					next();
-				}, next);
+				res.send(result);
 			}
 		} else {
 			shared.iterate(routes, function (value, key) {
@@ -119,11 +116,8 @@ function keymaster (req, res, next) {
 			if (result) {
 				if (typeof result === "function") {
 					result.call(obj, req, res);
-					next();
 				} else {
-					res.send(result).then(function () {
-						next();
-					}, next);
+					res.send(result);
 				}
 			} else {
 				next(new Error(404));

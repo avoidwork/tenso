@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 sudo dtrace -Z -n 'tenso*:::allowed{ trace(copyinstr(arg0)); trace(copyinstr(arg1)); trace(copyinstr(arg2)); trace(arg3); }'  \
-               -n 'tenso*:::allows{ trace(copyinstr(arg0)); trace(copyinstr(arg1)); trace(arg2); }'  \
                -n 'tenso*:::compress{ trace(copyinstr(arg0)); trace(copyinstr(arg1)); trace(arg2); }'  \
                -n 'tenso*:::compression{ trace(copyinstr(arg0)); trace(arg1); }'  \
                -n 'tenso*:::error{ trace(copyinstr(arg0)); trace(copyinstr(arg1)); trace(arg2); trace(copyinstr(arg3)); trace(arg4); }'  \

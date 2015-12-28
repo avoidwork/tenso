@@ -2,6 +2,7 @@ const path = require("path"),
 	array = require("retsu"),
 	turtleio = require("turtle.io"),
 	deferred = require("tiny-defer"),
+	merge = require("tiny-merge"),
 	regex = require(path.join(__dirname, "regex")),
 	utility = require(path.join(__dirname, "utility"));
 
@@ -104,7 +105,7 @@ class Tenso {
 			ref = [headers || {}];
 
 			if (res._headers) {
-				utility.merge(ref[0], res._headers);
+				merge(ref[0], res._headers);
 			}
 
 			if (req.protect) {

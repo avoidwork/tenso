@@ -1,5 +1,6 @@
 const path = require("path"),
 	array = require("retsu"),
+	coerce = require("tiny-coerce"),
 	keysort = require("keysort"),
 	url = require("url"),
 	session = require("express-session"),
@@ -8,7 +9,7 @@ const path = require("path"),
 	uuid = require("tiny-uuid4"),
 	middleware = require(path.join(__dirname, "middleware.js")),
 	regex = require(path.join(__dirname, "regex.js")),
-	shared = require(path.join(__dirname, "shared.js")),
+	iterate = require(path.join(__dirname, "iterate.js")),
 	passport = require("passport"),
 	BasicStrategy = require("passport-http").BasicStrategy,
 	BearerStrategy = require("passport-http-bearer").Strategy,
@@ -51,26 +52,6 @@ function clone (arg) {
 
 function isEmpty (obj) {
 	return trim(obj) === "";
-}
-
-function merge (a, b) {
-	if (a instanceof Object && b instanceof Object) {
-		Object.keys(b).forEach(function (i) {
-			if (a[i] instanceof Object && b[i] instanceof Object) {
-				a[i] = merge(a[i], b[i]);
-			} else if (a[i] instanceof Array && b[i] instanceof Array) {
-				a[i] = a[i].concat(b[i]);
-			} else {
-				a[i] = b[i];
-			}
-		});
-	} else if (a instanceof Array && b instanceof Array) {
-		a = a.concat(b);
-	} else {
-		a = b;
-	}
-
-	return a;
 }
 
 function auth (obj, config) {
@@ -121,7 +102,7 @@ function auth (obj, config) {
 	});
 
 	if (async) {
-		shared.iterate(config.auth, function (v, k) {
+		iterate(config.auth, function (v, k) {
 			if (v.enabled) {
 				authMap[k + "_uri"] = "/auth/" + k;
 				config.auth.protect.push(new RegExp("^/auth/" + k));
@@ -516,13 +497,13 @@ function bootstrap (obj, config) {
 	config.headers.server = "tenso/{{VERSION}}";
 
 	// Creating status > message map
-	shared.iterate(obj.server.codes, function (value, key) {
+	iterate(obj.server.codes, function (value, key) {
 		obj.messages[value] = obj.server.messages[key];
 	});
 
 	// Setting routes
-	shared.iterate(config.routes, function (routes, method) {
-		shared.iterate(routes, function (arg, route) {
+	iterate(config.routes, function (routes, method) {
+		iterate(routes, function (arg, route) {
 			if (typeof arg === "function") {
 				obj.server[method](route, function (...args) {
 					arg.apply(obj, args);
@@ -585,7 +566,7 @@ function queryString (qstring = "") {
 		if (item[1] === undefined) {
 			item[1] = "";
 		} else {
-			item[1] = shared.coerce(decodeURIComponent(item[1]));
+			item[1] = coerce(decodeURIComponent(item[1]));
 		}
 
 		if (obj[item[0]] === undefined) {
@@ -624,7 +605,7 @@ function parse (uri) {
 	parsed = url.parse(luri);
 	parsed.query = parsed.search ? queryString(parsed.search) : {};
 
-	shared.iterate(parsed, function (v, k) {
+	iterate(parsed, function (v, k) {
 		if (v === null) {
 			parsed[k] = "";
 		}
@@ -781,7 +762,6 @@ module.exports = {
 	escape: escape,
 	hypermedia: hypermedia,
 	isEmpty: isEmpty,
-	merge: merge,
 	queryString: queryString,
 	parse: parse,
 	trim: trim

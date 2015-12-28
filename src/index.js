@@ -1,5 +1,6 @@
 const fs = require("fs"),
 	path = require("path"),
+	merge = require("tiny-merge"),
 	root = path.join(__dirname, ".."),
 	cfg = require(path.join(root, "config.json")),
 	tenso = require(path.join(__dirname, "tenso.js")),
@@ -8,7 +9,7 @@ const fs = require("fs"),
 function factory (arg) {
 	let hostname = arg ? arg.hostname || "localhost" : "localhost",
 		vhosts = {},
-		config = arg ? utility.merge(utility.clone(cfg), arg) : utility.clone(cfg),
+		config = arg ? merge(utility.clone(cfg), arg) : utility.clone(cfg),
 		obj;
 
 	if (!config.port) {

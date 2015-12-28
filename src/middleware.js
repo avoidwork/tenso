@@ -1,7 +1,8 @@
 const path = require("path"),
 	array = require("retsu"),
+	coerce = require("tiny-coerce"),
 	regex = require(path.join(__dirname, "regex.js")),
-	shared = require(path.join(__dirname, "shared.js"));
+	iterate = require(path.join(__dirname, "iterate.js"));
 
 const rateHeaders = [
 	"x-ratelimit-limit",
@@ -71,7 +72,7 @@ function parse (req, res, next) {
 			req.body = {};
 
 			array.each(args, function (i) {
-				req.body[i[0]] = shared.coerce(i[1]);
+				req.body[i[0]] = coerce(i[1]);
 			});
 		}
 
@@ -107,7 +108,7 @@ function keymaster (req, res, next) {
 				res.send(result);
 			}
 		} else {
-			shared.iterate(routes, function (value, key) {
+			iterate(routes, function (value, key) {
 				if (new RegExp("^" + key + "$", "i").test(uri)) {
 					return !(result = value);
 				}

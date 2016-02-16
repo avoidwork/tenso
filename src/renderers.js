@@ -2,6 +2,7 @@ const array = require("retsu"),
 	xml = require("tiny-xml"),
 	yaml = require("yamljs"),
 	path = require("path"),
+	csv = require("csv.js"),
 	utility = require(path.join(__dirname, "utility.js"));
 
 let renderers = new Map();
@@ -18,10 +19,11 @@ function sanitize (arg) {
 	return output;
 }
 
-renderers.set("text/csv", function (arg, req) {
+renderers.set("text/csv", function (arg, req, headers) {
 	req.headers.accept = "text/csv";
+	headers["content-type"] = "text/csv";
 
-	return arg.data.result;
+	return csv.encode(arg);
 });
 
 renderers.set("text/html", function (arg, req, headers, tpl) {

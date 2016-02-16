@@ -19,7 +19,7 @@ process.setMaxListeners(0);
 describe("Renderers", function () {
 	var port = 8010, server;
 
-	server = tenso({port: port, routes: routes, logs: {level: "error"}});
+	server = tenso({port: port, routes: routes, logging: {level: "error"}});
 	server.renderer("custom", function (arg) {
 		return arg;
 	}, "application/json");

@@ -1,4 +1,5 @@
 const path = require("path"),
+	http = require("http"),
 	array = require("retsu"),
 	coerce = require("tiny-coerce"),
 	keysort = require("keysort"),
@@ -497,8 +498,8 @@ function bootstrap (obj, config) {
 	config.headers.server = "tenso/{{VERSION}}";
 
 	// Creating status > message map
-	iterate(obj.server.codes, function (value, key) {
-		obj.messages[value] = obj.server.messages[key];
+	iterate(http.STATUS_CODES, function (value, key) {
+		obj.messages[key] = value;
 	});
 
 	// Setting routes
@@ -646,7 +647,7 @@ function hypermedia (server, req, rep, headers) {
 					if (uri !== root && !seen[uri]) {
 						seen[uri] = 1;
 
-						if (server.allowed("GET", uri, req.vhost)) {
+						if (server.allowed("GET", uri, req.host)) {
 							rep.links.push({uri: uri, rel: lrel});
 						}
 					}
@@ -667,7 +668,7 @@ function hypermedia (server, req, rep, headers) {
 	if (req.parsed.pathname !== "/") {
 		proot = root.replace(regex.trailing_slash, "").replace(regex.collection, "$1") || "/";
 
-		if (server.allows(proot, "GET", req.vhost)) {
+		if (server.allows(proot, "GET", req.host)) {
 			rep.links.push({
 				uri: proot,
 				rel: "collection"
@@ -722,7 +723,7 @@ function hypermedia (server, req, rep, headers) {
 				if (li !== collection) {
 					uri = li.indexOf("//") > -1 || li.indexOf("/") === 0 ? li : (collection + "/" + li).replace(/^\/\//, "/");
 
-					if (server.allowed("GET", uri, req.vhost)) {
+					if (server.allowed("GET", uri, req.host)) {
 						rep.links.push({uri: uri, rel: "item"});
 					}
 				}

@@ -25,7 +25,7 @@ function get_token (port, fn, url) {
 describe("Permissions (CSRF disabled)", function () {
 	var port = 8001;
 
-	tenso({port: port, routes: routes, logs: {level: "error"}, security: {csrf: false}});
+	tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
 
 	this.timeout(5000);
 
@@ -121,7 +121,7 @@ describe("Basic Auth", function () {
 	tenso({
 		port: port,
 		routes: routes,
-		logs: {level: "error"},
+		logging: {level: "error"},
 		auth: {basic: {enabled: true, list: ["test:123"]}, protect: ["/uuid"]}
 	});
 
@@ -177,7 +177,7 @@ describe("OAuth2 Token Bearer", function () {
 	tenso({
 		port: port,
 		routes: routes,
-		logs: {level: "error"},
+		logging: {level: "error"},
 		auth: {bearer: {enabled: true, tokens: ["abc-123"]}, protect: ["/"]}
 	});
 
@@ -220,7 +220,7 @@ describe("Local", function () {
 	tenso({
 		port: port,
 		routes: require("./routes.js"),
-		logs: {
+		logging: {
 			level: "error",
 			dtrace: true,
 			stderr: true

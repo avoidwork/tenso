@@ -42,7 +42,7 @@
     "tiny-merge": "^1.0.0",
     "tiny-uuid4": "^1.0.0",
     "tiny-xml": "^1.0.6",
-    "turtle.io": "^6.0.8",
+    "turtle.io": "^6.0.9",
     "yamljs": "^0.2.4"
   },
   "devDependencies": {

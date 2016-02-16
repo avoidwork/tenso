@@ -84,15 +84,14 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 ```
 {
 	"auth": {}, /* Optional, see Authentication section */
-	"cache": 1000, /* Optional, size of Etag LRU cache */
-	"compress": false, /* Optional, enabled by default, disabled with SSL */
+	"cacheSize": 1000, /* Optional, size of Etag LRU cache */
+	"compress": false, /* Optional, enabled by default */
 	"headers": {}, /* Optional, custom headers */
 	"hostname": "localhost", /* Optional, default is 'localhost' */
 	"json": 2, /* Optional, default indent for 'pretty' JSON */
-	"logs": {
+	"logging": {
 		"level": "info", /* Optional */
-		"stdout": true, /* Optional */
-		"dtrace": false, /* Optional */
+		"enabled": true, /* Optional */
 		"stack": true /* Optional */
 	},
 	"port": 8000, /* Optional */
@@ -322,25 +321,6 @@ A 'max byte' limit can be enforced on all routes that handle `PATCH`, `POST`, & 
 
 ## Logging
 Standard log levels are supported, and are emitted (by configuration) to `stdout` & `stderr`. Stack traces can be enabled.
-
-## DTrace
-DTrace probes can be enabled by configuration (disabled by default). A shell script is available at `./dtrace.sh` to observe the probes.
-The last argument for each probe is the nanoseconds it took to execute.
-
-```
-"allowed",        "char *", "char *", "char *", "int"
-"compress",       "char *", "char *", "int"
-"compression",    "char *", "int"
-"error",          "char *", "char *", "int",    "char *", "int"
-"headers",        "int",    "int"
-"log",            "char *", "int",    "int",    "int"
-"proxy",          "char *", "char *", "char *", "char *", "int"
-"middleware",     "char *", "char *", "int"
-"request",        "char *", "int"
-"respond",        "char *", "char *", "char *", "int",    "int"
-"status",         "int",    "int",    "int",    "int",    "int"
-"write",          "char *", "char *", "char *", "char *", "int"
-```
 
 ## License
 Copyright (c) 2015 Jason Mulligan  

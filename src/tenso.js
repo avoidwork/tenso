@@ -14,13 +14,15 @@ class Tenso {
 		this.hostname = "";
 		this.messages = {};
 		this.rates = {};
-		this.server = turtleio(config);
+		this.server = turtleio(config, (req, res, status, arg) => {
+			this.error(req, res, status, arg);
+		});
 		this.server.tenso = this;
 		this.version = "{{VERSION}}";
 	}
 
 	error (req, res, status, arg) {
-		return this.server.error(req, res, status, arg);
+		return this.respond(req, res, arg instanceof Error ? arg : new Error(arg), status);
 	}
 
 	rate (req, fn) {
@@ -62,7 +64,7 @@ class Tenso {
 	}
 
 	redirect (req, res, uri, perm = false) {
-		return this.server.respond(req, res, this.server.messages.NO_CONTENT, this.server.codes[!perm ? "FOUND" : "MOVED"], {location: uri});
+		return this.server.send(req, res, "", !perm ? 302 : 301, {location: uri});
 	}
 
 	render (req, arg, headers) {
@@ -99,7 +101,7 @@ class Tenso {
 	respond (req, res, arg, status, headers) {
 		let resStatus = status || 200,
 			defer = deferred(),
-			ref;
+			ref, output;
 
 		if (!res._header) {
 			ref = [headers || {}];
@@ -122,10 +124,9 @@ class Tenso {
 				ref[0][this.server.config.security.key] = res.locals[this.server.config.security.key];
 			}
 
-			ref[0] = this.server.headers(req, ref[0], resStatus);
-			this.server.respond(req, res, this.render(req, utility.hypermedia(this.server, req, this.serialize(req, arg, resStatus), ref[0]), ref[0]), resStatus, ref[0]).then(function () {
-				defer.resolve();
-			}, defer.reject);
+			output = this.render(req, utility.hypermedia(this.server, req, this.serialize(req, arg, resStatus), ref[0]), ref[0]);
+			ref[0] = this.server.headers(req, res, resStatus, output, ref[0], false);
+			this.server.send(req, res, output, resStatus, ref[0]).then(defer.resolve, defer.reject);
 		} else {
 			defer.resolve();
 		}

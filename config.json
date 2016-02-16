@@ -52,12 +52,14 @@
 		}
 	},
 	"compress": true,
+	"headers": {
+		"cache-control": "private max-age=60"
+	},
 	"hostname": "127.0.0.1",
-	"id": "tenso",
 	"json": 2,
-	"logs": {
-		"stdout": true,
-		"dtrace": false,
+	"logging": {
+		"level": "info",
+		"enabled": true,
 		"stack": false
 	},
 	"security": {

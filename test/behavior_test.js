@@ -22,7 +22,7 @@ function get_token (port, fn, url) {
 describe("Pagination", function () {
 	var port = 8002;
 
-	tenso({port: port, routes: routes, logs: {level: "error"}});
+	tenso({port: port, routes: routes, logging: {level: "error"}});
 
 	this.timeout(5000);
 
@@ -167,7 +167,7 @@ describe("Pagination", function () {
 describe("Hypermedia", function () {
 	var port = 8003;
 
-	tenso({port: port, routes: routes, logs: {level: "error"}});
+	tenso({port: port, routes: routes, logging: {level: "error"}});
 
 	this.timeout(5000);
 
@@ -236,7 +236,7 @@ describe("Hypermedia", function () {
 describe("Rate Limiting", function () {
 	var port = 8007;
 
-	tenso({port: port, routes: routes, logs: {level: "error"}, rate: {enabled: true, limit: 2, reset: 900}});
+	tenso({port: port, routes: routes, logging: {level: "error"}, rate: {enabled: true, limit: 2, reset: 900}});
 
 	this.timeout(5000);
 
@@ -303,7 +303,7 @@ describe("Rate Limiting (Override)", function () {
 	tenso({
 		port: port,
 		routes: routes,
-		logs: {
+		logging: {
 			level: "error"
 		},
 		rate: {
@@ -369,7 +369,7 @@ describe("Rate Limiting (Override)", function () {
 describe("Request body max byte size", function () {
 	var port = 8008;
 
-	tenso({port: port, routes: routes, logs: {level: "error"}, maxBytes: 10});
+	tenso({port: port, routes: routes, logging: {level: "error"}, maxBytes: 10});
 
 	this.timeout(5000);
 

@@ -8,7 +8,7 @@ const fs = require("fs"),
 
 function factory (arg) {
 	let hostname = arg ? arg.hostname || "localhost" : "localhost",
-		vhosts = {},
+		hosts = {},
 		config = arg ? merge(utility.clone(cfg), arg) : utility.clone(cfg),
 		obj;
 
@@ -17,12 +17,12 @@ function factory (arg) {
 		process.exit(1);
 	}
 
-	vhosts[hostname] = "www";
+	hosts[hostname] = "www";
 	config.root = root;
-	config.vhosts = vhosts;
+	config.hosts = hosts;
 	config.default = hostname;
 	config.template = fs.readFileSync(path.join(config.root, "template.html"), {encoding: "utf8"});
-	obj = tenso();
+	obj = tenso(config);
 	obj.hostname = hostname;
 	utility.bootstrap(obj, config);
 	obj.server.start(config);

@@ -1,4 +1,5 @@
 const path = require("path"),
+	http = require("http"),
 	array = require("retsu"),
 	turtleio = require("turtle.io"),
 	deferred = require("tiny-defer"),
@@ -21,8 +22,10 @@ class Tenso {
 		this.version = "{{VERSION}}";
 	}
 
-	error (req, res, status, arg) {
-		return this.respond(req, res, arg instanceof Error ? arg : new Error(arg), status);
+	error (req, res, status = 500, arg) {
+		let msg = arg || http.STATUS_CODES[status];
+
+		return this.respond(req, res, msg instanceof Error ? msg : new Error(msg), status);
 	}
 
 	rate (req, fn) {

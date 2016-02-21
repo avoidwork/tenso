@@ -100,7 +100,7 @@
 		"override": null
 	},
 	"websocket": {
-		"enabled": true,
+		"enabled": false,
 		"port": 3000
 	},
 	"title": "Tensō Browsable API"

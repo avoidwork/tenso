@@ -18,6 +18,7 @@ class Tenso {
 			this.error(req, res, status, arg);
 		});
 		this.server.tenso = this;
+		this.websocket = null;
 		this.version = "{{VERSION}}";
 	}
 

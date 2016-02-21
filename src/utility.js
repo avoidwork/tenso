@@ -21,7 +21,8 @@ const path = require("path"),
 	OAuth2Strategy = require("passport-oauth2").Strategy,
 	SAMLStrategy = require("passport-saml").Strategy,
 	TwitterStrategy = require("passport-twitter").Strategy,
-	RedisStore = require("connect-redis")(session);
+	RedisStore = require("connect-redis")(session),
+	lws = require("lws");
 
 function trim (obj) {
 	return obj.replace(/^(\s+|\t+|\n+)|(\s+|\t+|\n+)$/g, "");
@@ -488,36 +489,51 @@ function auth (obj, config) {
 }
 
 function bootstrap (obj, config) {
-	let notify = false;
-
 	// Bootstrapping configuration
 	auth(obj, config);
 
 	// Setting headers
-	config.headers = config.headers || {};
+	if (!config.headers) {
+		config.headers = {};
+	}
+
 	config.headers.server = "tenso/{{VERSION}}";
+
+	// Starting WebSocket server
+	if (config.websocket.enabled) {
+		obj.websocket = new lws.Server({port: config.websocket.port});
+		obj.server.log("Started WebSocket server on port " + config.websocket.port, "debug");
+	}
 
 	// Setting routes
 	iterate(config.routes, function (routes, method) {
-		iterate(routes, function (arg, route) {
-			if (typeof arg === "function") {
-				obj.server[method](route, function (...args) {
-					arg.apply(obj, args);
-				});
-			} else {
-				obj.server[method](route, function (req, res) {
-					if (!res._header) {
-						res.send(arg);
-					}
+		if (method === "socket") {
+			if (obj.websocket) {
+				iterate(routes, function (arg, event) {
+					obj.websocket.on(event, arg);
 				});
 			}
-		});
+		} else {
+			iterate(routes, function (arg, route) {
+				if (typeof arg === "function") {
+					obj.server[method](route, function (...args) {
+						arg.apply(obj, args);
+					});
+				} else {
+					obj.server[method](route, function (req, res) {
+						if (!res._header) {
+							res.send(arg);
+						}
+					});
+				}
+			});
+		}
 	});
 
 	// Disabling compression over SSL due to BREACH
 	if (config.ssl.cert && config.ssl.key) {
 		config.compress = false;
-		notify = true;
+		obj.server.log("Compression over SSL is disabled for your protection", "debug");
 	}
 
 	// Starting API server
@@ -527,10 +543,6 @@ function bootstrap (obj, config) {
 
 		obj.respond(req, res, err, status);
 	});
-
-	if (notify) {
-		obj.server.log("Compression over SSL is disabled for your protection", "debug");
-	}
 
 	return obj;
 }

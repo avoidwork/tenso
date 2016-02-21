@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tensō is a REST API gateway for node.js, designed to simplify the implementation of APIs.",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "homepage": "http://avoidwork.github.io/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -20,6 +20,7 @@
     "test": "grunt test"
   },
   "dependencies": {
+    "coap": "^0.13.1",
     "connect-redis": "^3.0.2",
     "cookie-parser": "^1.4.1",
     "csv.js": "^1.0.2",

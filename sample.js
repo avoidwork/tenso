@@ -4,7 +4,12 @@ require("./lib/index")({
 	},
 	websocket: {
 		enabled: true,
-		port: 3000
+		options: {
+			port: 3000
+		}
+	},
+	coap: {
+		enabled: true
 	},
 	routes: require(__dirname + "/test/routes.js")
 });

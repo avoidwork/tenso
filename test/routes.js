@@ -42,5 +42,14 @@ module.exports.socket = {
 	message: function (socket, message, binary, server) {
 		console.log('[Message: ' + message + ']');
 		server.send(socket, new Buffer('You sent me this: \"' + message + '\"'), false);
+	},
+	close: function () {
+		console.log('[Closed connection]');
+	}
+};
+
+module.exports.coap = {
+	request: function (req, res) {
+		res.end('Hello World!');
 	}
 };

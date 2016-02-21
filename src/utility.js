@@ -22,7 +22,8 @@ const path = require("path"),
 	SAMLStrategy = require("passport-saml").Strategy,
 	TwitterStrategy = require("passport-twitter").Strategy,
 	RedisStore = require("connect-redis")(session),
-	lws = require("lws");
+	lws = require("lws"),
+	coap = require("coap");
 
 function trim (obj) {
 	return obj.replace(/^(\s+|\t+|\n+)|(\s+|\t+|\n+)$/g, "");
@@ -505,9 +506,25 @@ function bootstrap (obj, config) {
 		obj.server.log("Started WebSocket server on port " + config.websocket.options.port, "debug");
 	}
 
+	// Starting COAP server
+	if (config.coap.enabled) {
+		obj.coap = coap.createServer({type: config.coap.options.type});
+		obj.coap.listen(config.coap.options.port, config.hostname);
+		obj.server.log("Started COAP (" + config.coap.options.type + ") server on " + config.hostname + ":" + config.coap.options.port, "debug");
+	}
+
 	// Setting routes
 	iterate(config.routes, function (routes, method) {
-		if (method === "socket") {
+		if (method === "coap") {
+			if (obj.websocket) {
+				iterate(routes, function (fn, event) {
+					obj.server.log("COAP event handler: '" + event + "'", "debug");
+					obj.coap.on(event, (req, res) => {
+						fn(req, res, obj.coap, obj);
+					});
+				});
+			}
+		} else if (method === "socket") {
 			if (obj.websocket) {
 				iterate(routes, function (fn, event) {
 					obj.server.log("WebSocket event handler: '" + event + "'", "debug");

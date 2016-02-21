@@ -350,6 +350,21 @@ Server options can be found [here](https://github.com/alexhultman/node-lws#new-l
 }
 ```
 
+## COAP
+A companion COAP server can be enabled by configuration, with a `request` event handler set as a `coap` route.
+
+Parameters for `request` are `req, res, server, tenso`.
+
+Server details can be found [here](https://github.com/mcollina/node-coap#createserveroptions-requestlistener)
+
+```
+{
+    "coap": {
+        "enabled": true
+    }
+}
+```
+
 ## License
 Copyright (c) 2016 Jason Mulligan  
 Licensed under the BSD-3 license.

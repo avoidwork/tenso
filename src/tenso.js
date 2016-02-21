@@ -12,6 +12,7 @@ let renderers = require(path.join(__dirname, "renderers")),
 
 class Tenso {
 	constructor (config) {
+		this.coap = null;
 		this.hostname = "";
 		this.rates = {};
 		this.server = turtleio(config, (req, res, status, arg) => {

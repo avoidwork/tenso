@@ -55,6 +55,7 @@
 	"headers": {
 		"cache-control": "private max-age=60"
 	},
+	"address": "127.0.0.1",
 	"hostname": "127.0.0.1",
 	"json": 2,
 	"logging": {
@@ -104,6 +105,13 @@
 		"options": {
 			"port": 3000,
 			"keepAliveInterval": 10000
+		}
+	},
+	"coap": {
+		"enabled": false,
+		"options": {
+			"type": "udp4",
+			"port": 5683
 		}
 	},
 	"title": "Tensō Browsable API"

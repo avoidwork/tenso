@@ -99,5 +99,9 @@
 		"message": "Too many requests",
 		"override": null
 	},
+	"websocket": {
+		"enabled": true,
+		"port": 3000
+	},
 	"title": "Tensō Browsable API"
 }

@@ -320,7 +320,29 @@ A 'max byte' limit can be enforced on all routes that handle `PATCH`, `POST`, & 
 ```
 
 ## Logging
-Standard log levels are supported, and are emitted (by configuration) to `stdout` & `stderr`. Stack traces can be enabled.
+Standard log levels are supported, and are emitted to `stdout` & `stderr`. Stack traces can be enabled.
+
+```
+{
+    "logging": {
+        "level": "warn",
+        "enabled": true,
+        "stack": true
+    }
+}
+```
+
+## WebSocket
+A companion WebSocket server can be enabled by configuration, with event handlers (`connection`, `message`, & `close`) set as a `socket` route.
+
+```
+{
+    "websocket": {
+        "enabled": true,
+        "port": 3000
+    }
+}
+```
 
 ## License
 Copyright (c) 2015 Jason Mulligan  

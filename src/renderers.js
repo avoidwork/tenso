@@ -22,6 +22,7 @@ function sanitize (arg) {
 renderers.set("text/csv", function (arg, req, headers) {
 	req.headers.accept = "text/csv";
 	headers["content-type"] = "text/csv";
+	headers["content-disposition"] = "attachment; filename=\"" + req.parsed.pathname.replace(/.*\//g, "").replace(/\..*/, "_") + req.parsed.search.replace("?", "").replace(/\&|=/g, "_") + ".csv\"";
 
 	return csv.encode(arg);
 });

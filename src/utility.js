@@ -497,11 +497,6 @@ function bootstrap (obj, config) {
 	config.headers = config.headers || {};
 	config.headers.server = "tenso/{{VERSION}}";
 
-	// Creating status > message map
-	iterate(http.STATUS_CODES, function (value, key) {
-		obj.messages[key] = value;
-	});
-
 	// Setting routes
 	iterate(config.routes, function (routes, method) {
 		iterate(routes, function (arg, route) {
@@ -528,7 +523,7 @@ function bootstrap (obj, config) {
 	// Starting API server
 	obj.server.start(config, function (req, res, status, msg) {
 		let stat = status instanceof Error ? parseInt(status.message, 10) : status,
-			err = msg instanceof Error ? msg : new Error(msg || obj.messages[stat]);
+			err = msg instanceof Error ? msg : new Error(msg || http.STATUS_CODES[stat]);
 
 		obj.respond(req, res, err, status);
 	});

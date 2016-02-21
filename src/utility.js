@@ -502,16 +502,21 @@ function bootstrap (obj, config) {
 	// Starting WebSocket server
 	if (config.websocket.enabled) {
 		obj.websocket = new lws.Server(config.websocket.options);
-		obj.server.log("Started websocket server on port " + config.websocket.options.port, "debug");
+		obj.server.log("Started WebSocket server on port " + config.websocket.options.port, "debug");
 	}
 
 	// Setting routes
 	iterate(config.routes, function (routes, method) {
 		if (method === "socket") {
 			if (obj.websocket) {
-				iterate(routes, function (arg, event) {
-					obj.websocket.on(event, ...args => {
-						arg(...args, obj.websocket, obj);
+				iterate(routes, function (fn, event) {
+					obj.server.log("WebSocket event handler: '" + event + "'", "debug");
+					obj.websocket.on(event, (socket, message, binary) => {
+						if (event === "message") {
+							fn(socket, message, binary, obj.websocket, obj);
+						} else {
+							fn(socket, obj.websocket, obj);
+						}
 					});
 				});
 			}

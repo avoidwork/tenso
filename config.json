@@ -70,7 +70,7 @@
 		"xframe": "SAMEORIGIN",
 		"p3p": "",
 		"hsts": {
-			"maxAge": 31536000,
+			"maxAge": 60,
 			"includeSubDomains": true,
 			"preload": true
 		},

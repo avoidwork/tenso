@@ -33,10 +33,14 @@ module.exports.post = {
 };
 
 module.exports.socket = {
-	connection: function (socket, server, tenso) {
-		console.log("WebSocket connected");
-		console.log(socket);
-		console.log(server);
-		console.log(tenso);
+	connection: function (socket, server) {
+		console.log('[Connection]');
+		server.send(socket, new Buffer('a text message'), false);
+		server.send(socket, new Buffer('a binary message'), true);
+		server.setUserData(socket, 'persistent per socket data');
+	},
+	message: function (socket, message, binary, server) {
+		console.log('[Message: ' + message + ']');
+		server.send(socket, new Buffer('You sent me this: \"' + message + '\"'), false);
 	}
-}
+};

@@ -510,7 +510,9 @@ function bootstrap (obj, config) {
 		if (method === "socket") {
 			if (obj.websocket) {
 				iterate(routes, function (arg, event) {
-					obj.websocket.on(event, arg);
+					obj.websocket.on(event, ...args => {
+						arg(...args, obj.websocket, obj);
+					});
 				});
 			}
 		} else {

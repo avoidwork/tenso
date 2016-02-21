@@ -335,6 +335,8 @@ Standard log levels are supported, and are emitted to `stdout` & `stderr`. Stack
 ## WebSocket
 A companion WebSocket server can be enabled by configuration, with event handlers (`connection`, `message`, & `close`) set as a `socket` route.
 
+Parameters for `message` are `socket, message, binary, server, tenso`, and `socket, server, tenso` for `connection` & `close`.
+
 ```
 {
     "websocket": {

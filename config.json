@@ -101,7 +101,10 @@
 	},
 	"websocket": {
 		"enabled": false,
-		"port": 3000
+		"options": {
+			"port": 3000,
+			"keepAliveInterval": 10000
+		}
 	},
 	"title": "Tensō Browsable API"
 }

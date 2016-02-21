@@ -337,11 +337,15 @@ A companion WebSocket server can be enabled by configuration, with event handler
 
 Parameters for `message` are `socket, message, binary, server, tenso`, and `socket, server, tenso` for `connection` & `close`.
 
+Server options can be found [here](https://github.com/alexhultman/node-lws#new-lwsserveroptions)
+
 ```
 {
     "websocket": {
         "enabled": true,
-        "port": 3000
+        "options": {
+            "port": 3000
+        }
     }
 }
 ```

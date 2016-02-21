@@ -31,3 +31,12 @@ module.exports.post = {
 		this.respond(req, res, "OK!");
 	}
 };
+
+module.exports.socket = {
+	connection: function (socket, server, tenso) {
+		console.log("WebSocket connected");
+		console.log(socket);
+		console.log(server);
+		console.log(tenso);
+	}
+}

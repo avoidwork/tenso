@@ -501,8 +501,8 @@ function bootstrap (obj, config) {
 
 	// Starting WebSocket server
 	if (config.websocket.enabled) {
-		obj.websocket = new lws.Server({port: config.websocket.port});
-		obj.server.log("Started WebSocket server on port " + config.websocket.port, "debug");
+		obj.websocket = new lws.Server(config.websocket.options);
+		obj.server.log("Started websocket server on port " + config.websocket.options.port, "debug");
 	}
 
 	// Setting routes

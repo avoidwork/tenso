@@ -351,5 +351,5 @@ Server options can be found [here](https://github.com/alexhultman/node-lws#new-l
 ```
 
 ## License
-Copyright (c) 2015 Jason Mulligan  
+Copyright (c) 2016 Jason Mulligan  
 Licensed under the BSD-3 license.

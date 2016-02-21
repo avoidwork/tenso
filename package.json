@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tensō is a REST API gateway for node.js, designed to simplify the implementation of APIs.",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "homepage": "http://avoidwork.github.io/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -70,6 +70,9 @@
     "elastic",
     "api",
     "app",
-    "application"
+    "application",
+    "websockets",
+    "sockets",
+    "socket"
   ]
 }

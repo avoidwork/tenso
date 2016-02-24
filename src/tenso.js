@@ -143,9 +143,9 @@ class Tenso {
 		return defer.promise;
 	}
 
-	serialize (req, arg, status = 200) {
+	serialize (req, arg, status = 200, iot = false) {
 		let format = "application/json",
-			accepts = utility.explode(req.parsed.query.format || req.headers.accept || format, ","),
+			accepts = !iot ? utility.explode(req.parsed.query.format || req.headers.accept || format, ",") : format,
 			errz = arg instanceof Error,
 			result, serializer;
 

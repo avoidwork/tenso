@@ -135,7 +135,6 @@ class Tenso {
 			}
 
 			output = this.render(req, utility.hypermedia(this.server, req, this.serialize(req, arg, resStatus), ref[0]), ref[0]);
-			ref[0] = this.server.headers(req, res, resStatus, output, ref[0], false);
 			this.server.send(req, res, output, resStatus, ref[0]).then(defer.resolve, defer.reject);
 		} else {
 			defer.resolve();

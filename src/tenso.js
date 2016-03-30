@@ -11,7 +11,8 @@ let renderers = require(path.join(__dirname, "renderers")),
 	serializers = require(path.join(__dirname, "serializers"));
 
 class Tenso {
-	constructor (config) {
+	constructor (config = {headers: {}}) {
+		config.headers.server = "tenso/{{VERSION}}";
 		this.coap = null;
 		this.hostname = "";
 		this.rates = {};

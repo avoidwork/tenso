@@ -22,8 +22,14 @@ const path = require("path"),
 	SAMLStrategy = require("passport-saml").Strategy,
 	TwitterStrategy = require("passport-twitter").Strategy,
 	RedisStore = require("connect-redis")(session),
-	lws = require("lws"),
+	os = require("os");
+
+let lws, coap;
+
+if (os.platform() !== "win32") {
+	lws = require("lws");
 	coap = require("coap");
+}
 
 function trim (obj) {
 	return obj.replace(/^(\s+|\t+|\n+)|(\s+|\t+|\n+)$/g, "");
@@ -501,13 +507,13 @@ function bootstrap (obj, config) {
 	config.headers.server = "tenso/{{VERSION}}";
 
 	// Starting WebSocket server
-	if (config.websocket.enabled) {
+	if (config.websocket.enabled && lws) {
 		obj.websocket = new lws.Server(config.websocket.options);
 		obj.server.log("Started WebSocket server on port " + config.websocket.options.port, "debug");
 	}
 
 	// Starting COAP server
-	if (config.coap.enabled) {
+	if (config.coap.enabled && coap) {
 		obj.coap = coap.createServer({type: config.coap.options.type});
 		obj.coap.listen(config.coap.options.port, config.hostname);
 		obj.server.log("Started COAP (" + config.coap.options.type + ") server on " + config.hostname + ":" + config.coap.options.port, "debug");

@@ -21,14 +21,15 @@ const path = require("path"),
 	OAuth2Strategy = require("passport-oauth2").Strategy,
 	SAMLStrategy = require("passport-saml").Strategy,
 	TwitterStrategy = require("passport-twitter").Strategy,
-	RedisStore = require("connect-redis")(session),
-	os = require("os");
+	RedisStore = require("connect-redis")(session);
 
 let lws, coap;
 
-if (os.platform() !== "win32") {
+try {
 	lws = require("lws");
 	coap = require("coap");
+} catch (e) {
+	void 0;
 }
 
 function trim (obj) {

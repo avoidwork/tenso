@@ -125,8 +125,8 @@ class Tenso {
 					ref[0]["cache-control"] = utility.clone(this.server.config.headers["cache-control"]);
 				}
 
-				if (ref[0]["cache-control"] !== undefined && ref[0]["cache-control"].indexOf("private ") === -1) {
-					ref[0]["cache-control"] = "private " + ref[0]["cache-control"];
+				if (ref[0]["cache-control"] !== undefined && ref[0]["cache-control"].indexOf("private") === -1) {
+					ref[0]["cache-control"] = "private, " + ref[0]["cache-control"];
 				}
 			}
 

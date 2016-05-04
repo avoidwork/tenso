@@ -120,13 +120,13 @@ class Tenso {
 				ref[0].allow = req.allow;
 			}
 
-			if (req.protect) {
-				if (ref[0]["cache-control"] === undefined && this.server.config.headers["cache-control"]) {
+			if (req.protect && ref[0]["cache-control"] === undefined) {
+				if (this.server.config.headers["cache-control"]) {
 					ref[0]["cache-control"] = utility.clone(this.server.config.headers["cache-control"]);
 				}
 
-				if (ref[0]["cache-control"] !== undefined && ref[0]["cache-control"].indexOf("private") === -1) {
-					ref[0]["cache-control"] = "private, " + ref[0]["cache-control"];
+				if (!regex.private.test(ref[0]["cache-control"])) {
+					ref[0]["cache-control"] = "private, " + ref[0]["cache-control"].replace(/(private|public),\s/g, "");
 				}
 			}
 

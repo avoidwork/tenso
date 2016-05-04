@@ -11,6 +11,7 @@ const regex = {
 	leading: /.*\//,
 	mimetype: /;.*/,
 	modify: /DELETE|PATCH|POST|PUT/,
+	private: /private/,
 	scheme: /^(\w+\:\/\/)|\//,
 	trailing: /_.*$/,
 	trailing_s: /s$/,

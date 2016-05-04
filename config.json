@@ -53,7 +53,7 @@
 	},
 	"compress": true,
 	"headers": {
-		"cache-control": "private max-age=60"
+		"cache-control": "max-age=60, must-revalidate"
 	},
 	"address": "127.0.0.1",
 	"hostname": "127.0.0.1",

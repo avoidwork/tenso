@@ -365,6 +365,15 @@ Server details can be found [here](https://github.com/mcollina/node-coap#creates
 }
 ```
 
+## Template
+The browsable template can be overridden with a custom HTML document.
+
+```
+{
+    "template": "/var/www/api/template.html"
+}
+```
+
 ## License
 Copyright (c) 2016 Jason Mulligan  
 Licensed under the BSD-3 license.

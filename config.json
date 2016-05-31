@@ -114,5 +114,6 @@
 			"port": 5683
 		}
 	},
-	"title": "Tensō Browsable API"
+	"title": "Tensō Browsable API",
+	"template": ""
 }

@@ -21,7 +21,7 @@ function factory (arg) {
 	config.root = root;
 	config.hosts = hosts;
 	config.default = hostname;
-	config.template = fs.readFileSync(path.join(config.root, "template.html"), {encoding: "utf8"});
+	config.template = fs.readFileSync(config.template || path.join(config.root, "template.html"), {encoding: "utf8"});
 	obj = tenso(config);
 	obj.hostname = hostname;
 	utility.bootstrap(obj, config);

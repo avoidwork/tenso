@@ -1,14 +1,13 @@
 /.idea/
 /.sass-cache/
-/doc/
 /node_modules/
 /src/
 /test/
 /sass/
+.eslintrc
 .git
 .gitignore
 .travis.yml
-docstrap.json
 Gruntfile.js
 sample.js
 routes.js

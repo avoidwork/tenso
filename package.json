@@ -14,7 +14,7 @@
   "license": "BSD-3-Clause",
   "main": "lib/index",
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=6.0.0"
   },
   "scripts": {
     "test": "grunt test"
@@ -27,7 +27,6 @@
     "express-session": "~1.13.0",
     "keysort": "~0.2.0",
     "lusca": "~1.3.0",
-    "lws": "~0.2.1",
     "passport": "~0.3.2",
     "passport-facebook": "~2.1.0",
     "passport-google": "~0.3.0",
@@ -44,8 +43,9 @@
     "tiny-merge": "~1.0.0",
     "tiny-uuid4": "~1.0.1",
     "tiny-xml": "~1.0.6",
-    "turtle.io": "~6.1.0",
-    "yamljs": "~0.2.5"
+    "turtle.io": "~7.1.1",
+    "yamljs": "~0.2.5",
+    "uws": "~0.7.0"
   },
   "devDependencies": {
     "babel-eslint": "~4.1.8",

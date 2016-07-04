@@ -1,5 +1,5 @@
 var hippie = require("hippie"),
-	tenso = require("../lib/index"),
+	tenso = require("../index"),
 	routes = require("./routes.js"),
 	array = require("retsu"),
 	csrf = 'x-csrf-token';

@@ -1,4 +1,4 @@
-require("./lib/index")({
+require("./index.js")({
 	logging: {
 		level: "debug"
 	},

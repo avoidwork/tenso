@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tensō is a REST API gateway for node.js, designed to simplify the implementation of APIs.",
-  "version": "3.3.13",
+  "version": "4.0.0",
   "homepage": "http://avoidwork.github.io/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -12,7 +12,7 @@
     "url": "https://github.com/avoidwork/tenso/issues"
   },
   "license": "BSD-3-Clause",
-  "main": "lib/index",
+  "main": "index",
   "engines": {
     "node": ">=6.0.0"
   },
@@ -43,7 +43,7 @@
     "tiny-merge": "~1.0.0",
     "tiny-uuid4": "~1.0.1",
     "tiny-xml": "~1.0.6",
-    "turtle.io": "~7.1.1",
+    "turtle.io": "~7.1.9",
     "yamljs": "~0.2.5",
     "uws": "~0.7.0"
   },

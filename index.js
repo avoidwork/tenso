@@ -1,10 +1,12 @@
+"use strict";
+
 const fs = require("fs"),
 	path = require("path"),
 	merge = require("tiny-merge"),
-	root = path.join(__dirname, ".."),
+	root = __dirname,
 	cfg = require(path.join(root, "config.json")),
-	tenso = require(path.join(__dirname, "tenso.js")),
-	utility = require(path.join(__dirname, "utility.js"));
+	tenso = require(path.join(root, "lib", "tenso.js")),
+	utility = require(path.join(root, "lib", "utility.js"));
 
 function factory (arg) {
 	let hostname = arg ? arg.hostname || "localhost" : "localhost",

@@ -13,6 +13,7 @@
   },
   "license": "BSD-3-Clause",
   "main": "index",
+  "engineStrict": true,
   "engines": {
     "node": ">=6.0.0"
   },

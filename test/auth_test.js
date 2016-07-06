@@ -276,7 +276,7 @@ describe("Local", function () {
 			.expectValue("data", null)
 			.expectValue("error", "CSRF token missing")
 			.expectValue("status", 403)
-			.end(function (err) {
+			.end(function (err, res, body) {
 				if (err) throw err;
 				done();
 			});

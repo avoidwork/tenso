@@ -1,7 +1,7 @@
 var hippie = require("hippie"),
 	tenso = require("../index"),
 	routes = require("./routes.js"),
-	csrf = 'x-csrf-token';
+	csrf = "x-csrf-token";
 
 function persistCookies (opts, next) {
 	opts.jar = true;
@@ -17,7 +17,7 @@ function api (port, not_json) {
 process.setMaxListeners(0);
 
 describe("Renderers", function () {
-	var port = 8010, server;
+	var port = 8011, server;
 
 	server = tenso({port: port, routes: routes, logging: {level: "error"}});
 	server.renderer("custom", function (arg) {

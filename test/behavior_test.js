@@ -2,7 +2,7 @@ var hippie = require("hippie"),
 	tenso = require("../index"),
 	routes = require("./routes.js"),
 	array = require("retsu"),
-	csrf = 'x-csrf-token';
+	csrf = "x-csrf-token";
 
 function persistCookies (opts, next) {
 	opts.jar = true;
@@ -418,5 +418,27 @@ describe("Request body max byte size", function () {
 					done();
 				});
 		}, "/test");
+	});
+});
+
+describe("Route parameters", function () {
+	var port = 8010;
+
+	tenso({port: port, routes: routes, logging: {level: "error"}});
+
+	this.timeout(5000);
+
+	it("GET /test/hidden - returns an a 'hidden' result", function (done) {
+		api(port)
+			.get("/test/hidden")
+			.expectStatus(200)
+			.expectValue("links", [{uri: "/test", rel: "collection"}])
+			.expectValue("data", "hidden")
+			.expectValue("error", null)
+			.expectValue("status", 200)
+			.end(function (err) {
+				if (err) throw err;
+				done();
+			});
 	});
 });

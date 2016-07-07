@@ -3,7 +3,7 @@ var hippie = require("hippie"),
 	tenso = require("../index"),
 	routes = require("./routes.js"),
 	array = require("retsu"),
-	csrf = 'x-csrf-token';
+	csrf = "x-csrf-token";
 
 process.setMaxListeners(0);
 
@@ -148,7 +148,7 @@ describe("Basic Auth", function () {
 
 	it("GET /uuid - returns a uuid (authorized)", function (done) {
 		api(port)
-			.auth('test', '123')
+			.auth("test", "123")
 			.get("/uuid")
 			.expectStatus(200)
 			.expectValue("links", [{uri: "/", rel: "collection"}])
@@ -185,7 +185,7 @@ describe("OAuth2 Token Bearer", function () {
 
 	it("GET / - returns an array of endpoints (authorized)", function (done) {
 		api(port)
-			.header('Authorization', 'Bearer abc-123')
+			.header("Authorization", "Bearer abc-123")
 			.get("/")
 			.expectStatus(200)
 			.expectValue("links", [{uri: "/empty", rel: "item"},
@@ -276,7 +276,7 @@ describe("Local", function () {
 			.expectValue("data", null)
 			.expectValue("error", "CSRF token missing")
 			.expectValue("status", 403)
-			.end(function (err, res, body) {
+			.end(function (err) {
 				if (err) throw err;
 				done();
 			});
@@ -301,7 +301,7 @@ describe("Local", function () {
 				.expectValue("data", null)
 				.expectValue("error", "Unauthorized")
 				.expectValue("status", 401)
-				.end(function (err, body, res) {
+				.end(function (err) {
 					if (err) throw err;
 					done();
 				});

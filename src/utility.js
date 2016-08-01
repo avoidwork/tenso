@@ -23,10 +23,10 @@ const path = require("path"),
 	TwitterStrategy = require("passport-twitter").Strategy,
 	RedisStore = require("connect-redis")(session);
 
-let lws, coap;
+let uws, coap;
 
 try {
-	lws = require("lws");
+	uws = require("uws");
 	coap = require("coap");
 } catch (e) {
 	void 0;
@@ -508,8 +508,8 @@ function bootstrap (obj, config) {
 	config.headers.server = "tenso/{{VERSION}}";
 
 	// Starting WebSocket server
-	if (config.websocket.enabled && lws) {
-		obj.websocket = new lws.Server(config.websocket.options);
+	if (config.websocket.enabled && uws) {
+		obj.websocket = new uws.Server(config.websocket.options);
 		obj.server.log("Started WebSocket server on port " + config.websocket.options.port, "debug");
 	}
 

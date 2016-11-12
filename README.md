@@ -72,11 +72,7 @@ Tensō 1.4.0 added a few common format renderers, such as CSV, HTML, YAML, & XML
 Custom renderers can be registered with `server.renderer('name', fn, 'mimetype');`.
 
 ## Cache
-Tensō has a robust multi-level cache strategy, starting at the response headers. If a response can be cached, an `Etag` will be sent to the `Client`, and registered in an `Etag LRU cache` which Tensō 
-uses along with a 'cache compressed asset to disk' strategy, allowing Tensō to stream the last known version of a resource to the next `Client` that supports the same compression (gzip or deflate).
-`Etags` will lazy expire from the cache, to minimize wasted cycles.
-
-Caching can be disabled by setting the `cache-control` header to a "private" or "no cache" directive (see the above `/uuid` example).
+ETags are built in! Caching can be disabled by setting the `cache-control` header to a "private" or "no cache" directive (see the above `/uuid` example).
  
 ## Configuration
 This is a sample configuration for Tensō, without authentication or SSL. This would be ideal for development, but not production! Enabling SSL is as easy as providing file paths for the two keys.

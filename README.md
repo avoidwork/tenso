@@ -257,6 +257,23 @@ Twitter authentication will create `/auth`, `/auth/twitter`, & `/auth/twitter/ca
 }
 ```
 
+## ETags
+To enable state propagation set `notify` to `true`, and when receiving new state pass to `instance.server.etags.update()`.
+
+```
+{
+	"etags": {
+		"notify": true,
+		"onchange": (eventName, serializedCache) => {
+		... // serializedCache needs to be passed to other instances `etags.update()`
+		},
+		"update": serializedCache => {
+		... // Override if you want to do more than set new state
+		}
+	}
+}
+```
+
 ## Sessions
 Sessions can use a memory (default) or redis store. Memory will limit your sessions to a single server instance, while redis will allow you to share sessions across a cluster of processes, or machines. To use redis, set the `store` property to "redis".
 

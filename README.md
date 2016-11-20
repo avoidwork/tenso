@@ -1,7 +1,8 @@
 Tensō
 =====
 
-[![build status](https://secure.travis-ci.org/avoidwork/tenso.svg)](http://travis-ci.org/avoidwork/tenso) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/avoidwork/tenso?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![build status](https://secure.travis-ci.org/avoidwork/tenso.svg)](http://travis-ci.org/avoidwork/tenso)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/avoidwork/tenso?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Tensō is a REST API gateway for node.js, designed to simplify the implementation of APIs.
 

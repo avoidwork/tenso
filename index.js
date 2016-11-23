@@ -4,6 +4,7 @@ const fs = require("fs"),
 	path = require("path"),
 	merge = require("tiny-merge"),
 	root = __dirname,
+	pkg = require(path.join(root, "package.json")),
 	cfg = require(path.join(root, "config.json")),
 	tenso = require(path.join(root, "lib", "tenso.js")),
 	utility = require(path.join(root, "lib", "utility.js"));
@@ -24,6 +25,7 @@ function factory (arg) {
 	config.hosts = hosts;
 	config.default = hostname;
 	config.template = fs.readFileSync(config.template || path.join(config.root, "template.html"), {encoding: "utf8"});
+	config.version = pkg.version;
 	obj = tenso(config);
 	obj.hostname = hostname;
 	utility.bootstrap(obj, config);

@@ -265,6 +265,7 @@ To enable state propagation set `notify` to `true`, and when receiving new state
 {
 	"etags": {
 		"notify": true,
+		"ignore": [], // Paths to ignore
 		"onchange": (eventName, serializedCache) => {
 		... // serializedCache needs to be passed to other instances `etags.update()`
 		},

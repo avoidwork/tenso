@@ -51,6 +51,9 @@
 			"consumer_secret": ""
 		}
 	},
+	"etags": {
+		"ignore": []
+	},
 	"compress": true,
 	"headers": {
 		"cache-control": "max-age=60, must-revalidate"

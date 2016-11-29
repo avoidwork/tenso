@@ -21,6 +21,14 @@
 			"enabled": false,
 			"auth": null
 		},
+		"jwt": {
+			"enabled": false,
+			"audience": "",
+			"algorithms": ["HS256", "HS384", "HS512"],
+			"ignoreExpiration": false,
+			"issuer": "",
+			"secretOrKey": ""
+		},
 		"linkedin": {
 			"enabled": false,
 			"auth": null,

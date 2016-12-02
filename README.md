@@ -160,7 +160,7 @@ Google authentication (OpenID) will create `/auth`, `/auth/google`, & `/auth/goo
 ```
 
 ### JWT
-JWT (JSON Web Token) authentication is stateless and does not have an entry point. The `auth(sub, callback)` function must verify `sub`, and must execute `callback(err, user)`.
+JWT (JSON Web Token) authentication is stateless and does not have an entry point. The `auth(token, callback)` function must verify `token.sub`, and must execute `callback(err, user)`.
 
 ```
 {

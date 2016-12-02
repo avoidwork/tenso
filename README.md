@@ -168,6 +168,11 @@ JWT (JSON Web Token) authentication is stateless and does not have an entry poin
 		"jwt": {
 			"enabled": true,
 			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
+			"algorithms": [], /* Optional signing algorithms, defaults to ["HS256", "HS384", "HS512"] */
+			"audience": "", /* Optional, used to verify `aud` */
+			"issuer: "", /* Optional, used to verify `iss` */
+			"ignoreExpiration": false, /* Optional, set to `true` to ignore expired tokens */
+			"secretOrKey": ""
 		}
 		"protect": ["/private"]
 	}

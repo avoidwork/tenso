@@ -20,7 +20,7 @@ Routes are loaded as a module, with each HTTP method as an export, affording a v
 
 Route handlers have the context of the Tensō server, i.e. `this` will allow you to send a response with `this.respond(req, res, body[, status, headers])`. You can also use `res` to `res.respond(body[, status, headers])`, `res.redirect(url)`, or `res.error(status[, Error])`. 
 
-The following example will create GET routes that will return an empty `Array` at `/`, an `Error` at `/reports/tps`, & a version 4 UUID at `/uuid`.
+The following example will create GET routes that will return an `Array` at `/`, an `Error` at `/reports/tps`, & a version 4 UUID at `/uuid`.
 
 ```javascript
 var uuid = require("tiny-uuid4");

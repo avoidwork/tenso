@@ -169,7 +169,7 @@ This authentication strategy relies on out-of-band information for the `secret`,
 	"auth": {
 		"jwt": {
 			"enabled": true,
-			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
+			"auth": function (token, cb) { ... }, /* Authentication handler, to 'find' or 'create' a User */
 			"algorithms": [], /* Optional signing algorithms, defaults to ["HS256", "HS384", "HS512"] */
 			"audience": "", /* Optional, used to verify `aud` */
 			"issuer: "", /* Optional, used to verify `iss` */

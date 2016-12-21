@@ -10,7 +10,7 @@ require("./index.js")({
 	},
 	auth: {
 		local: {
-			enabled: false,
+			enabled: true,
 			auth: function (username, password, callback) {
 				if (username === "test" && password === 123) {
 					callback(null, {username: username, password: password});
@@ -19,16 +19,9 @@ require("./index.js")({
 				}
 			}
 		},
-		jwt: {
-			enabled: true,
-			auth: function (username, password, callback) {
-				console.log(username, password, callback);
-				callback(null, {username: "x", password: "y"});
-			},
-			secretOrKey: "jennifer"
-		},
 		protect: ["/uuid"]
+	},
+	security: {
+		csrf: false
 	}
 });
-
-console.log('Token', jwt.sign({username: 'jason@attack.io' }, 'jennifer'));

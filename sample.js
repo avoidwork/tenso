@@ -1,3 +1,5 @@
+var jwt = require("jsonwebtoken");
+
 require("./index.js")({
 	port: 8000,
 	routes: require("./test/routes.js"),
@@ -18,5 +20,8 @@ require("./index.js")({
 			}
 		},
 		protect: ["/uuid"]
+	},
+	security: {
+		csrf: false
 	}
 });

@@ -159,6 +159,29 @@ Google authentication (OpenID) will create `/auth`, `/auth/google`, & `/auth/goo
 }
 ```
 
+### JWT
+JWT (JSON Web Token) authentication is stateless and does not have an entry point. The `auth(token, callback)` function must verify `token.sub`, and must execute `callback(err, user)`.
+
+This authentication strategy relies on out-of-band information for the `secret`, and other optional token attributes.
+
+```
+{
+	"auth": {
+		"jwt": {
+			"enabled": true,
+			"auth": function (token, cb) { ... }, /* Authentication handler, to 'find' or 'create' a User */
+			"algorithms": [], /* Optional signing algorithms, defaults to ["HS256", "HS384", "HS512"] */
+			"audience": "", /* Optional, used to verify `aud` */
+			"issuer: "", /* Optional, used to verify `iss` */
+			"ignoreExpiration": false, /* Optional, set to `true` to ignore expired tokens */
+			"scheme": "Bearer", /* Optional, set to specify the `Authorization` scheme */
+			"secretOrKey": ""
+		}
+		"protect": ["/private"]
+	}
+}
+```
+
 ### LinkedIn
 LinkedIn authentication will create `/auth`, `/auth/linkedin`, & `/auth/linkedin/callback` routes. `auth(token, tokenSecret, profile, callback)` must execute `callback(err, user)`.
  

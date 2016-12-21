@@ -1,5 +1,6 @@
 var hippie = require("hippie"),
 	emitter = require("events"),
+	jwt = require("jsonwebtoken"),
 	tenso = require("../index"),
 	routes = require("./routes.js"),
 	array = require("retsu"),
@@ -338,6 +339,61 @@ describe("Local", function () {
 			.expectValue("links", [{uri: "/", rel: "collection"}])
 			.expectValue("error", null)
 			.expectValue("status", 200)
+			.end(function (err) {
+				if (err) throw err;
+				done();
+			});
+	});
+});
+
+describe("JWT", function () {
+	var port = 8012,
+		secret = "jennifer",
+		token = jwt.sign({username: "jason@attack.io"}, secret);
+
+	tenso({
+		port: port,
+		routes: routes,
+		logging: {level: "error"},
+		auth: {
+			jwt: {
+				enabled: true,
+				auth: function (token, cb) {
+					if (token.username === 'jason@attack.io') {
+						cb(null, token);
+					} else {
+						cb(new Error('Invalid token'), null);
+					}
+				},
+				secretOrKey: secret
+			},
+			security: {
+				csrf: false
+			},
+			protect: ["/uuid"]
+		}
+	});
+
+	this.timeout(5000);
+
+	it("GET /uuid - returns a uuid (authorized)", function (done) {
+		api(port, false)
+			.header('Authorization', 'Bearer ' + token)
+			.get("/uuid")
+			.expectStatus(200)
+			.expectValue("links", [{uri: "/", rel: "collection"}])
+			.expectValue("error", null)
+			.expectValue("status", 200)
+			.end(function (err) {
+				if (err) throw err;
+				done();
+			});
+	});
+
+	it("GET /uuid - returns an 'unauthorized' error", function (done) {
+		api(port, true)
+			.get("/uuid")
+			.expectStatus(401)
 			.end(function (err) {
 				if (err) throw err;
 				done();

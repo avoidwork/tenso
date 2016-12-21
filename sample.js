@@ -1,5 +1,3 @@
-var jwt = require("jsonwebtoken");
-
 require("./index.js")({
 	port: 8000,
 	routes: require("./test/routes.js"),
@@ -10,7 +8,7 @@ require("./index.js")({
 	},
 	auth: {
 		local: {
-			enabled: true,
+			enabled: false,
 			auth: function (username, password, callback) {
 				if (username === "test" && password === 123) {
 					callback(null, {username: username, password: password});
@@ -18,6 +16,13 @@ require("./index.js")({
 					callback(true, null);
 				}
 			}
+		},
+		jwt: {
+			enabled: true,
+			auth: function (token, cb) {
+				cb(null, token);
+			},
+			secretOrKey: "jennifer"
 		},
 		protect: ["/uuid"]
 	},

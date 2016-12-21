@@ -174,6 +174,7 @@ This authentication strategy relies on out-of-band information for the `secret`,
 			"audience": "", /* Optional, used to verify `aud` */
 			"issuer: "", /* Optional, used to verify `iss` */
 			"ignoreExpiration": false, /* Optional, set to `true` to ignore expired tokens */
+			"scheme": "Bearer", /* Optional, set to specify the `Authorization` scheme */
 			"secretOrKey": ""
 		}
 		"protect": ["/private"]

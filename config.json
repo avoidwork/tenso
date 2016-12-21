@@ -27,6 +27,7 @@
 			"algorithms": ["HS256", "HS384", "HS512"],
 			"ignoreExpiration": false,
 			"issuer": "",
+			"scheme": "Bearer",
 			"secretOrKey": ""
 		},
 		"linkedin": {

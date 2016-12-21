@@ -162,6 +162,8 @@ Google authentication (OpenID) will create `/auth`, `/auth/google`, & `/auth/goo
 ### JWT
 JWT (JSON Web Token) authentication is stateless and does not have an entry point. The `auth(token, callback)` function must verify `token.sub`, and must execute `callback(err, user)`.
 
+With this authentication strategy there is no way to retrieve the password; it's expected that the client have the `secret` and other optional values as out of band information.
+
 ```
 {
 	"auth": {

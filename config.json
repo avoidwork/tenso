@@ -69,7 +69,7 @@
 	},
 	"address": "127.0.0.1",
 	"hostname": "127.0.0.1",
-	"json": 2,
+	"json": 0,
 	"logging": {
 		"level": "info",
 		"enabled": true,
@@ -127,5 +127,9 @@
 		}
 	},
 	"title": "Tensō Browsable API",
-	"template": ""
+	"template": "",
+	"regex": {
+		"hypermedia": "[a-zA-Z]+_(guid|uuid|id|url|uri)$",
+		"id": "^(_id|id)$"
+	}
 }

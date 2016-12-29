@@ -93,6 +93,10 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 	},
 	"port": 8000, /* Optional */
 	"routes": require("./routes.js"), /* Required! */
+	"regex": {
+		"hypermedia": "[a-zA-Z]+_(guid|uuid|id|url|uri)$", /* Optional, changes hypermedia detection / generation */
+		"id": "^(_id|id)$" /* Optional, changes hypermedia detection / generation */
+	},
 	"session": { /* Optional */
 		"secret": null,
 		"store": "memory", /* "memory" or "redis" */

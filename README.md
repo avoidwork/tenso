@@ -8,6 +8,9 @@ Tensō is a REST API gateway for node.js, designed to simplify the implementatio
 
 Tensō will handle the serialization & creation of hypermedia links, all you have to do is give it `Arrays` or `Objects`.
 
+## Sample application
+You can clone or fork the sample application at https://github.com/avoidwork/tenso-sample
+
 ## Example
 Creating an API with Tensō can be as simple as one statement.
 
@@ -417,5 +420,5 @@ The browsable template can be overridden with a custom HTML document.
 ```
 
 ## License
-Copyright (c) 2016 Jason Mulligan  
+Copyright (c) 2017 Jason Mulligan
 Licensed under the BSD-3 license.

@@ -10,10 +10,11 @@ const fs = require("fs"),
 	utility = require(path.join(root, "lib", "utility.js"));
 
 function factory (arg) {
-	let hostname = arg ? arg.hostname || "localhost" : "localhost",
+	const hostname = arg ? arg.hostname || "localhost" : "localhost",
 		hosts = {},
-		config = arg ? merge(utility.clone(cfg), arg) : utility.clone(cfg),
-		obj;
+		config = arg ? merge(utility.clone(cfg), arg) : utility.clone(cfg);
+
+	let obj;
 
 	if (!config.port) {
 		console.error("Invalid configuration");

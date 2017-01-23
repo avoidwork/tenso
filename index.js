@@ -21,10 +21,20 @@ function factory (arg) {
 		process.exit(1);
 	}
 
-	hosts[hostname] = "www";
-	config.root = root;
-	config.hosts = hosts;
-	config.default = hostname;
+	if (!config.root) {
+		config.root = root;
+	}
+
+	if (!config.hosts) {
+		hosts[hostname] = "www";
+		config.hosts = hosts;
+	}
+
+	if (!config.default) {
+		config.default = hostname;
+	}
+
+	config.root = path.resolve(config.root);
 	config.template = fs.readFileSync(config.template || path.join(config.root, "template.html"), {encoding: "utf8"});
 	config.version = pkg.version;
 	obj = tenso(config);

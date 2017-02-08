@@ -79,7 +79,7 @@
 		"key": "x-csrf-token",
 		"secret": "tenso",
 		"csrf": true,
-		"csp": null,
+		"csp": "",
 		"xframe": "SAMEORIGIN",
 		"p3p": "",
 		"hsts": {
@@ -87,7 +87,8 @@
 			"includeSubDomains": true,
 			"preload": true
 		},
-		"xssProtection": true
+		"xssProtection": true,
+		"nosniff": true
 	},
 	"maxBytes": 1048576,
 	"port": 8000,

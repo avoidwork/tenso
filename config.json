@@ -79,7 +79,7 @@
 		"key": "x-csrf-token",
 		"secret": "tenso",
 		"csrf": true,
-		"csp": "",
+		"csp": null,
 		"xframe": "SAMEORIGIN",
 		"p3p": "",
 		"hsts": {

@@ -1,193 +1,119 @@
-var hippie = require("hippie"),
+const tinyhttptest = require("tiny-httptest"),
 	tenso = require("../index"),
 	routes = require("./routes.js"),
-	csrf = "x-csrf-token";
-
-function persistCookies (opts, next) {
-	opts.jar = true;
-	next(opts);
-}
-
-function api (port, not_json) {
-	var obj = hippie().base("http://localhost:" + port).use(persistCookies);
-
-	return not_json ? obj : obj.expectHeader("Content-Type", "application/json").json();
-}
+	timeout = 5000;
 
 process.setMaxListeners(0);
 
 describe("Renderers", function () {
-	var port = 8011, server;
+	const port = 8011;
+	let server;
 
-	server = tenso({port: port, routes: routes, logging: {level: "error"}});
+	this.timeout(timeout);
+	server = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
 	server.renderer("custom", function (arg) {
 		return arg;
 	}, "application/json");
 
-	this.timeout(5000);
-
-	it("GET CSV (header)", function (done) {
-		api(port, true)
-			.get("/")
-			.header("accept", "text/csv")
+	it("GET CSV (header)", function () {
+		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "text/csv"}})
 			.expectStatus(200)
-			.expectHeader("Content-Type", "text/csv")
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.expectHeader("content-type", "text/csv")
+			.end();
 	});
 
-	it("GET CSV (query string)", function (done) {
-		api(port, true)
-			.get("/?format=text/csv")
+	it("GET CSV (query string)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/?format=text/csv"})
 			.expectStatus(200)
-			.expectHeader("Content-Type", "text/csv")
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.expectHeader("content-type", "text/csv")
+			.end();
 	});
 
-	it("GET JSONP (header)", function (done) {
-		api(port, true)
-			.get("/")
-			.header("accept", "application/javascript")
+	it("GET JSONP (header)", function () {
+		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "application/javascript"}})
 			.expectStatus(200)
-			.expectHeader("Content-Type", "application/javascript")
+			.expectHeader("content-type", "application/javascript")
 			.expectBody(/^callback\(/)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("GET JSONP (query string)", function (done) {
-		api(port, true)
-			.get("/?format=application/javascript")
+	it("GET JSONP (query string)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/?format=application/javascript"})
 			.expectStatus(200)
-			.expectHeader("Content-Type", "application/javascript")
+			.expectHeader("content-type", "application/javascript")
 			.expectBody(/^callback\(/)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("GET JSONP (header - custom callback)", function (done) {
-		api(port, true)
-			.get("/?callback=custom")
-			.header("accept", "application/javascript")
+	it("GET JSONP (header - custom callback)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/?callback=custom", headers: {accept: "application/javascript"}})
 			.expectStatus(200)
-			.expectHeader("Content-Type", "application/javascript")
+			.expectHeader("content-type", "application/javascript")
 			.expectBody(/^custom\(/)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("GET JSONP (query string - custom callback)", function (done) {
-		api(port, true)
-			.get("/?format=application/javascript&callback=custom")
+	it("GET JSONP (query string - custom callback)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/?format=application/javascript&callback=custom"})
 			.expectStatus(200)
-			.expectHeader("Content-Type", "application/javascript")
+			.expectHeader("content-type", "application/javascript")
 			.expectBody(/^custom\(/)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("GET HTML (header)", function (done) {
-		api(port, true)
-			.get("/")
-			.header("accept", "text/html")
+	it("GET HTML (header)", function () {
+		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "text/html"}})
 			.expectStatus(200)
-			.expectHeader("Content-Type", "text/html")
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.expectHeader("content-type", "text/html")
+			.end();
 	});
 
-	it("GET HTML (query string)", function (done) {
-		api(port, true)
-			.get("/?format=text/html")
+	it("GET HTML (query string)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/?format=text/html"})
 			.expectStatus(200)
-			.expectHeader("Content-Type", "text/html")
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.expectHeader("content-type", "text/html")
+			.end();
 	});
 
-	it("GET YAML (header)", function (done) {
-		api(port, true)
-			.get("/")
-			.header("accept", "application/yaml")
+	it("GET YAML (header)", function () {
+		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "application/yaml"}})
 			.expectStatus(200)
-			.expectHeader("Content-Type", "application/yaml")
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.expectHeader("content-type", "application/yaml")
+			.end();
 	});
 
-	it("GET YAML (query string)", function (done) {
-		api(port, true)
-			.get("/?format=application/yaml")
+	it("GET YAML (query string)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/?format=application/yaml"})
 			.expectStatus(200)
-			.expectHeader("Content-Type", "application/yaml")
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.expectHeader("content-type", "application/yaml")
+			.end();
 	});
 
-	it("GET XML (header)", function (done) {
-		api(port, true)
-			.get("/")
-			.header("accept", "application/xml")
+	it("GET XML (header)", function () {
+		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "application/xml"}})
 			.expectStatus(200)
-			.expectHeader("Content-Type", "application/xml")
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.expectHeader("content-type", "application/xml")
+			.end();
 	});
 
-	it("GET XML (query string)", function (done) {
-		api(port, true)
-			.get("/?format=application/xml")
+	it("GET XML (query string)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/?format=application/xml"})
 			.expectStatus(200)
-			.expectHeader("Content-Type", "application/xml")
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.expectHeader("content-type", "application/xml")
+			.end();
 	});
 
-	it("GET Custom (header)", function (done) {
-		api(port, true)
-			.get("/")
-			.header("accept", "application/custom")
+	it("GET Custom (header)", function () {
+		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "application/custom"}})
 			.expectStatus(200)
-			.expectHeader("Content-Type", "application/json")
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.expectHeader("content-type", "application/json")
+			.end();
 	});
 
-	it("GET Custom (query string)", function (done) {
-		api(port, true)
-			.get("/?format=application/custom")
+	it("GET Custom (query string)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/?format=application/custom"})
 			.expectStatus(200)
-			.expectHeader("Content-Type", "application/json")
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.expectHeader("content-type", "application/json")
+			.end();
 	});
 });

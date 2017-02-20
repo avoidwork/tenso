@@ -2,9 +2,7 @@ require("./index.js")({
 	port: 8000,
 	routes: require("./test/routes.js"),
 	logging: {
-		level: "error",
-		dtrace: true,
-		stderr: true
+		level: "info"
 	},
 	auth: {
 		local: {

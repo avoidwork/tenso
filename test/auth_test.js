@@ -1,38 +1,20 @@
-var hippie = require("hippie"),
-	emitter = require("events"),
+const tinyhttptest = require("tiny-httptest"),
 	jwt = require("jsonwebtoken"),
 	tenso = require("../index"),
 	routes = require("./routes.js"),
-	array = require("retsu"),
-	csrf = "x-csrf-token";
+	csrf = "x-csrf-token",
+	timeout = 5000;
 
 process.setMaxListeners(0);
 
-function persistCookies (opts, next) {
-	opts.jar = true;
-	next(opts);
-}
-
-function api (port, not_json) {
-	var obj = hippie().base("http://localhost:" + port).use(persistCookies);
-
-	return not_json ? obj : obj.expectHeader("Content-Type", "application/json").json();
-}
-
-function get_token (port, fn, url) {
-	return api(port).get(url || "/login").end(fn);
-}
-
 describe("Permissions (CSRF disabled)", function () {
-	var port = 8001;
+	const port = 8001;
 
+	this.timeout(timeout);
 	tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
 
-	this.timeout(5000);
-
-	it("GET / - returns an array of endpoints", function (done) {
-		api(port)
-			.get("/")
+	it("GET / - returns an array of endpoints", function () {
+		return tinyhttptest({url: "http://localhost:" + port})
 			.expectStatus(200)
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
 			.expectValue("links", [{uri: "/empty", rel: "item"},
@@ -44,93 +26,63 @@ describe("Permissions (CSRF disabled)", function () {
 			.expectValue("data", ["empty", "items", "somethings", "test", "things"])
 			.expectValue("error", null)
 			.expectValue("status", 200)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("GET /invalid - returns a 'not found' error", function (done) {
-		api(port)
-			.get("/invalid")
+	it("GET /invalid - returns a 'not found' error", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/invalid"})
 			.expectStatus(404)
 			.expectValue("data", null)
 			.expectValue("error", "Not Found")
 			.expectValue("status", 404)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("DELETE / - returns a 'method not allowed' error", function (done) {
-		api(port)
-			.del("/")
+	it("DELETE / - returns a 'method not allowed' error", function () {
+		return tinyhttptest({url: "http://localhost:" + port, method: "delete"})
 			.expectStatus(405)
 			.expectValue("data", null)
 			.expectValue("error", "Method Not Allowed")
 			.expectValue("status", 405)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("POST / - returns a 'method not allowed' error", function (done) {
-		api(port)
-			.post("/")
+	it("POST / - returns a 'method not allowed' error", function () {
+		return tinyhttptest({url: "http://localhost:" + port, method: "post"})
 			.expectStatus(405)
 			.expectValue("data", null)
 			.expectValue("error", "Method Not Allowed")
 			.expectValue("status", 405)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("PUT / - returns a 'method not allowed' error", function (done) {
-		api(port)
-			.put("/")
+	it("PUT / - returns a 'method not allowed' error", function () {
+		return tinyhttptest({url: "http://localhost:" + port, method: "put"})
 			.expectStatus(405)
 			.expectValue("data", null)
 			.expectValue("error", "Method Not Allowed")
 			.expectValue("status", 405)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("PATCH / - returns a 'method not allowed' error", function (done) {
-		api(port)
-			.patch("/")
+	it("PATCH / - returns a 'method not allowed' error", function () {
+		return tinyhttptest({url: "http://localhost:" + port, method: "patch"})
 			.expectStatus(405)
 			.expectValue("data", null)
 			.expectValue("error", "Method Not Allowed")
 			.expectValue("status", 405)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 });
 
 describe("Basic Auth", function () {
-	var port = 8004;
+	const port = 8004;
 
-	tenso({
-		port: port,
-		routes: routes,
-		logging: {level: "error"},
-		auth: {basic: {enabled: true, list: ["test:123"]}, protect: ["/uuid"]}
-	});
+	this.timeout(timeout);
+	tenso({port: port, routes: routes, logging: {level: "error"}, auth: {basic: {enabled: true, list: ["test:123"]}, protect: ["/uuid"]}});
 
-	this.timeout(5000);
-
-	it("GET / - returns links", function (done) {
-		api(port)
-			.get("/")
+	it("GET / - returns links", function () {
+		return tinyhttptest({url: "http://localhost:" + port})
 			.expectStatus(200)
 			.expectValue("links", [{uri: "/empty", rel: "item"},
 				{uri: "/items", rel: "item"},
@@ -141,53 +93,33 @@ describe("Basic Auth", function () {
 			.expectValue("data", ["empty", "items", "somethings", "test", "things"])
 			.expectValue("error", null)
 			.expectValue("status", 200)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("GET /uuid - returns a uuid (authorized)", function (done) {
-		api(port)
-			.auth("test", "123")
-			.get("/uuid")
+	it("GET /uuid - returns a uuid (authorized)", function () {
+		return tinyhttptest({url: "http://test:123@localhost:" + port + "/uuid"})
 			.expectStatus(200)
 			.expectValue("links", [{uri: "/", rel: "collection"}])
 			.expectValue("error", null)
 			.expectValue("status", 200)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("GET /uuid - returns an 'unauthorized' error", function (done) {
-		api(port, true)
-			.get("/uuid")
+	it("GET /uuid - returns an 'unauthorized' error", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/uuid"})
 			.expectStatus(401)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 });
 
 describe("OAuth2 Token Bearer", function () {
-	var port = 8005;
+	const port = 8005;
 
-	tenso({
-		port: port,
-		routes: routes,
-		logging: {level: "error"},
-		auth: {bearer: {enabled: true, tokens: ["abc-123"]}, protect: ["/"]}
-	});
+	this.timeout(timeout);
+	tenso({port: port, routes: routes, logging: {level: "error"}, auth: {bearer: {enabled: true, tokens: ["abc-123"]}, protect: ["/"]}});
 
-	this.timeout(5000);
-
-	it("GET / - returns an array of endpoints (authorized)", function (done) {
-		api(port)
-			.header("Authorization", "Bearer abc-123")
-			.get("/")
+	it("GET / - returns an array of endpoints (authorized)", function () {
+		return tinyhttptest({url: "http://test:123@localhost:" + port, headers: {authorization: "Bearer abc-123"}})
 			.expectStatus(200)
 			.expectValue("links", [{uri: "/empty", rel: "item"},
 				{uri: "/items", rel: "item"},
@@ -198,205 +130,137 @@ describe("OAuth2 Token Bearer", function () {
 			.expectValue("data", ["empty", "items", "somethings", "test", "things"])
 			.expectValue("error", null)
 			.expectValue("status", 200)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("GET / - returns an 'unauthorized' error", function (done) {
-		api(port, true)
-			.get("/")
+	it("GET / - returns an 'unauthorized' error", function () {
+		return tinyhttptest({url: "http://test:123@localhost:" + port})
 			.expectStatus(401)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 });
 
 describe("Local", function () {
-	var port = 8006;
+	const port = 8006,
+		valid = 123,
+		invalid = 1234;
 
-	tenso({
-		port: port,
-		routes: require("./routes.js"),
-		logging: {
-			level: "error",
-			dtrace: true,
-			stderr: true
-		},
-		auth: {
-			local: {
-				enabled: true,
-				auth: function (username, password, callback) {
-					if (username === "test" && password === 123) {
-						callback(null, {username: username, password: password});
-					} else {
-						callback(true, null);
-					}
+	this.timeout(timeout);
+	tenso({port: port, routes: routes, logging: {level: "error"}, auth: {
+		local: {
+			enabled: true,
+			auth: function (username, password, callback) {
+				if (username === "test" && password === valid) {
+					callback(null, {username: username, password: password});
+				} else {
+					callback(true, null);
 				}
-			},
-			protect: ["/uuid"]
-		}
-	});
+			}
+		},
+		protect: ["/uuid"]
+	}});
 
-	this.timeout(5000);
-
-	it("GET /uuid (invalid) - returns an 'unauthorized' error", function (done) {
-		api(port, true)
-			.get("/uuid")
+	it("GET /uuid (invalid) - returns an 'unauthorized' error", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/uuid"})
+			.cookies()
 			.expectStatus(302)
-			.expectHeader("Location", "/login")
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.expectHeader("location", "/login")
+			.end();
 	});
 
-	it("GET /login - returns an authentication message", function (done) {
-		api(port)
-			.get("/login")
+	it("GET /login - returns an authentication message", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/login"})
+			.cookies()
+			.captureHeader(csrf)
 			.expectStatus(200)
 			.expectValue("links", [{uri: "/", rel: "collection"}])
 			.expectValue("data", {instruction: "POST 'username' & 'password' to authenticate"})
 			.expectValue("error", null)
 			.expectValue("status", 200)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("POST /login (invalid / no CSRF token) - returns an 'unauthorized' error", function (done) {
-		api(port)
-			.post("/login")
-			.form()
-			.send({username: "test", password: 1232})
+	it("POST /login (invalid / no CSRF token) - returns an 'unauthorized' error", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/login", method: "post"})
+			.cookies()
+			.json({username: "test", password: invalid})
 			.expectStatus(403)
 			.expectValue("data", null)
 			.expectValue("error", "CSRF token missing")
 			.expectValue("status", 403)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("POST /login (invalid) - returns an 'unauthorized' error", function (done) {
-		get_token(port, function (err, res) {
-			var token;
-
-			if (err) throw err;
-
-			token = res.headers[csrf];
-
-			api(port, true)
-				.header(csrf, token)
-				.header("accept", "application/json")
-				.post("/login")
-				.form()
-				.send({username: "test", password: 1232})
-				.json()
-				.expectStatus(401)
-				.expectValue("data", null)
-				.expectValue("error", "Unauthorized")
-				.expectValue("status", 401)
-				.end(function (err) {
-					if (err) throw err;
-					done();
-				});
-		});
+	it("POST /login (invalid) - returns an 'unauthorized' error", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/login", method: "post"})
+			.cookies()
+			.reuseHeader(csrf)
+			.json({username: "test", password: invalid})
+			.expectStatus(401)
+			.expectValue("data", null)
+			.expectValue("error", "Unauthorized")
+			.expectValue("status", 401)
+			.end();
 	});
 
-	// needs to reuse the session cookie header for identification
-	it("POST /login - redirects to a predetermined URI", function (done) {
-		get_token(port, function (err, res) {
-			var token;
-
-			if (err) throw err;
-
-			token = res.headers[csrf];
-
-			api(port, true)
-				.header(csrf, token)
-				.post("/login")
-				.form()
-				.send({username: "test", password: 123})
-				.expectStatus(302)
-				.expectHeader("Location", "/")
-				.end(function (err) {
-					if (err) throw err;
-					done();
-				});
-		});
+	it("POST /login - redirects to a predetermined URI", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/login", method: "post"})
+			.cookies()
+			.reuseHeader(csrf)
+			.json({username: "test", password: valid})
+			.expectStatus(302)
+			.expectHeader("content-type", "text/html; charset=utf-8") // anti-pattern of strategy
+			.expectHeader("location", "/")
+			.end();
 	});
 
-	it("GET /uuid (session) - returns a version 4 uuid", function (done) {
-		api(port)
-			.get("/uuid")
+	it("GET /uuid (session) - returns a version 4 uuid", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/uuid"})
+			.cookies()
 			.expectStatus(200)
 			.expectValue("links", [{uri: "/", rel: "collection"}])
 			.expectValue("error", null)
 			.expectValue("status", 200)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 });
 
 describe("JWT", function () {
-	var port = 8012,
+	const port = 8012,
 		secret = "jennifer",
 		token = jwt.sign({username: "jason@attack.io"}, secret);
 
-	tenso({
-		port: port,
-		routes: routes,
-		logging: {level: "error"},
-		auth: {
-			jwt: {
-				enabled: true,
-				auth: function (token, cb) {
-					if (token.username === 'jason@attack.io') {
-						cb(null, token);
-					} else {
-						cb(new Error('Invalid token'), null);
-					}
-				},
-				secretOrKey: secret
+	this.timeout(timeout);
+	tenso({port: port, routes: routes, logging: {level: "error"}, auth: {
+		jwt: {
+			enabled: true,
+			auth: function (arg, cb) {
+				if (arg.username === "jason@attack.io") {
+					cb(null, arg);
+				} else {
+					cb(new Error("Invalid token"), null);
+				}
 			},
-			security: {
-				csrf: false
-			},
-			protect: ["/uuid"]
-		}
-	});
+			secretOrKey: secret
+		},
+		security: {
+			csrf: false
+		},
+		protect: ["/uuid"]
+	}});
 
-	this.timeout(5000);
-
-	it("GET /uuid - returns a uuid (authorized)", function (done) {
-		api(port, false)
-			.header('Authorization', 'Bearer ' + token)
-			.get("/uuid")
+	it("GET /uuid - returns a uuid (authorized)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/uuid", headers: {authorization: "Bearer " + token}})
 			.expectStatus(200)
 			.expectValue("links", [{uri: "/", rel: "collection"}])
 			.expectValue("error", null)
 			.expectValue("status", 200)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("GET /uuid - returns an 'unauthorized' error", function (done) {
-		api(port, true)
-			.get("/uuid")
+	it("GET /uuid - returns an 'unauthorized' error", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/uuid"})
 			.expectStatus(401)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 });

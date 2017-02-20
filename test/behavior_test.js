@@ -328,3 +328,24 @@ describe("Route parameters", function () {
 			.end();
 	});
 });
+
+describe("CORS", function () {
+	const port = 8013;
+
+	this.timeout(timeout);
+	tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+
+	it("OPTIONS /empty - returns an empty array", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/empty", method: "options"})
+			.cors()
+			.expectStatus(200)
+			.end();
+	});
+
+	it("GET /empty - returns an empty array", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/empty"})
+			.cors()
+			.expectStatus(200)
+			.end();
+	});
+});

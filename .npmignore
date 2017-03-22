@@ -1,11 +1,7 @@
 /.idea/
-/.sass-cache/
 /node_modules/
-/src/
 /test/
-/sass/
 .eslintrc
-.git
 .gitignore
 .travis.yml
 Gruntfile.js

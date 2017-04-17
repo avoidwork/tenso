@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>{{title}}</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link type="text/css" href="assets/css/bulma.css">
+</head>
+<body>
+
+<section class="hero">
+	<div class="hero-body">
+		<div class="container">
+			<h1 class="title">
+				{{title}}
+			</h1>
+		</div>
+	</div>
+</section>
+
+<section class="section">
+	<div class="container">
+		<div class="tabs">
+			<ul>
+				<li class="is-active"><a>Response</a></li>
+				<li><a>Send Request</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="content">
+        <div class="field">
+			<label class="label">Subject</label>
+			<p class="control">
+    <span class="select">
+      <select>
+        <option>Select dropdown</option>
+        <option>With options</option>
+      </select>
+    </span>
+			</p>
+		</div>
+	</div>
+</section>
+
+<footer class="footer">
+	<div class="container">
+		<div class="content has-text-centered">
+			<p>
+				Copyright &copy; {{year}} <a href="http://avoidwork.com" title="View my homepage">Jason Mulligan</a><br>
+				<a href="https://github.com/avoidwork/tenso" title="View project homepage">Tensō</a> {{version}}
+			</p>
+		</div>
+	</div>
+</footer>
+
+<script type="application/javascript" src="assets/js/tiny-observable.min.js" />
+<script type="application/javascript" src="assets/js/dom-router.min.js" />
+
+</body>
+</html>
+
+<!--
+<article>
+	<h2 class="overflow">{{url}}</h2>
+	<form>
+		<fieldset>
+			<label for="formats">Format</label>
+			<select id="formats">
+				{{formats}}
+			</select>
+		</fieldset>
+	</form>
+	<div>
+		<div class="float">
+			<table>
+				<thead>
+				<tr>
+					<th>Header</th>
+					<th>Value</th>
+				</tr>
+				</thead>
+				<tbody>
+				{{headers}}
+				</tbody>
+			</table>
+		</div>
+		<div id="io" class="float">
+			<nav class="hidden">
+				<ul>
+					<li><a class="active" data-type="code" title="View response">Response</a></li>
+					<li><a data-type="form" title="Send a request">Send Request</a></li>
+				</ul>
+			</nav>
+			<div>
+				<div class="code">
+					<pre><code>{{body}}</code></pre>
+				</div>
+				<div class="form hidden">
+					<form>
+						<label for="methods">Method</label>
+						<select id="methods">
+							{{methods}}
+						</select>
+						<fieldset id="body">
+							<textarea placeholder="JSON is required"></textarea>
+						</fieldset>
+						<button type="submit">Submit</button> <button type="reset">Reset</button>
+						<div id="result" class="hidden">
+							<h3>Result</h3>
+							<div class="code">
+								<pre><code></code></pre>
+							</div>
+						</div>
+					</form>
+					<div id="allow" class="hidden">{{allow}}</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</article>
+-->

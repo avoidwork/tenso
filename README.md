@@ -45,6 +45,9 @@ Protected routes are routes that require authorization for access, and will redi
 #### Unprotected Routes
 Unprotected routes are routes that do not require authorization for access, and will exit the authorization pipeline early to avoid rate limiting, csrf tokens, & other security measures. These routes are the DMZ of your API! _You_ **must** secure these end points with alternative methods if accepting input!
 
+#### Reserved Route
+The `/assets/*` route is reserved for the HTML browsable interface assets; please do not try to reuse this for data.
+
 ### Request Helpers
 Tensō decorates `req` with "helpers" such as `req.ip`, & `req.parsed`. `PATCH`, `PUT`, & `POST` payloads are available as `req.body`. Sessions are available as `req.session` when using `local` authentication.
 

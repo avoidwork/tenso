@@ -49,7 +49,7 @@ Unprotected routes are routes that do not require authorization for access, and 
 Tensō decorates `req` with "helpers" such as `req.ip`, & `req.parsed`. `PATCH`, `PUT`, & `POST` payloads are available as `req.body`. Sessions are available as `req.session` when using `local` authentication.
 
 ## Responses
-Responses will have a standard shape, and will be utf-8 by default. The result will be in `data`. Hypermedia (pagination, links, etc.) will be in `links:[ {"uri": "...", "rel": "..."}, ...]`, & pagination will also be present via the `Link` HTTP header.
+Responses will have a standard shape, and will be utf-8 by default. The result will be in `data`. Hypermedia (pagination & links) will be in `links:[ {"uri": "...", "rel": "..."}, ...]`, & also in the `Link` HTTP header.
 
 Page size can be specified via the `page_size` parameter, e.g. `?page_size=25`.
 

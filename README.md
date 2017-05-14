@@ -53,7 +53,7 @@ Responses will have a standard shape, and will be utf-8 by default. The result w
 
 Page size can be specified via the `page_size` parameter, e.g. `?page_size=25`.
 
-Sort order can be specified via then `order-by` which accepts `[field ]asc|desc` & can be combined like an SQL 'ORDER BY', e.g. `?order_by=fullName` or `?order_by=lastName%20asc&order_by=firstName%20asc&order_by=age%20desc`
+Sort order can be specified via then `order-by` which accepts `[field ]asc|desc` & can be combined like an SQL 'ORDER BY', e.g. `?order_by=desc` or `?order_by=lastName%20asc&order_by=firstName%20asc&order_by=age%20desc`
 
 ```json
 {

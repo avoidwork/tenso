@@ -26,7 +26,7 @@
     "cookie-parser": "~1.4.3",
     "csv.js": "~1.0.2",
     "express-session": "~1.15.2",
-    "keysort": "^1.0.2",
+    "keysort": "~1.0.2",
     "lusca": "~1.4.1",
     "passport": "~0.3.2",
     "passport-facebook": "~2.1.1",

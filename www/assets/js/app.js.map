@@ -1,0 +1,1 @@
+{"version":3,"sources":["app.es6"],"names":["x","console","log"],"mappings":";;AAAA,IAAMA,IAAI,IAAV;;AAEAC,QAAQC,GAAR,CAAYF,CAAZ","file":"app.js","sourcesContent":["const x = true;\r\n\r\nconsole.log(x);\r\n"]}

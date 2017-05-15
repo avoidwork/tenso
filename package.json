@@ -50,14 +50,16 @@
     "yamljs": "~0.2.10"
   },
   "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-env": "^1.4.0",
     "grunt": "~1.0.1",
     "grunt-cli": "~1.2.0",
     "grunt-contrib-watch": "~1.0.0",
     "grunt-eslint": "~19.0.0",
     "grunt-mocha-test": "~0.13.2",
     "grunt-nsp": "~2.3.1",
-    "mocha": "~3.2.0",
     "jsonwebtoken": "~7.3.0",
+    "mocha": "~3.2.0",
     "tiny-httptest": "~1.0.7"
   },
   "keywords": [

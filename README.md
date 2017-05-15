@@ -425,6 +425,15 @@ The browsable template can be overridden with a custom HTML document.
 }
 ```
 
+## Static assets folder
+The browsable template can load assets from this folder. assets.
+
+```
+{
+    "static": "/var/www/api/assets/.*"
+}
+```
+
 ## License
 Copyright (c) 2017 Jason Mulligan
 Licensed under the BSD-3-Clause license.

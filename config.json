@@ -132,5 +132,6 @@
 	"regex": {
 		"hypermedia": "[a-zA-Z]+_(guid|uuid|id|url|uri)$",
 		"id": "^(_id|id)$"
-	}
+	},
+	"static": "/assets/.*"
 }

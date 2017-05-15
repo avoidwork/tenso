@@ -349,3 +349,65 @@ describe("CORS", function () {
 			.end();
 	});
 });
+
+describe("Sorting", function () {
+	const port = 8014;
+
+	this.timeout(timeout);
+	tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+
+	it("GET /things?order_by=user_id%20asc&order_by=name%20desc - returns a sorted array of objects", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/things?order_by=user_id%20asc&order_by=name%20desc"})
+			.expectStatus(200)
+			.expectValue("data", [
+				{
+					"id": 2,
+					"name": "thing 2",
+					"user_id": 1
+				},
+				{
+					"id": 1,
+					"name": "thing 1",
+					"user_id": 1
+				},
+				{
+					"id": 3,
+					"name": "thing 3",
+					"user_id": 2
+				}
+			])
+			.expectValue("error", null)
+			.expectValue("status", 200)
+			.end();
+	});
+
+	it("GET /items?order_by=asc - returns a sorted array of primitives", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/items?order_by=asc"})
+			.expectStatus(200)
+			.expectValue("data", [
+				1,
+				2,
+				3,
+				4,
+				5
+			])
+			.expectValue("error", null)
+			.expectValue("status", 200)
+			.end();
+	});
+
+	it("GET /items?order_by=desc - returns a sorted array of primitives", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/items?order_by=desc"})
+			.expectStatus(200)
+			.expectValue("data", [
+				15,
+				14,
+				13,
+				12,
+				11
+			])
+			.expectValue("error", null)
+			.expectValue("status", 200)
+			.end();
+	});
+});

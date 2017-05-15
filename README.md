@@ -52,7 +52,11 @@ The `/assets/*` route is reserved for the HTML browsable interface assets; pleas
 Tensō decorates `req` with "helpers" such as `req.ip`, & `req.parsed`. `PATCH`, `PUT`, & `POST` payloads are available as `req.body`. Sessions are available as `req.session` when using `local` authentication.
 
 ## Responses
-Responses will have a standard shape, and will be utf-8 by default. The result will be in `data`. Hypermedia (pagination, links, etc.) will be in `links:[ {"uri": "...", "rel": "..."}, ...]`, & pagination will also be present via the `Link` HTTP header.
+Responses will have a standard shape, and will be utf-8 by default. The result will be in `data`. Hypermedia (pagination & links) will be in `links:[ {"uri": "...", "rel": "..."}, ...]`, & also in the `Link` HTTP header.
+
+Page size can be specified via the `page_size` parameter, e.g. `?page_size=25`.
+
+Sort order can be specified via then `order-by` which accepts `[field ]asc|desc` & can be combined like an SQL 'ORDER BY', e.g. `?order_by=desc` or `?order_by=lastName%20asc&order_by=firstName%20asc&order_by=age%20desc`
 
 ```json
 {

@@ -7,9 +7,11 @@
 
 	// Stage 1 of prettifying a <code>
 	function prepare (html) {
-		const keys = html.match(/\".*":/g),
-			matches = keys.concat(html.match(/:\s(\".*\"|\d{3,3}|null)/g)),
-			replaces = matches.map(i => keys.contains(i) ? i.replace(/(\"(.*)\")/, "<span class='key $2'>$1</span>") : i.replace(/(\".*\"|\d{3,3}|null)/, "<span class='item'>$1</span>"));
+		const keys = Array.from(html.match(/\".*":/g)),
+			matches = Array.from(keys.concat(html.match(/:\s(\".*\"|\d{3,3}|null)/g))),
+			replaces = matches.map(i => {
+				keys.includes(i) ? i.replace(/(\"(.*)\")/, "<span class='key $2'>$1</span>") : i.replace(/(\".*\"|\d{3,3}|null)/, "<span class='item'>$1</span>")
+			});
 
 		let output = html;
 
@@ -66,21 +68,6 @@
 		});
 	}});
 
-
-	// Setting up the UI
-	window.requestAnimationFrame(() => {
-		// Hiding the request tab if read-only
-		if (!(/(PATCH|PUT|POST)/).test(document.querySelector("#allow").innerText)) {
-			document.querySelector("li.request").classList.add("dr-hidden");
-		}
-
-		// Resetting format selection (back button)
-		document.querySelector("#formats").selectedIndex = 0;
-
-		// Prettifying the response
-		prettify(document.querySelector("code"));
-	});
-
 	// Wiring up format selection
 	document.querySelector("#formats").onchange = function (ev) {
 		window.location = window.location.pathname + "?format=" + ev.target.options[ev.target.selectedIndex].value;
@@ -98,4 +85,18 @@
 			console.log(e);
 		}
 	}
+
+	// Setting up the UI
+	window.requestAnimationFrame(() => {
+		// Hiding the request tab if read-only
+		if (!(/(PATCH|PUT|POST)/).test(document.querySelector("#allow").innerText)) {
+			document.querySelector("li.request").classList.add("dr-hidden");
+		}
+
+		// Resetting format selection (back button)
+		document.querySelector("#formats").selectedIndex = 0;
+
+		// Prettifying the response
+		prettify(document.querySelector("#body"));
+	});
 })();

@@ -1,11 +1,6 @@
 "use strict";
 
 (function () {
-	const now = new Date().getTime(),
-		render = window.requestAnimationFrame || function (arg) {
-			setTimeout(arg(now), 16);
-		};
-
 	console.log([
 		"        ,----,",
 		"      ,/   .`|",
@@ -25,10 +20,9 @@
 	].join("\n"));
 
 	router({css: {current: "is-active", hidden: "dr-hidden"}, callback: ev => {
-		render(() => {
+		window.requestAnimationFrame(() => {
 			document.querySelectorAll("li.is-active").forEach(i => i.classList.remove("is-active"));
 			ev.trigger.parentNode.classList.add("is-active");
-			console.log(ev.element.id, "is visible");
 		});
 	}});
 

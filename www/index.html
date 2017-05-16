@@ -23,22 +23,31 @@
 	<div class="container">
 		<div class="tabs">
 			<ul>
-				<li class="is-active"><a>Response</a></li>
-				<li><a>Send Request</a></li>
+				<li class="response">
+					<a href="#response">Response</a>
+				</li>
+				<li class="request">
+					<a href="#request">Send Request</a>
+				</li>
 			</ul>
 		</div>
 	</div>
 	<div class="content">
-		<div class="field">
-			<label class="label">Subject</label>
-			<p class="control">
-			<span class="select">
-				<select>
-					<option>Select dropdown</option>
-					<option>With options</option>
-				</select>
-			</span>
-			</p>
+		<div id="response" class="dr-hidden">
+			<div class="field">
+				<label class="label">Subject</label>
+				<p class="control">
+					<span class="select">
+						<select>
+							<option>Select dropdown</option>
+							<option>With options</option>
+						</select>
+					</span>
+				</p>
+			</div>
+		</div>
+		<div id="request" class="dr-hidden">
+			Request form here
 		</div>
 	</div>
 </section>

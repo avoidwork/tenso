@@ -123,7 +123,7 @@
 			"port": 5683
 		}
 	},
-	"title": "Tensō API",
+	"title": "Tensō",
 	"template": "",
 	"regex": {
 		"hypermedia": "[a-zA-Z]+_(guid|uuid|id|url|uri)$",

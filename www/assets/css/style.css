@@ -8,7 +8,7 @@ body {
   background: whitesmoke; }
 
 .dr-hidden {
-  display: none; }
+  display: none !important; }
 
 a, a:focus, a:hover, a:active, a.is-active {
   color: #00527D !important; }

@@ -16,9 +16,9 @@
 	// Setting up the UI
 	window.requestAnimationFrame(function () {
 		// Hiding the request tab if read-only
-		if (!/(PATCH|PUT|POST)/.test(document.querySelector("#allow").innerText)) {
-			document.querySelector("li.request").classList.add("dr-hidden");
-		}
+		if (!/(PATCH|PUT|POST)/.test(document.querySelector("#allow").innerText)) {}
+		//document.querySelector("li.request").classList.add("dr-hidden");
+
 
 		// Resetting format selection (back button)
 		document.querySelector("#formats").selectedIndex = 0;

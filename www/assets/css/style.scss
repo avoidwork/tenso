@@ -16,7 +16,8 @@ body {
   display: none !important;
 }
 
-a {
+a,
+textarea {
   &,
   &:focus,
   &:hover,
@@ -26,17 +27,27 @@ a {
   }
 }
 
+.input,
+.textarea,
+.select,
+.select select {
+  &,
+  &:after,
+  &:focus,
+  &:hover,
+  &:active,
+  &.is-active {
+    border-color: $blue;
+  }
+}
+
+button.is-primary {
+  background-color: $blue !important;
+}
+
 .tabs li.is-active a {
   border-bottom-color: $blue !important;
   color: $blue !important;
-}
-
-.select select:focus, .select select.is-focused, .select select:active, .select select.is-active {
-  border-color: $blue;
-}
-
-.select:after {
-  border-color: $blue !important;
 }
 
 pre {

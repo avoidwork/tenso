@@ -27,6 +27,6 @@
 	}});
 
 	document.querySelector("#formats").onchange = function (ev) {
-		console.log(ev);
+		window.location = window.location.pathname + "?format=" + ev.target.options[ev.target.selectedIndex].value;
 	};
 })();

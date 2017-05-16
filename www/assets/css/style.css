@@ -10,28 +10,20 @@ body {
 .dr-hidden {
   display: none !important; }
 
-a, a:focus, a:hover, a:active, a.is-active,
-textarea,
-textarea:focus,
-textarea:hover,
-textarea:active,
-textarea.is-active {
+a:focus, a:hover, a:active, a.is-active {
   color: #00527D !important; }
 
-.input, .input:after, .input:focus, .input:hover, .input:active, .input.is-active,
-.textarea,
+.input:after, .input:focus, .input:hover, .input:active, .input.is-active,
 .textarea:after,
 .textarea:focus,
 .textarea:hover,
 .textarea:active,
 .textarea.is-active,
-.select,
 .select:after,
 .select:focus,
 .select:hover,
 .select:active,
 .select.is-active,
-.select select,
 .select select:after,
 .select select:focus,
 .select select:hover,

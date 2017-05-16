@@ -16,9 +16,7 @@ body {
   display: none !important;
 }
 
-a,
-textarea {
-  &,
+a {
   &:focus,
   &:hover,
   &:active,
@@ -31,7 +29,6 @@ textarea {
 .textarea,
 .select,
 .select select {
-  &,
   &:after,
   &:focus,
   &:hover,

@@ -36,6 +36,16 @@
 		<section class="section">
 			<div class="container">
 				<div id="response" class="dr-hidden">
+					<div class="field">
+						<label class="label">Formats</label>
+						<p class="control">
+							<span class="select">
+								<select id="formats">
+									{{formats}}
+								</select>
+							</span>
+						</p>
+					</div>
 					<div class="columns">
 						<div class="column">
 							<div class="panel">
@@ -55,7 +65,9 @@
 							</div>
 						</div>
 						<div class="column">
-							Response body here!
+							<code class="is-marginless is-paddingless">
+								<pre>{{body}}</pre>
+							</code>
 						</div>
 					</div>
 				</div>
@@ -75,6 +87,8 @@
 		</div>
 	</div>
 </footer>
+
+<div id="allow" class="dr-hidden">{{allow}}</div>
 
 <script type="application/javascript" src="assets/js/dom-router.min.js"></script>
 <script type="application/javascript" src="assets/js/app.js"></script>

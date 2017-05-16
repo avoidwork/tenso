@@ -28,7 +28,11 @@
 		render(() => {
 			document.querySelectorAll("li.is-active").forEach(i => i.classList.remove("is-active"));
 			ev.trigger.parentNode.classList.add("is-active");
-			console.log(arg.element.id, "is visible");
+			console.log(ev.element.id, "is visible");
 		});
 	}});
+
+	document.querySelector("#formats").onchange = function (ev) {
+		console.log(ev);
+	};
 })();

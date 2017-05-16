@@ -12,12 +12,6 @@ body {
   background: whitesmoke;
 }
 
-.footer {
-  .logo {
-    width: $ten * 16;
-  }
-}
-
 .dr-hidden {
   display: none;
 }
@@ -35,4 +29,23 @@ a {
 .tabs li.is-active a {
   border-bottom-color: $blue !important;
   color: $blue !important;
+}
+
+.select select:focus, .select select.is-focused, .select select:active, .select select.is-active {
+  border-color: $blue;
+}
+
+.select:after {
+  border-color: $blue !important;
+}
+
+pre {
+  padding: $ten;
+  font-size: 1em;
+}
+
+.footer {
+  .logo {
+    width: $ten * 16;
+  }
 }

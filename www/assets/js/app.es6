@@ -1,6 +1,45 @@
 "use strict";
 
 (function () {
+	function escape (arg) {
+		return arg.replace(/[\-\[\]{}()*+?.,\\\/\^\$|#\s]/g, "\\$&");
+	}
+
+	// Stage 1 of prettifying a <code>
+	function prepare (html) {
+		const keys = html.match(/\".*":/g),
+			matches = keys.concat(html.match(/:\s(\".*\"|\d{3,3}|null)/g)),
+			replaces = matches.map(i => keys.contains(i) ? i.replace(/(\"(.*)\")/, "<span class='key $2'>$1</span>") : i.replace(/(\".*\"|\d{3,3}|null)/, "<span class='item'>$1</span>"));
+
+		let output = html;
+
+		matches.forEach((i, idx) => {
+			output = output.replace(new RegExp(escape(i), "g"), replaces[idx]);
+		});
+
+		return output;
+	}
+
+	// Prettifies a <code>
+	function prettify (arg) {
+		// Changing <pre> into selectable Elements
+		arg.parentNode.parentNode.innerHTML = prepare(arg.innerHTML)
+			.replace(/\n/g, "<br>\n")
+			.replace(/(\s{2,2})/g, "<span class='spaces'></span>");
+
+		// Changing URIs into anchors
+		document.querySelectorAll(".item").forEach(i => {
+			let html = i.innerHTML,
+				val = html.replace(/(^\"|\"$)/g, "");
+
+			if (val.indexOf( "/" ) === 0 || val.indexOf("//") > -1) {
+				html = html.replace(val, "<a href='" + val + "' title='View " + val + "'>" + val + "</a>");
+			}
+
+			i.innerHTML = html;
+		});
+	}
+
 	console.log([
 		"        ,----,",
 		"      ,/   .`|",
@@ -27,6 +66,7 @@
 		});
 	}});
 
+
 	// Setting up the UI
 	window.requestAnimationFrame(() => {
 		// Hiding the request tab if read-only
@@ -36,6 +76,9 @@
 
 		// Resetting format selection (back button)
 		document.querySelector("#formats").selectedIndex = 0;
+
+		// Prettifying the response
+		prettify(document.querySelector("code"));
 	});
 
 	// Wiring up format selection

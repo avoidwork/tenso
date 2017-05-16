@@ -1,4 +1,16 @@
 $ten: 10px;
+$blue: #00527D;
+
+html,
+body {
+  min-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+body {
+  background: whitesmoke;
+}
 
 .footer {
   .logo {
@@ -8,4 +20,19 @@ $ten: 10px;
 
 .dr-hidden {
   display: none;
+}
+
+a {
+  &,
+  &:focus,
+  &:hover,
+  &:active,
+  &.is-active {
+    color: $blue !important;
+  }
+}
+
+.tabs li.is-active a {
+  border-bottom-color: $blue !important;
+  color: $blue !important;
 }

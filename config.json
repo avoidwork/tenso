@@ -82,11 +82,7 @@
 		"csp": null,
 		"xframe": "SAMEORIGIN",
 		"p3p": "",
-		"hsts": {
-			"maxAge": 10886400,
-			"includeSubDomains": true,
-			"preload": true
-		},
+		"hsts": null,
 		"xssProtection": true,
 		"nosniff": true
 	},

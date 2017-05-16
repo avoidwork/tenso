@@ -33,22 +33,37 @@
 		</div>
 	</div>
 	<div class="content">
-		<div id="response" class="dr-hidden">
-			<div class="field">
-				<label class="label">Subject</label>
-				<p class="control">
-					<span class="select">
-						<select>
-							<option>Select dropdown</option>
-							<option>With options</option>
-						</select>
-					</span>
-				</p>
+		<section class="section">
+			<div class="container">
+				<div id="response" class="dr-hidden">
+					<div class="columns">
+						<div class="column">
+							<div class="panel">
+								<div class="panel-block">
+									<table class="table">
+										<thead>
+										<tr>
+											<th>Header</th>
+											<th>Value</th>
+										</tr>
+										</thead>
+										<tbody>
+										{{headers}}
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+						<div class="column">
+							Response body here!
+						</div>
+					</div>
+				</div>
+				<div id="request" class="dr-hidden">
+					Request form here
+				</div>
 			</div>
-		</div>
-		<div id="request" class="dr-hidden">
-			Request form here
-		</div>
+		</section>
 	</div>
 </section>
 
@@ -62,7 +77,6 @@
 </footer>
 
 <script type="application/javascript" src="assets/js/dom-router.min.js"></script>
-<script type="application/javascript" src="assets/js/tiny-observable.min.js"></script>
 <script type="application/javascript" src="assets/js/app.js"></script>
 
 </body>

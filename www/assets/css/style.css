@@ -1,7 +1,23 @@
+html,
+body {
+  min-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden; }
+
+body {
+  background: whitesmoke; }
+
 .footer .logo {
   width: 160px; }
 
 .dr-hidden {
   display: none; }
+
+a, a:focus, a:hover, a:active, a.is-active {
+  color: #00527D !important; }
+
+.tabs li.is-active a {
+  border-bottom-color: #00527D !important;
+  color: #00527D !important; }
 
 /*# sourceMappingURL=style.css.map */

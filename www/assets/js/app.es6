@@ -6,8 +6,6 @@
 			setTimeout(arg(now), 16);
 		};
 
-	//const observer = observable();
-
 	console.log([
 		"        ,----,",
 		"      ,/   .`|",
@@ -33,14 +31,4 @@
 			console.log(arg.element.id, "is visible");
 		});
 	}});
-
-	// Hooking into every click event
-	//observer.hook(document.querySelector("body"), "click");
-
-	// Capturing events, and redirecting
-	/*observer.on("click", function (ev) {
-		ev.preventDefault();
-		ev.stopPropagation();
-		console.log(ev);
-	});*/
 })();

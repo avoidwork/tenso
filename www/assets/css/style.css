@@ -42,7 +42,12 @@ pre {
   padding: 10px;
   font-size: 1em; }
 
+.spaced {
+  margin-bottom: 25px; }
+
 .footer .logo {
   width: 160px; }
+.footer a {
+  color: #00527D !important; }
 
 /*# sourceMappingURL=style.css.map */

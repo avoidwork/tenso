@@ -52,8 +52,16 @@ pre {
   font-size: 1em;
 }
 
+.spaced {
+  margin-bottom: $ten * 2.5;
+}
+
 .footer {
   .logo {
     width: $ten * 16;
+  }
+
+  a {
+    color: $blue !important;
   }
 }

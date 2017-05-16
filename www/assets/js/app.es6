@@ -31,7 +31,7 @@
 	window.requestAnimationFrame(() => {
 		// Hiding the request tab if read-only
 		if (!(/(PATCH|PUT|POST)/).test(document.querySelector("#allow").innerText)) {
-			//document.querySelector("li.request").classList.add("dr-hidden");
+			document.querySelector("li.request").classList.add("dr-hidden");
 		}
 
 		// Resetting format selection (back button)
@@ -42,4 +42,17 @@
 	document.querySelector("#formats").onchange = function (ev) {
 		window.location = window.location.pathname + "?format=" + ev.target.options[ev.target.selectedIndex].value;
 	};
+
+	// Wiring up JSON validation
+	document.querySelector("textarea").onchange = function (ev) {
+		try {
+			JSON.parse(JSON.stringify(ev.target.value));
+			ev.target.classList.remove("is-danger");
+			document.querySelector(".button.is-primary").classList.remove("is-disabled");
+		} catch (e) {
+			ev.target.classList.add("is-danger");
+			document.querySelector(".button.is-primary").classList.add("is-disabled");
+			console.log(e);
+		}
+	}
 })();

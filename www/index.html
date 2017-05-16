@@ -20,7 +20,7 @@
 </section>
 
 <section class="section">
-	<div class="container">
+	<div class="container spaced">
 		<div class="tabs">
 			<ul>
 				<li class="response">
@@ -33,12 +33,11 @@
 		</div>
 	</div>
 	<div class="content">
-		<section class="section">
 			<div class="container">
 				<div id="response" class="dr-hidden">
 					<div class="field">
 						<label class="label">Formats</label>
-						<p class="control">
+						<p class="control spaced">
 							<span class="select">
 								<select id="formats">
 									{{formats}}
@@ -48,50 +47,58 @@
 					</div>
 					<div class="columns">
 						<div class="column">
-							<div class="panel">
-								<div class="panel-block">
-									<table class="table">
-										<thead>
-										<tr>
-											<th>Header</th>
-											<th>Value</th>
-										</tr>
-										</thead>
-										<tbody>
-										{{headers}}
-										</tbody>
-									</table>
-								</div>
+							<div class="box">
+								<table class="table">
+									<thead>
+									<tr>
+										<th>Header</th>
+										<th>Value</th>
+									</tr>
+									</thead>
+									<tbody>
+									{{headers}}
+									</tbody>
+								</table>
 							</div>
 						</div>
 						<div class="column">
-							<code class="is-marginless is-paddingless">
-								<pre>{{body}}</pre>
-							</code>
+							<div class="box">
+								<code class="is-marginless is-paddingless">
+									<pre>{{body}}</pre>
+								</code>
+							</div>
 						</div>
 					</div>
 				</div>
 				<div id="request" class="dr-hidden">
 					<div class="container">
-						<div class="field">
-							<label class="label">Body</label>
-							<p class="control">
-								<textarea class="textarea" placeholder="Enter JSON request body here"></textarea>
-							</p>
-						</div>
+						<form>
+							<div class="field">
+								<label class="label">Method</label>
+								<p class="control spaced">
+									<span class="select">
+										<select id="methods">
+											{{methods}}
+										</select>
+									</span>
+								</p>
+							</div>
+							<div class="field">
+								<label class="label">Body</label>
+								<p class="control">
+									<textarea class="textarea" placeholder="Enter JSON request body here"></textarea>
+								</p>
+							</div>
 
-						<div class="field is-grouped">
-							<p class="control">
-								<button class="button is-primary">Submit</button>
-							</p>
-							<p class="control">
-								<button class="button is-link">Cancel</button>
-							</p>
-						</div>
+							<div class="field is-grouped">
+								<p class="control">
+									<button type="submit" class="button is-primary is-disabled">Submit</button>
+								</p>
+							</div>
+						</form>
 					</div>
 				</div>
 			</div>
-		</section>
 	</div>
 </section>
 

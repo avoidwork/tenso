@@ -337,14 +337,14 @@ describe("CORS", function () {
 
 	it("OPTIONS /empty - returns an empty array", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/empty", method: "options"})
-			.cors()
+			.cors("http://not.localhost")
 			.expectStatus(200)
 			.end();
 	});
 
 	it("GET /empty - returns an empty array", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/empty"})
-			.cors()
+			.cors("http://not.localhost")
 			.expectStatus(200)
 			.end();
 	});

@@ -52,8 +52,12 @@
 				let form = document.querySelector("form");
 
 				form.setAttribute("method", methods.options[methods.selectedIndex].value);
-				form.onsubmit = () => {
-					window.location.hash = "";
+
+				// Intercepting the submission
+				form.onsubmit = ev => {
+					ev.preventDefault();
+					ev.stopPropagation();
+					window.requestAnimationFrame(() => ev.target.querySelector("button").classList.add("is-loading"));
 				};
 
 				methods.onchange = () => form.setAttribute("method", methods.options[methods.selectedIndex].value);
@@ -62,22 +66,20 @@
 	}});
 
 	// Wiring up format selection
-	document.querySelector("#formats").onchange = function (ev) {
+	document.querySelector("#formats").onchange = ev => {
 		window.location = window.location.pathname + "?format=" + ev.target.options[ev.target.selectedIndex].value;
 	};
 
 	// Wiring up JSON validation
-	document.querySelector("textarea").onchange = function (ev) {
-		try {
-			JSON.parse(JSON.stringify(ev.target.value));
+	document.querySelector("textarea").onkeyup = ev => {
+		if (ev.target.value !== "") {
 			ev.target.classList.remove("is-danger");
 			document.querySelector(".button.is-primary").classList.remove("is-disabled");
-		} catch (e) {
+		} else {
 			ev.target.classList.add("is-danger");
 			document.querySelector(".button.is-primary").classList.add("is-disabled");
-			console.log(e);
 		}
-	}
+	};
 
 	// Setting up the UI
 	window.requestAnimationFrame(() => {

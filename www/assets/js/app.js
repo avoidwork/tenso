@@ -54,8 +54,14 @@
 					var form = document.querySelector("form");
 
 					form.setAttribute("method", methods.options[methods.selectedIndex].value);
-					form.onsubmit = function () {
-						window.location.hash = "";
+
+					// Intercepting the submission
+					form.onsubmit = function (ev) {
+						ev.preventDefault();
+						ev.stopPropagation();
+						window.requestAnimationFrame(function () {
+							return ev.target.querySelector("button").classList.add("is-loading");
+						});
 					};
 
 					methods.onchange = function () {
@@ -71,15 +77,13 @@
 	};
 
 	// Wiring up JSON validation
-	document.querySelector("textarea").onchange = function (ev) {
-		try {
-			JSON.parse(JSON.stringify(ev.target.value));
+	document.querySelector("textarea").onkeyup = function (ev) {
+		if (ev.target.value !== "") {
 			ev.target.classList.remove("is-danger");
 			document.querySelector(".button.is-primary").classList.remove("is-disabled");
-		} catch (e) {
+		} else {
 			ev.target.classList.add("is-danger");
 			document.querySelector(".button.is-primary").classList.add("is-disabled");
-			console.log(e);
 		}
 	};
 

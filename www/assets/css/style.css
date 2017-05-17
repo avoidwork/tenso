@@ -13,6 +13,9 @@ body {
 a:focus, a:hover, a:active, a.is-active {
   color: #00527D !important; }
 
+.item a {
+  color: #00527D !important; }
+
 .input:after, .input:focus, .input:hover, .input:active, .input.is-active,
 .textarea:after,
 .textarea:focus,
@@ -41,6 +44,19 @@ button.is-primary {
 pre {
   padding: 10px;
   font-size: 1em; }
+
+code {
+  background: white; }
+
+.key {
+  font-weight: bold; }
+
+.code {
+  font-family: "Lucida Console", monospace, Monaco, "Courier New", Courier; }
+
+.spaces {
+  display: inline-block;
+  width: 1.1em; }
 
 .spaced {
   margin-bottom: 25px; }

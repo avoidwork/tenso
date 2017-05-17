@@ -21,8 +21,7 @@ require("./index.js")({
 				cb(null, token);
 			},
 			secretOrKey: "jennifer"
-		},
-		protect: ["/uuid"]
+		}
 	},
 	security: {
 		csrf: false

@@ -10,7 +10,7 @@
 		var keys = Array.from(html.match(/\".*":/g)),
 		    matches = Array.from(keys.concat(html.match(/:\s(\".*\"|\d{3,3}|null)/g))),
 		    replaces = matches.map(function (i) {
-			keys.includes(i) ? i.replace(/(\"(.*)\")/, "<span class='key $2'>$1</span>") : i.replace(/(\".*\"|\d{3,3}|null)/, "<span class='item'>$1</span>");
+			return keys.includes(i) ? i.replace(/(\"(.*)\")/, "<span class='key $2'>$1</span>") : i.replace(/(\".*\"|\d{3,3}|null)/, "<span class='item'>$1</span>");
 		});
 
 		var output = html;
@@ -43,10 +43,25 @@
 	// Creating a DOM router
 	router({ css: { current: "is-active", hidden: "dr-hidden" }, callback: function callback(ev) {
 			window.requestAnimationFrame(function () {
+				var methods = document.querySelector("#methods");
+
 				document.querySelectorAll("li.is-active").forEach(function (i) {
 					return i.classList.remove("is-active");
 				});
 				ev.trigger.parentNode.classList.add("is-active");
+
+				if (methods !== null) {
+					var form = document.querySelector("form");
+
+					form.setAttribute("method", methods.options[methods.selectedIndex].value);
+					form.onsubmit = function () {
+						window.location.hash = "";
+					};
+
+					methods.onchange = function () {
+						return form.setAttribute("method", methods.options[methods.selectedIndex].value);
+					};
+				}
 			});
 		} });
 

@@ -25,6 +25,12 @@ a {
   }
 }
 
+.item {
+  a {
+    color: $blue !important;
+  }
+}
+
 .input,
 .textarea,
 .select,
@@ -50,6 +56,22 @@ button.is-primary {
 pre {
   padding: $ten;
   font-size: 1em;
+}
+
+code {
+  background: white;
+}
+
+.key {
+  font-weight: bold;
+}
+
+.code {
+  font-family: "Lucida Console", monospace, Monaco, "Courier New", Courier
+}
+.spaces {
+  display: inline-block;
+  width: 1.1em;
 }
 
 .spaced {

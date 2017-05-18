@@ -11,7 +11,8 @@
 	    loading = modal.querySelector(".loading"),
 	    textarea = document.querySelector("textarea"),
 	    resBody = modal.querySelector(".body"),
-	    json = /^[\[\{"]/;
+	    json = /^[\[\{"]/,
+	    isJson = /application\/json/;
 
 	if (methods.childElementCount > 0) {
 		form.setAttribute("method", methods.options[methods.selectedIndex].value);
@@ -89,7 +90,7 @@
 				throw res;
 			}
 
-			return json ? res.json() : res.text();
+			return isJson.test(res.headers.get("content-type") || "") ? res.json() : res.text();
 		}).then(function (arg) {
 			window.requestAnimationFrame(function () {
 				resBody.innerText = arg.data;

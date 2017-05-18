@@ -40,6 +40,21 @@
 		});
 	}
 
+	function maybeJson(arg) {
+		var output = false;
+
+		if (json.test(arg)) {
+			try {
+				JSON.parse(JSON.stringify(arg));
+				output = true;
+			} catch (err) {
+				console.warn(err.message);
+			}
+		}
+
+		return output;
+	}
+
 	// Wiring up the request tab
 	var button = document.querySelector("button"),
 	    close = document.querySelector("#close"),
@@ -47,7 +62,9 @@
 	    methods = document.querySelector("#methods"),
 	    modal = document.querySelector(".modal"),
 	    loading = modal.querySelector(".loading"),
-	    resBody = modal.querySelector(".body");
+	    textarea = document.querySelector("textarea"),
+	    resBody = modal.querySelector(".body"),
+	    json = /^[\[\{"]/;
 
 	var flight = false;
 
@@ -58,12 +75,39 @@
 		ev.preventDefault();
 		ev.stopPropagation();
 		flight = true;
+
 		window.requestAnimationFrame(function () {
 			resBody.innerText = "";
 			resBody.classList.add("dr-hidden");
 			loading.classList.remove("dr-hidden");
 			button.classList.add("is-loading");
 			modal.classList.add("is-active");
+		});
+
+		fetch(location.protocol + "//" + location.host + location.pathname, { method: methods.options[methods.selectedIndex].value, body: maybeJson(textarea.value) ? JSON.stringify(textarea.value) : textarea.value, credentials: "include", headers: { "content-type": maybeJson(textarea.value) ? "application/json" : "application/x-www-form-urlencoded", "x-csrf-token": document.querySelector("#csrf").innerText } }).then(function (res) {
+			if (!res.ok) {
+				throw res;
+			}
+
+			return json ? res.json() : res.text();
+		}).then(function (arg) {
+			window.requestAnimationFrame(function () {
+				resBody.innerText = arg.data;
+				resBody.parentNode.classList.remove("has-text-centered");
+				resBody.classList.remove("dr-hidden");
+				loading.classList.add("dr-hidden");
+				button.classList.remove("is-loading");
+			});
+		}).catch(function (res) {
+			window.requestAnimationFrame(function () {
+				resBody.innerHTML = "<h1 class=\"title\">" + res.status + " - " + res.statusText + "</h1>";
+				resBody.parentNode.classList.add("has-text-centered");
+				resBody.classList.remove("dr-hidden");
+				loading.classList.add("dr-hidden");
+				button.classList.remove("is-loading");
+			});
+
+			console.warn(res.status + " - " + res.statusText);
 		});
 	};
 
@@ -84,9 +128,9 @@
 
 	// Wiring up format selection
 	close.onclick = function (ev) {
-		flight = false;
 		ev.preventDefault();
 		ev.stopPropagation();
+		flight = false;
 		button.classList.remove("is-loading");
 		modal.classList.remove("is-active");
 	};
@@ -97,7 +141,7 @@
 	};
 
 	// Wiring up JSON validation
-	document.querySelector("textarea").onkeyup = function (ev) {
+	textarea.onkeyup = function (ev) {
 		if (ev.target.value !== "") {
 			ev.target.classList.remove("is-danger");
 			button.classList.remove("is-disabled");

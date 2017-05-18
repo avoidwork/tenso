@@ -46,7 +46,8 @@ pre {
   font-size: 1em; }
 
 code {
-  background: white; }
+  background: white;
+  color: black; }
 
 .key {
   font-weight: bold; }

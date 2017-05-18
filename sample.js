@@ -21,10 +21,12 @@ require("./index.js")({
 				cb(null, token);
 			},
 			secretOrKey: "jennifer"
-		},
-		protect: ["/uuid"]
+		}
 	},
 	security: {
-		csrf: false
+		csrf: true
+	},
+	headers: {
+		"cache-control": "no-cache"
 	}
 });

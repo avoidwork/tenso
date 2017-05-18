@@ -82,11 +82,7 @@
 		"csp": null,
 		"xframe": "SAMEORIGIN",
 		"p3p": "",
-		"hsts": {
-			"maxAge": 10886400,
-			"includeSubDomains": true,
-			"preload": true
-		},
+		"hsts": null,
 		"xssProtection": true,
 		"nosniff": true
 	},
@@ -127,10 +123,11 @@
 			"port": 5683
 		}
 	},
-	"title": "Tensō Browsable API",
+	"title": "Tensō",
 	"template": "",
 	"regex": {
 		"hypermedia": "[a-zA-Z]+_(guid|uuid|id|url|uri)$",
 		"id": "^(_id|id)$"
-	}
+	},
+	"static": "/assets/.*"
 }

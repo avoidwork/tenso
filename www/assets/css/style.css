@@ -1,0 +1,70 @@
+html,
+body {
+  min-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden; }
+
+body {
+  background: whitesmoke; }
+
+.dr-hidden {
+  display: none !important; }
+
+a:focus, a:hover, a:active, a.is-active {
+  color: #00527D !important; }
+
+.item a {
+  color: #00527D !important; }
+
+.input:after, .input:focus, .input:hover, .input:active, .input.is-active,
+.textarea:after,
+.textarea:focus,
+.textarea:hover,
+.textarea:active,
+.textarea.is-active,
+.select:after,
+.select:focus,
+.select:hover,
+.select:active,
+.select.is-active,
+.select select:after,
+.select select:focus,
+.select select:hover,
+.select select:active,
+.select select.is-active {
+  border-color: #00527D; }
+
+button.is-primary {
+  background-color: #00527D !important; }
+
+.tabs li.is-active a {
+  border-bottom-color: #00527D !important;
+  color: #00527D !important; }
+
+pre {
+  padding: 10px;
+  font-size: 1em; }
+
+code {
+  background: white;
+  color: black; }
+
+.key {
+  font-weight: bold; }
+
+.spaces {
+  display: inline-block;
+  width: 1.1em; }
+
+.spaced {
+  margin-bottom: 25px; }
+
+.textarea {
+  height: 300px; }
+
+.footer .logo {
+  width: 160px; }
+.footer a {
+  color: #00527D !important; }
+
+/*# sourceMappingURL=style.css.map */

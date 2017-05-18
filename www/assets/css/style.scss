@@ -1,0 +1,91 @@
+$ten: 10px;
+$blue: #00527D;
+
+html,
+body {
+  min-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+body {
+  background: whitesmoke;
+}
+
+.dr-hidden {
+  display: none !important;
+}
+
+a {
+  &:focus,
+  &:hover,
+  &:active,
+  &.is-active {
+    color: $blue !important;
+  }
+}
+
+.item {
+  a {
+    color: $blue !important;
+  }
+}
+
+.input,
+.textarea,
+.select,
+.select select {
+  &:after,
+  &:focus,
+  &:hover,
+  &:active,
+  &.is-active {
+    border-color: $blue;
+  }
+}
+
+button.is-primary {
+  background-color: $blue !important;
+}
+
+.tabs li.is-active a {
+  border-bottom-color: $blue !important;
+  color: $blue !important;
+}
+
+pre {
+  padding: $ten;
+  font-size: 1em;
+}
+
+code {
+  background: white;
+  color: black;
+}
+
+.key {
+  font-weight: bold;
+}
+
+.spaces {
+  display: inline-block;
+  width: 1.1em;
+}
+
+.spaced {
+  margin-bottom: $ten * 2.5;
+}
+
+.textarea {
+  height: $ten * 30;
+}
+
+.footer {
+  .logo {
+    width: $ten * 16;
+  }
+
+  a {
+    color: $blue !important;
+  }
+}

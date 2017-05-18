@@ -40,7 +40,7 @@ function factory (arg) {
 
 	config.routes.get[config.static] = (req, res) => req.server.static(req, res);
 	config.root = path.resolve(config.root);
-	config.template = fs.readFileSync(config.template || path.join(config.root, "www", "index.html"), {encoding: "utf8"});
+	config.template = fs.readFileSync(config.template || path.join(config.root, "template.html"), {encoding: "utf8"});
 	config.version = pkg.version;
 	obj = tenso(config);
 	obj.hostname = hostname;

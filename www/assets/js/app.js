@@ -68,7 +68,7 @@
 
 	var flight = false;
 
-	form.setAttribute("method", methods.options[methods.selectedIndex].value);
+	form.setAttribute("method", methods.options[methods.selectedIndex || 0].value);
 
 	// Intercepting the submission
 	form.onsubmit = function (ev) {
@@ -84,7 +84,7 @@
 			modal.classList.add("is-active");
 		});
 
-		fetch(location.protocol + "//" + location.host + location.pathname, { method: methods.options[methods.selectedIndex].value, body: maybeJson(textarea.value) ? JSON.stringify(textarea.value) : textarea.value, credentials: "include", headers: { "content-type": maybeJson(textarea.value) ? "application/json" : "application/x-www-form-urlencoded", "x-csrf-token": document.querySelector("#csrf").innerText } }).then(function (res) {
+		fetch(location.protocol + "//" + location.host + location.pathname, { method: methods.options[methods.selectedIndex || 0].value, body: maybeJson(textarea.value) ? JSON.stringify(textarea.value) : textarea.value, credentials: "include", headers: { "content-type": maybeJson(textarea.value) ? "application/json" : "application/x-www-form-urlencoded", "x-csrf-token": document.querySelector("#csrf").innerText } }).then(function (res) {
 			if (!res.ok) {
 				throw res;
 			}
@@ -112,7 +112,7 @@
 	};
 
 	methods.onchange = function () {
-		return form.setAttribute("method", methods.options[methods.selectedIndex].value);
+		return form.setAttribute("method", methods.options[methods.selectedIndex || 0].value);
 	};
 
 	// Creating a DOM router

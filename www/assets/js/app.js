@@ -28,7 +28,7 @@
 		arg.parentNode.parentNode.innerHTML = prepare(arg.innerHTML).replace(/\n/g, "<br>\n").replace(/(\s{2,2})/g, "<span class='spaces'></span>");
 
 		// Changing URIs into anchors
-		document.querySelectorAll(".item").forEach(function (i) {
+		Array.from(document.querySelectorAll(".item")).forEach(function (i) {
 			var html = i.innerHTML,
 			    val = html.replace(/(^\"|\"$)/g, "");
 
@@ -121,7 +121,7 @@
 	router({ css: { current: "is-active", hidden: "dr-hidden" }, callback: function callback(ev) {
 			flight = false;
 			window.requestAnimationFrame(function () {
-				document.querySelectorAll("li.is-active").forEach(function (i) {
+				Array.from(document.querySelectorAll("li.is-active")).forEach(function (i) {
 					return i.classList.remove("is-active");
 				});
 				ev.trigger.parentNode.classList.add("is-active");

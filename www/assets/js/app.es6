@@ -28,7 +28,7 @@
 			.replace(/(\s{2,2})/g, "<span class='spaces'></span>");
 
 		// Changing URIs into anchors
-		document.querySelectorAll(".item").forEach(i => {
+		Array.from(document.querySelectorAll(".item")).forEach(i => {
 			let html = i.innerHTML,
 				val = html.replace(/(^\"|\"$)/g, "");
 
@@ -119,7 +119,7 @@
 	router({css: {current: "is-active", hidden: "dr-hidden"}, callback: ev => {
 		flight = false;
 		window.requestAnimationFrame(() => {
-			document.querySelectorAll("li.is-active").forEach(i => i.classList.remove("is-active"));
+			Array.from(document.querySelectorAll("li.is-active")).forEach(i => i.classList.remove("is-active"));
 			ev.trigger.parentNode.classList.add("is-active");
 		});
 	}});

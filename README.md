@@ -434,6 +434,15 @@ The browsable template can load assets from this folder. assets.
 }
 ```
 
+## Static assets cache
+The browsable template assets have a default `public` cache of `300` seconds (5 minutes). These assets will always be considered `public`, but you can customize how long they are cacheable.
+
+```
+{
+    "staticCache": 300
+}
+```
+
 ## License
 Copyright (c) 2017 Jason Mulligan
 Licensed under the BSD-3-Clause license.

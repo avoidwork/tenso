@@ -51,15 +51,15 @@ code {
 .key {
   font-weight: bold; }
 
-.code {
-  font-family: "Lucida Console", monospace, Monaco, "Courier New", Courier; }
-
 .spaces {
   display: inline-block;
   width: 1.1em; }
 
 .spaced {
   margin-bottom: 25px; }
+
+.textarea {
+  height: 300px; }
 
 .footer .logo {
   width: 160px; }

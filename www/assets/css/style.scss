@@ -66,9 +66,6 @@ code {
   font-weight: bold;
 }
 
-.code {
-  font-family: "Lucida Console", monospace, Monaco, "Courier New", Courier
-}
 .spaces {
   display: inline-block;
   width: 1.1em;
@@ -76,6 +73,10 @@ code {
 
 .spaced {
   margin-bottom: $ten * 2.5;
+}
+
+.textarea {
+  height: $ten * 30;
 }
 
 .footer {

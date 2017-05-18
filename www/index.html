@@ -62,7 +62,7 @@
 							</div>
 						</div>
 						<div class="column">
-							<div class="box">
+							<div class="box code">
 								<code class="is-marginless is-paddingless">
 									<pre id="body">{{body}}</pre>
 								</code>
@@ -92,7 +92,6 @@
 
 							<div class="field is-grouped">
 								<p class="control">
-									<input type="hidden" name="x-csrf-token" value="{{csrf}}" />
 									<button type="submit" class="button is-primary is-disabled">Submit</button>
 								</p>
 							</div>
@@ -112,7 +111,19 @@
 	</div>
 </footer>
 
+<div id="result" class="modal">
+	<div class="modal-background"></div>
+	<div class="modal-content">
+		<div class="loading box has-text-centered">
+			<div class="button is-large is-white is-loading"></div>
+		</div>
+		<div class="body dr-hidden"></div>
+	</div>
+	<button id="close" class="modal-close"></button>
+</div>
+
 <div id="allow" class="dr-hidden">{{allow}}</div>
+<div id="csrf" class="dr-hidden">{{csrf}}</div>
 
 <script type="application/javascript" src="/assets/js/dom-router.min.js"></script>
 <script type="application/javascript" src="/assets/js/app.js"></script>

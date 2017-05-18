@@ -40,39 +40,59 @@
 		});
 	}
 
+	// Wiring up the request tab
+	var button = document.querySelector("button"),
+	    close = document.querySelector("#close"),
+	    form = document.querySelector("form"),
+	    methods = document.querySelector("#methods"),
+	    modal = document.querySelector(".modal"),
+	    loading = modal.querySelector(".loading"),
+	    resBody = modal.querySelector(".body");
+
+	var flight = false;
+
+	form.setAttribute("method", methods.options[methods.selectedIndex].value);
+
+	// Intercepting the submission
+	form.onsubmit = function (ev) {
+		ev.preventDefault();
+		ev.stopPropagation();
+		flight = true;
+		window.requestAnimationFrame(function () {
+			resBody.innerText = "";
+			resBody.classList.add("dr-hidden");
+			loading.classList.remove("dr-hidden");
+			button.classList.add("is-loading");
+			modal.classList.add("is-active");
+		});
+	};
+
+	methods.onchange = function () {
+		return form.setAttribute("method", methods.options[methods.selectedIndex].value);
+	};
+
 	// Creating a DOM router
 	router({ css: { current: "is-active", hidden: "dr-hidden" }, callback: function callback(ev) {
+			flight = false;
 			window.requestAnimationFrame(function () {
-				var methods = document.querySelector("#methods");
-
 				document.querySelectorAll("li.is-active").forEach(function (i) {
 					return i.classList.remove("is-active");
 				});
 				ev.trigger.parentNode.classList.add("is-active");
-
-				if (methods !== null) {
-					var form = document.querySelector("form");
-
-					form.setAttribute("method", methods.options[methods.selectedIndex].value);
-
-					// Intercepting the submission
-					form.onsubmit = function (ev) {
-						ev.preventDefault();
-						ev.stopPropagation();
-						window.requestAnimationFrame(function () {
-							return ev.target.querySelector("button").classList.add("is-loading");
-						});
-					};
-
-					methods.onchange = function () {
-						return form.setAttribute("method", methods.options[methods.selectedIndex].value);
-					};
-				}
 			});
 		} });
 
 	// Wiring up format selection
-	document.querySelector("#formats").onchange = function (ev) {
+	close.onclick = function (ev) {
+		flight = false;
+		ev.preventDefault();
+		ev.stopPropagation();
+		button.classList.remove("is-loading");
+		modal.classList.remove("is-active");
+	};
+
+	// Wiring up format selection
+	formats.onchange = function (ev) {
 		window.location = window.location.pathname + "?format=" + ev.target.options[ev.target.selectedIndex].value;
 	};
 
@@ -80,10 +100,10 @@
 	document.querySelector("textarea").onkeyup = function (ev) {
 		if (ev.target.value !== "") {
 			ev.target.classList.remove("is-danger");
-			document.querySelector(".button.is-primary").classList.remove("is-disabled");
+			button.classList.remove("is-disabled");
 		} else {
 			ev.target.classList.add("is-danger");
-			document.querySelector(".button.is-primary").classList.add("is-disabled");
+			button.classList.add("is-disabled");
 		}
 	};
 
@@ -95,7 +115,7 @@
 		}
 
 		// Resetting format selection (back button)
-		document.querySelector("#formats").selectedIndex = 0;
+		formats.selectedIndex = 0;
 
 		// Prettifying the response
 		prettify(document.querySelector("#body"));

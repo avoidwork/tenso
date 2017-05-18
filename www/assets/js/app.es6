@@ -40,33 +40,55 @@
 		});
 	}
 
+	// Wiring up the request tab
+	const button = document.querySelector("button"),
+		close = document.querySelector("#close"),
+		form = document.querySelector("form"),
+		methods = document.querySelector("#methods"),
+		modal = document.querySelector(".modal"),
+		loading = modal.querySelector(".loading"),
+		resBody = modal.querySelector(".body");
+	
+	let flight = false;
+
+	form.setAttribute("method", methods.options[methods.selectedIndex].value);
+
+	// Intercepting the submission
+	form.onsubmit = ev => {
+		ev.preventDefault();
+		ev.stopPropagation();
+		flight = true;
+		window.requestAnimationFrame(() => {
+			resBody.innerText = "";
+			resBody.classList.add("dr-hidden");
+			loading.classList.remove("dr-hidden");
+			button.classList.add("is-loading");
+			modal.classList.add("is-active");
+		});
+	};
+
+	methods.onchange = () => form.setAttribute("method", methods.options[methods.selectedIndex].value);
+
 	// Creating a DOM router
 	router({css: {current: "is-active", hidden: "dr-hidden"}, callback: ev => {
+		flight = false;
 		window.requestAnimationFrame(() => {
-			const methods = document.querySelector("#methods");
-
 			document.querySelectorAll("li.is-active").forEach(i => i.classList.remove("is-active"));
 			ev.trigger.parentNode.classList.add("is-active");
-
-			if (methods !== null) {
-				let form = document.querySelector("form");
-
-				form.setAttribute("method", methods.options[methods.selectedIndex].value);
-
-				// Intercepting the submission
-				form.onsubmit = ev => {
-					ev.preventDefault();
-					ev.stopPropagation();
-					window.requestAnimationFrame(() => ev.target.querySelector("button").classList.add("is-loading"));
-				};
-
-				methods.onchange = () => form.setAttribute("method", methods.options[methods.selectedIndex].value);
-			}
 		});
 	}});
 
 	// Wiring up format selection
-	document.querySelector("#formats").onchange = ev => {
+	close.onclick = ev => {
+		flight = false;
+		ev.preventDefault();
+		ev.stopPropagation();
+		button.classList.remove("is-loading");
+		modal.classList.remove("is-active");
+	};
+
+	// Wiring up format selection
+	formats.onchange = ev => {
 		window.location = window.location.pathname + "?format=" + ev.target.options[ev.target.selectedIndex].value;
 	};
 
@@ -74,10 +96,10 @@
 	document.querySelector("textarea").onkeyup = ev => {
 		if (ev.target.value !== "") {
 			ev.target.classList.remove("is-danger");
-			document.querySelector(".button.is-primary").classList.remove("is-disabled");
+			button.classList.remove("is-disabled");
 		} else {
 			ev.target.classList.add("is-danger");
-			document.querySelector(".button.is-primary").classList.add("is-disabled");
+			button.classList.add("is-disabled");
 		}
 	};
 
@@ -89,7 +111,7 @@
 		}
 
 		// Resetting format selection (back button)
-		document.querySelector("#formats").selectedIndex = 0;
+		formats.selectedIndex = 0;
 
 		// Prettifying the response
 		prettify(document.querySelector("#body"));

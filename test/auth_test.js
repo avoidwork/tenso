@@ -15,6 +15,7 @@ describe("Permissions (CSRF disabled)", function () {
 
 	it("GET / - returns an array of endpoints", function () {
 		return tinyhttptest({url: "http://localhost:" + port})
+			.expectJson()
 			.expectStatus(200)
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
 			.expectValue("links", [{uri: "/empty", rel: "item"},
@@ -31,6 +32,7 @@ describe("Permissions (CSRF disabled)", function () {
 
 	it("GET /invalid - returns a 'not found' error", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/invalid"})
+			.expectJson()
 			.expectStatus(404)
 			.expectValue("data", null)
 			.expectValue("error", "Not Found")
@@ -40,6 +42,7 @@ describe("Permissions (CSRF disabled)", function () {
 
 	it("DELETE / - returns a 'method not allowed' error", function () {
 		return tinyhttptest({url: "http://localhost:" + port, method: "delete"})
+			.expectJson()
 			.expectStatus(405)
 			.expectValue("data", null)
 			.expectValue("error", "Method Not Allowed")
@@ -49,6 +52,7 @@ describe("Permissions (CSRF disabled)", function () {
 
 	it("POST / - returns a 'method not allowed' error", function () {
 		return tinyhttptest({url: "http://localhost:" + port, method: "post"})
+			.expectJson()
 			.expectStatus(405)
 			.expectValue("data", null)
 			.expectValue("error", "Method Not Allowed")
@@ -58,6 +62,7 @@ describe("Permissions (CSRF disabled)", function () {
 
 	it("PUT / - returns a 'method not allowed' error", function () {
 		return tinyhttptest({url: "http://localhost:" + port, method: "put"})
+			.expectJson()
 			.expectStatus(405)
 			.expectValue("data", null)
 			.expectValue("error", "Method Not Allowed")
@@ -67,6 +72,7 @@ describe("Permissions (CSRF disabled)", function () {
 
 	it("PATCH / - returns a 'method not allowed' error", function () {
 		return tinyhttptest({url: "http://localhost:" + port, method: "patch"})
+			.expectJson()
 			.expectStatus(405)
 			.expectValue("data", null)
 			.expectValue("error", "Method Not Allowed")
@@ -83,6 +89,7 @@ describe("Basic Auth", function () {
 
 	it("GET / - returns links", function () {
 		return tinyhttptest({url: "http://localhost:" + port})
+			.expectJson()
 			.expectStatus(200)
 			.expectValue("links", [{uri: "/empty", rel: "item"},
 				{uri: "/items", rel: "item"},
@@ -98,6 +105,7 @@ describe("Basic Auth", function () {
 
 	it("GET /uuid - returns a uuid (authorized)", function () {
 		return tinyhttptest({url: "http://test:123@localhost:" + port + "/uuid"})
+			.expectJson()
 			.expectStatus(200)
 			.expectValue("links", [{uri: "/", rel: "collection"}])
 			.expectValue("error", null)
@@ -120,6 +128,7 @@ describe("OAuth2 Token Bearer", function () {
 
 	it("GET / - returns an array of endpoints (authorized)", function () {
 		return tinyhttptest({url: "http://test:123@localhost:" + port, headers: {authorization: "Bearer abc-123"}})
+			.expectJson()
 			.expectStatus(200)
 			.expectValue("links", [{uri: "/empty", rel: "item"},
 				{uri: "/items", rel: "item"},
@@ -172,6 +181,7 @@ describe("Local", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/login"})
 			.cookies()
 			.captureHeader(csrf)
+			.expectJson()
 			.expectStatus(200)
 			.expectValue("links", [{uri: "/", rel: "collection"}])
 			.expectValue("data", {instruction: "POST 'username' & 'password' to authenticate"})
@@ -218,6 +228,7 @@ describe("Local", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/uuid"})
 			.cookies()
 			.expectStatus(200)
+			.expectJson()
 			.expectValue("links", [{uri: "/", rel: "collection"}])
 			.expectValue("error", null)
 			.expectValue("status", 200)
@@ -252,6 +263,7 @@ describe("JWT", function () {
 	it("GET /uuid - returns a uuid (authorized)", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/uuid", headers: {authorization: "Bearer " + token}})
 			.expectStatus(200)
+			.expectJson()
 			.expectValue("links", [{uri: "/", rel: "collection"}])
 			.expectValue("error", null)
 			.expectValue("status", 200)

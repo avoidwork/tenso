@@ -1,6 +1,22 @@
 "use strict";
 
-(function () {
+(function (document, window, location, fetch, router) {
+	// Wiring up the request tab
+	var button = document.querySelector("button"),
+	    close = document.querySelector("#close"),
+	    form = document.querySelector("form"),
+	    formats = document.querySelector("#formats"),
+	    methods = document.querySelector("#methods"),
+	    modal = document.querySelector(".modal"),
+	    loading = modal.querySelector(".loading"),
+	    textarea = document.querySelector("textarea"),
+	    resBody = modal.querySelector(".body"),
+	    json = /^[\[\{"]/;
+
+	if (methods.childElementCount > 0) {
+		form.setAttribute("method", methods.options[methods.selectedIndex].value);
+	}
+
 	function escape(arg) {
 		return arg.replace(/[\-\[\]{}()*+?.,\\\/\^\$|#\s]/g, "\\$&");
 	}
@@ -55,28 +71,10 @@
 		return output;
 	}
 
-	// Wiring up the request tab
-	var button = document.querySelector("button"),
-	    close = document.querySelector("#close"),
-	    form = document.querySelector("form"),
-	    methods = document.querySelector("#methods"),
-	    modal = document.querySelector(".modal"),
-	    loading = modal.querySelector(".loading"),
-	    textarea = document.querySelector("textarea"),
-	    resBody = modal.querySelector(".body"),
-	    json = /^[\[\{"]/;
-
-	var flight = false;
-
-	if (methods.childElementCount > 0) {
-		form.setAttribute("method", methods.options[methods.selectedIndex].value);
-	}
-
 	// Intercepting the submission
 	form.onsubmit = function (ev) {
 		ev.preventDefault();
 		ev.stopPropagation();
-		flight = true;
 
 		window.requestAnimationFrame(function () {
 			resBody.innerText = "";
@@ -119,7 +117,6 @@
 
 	// Creating a DOM router
 	router({ css: { current: "is-active", hidden: "dr-hidden" }, callback: function callback(ev) {
-			flight = false;
 			window.requestAnimationFrame(function () {
 				Array.from(document.querySelectorAll("li.is-active")).forEach(function (i) {
 					return i.classList.remove("is-active");
@@ -132,7 +129,6 @@
 	close.onclick = function (ev) {
 		ev.preventDefault();
 		ev.stopPropagation();
-		flight = false;
 		button.classList.remove("is-loading");
 		modal.classList.remove("is-active");
 	};
@@ -168,5 +164,5 @@
 	});
 
 	console.log(["        ,----,", "      ,/   .`|", "    ,`   .'  :", "  ;    ;     /", ".'___,/    ,'              ,---,              ,---.", "|    :     |           ,-+-. /  | .--.--.    '   ,'\\", ";    |.';  ;   ,---.  ,--.'|'   |/  /    '  /   /   |", "`----'  |  |  /     \\|   |  ,\"' |  :  /`./ .   ; ,. :", "    '   :  ; /    /  |   | /  | |  :  ;_   '   | |: :", "    |   |  '.    ' / |   | |  | |\\  \\    `.'   | .; :", "    '   :  |'   ;   /|   | |  |/  `----.   \\   :    |", "    ;   |.' '   |  / |   | |--'  /  /`--'  /\\   \\  /", "    '---'   |   :    |   |/     '--'.     /  `----'", "             \\   \\  /'---'        `--'---'", "              `----'"].join("\n"));
-})();
+})(document, window, location, fetch, router);
 //# sourceMappingURL=app.js.map

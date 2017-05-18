@@ -1,6 +1,22 @@
 "use strict";
 
-(function () {
+(function (document, window, location, fetch, router) {
+	// Wiring up the request tab
+	const button = document.querySelector("button"),
+		close = document.querySelector("#close"),
+		form = document.querySelector("form"),
+		formats = document.querySelector("#formats"),
+		methods = document.querySelector("#methods"),
+		modal = document.querySelector(".modal"),
+		loading = modal.querySelector(".loading"),
+		textarea = document.querySelector("textarea"),
+		resBody = modal.querySelector(".body"),
+		json = /^[\[\{"]/;
+
+	if (methods.childElementCount > 0) {
+		form.setAttribute("method", methods.options[methods.selectedIndex].value);
+	}
+
 	function escape (arg) {
 		return arg.replace(/[\-\[\]{}()*+?.,\\\/\^\$|#\s]/g, "\\$&");
 	}
@@ -32,7 +48,7 @@
 			let html = i.innerHTML,
 				val = html.replace(/(^\"|\"$)/g, "");
 
-			if (val.indexOf( "/" ) === 0 || val.indexOf("//") > -1) {
+			if (val.indexOf("/") === 0 || val.indexOf("//") > -1) {
 				html = html.replace(val, "<a href='" + val + "' title='View " + val + "'>" + val + "</a>");
 			}
 
@@ -55,28 +71,10 @@
 		return output;
 	}
 
-	// Wiring up the request tab
-	const button = document.querySelector("button"),
-		close = document.querySelector("#close"),
-		form = document.querySelector("form"),
-		methods = document.querySelector("#methods"),
-		modal = document.querySelector(".modal"),
-		loading = modal.querySelector(".loading"),
-		textarea = document.querySelector("textarea"),
-		resBody = modal.querySelector(".body"),
-		json = /^[\[\{"]/;
-	
-	let flight = false;
-
-	if (methods.childElementCount > 0) {
-		form.setAttribute("method", methods.options[methods.selectedIndex].value);
-	}
-
 	// Intercepting the submission
 	form.onsubmit = ev => {
 		ev.preventDefault();
 		ev.stopPropagation();
-		flight = true;
 
 		window.requestAnimationFrame(() => {
 			resBody.innerText = "";
@@ -103,7 +101,7 @@
 		}).catch(res => {
 			window.requestAnimationFrame(() => {
 				resBody.innerHTML = "<h1 class=\"title\">" + res.status + " - " + res.statusText + "</h1>";
-				resBody.parentNode.classList.add("has-text-centered")
+				resBody.parentNode.classList.add("has-text-centered");
 				resBody.classList.remove("dr-hidden");
 				loading.classList.add("dr-hidden");
 				button.classList.remove("is-loading");
@@ -117,7 +115,6 @@
 
 	// Creating a DOM router
 	router({css: {current: "is-active", hidden: "dr-hidden"}, callback: ev => {
-		flight = false;
 		window.requestAnimationFrame(() => {
 			Array.from(document.querySelectorAll("li.is-active")).forEach(i => i.classList.remove("is-active"));
 			ev.trigger.parentNode.classList.add("is-active");
@@ -128,7 +125,6 @@
 	close.onclick = ev => {
 		ev.preventDefault();
 		ev.stopPropagation();
-		flight = false;
 		button.classList.remove("is-loading");
 		modal.classList.remove("is-active");
 	};
@@ -180,4 +176,4 @@
 		"             \\   \\  /'---'        `--'---'",
 		"              `----'"
 	].join("\n"));
-})();
+}(document, window, location, fetch, router));

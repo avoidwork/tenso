@@ -1,6 +1,6 @@
 {
   "env": {
-    "browser": false,
+    "browser": true,
     "node": true,
     "es6": true,
     "amd": false
@@ -13,7 +13,8 @@
   },
   "globals": {
     "describe": true,
-    "it": true
+    "it": true,
+    "router": true
   },
   "rules": {
     "arrow-parens": [2, "as-needed"],

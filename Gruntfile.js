@@ -4,7 +4,8 @@ module.exports = function (grunt) {
 		eslint: {
 			target: [
 				"lib/*.js",
-				"test/*.js"
+				"test/*.js",
+				"www/assets/js/*.es6"
 			]
 		},
 		mochaTest : {

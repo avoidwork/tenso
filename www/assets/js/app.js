@@ -93,7 +93,7 @@
 			return isJson.test(res.headers.get("content-type") || "") ? res.json() : res.text();
 		}).then(function (arg) {
 			window.requestAnimationFrame(function () {
-				resBody.innerText = arg.data;
+				resBody.innerText = arg.data || arg;
 				resBody.parentNode.classList.remove("has-text-centered");
 				resBody.classList.remove("dr-hidden");
 				loading.classList.add("dr-hidden");

@@ -325,6 +325,12 @@ If the session `secret` is not provided, a version 4 `UUID` will be used.
 		"redis": {
 			"host": "127.0.0.1",
 			"port": 6379
+		},
+		"cookie": {
+				"path": "/",
+				"httpOnly": true,
+				"secure": false,
+				"maxAge": 900000
 		}
 	}
 }

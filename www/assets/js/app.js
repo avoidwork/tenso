@@ -85,7 +85,7 @@
 			modal.classList.add("is-active");
 		});
 
-		fetch(location.protocol + "//" + location.host + location.pathname, { method: methods.options[methods.selectedIndex].value, body: maybeJson(textarea.value) ? JSON.stringify(textarea.value) : textarea.value, credentials: "include", headers: { "content-type": maybeJson(textarea.value) ? "application/json" : "application/x-www-form-urlencoded", "x-csrf-token": document.querySelector("#csrf").innerText } }).then(function (res) {
+		fetch(location.protocol + "//" + location.host + location.pathname, { method: methods.options[methods.selectedIndex].value, body: textarea.value, credentials: "include", headers: { "content-type": maybeJson(textarea.value) ? "application/json" : "application/x-www-form-urlencoded", "x-csrf-token": document.querySelector("#csrf").innerText } }).then(function (res) {
 			if (!res.ok) {
 				throw res;
 			}

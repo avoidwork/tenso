@@ -72,6 +72,10 @@
 		return output;
 	}
 
+	function sanitize (arg = "") {
+		return arg.replace(/\</g, "&lt;").replace(/\>/g, "&gt;");
+	}
+
 	// Intercepting the submission
 	form.onsubmit = ev => {
 		ev.preventDefault();
@@ -93,7 +97,7 @@
 			return isJson.test(res.headers.get("content-type") || "") ? res.json() : res.text();
 		}).then(arg => {
 			window.requestAnimationFrame(() => {
-				resBody.innerText = arg.data || arg;
+				resBody.innerHTML = arg.data !== undefined ? Array.isArray(arg.data) ? arg.data.map(i => sanitize(i)).join("<br>\n") : sanitize(arg.data) : sanitize(arg.data) || sanitize(arg);
 				resBody.parentNode.classList.remove("has-text-centered");
 				resBody.classList.remove("dr-hidden");
 				loading.classList.add("dr-hidden");

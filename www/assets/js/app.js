@@ -72,6 +72,12 @@
 		return output;
 	}
 
+	function sanitize() {
+		var arg = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+
+		return arg.replace(/\</g, "&lt;").replace(/\>/g, "&gt;");
+	}
+
 	// Intercepting the submission
 	form.onsubmit = function (ev) {
 		ev.preventDefault();
@@ -93,7 +99,9 @@
 			return isJson.test(res.headers.get("content-type") || "") ? res.json() : res.text();
 		}).then(function (arg) {
 			window.requestAnimationFrame(function () {
-				resBody.innerText = arg.data || arg;
+				resBody.innerHTML = arg.data !== undefined ? Array.isArray(arg.data) ? arg.data.map(function (i) {
+					return sanitize(i);
+				}).join("<br>\n") : sanitize(arg.data) : sanitize(arg.data) || sanitize(arg);
 				resBody.parentNode.classList.remove("has-text-centered");
 				resBody.classList.remove("dr-hidden");
 				loading.classList.add("dr-hidden");

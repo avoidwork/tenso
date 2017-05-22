@@ -135,17 +135,6 @@
 		window.location = window.location.pathname + "?format=" + ev.target.options[ev.target.selectedIndex].value;
 	};
 
-	// Wiring up JSON validation
-	textarea.onkeyup = ev => {
-		if (ev.target.value !== "") {
-			ev.target.classList.remove("is-danger");
-			button.classList.remove("is-disabled");
-		} else {
-			ev.target.classList.add("is-danger");
-			button.classList.add("is-disabled");
-		}
-	};
-
 	// Setting up the UI
 	window.requestAnimationFrame(() => {
 		// Hiding the request tab if read-only

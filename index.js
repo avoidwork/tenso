@@ -21,20 +21,20 @@ function factory (arg) {
 		process.exit(1);
 	}
 
-	if (config.root === undefined) {
+	if (config.root === void 0) {
 		config.root = root;
 	}
 
-	if (config.hosts === undefined) {
+	if (config.hosts === void 0) {
 		hosts[hostname] = "www";
 		config.hosts = hosts;
 	}
 
-	if (config.default === undefined) {
+	if (config.default === void 0) {
 		config.default = hostname;
 	}
 
-	if (config.routes.get === undefined) {
+	if (config.routes.get === void 0) {
 		config.routes.get = {};
 	}
 

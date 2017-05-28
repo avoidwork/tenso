@@ -16,21 +16,21 @@ function factory (arg) {
 
 	let obj;
 
-	if (!config.port) {
+	if (isNaN(config.port) || config.port < 1) {
 		console.error("Invalid configuration");
 		process.exit(1);
 	}
 
-	if (!config.root) {
+	if (config.root === undefined) {
 		config.root = root;
 	}
 
-	if (!config.hosts) {
+	if (config.hosts === undefined) {
 		hosts[hostname] = "www";
 		config.hosts = hosts;
 	}
 
-	if (!config.default) {
+	if (config.default === undefined) {
 		config.default = hostname;
 	}
 

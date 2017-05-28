@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tensō is an elastic REST API gateway for node.js",
-  "version": "4.5.13",
+  "version": "4.5.14",
   "homepage": "http://avoidwork.github.io/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -22,10 +22,10 @@
   },
   "dependencies": {
     "coap": "~0.21.0",
-    "connect-redis": "~3.2.0",
+    "connect-redis": "~3.3.0",
     "cookie-parser": "~1.4.3",
     "csv.js": "~1.0.2",
-    "express-session": "~1.15.2",
+    "express-session": "~1.15.3",
     "keysort": "~1.0.2",
     "lusca": "~1.4.1",
     "passport": "~0.3.2",
@@ -45,8 +45,8 @@
     "tiny-merge": "~1.0.0",
     "tiny-uuid4": "~1.0.1",
     "tiny-xml": "~1.0.6",
-    "turtle.io": "~7.5.16",
-    "uws": "~0.14.1",
+    "turtle.io": "~7.5.17",
+    "uws": "~0.14.5",
     "yamljs": "~0.2.10"
   },
   "devDependencies": {
@@ -60,7 +60,7 @@
     "grunt-nsp": "~2.3.1",
     "jsonwebtoken": "~7.3.0",
     "mocha": "~3.2.0",
-    "tiny-httptest": "~1.0.7"
+    "tiny-httptest": "~1.0.8"
   },
   "keywords": [
     "REST",

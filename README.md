@@ -127,6 +127,8 @@ Sessions are used for non `Basic` or `Bearer Token` authentication, and will hav
 
 Multiple authentication strategies can be enabled at once.
 
+Authentication attempts have a random delay to deal with "timing attacks"; always rate limit in production environment!
+
 ### Basic Auth
 ```
 {

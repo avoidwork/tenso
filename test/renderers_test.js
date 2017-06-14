@@ -75,6 +75,14 @@ describe("Renderers", function () {
 			.end();
 	});
 
+	it("GET HTML (body)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/html?format=text/html"})
+			.expectStatus(200)
+			.expectHeader("content-type", "text/html")
+			.expectBody(/^([^](?!<\/html>))*[^]<\/html>[\n\r\s]*$/gi)
+			.end();
+	});
+
 	it("GET YAML (header)", function () {
 		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "application/yaml"}})
 			.expectStatus(200)

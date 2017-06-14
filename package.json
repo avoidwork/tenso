@@ -25,6 +25,7 @@
     "connect-redis": "~3.3.0",
     "cookie-parser": "~1.4.3",
     "csv.js": "~1.0.2",
+    "escape-html": "^1.0.3",
     "express-session": "~1.15.3",
     "keysort": "~1.0.2",
     "lusca": "~1.4.1",

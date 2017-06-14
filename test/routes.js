@@ -28,6 +28,9 @@ module.exports.get = {
 		14,
 		15
 	],
+	"/html": [
+		"</body></html>"
+	],
 	"/test": "Get to the chopper!",
 	"/test/:hidden": function (req, res) {
 		res.send(req.params.hidden);

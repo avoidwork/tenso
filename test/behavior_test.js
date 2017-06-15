@@ -132,7 +132,7 @@ describe("Hypermedia", function () {
 				uri: "/",
 				rel: "collection"
 			}])
-			.expectValue("data", [{id: 1, name: "thing 1", user_id: 1}, {
+			.expectValue("data", [{id: 1, name: "thing 1", user_id: 1, welcome: "<h1>blahblah</h1>"}, {
 				id: 2,
 				name: "thing 2",
 				user_id: 1
@@ -368,7 +368,8 @@ describe("Sorting", function () {
 				{
 					"id": 1,
 					"name": "thing 1",
-					"user_id": 1
+					"user_id": 1,
+					"welcome": "<h1>blahblah</h1>"
 				},
 				{
 					"id": 3,

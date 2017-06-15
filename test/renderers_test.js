@@ -69,9 +69,10 @@ describe("Renderers", function () {
 	});
 
 	it("GET HTML (query string)", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/?format=text/html"})
+		return tinyhttptest({url: "http://localhost:" + port + "/things?format=text/html"})
 			.expectStatus(200)
 			.expectHeader("content-type", "text/html")
+			.expectBody(/&lt;h1&gt;blahblah&lt;\/h1&gt;/)
 			.end();
 	});
 

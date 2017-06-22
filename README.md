@@ -79,7 +79,7 @@ Tensō will bend the rules of REST when using authentication strategies provided
 ## Browsable API / Renderers
 Tensō 1.4.0 added a few common format renderers, such as CSV, HTML, YAML, & XML. The HTML interface is a browsable API! You can use it to verify requests & responses, or simply poke around your API to see how it behaves.
 
-Custom renderers can be registered with `server.renderer('name', fn, 'mimetype');`.
+Custom renderers can be registered with `server.renderer('mimetype', fn);`.
 
 ## Cache
 ETags are built in! Caching can be disabled by setting the `cache-control` header to a "private" or "no cache" directive (see the above `/uuid` example).

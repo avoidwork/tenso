@@ -76,10 +76,10 @@ For example, if the key `user_id` was found, it would be mapped to `/users/:id` 
 
 Tensō will bend the rules of REST when using authentication strategies provided by passport.js, or CSRF if is enabled, because they rely on a session. Session storage is in memory, or Redis. You have the option of a stateless or stateful API.
 
-## Browsable API / Renderers
+## Browsable API / Renderers / Serializers
 Tensō 1.4.0 added a few common format renderers, such as CSV, HTML, YAML, & XML. The HTML interface is a browsable API! You can use it to verify requests & responses, or simply poke around your API to see how it behaves.
 
-Custom renderers can be registered with `server.renderer('mimetype', fn);`.
+Custom renderers can be registered with `server.renderer('mimetype', fn);`, and custom serializes can be registered with `server.serializer('mimetype', fn);`.
 
 ## Cache
 ETags are built in! Caching can be disabled by setting the `cache-control` header to a "private" or "no cache" directive (see the above `/uuid` example).

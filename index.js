@@ -48,10 +48,8 @@ function factory (arg) {
 	config.version = pkg.version;
 	obj = tenso(config);
 	obj.hostname = hostname;
-	utility.bootstrap(obj, config);
-	obj.server.start(config);
 
-	return obj;
+	return utility.bootstrap(obj, config);
 }
 
 module.exports = factory;

@@ -29,4 +29,4 @@ require("./index.js")({
 	headers: {
 		"cache-control": "no-cache"
 	}
-});
+}).start();

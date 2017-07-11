@@ -50,7 +50,7 @@ function factory (arg) {
 	utility.merge(obj.config, config);
 	obj.hostname = hostname;
 
-	return utility.bootstrap(obj, config);
+	return utility.bootstrap(obj, config).start();
 }
 
 module.exports = factory;

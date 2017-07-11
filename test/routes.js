@@ -73,13 +73,13 @@ module.exports.get = {
 		lastName: "Mulligan"
 	},
 	"/uuid": function (req, res) {
-		this.respond(req, res, uuid());
+		res.send(uuid());
 	}
 };
 
 module.exports.post = {
 	"/test": function (req, res) {
-		this.respond(req, res, "OK!");
+		res.send("OK!");
 	}
 };
 

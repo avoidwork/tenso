@@ -7,13 +7,10 @@ process.setMaxListeners(0);
 
 describe("Renderers", function () {
 	const port = 8011;
-	let server;
 
 	this.timeout(timeout);
-	server = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
-	server.renderer("custom", function (arg) {
-		return arg;
-	}, "application/json");
+	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+	this.tenso.renderer("custom", arg => arg, "application/json");
 
 	it("GET CSV (header)", function () {
 		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "text/csv"}})

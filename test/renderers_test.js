@@ -61,14 +61,14 @@ describe("Renderers", function () {
 	it("GET HTML (header)", function () {
 		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "text/html"}})
 			.expectStatus(200)
-			.expectHeader("content-type", "text/html")
+			.expectHeader("content-type", /text\/html/)
 			.end();
 	});
 
 	it("GET HTML (query string)", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/things?format=text/html"})
 			.expectStatus(200)
-			.expectHeader("content-type", "text/html")
+			.expectHeader("content-type", /text\/html/)
 			.expectBody(/&lt;h1&gt;blahblah&lt;\/h1&gt;/)
 			.end();
 	});

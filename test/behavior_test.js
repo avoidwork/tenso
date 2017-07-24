@@ -422,14 +422,14 @@ describe("Invalid Ranges", function () {
 	it("GET / (416 / 'Partial response - invalid')", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/", headers: {range: "a-b"}})
 			.expectStatus(416)
-			.expectBody(/Range Not Satisfiable/)
+			.expectValue("error", "Range Not Satisfiable")
 			.end();
 	});
 
 	it("GET / (416 / 'Partial response - invalid #2')", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/", headers: {range: "5-0"}})
 			.expectStatus(416)
-			.expectBody(/Range Not Satisfiable/)
+			.expectValue("error", "Range Not Satisfiable")
 			.end();
 	});
 });

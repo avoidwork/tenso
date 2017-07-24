@@ -412,24 +412,3 @@ describe("Sorting", function () {
 			.end();
 	});
 });
-
-describe("Invalid Ranges", function () {
-	const port = 8020;
-
-	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
-
-	it("GET / (416 / 'Partial response - invalid')", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/", headers: {range: "a-b"}})
-			.expectStatus(416)
-			.expectValue("error", "Range Not Satisfiable")
-			.end();
-	});
-
-	it("GET / (416 / 'Partial response - invalid #2')", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/", headers: {range: "5-0"}})
-			.expectStatus(416)
-			.expectValue("error", "Range Not Satisfiable")
-			.end();
-	});
-});

@@ -9,34 +9,19 @@ describe("Valid", function () {
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
 
-	it("GET / (200 / 'Hello World!')", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/"})
-			.etags()
-			.expectStatus(200)
-			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("transfer-encoding", "chunked")
-			.expectHeader("content-length", undefined)
-			.expectBody(/Hello world!/)
-			.end();
-	});
-
-	it("GET / (200 / 'Hello World!' - gzip)", function () {
+	it("GET / (200 / 'Array' - gzip)", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/", headers: {"accept-encoding": "gzip"}})
 			.expectStatus(200)
 			.expectHeader("content-encoding", "gzip")
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("transfer-encoding", "chunked")
-			.expectHeader("content-length", undefined)
 			.end();
 	});
 
-	it("GET / (200 / 'Hello World!' - deflate)", function () {
+	it("GET / (200 / 'Array' - deflate)", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/", headers: {"accept-encoding": "deflate"}})
 			.expectStatus(200)
 			.expectHeader("content-encoding", "deflate")
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("transfer-encoding", "chunked")
-			.expectHeader("content-length", undefined)
 			.end();
 	});
 
@@ -44,7 +29,7 @@ describe("Valid", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/", method: "head"})
 			.expectStatus(200)
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("content-length", /53|58/) // macOS & Windows size on disk
+			.expectHeader("content-length", 320)
 			.expectBody(/^$/)
 			.end();
 	});
@@ -53,7 +38,7 @@ describe("Valid", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/", method: "options"})
 			.expectStatus(200)
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("content-length", 0)
+			.expectHeader("content-length", 48)
 			.expectBody(/^$/)
 			.end();
 	});
@@ -71,7 +56,6 @@ describe("Valid", function () {
 	it("GET / (206 / 'Partial response - 0 offset - bytes')", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/", headers: {range: "bytes=0-5"}})
 			.expectStatus(206)
-			.expectHeader("transfer-encoding", "chunked")
 			.expectHeader("content-range", /^bytes 0-5\/5(3|8)$/)
 			.expectHeader("content-length", undefined)
 			.expectBody(/^\<html>$/)
@@ -81,7 +65,6 @@ describe("Valid", function () {
 	it("GET / (206 / 'Partial response - 0 offset')", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/", headers: {range: "0-5"}})
 			.expectStatus(206)
-			.expectHeader("transfer-encoding", "chunked")
 			.expectHeader("content-range", /^bytes 0-5\/5(3|8)$/)
 			.expectHeader("content-length", undefined)
 			.expectBody(/^\<html>$/)
@@ -91,7 +74,6 @@ describe("Valid", function () {
 	it("GET / (206 / 'Partial response - offset')", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/", headers: {range: "2-4"}})
 			.expectStatus(206)
-			.expectHeader("transfer-encoding", "chunked")
 			.expectHeader("content-range", /^bytes 2-4\/5(3|8)$/)
 			.expectHeader("content-length", undefined)
 			.expectBody(/^tml$/)

@@ -60,7 +60,7 @@ describe("Valid", function () {
 			.expectStatus(206)
 			.expectHeader("content-range", /^bytes 0-5\/290$/)
 			.expectHeader("content-length", undefined)
-			.expectBody(/^\<html>$/)
+			.expectBody(/^{"data$/)
 			.end();
 	});
 

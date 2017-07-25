@@ -55,7 +55,7 @@ describe("Valid", function () {
 			.end();
 	});
 
-	it("GET / (206 / 'Partial response - 0 offset - bytes')", function () {
+	it("GET / (206 / 'Partial response - bytes=0-5')", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/", headers: {range: "bytes=0-5"}})
 			.expectStatus(206)
 			.expectHeader("content-range", /^bytes 0-5\/290$/)
@@ -64,21 +64,12 @@ describe("Valid", function () {
 			.end();
 	});
 
-	it("GET / (206 / 'Partial response - 0 offset')", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/", headers: {range: "0-5"}})
+	it("GET / (206 / 'Partial response - bytes=-5')", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/", headers: {range: "bytes=-5"}})
 			.expectStatus(206)
-			.expectHeader("content-range", /^bytes 0-5\/290$/)
+			.expectHeader("content-range", /^bytes 285-290\/290$/)
 			.expectHeader("content-length", undefined)
-			.expectBody(/^{"data$/)
-			.end();
-	});
-
-	it("GET / (206 / 'Partial response - offset')", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/", headers: {range: "2-4"}})
-			.expectStatus(206)
-			.expectHeader("content-range", /^bytes 2-4\/290$/)
-			.expectHeader("content-length", undefined)
-			.expectBody(/^dat$/)
+			.expectBody(/^:200}$/)
 			.end();
 	});
 });

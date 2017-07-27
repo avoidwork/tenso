@@ -9,6 +9,13 @@ describe("Valid", function () {
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
 
+	it("GET / (200 / 'Array' - ETag capture)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/"})
+			.etags()
+			.expectStatus(200)
+			.end();
+	});
+
 	it("GET / (200 / 'Array' - gzip)", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/", headers: {"accept-encoding": "gzip"}})
 			.expectStatus(200)
@@ -45,7 +52,7 @@ describe("Valid", function () {
 			.end();
 	});
 
-	it("GET / (304 / empty)", function () {
+	it("GET / (304 / empty - ETag reuse)", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/"})
 			.etags()
 			.expectStatus(304)

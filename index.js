@@ -38,20 +38,14 @@ function factory (arg) {
 		config.routes.get = {};
 	}
 
-	config.routes.get[config.static] = (req, res) => {
-		res.header("cache-control", "public, max-age=" + (config.staticCache || 300));
-		req.server.static(req, res);
-	};
-
 	config.root = path.resolve(config.root);
 	config.template = fs.readFileSync(config.template || path.join(config.root, "template.html"), {encoding: "utf8"});
 	config.version = pkg.version;
-	obj = tenso(config);
+	obj = tenso();
+	utility.merge(obj.config, config);
 	obj.hostname = hostname;
-	utility.bootstrap(obj, config);
-	obj.server.start(config);
 
-	return obj;
+	return utility.bootstrap(obj, config).start();
 }
 
 module.exports = factory;

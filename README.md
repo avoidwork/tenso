@@ -20,22 +20,18 @@ require("tenso")({routes: require(__dirname+"/routes.js")});
 ### Creating Routes
 Routes are loaded as a module, with each HTTP method as an export, affording a very customizable API server.
 
-Route handlers have the context of the Tensō server, i.e. `this` will allow you to send a response with `this.respond(req, res, body[, status, headers])`. You can also use `res` to `res.respond(body[, status, headers])`, `res.redirect(url)`, or `res.error(status[, Error])`. 
+You can use `res` to `res.send(body[, status, headers])`, `res.redirect(url)`, or `res.error(status[, Error])`. 
 
 The following example will create GET routes that will return an `Array` at `/`, an `Error` at `/reports/tps`, & a version 4 UUID at `/uuid`.
 
 ```javascript
-var uuid = require("tiny-uuid4");
+const uuid = require("tiny-uuid4");
 
 module.exports.get = {
 	"/": ["reports", "uuid"],
 	"/reports": ["tps"],
-	"/reports/tps": function (req, res) {
-		res.error(785, Error("TPS Cover Sheet not attached"));
-	},
-	"/uuid": function (req, res) {
-		res.send(uuid(), 200, {"cache-control": "no-cache"});
-	}
+	"/reports/tps": (req, res) => res.error(785, Error("TPS Cover Sheet not attached")),
+	"/uuid": (req, res) => res.send(uuid(), 200, {"cache-control": "no-cache"})
 };
 ```
 

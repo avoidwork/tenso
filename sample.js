@@ -25,8 +25,5 @@ require("./index.js")({
 	},
 	security: {
 		csrf: true
-	},
-	headers: {
-		"cache-control": "no-cache"
 	}
 });

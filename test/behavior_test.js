@@ -7,7 +7,7 @@ describe("Pagination", function () {
 	const port = 8002;
 
 	this.timeout(timeout);
-	tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
 
 	it("GET /empty - returns an empty array", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/empty"})
@@ -123,7 +123,7 @@ describe("Hypermedia", function () {
 	const port = 8003;
 
 	this.timeout(timeout);
-	tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
 
 	it("GET /things - returns a collection of representations that has hypermedia properties", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/things"})
@@ -179,7 +179,7 @@ describe("Rate Limiting", function () {
 	const port = 8007;
 
 	this.timeout(timeout);
-	tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}, rate: {enabled: true, limit: 2, reset: 900}});
+	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}, rate: {enabled: true, limit: 2, reset: 900}});
 
 	it("GET / - returns an array of endpoints (1/2)", function () {
 		return tinyhttptest({url: "http://localhost:" + port})
@@ -233,7 +233,7 @@ describe("Rate Limiting (Override)", function () {
 	let i = 1;
 
 	this.timeout(timeout);
-	tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}, rate: {
+	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}, rate: {
 		enabled: true,
 		limit: 2,
 		reset: 900,
@@ -288,7 +288,7 @@ describe("Request body max byte size", function () {
 	const port = 8008;
 
 	this.timeout(timeout);
-	tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}, maxBytes: 10});
+	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}, maxBytes: 10});
 
 	it("POST /test - returns an a result", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/test", method: "post"})
@@ -316,7 +316,7 @@ describe("Route parameters", function () {
 	const port = 8010;
 
 	this.timeout(timeout);
-	tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
 
 	it("GET /test/hidden - returns an a 'hidden' result", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/test/hidden"})
@@ -333,7 +333,7 @@ describe("CORS", function () {
 	const port = 8013;
 
 	this.timeout(timeout);
-	tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
 
 	it("OPTIONS /empty - returns an empty array", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/empty", method: "options"})
@@ -354,7 +354,7 @@ describe("Sorting", function () {
 	const port = 8014;
 
 	this.timeout(timeout);
-	tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
 
 	it("GET /things?order_by=user_id%20asc&order_by=name%20desc - returns a sorted array of objects", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/things?order_by=user_id%20asc&order_by=name%20desc"})

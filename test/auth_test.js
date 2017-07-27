@@ -11,7 +11,7 @@ describe("Permissions (CSRF disabled)", function () {
 	const port = 8001;
 
 	this.timeout(timeout);
-	tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
 
 	it("GET / - returns an array of endpoints", function () {
 		return tinyhttptest({url: "http://localhost:" + port})
@@ -85,7 +85,7 @@ describe("Basic Auth", function () {
 	const port = 8004;
 
 	this.timeout(timeout);
-	tenso({port: port, routes: routes, logging: {level: "error"}, auth: {basic: {enabled: true, list: ["test:123"]}, protect: ["/uuid"]}});
+	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, auth: {basic: {enabled: true, list: ["test:123"]}, protect: ["/uuid"]}});
 
 	it("GET / - returns links", function () {
 		return tinyhttptest({url: "http://localhost:" + port})
@@ -124,7 +124,7 @@ describe("OAuth2 Token Bearer", function () {
 	const port = 8005;
 
 	this.timeout(timeout);
-	tenso({port: port, routes: routes, logging: {level: "error"}, auth: {bearer: {enabled: true, tokens: ["abc-123"]}, protect: ["/"]}});
+	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, auth: {bearer: {enabled: true, tokens: ["abc-123"]}, protect: ["/"]}});
 
 	it("GET / - returns an array of endpoints (authorized)", function () {
 		return tinyhttptest({url: "http://test:123@localhost:" + port, headers: {authorization: "Bearer abc-123"}})
@@ -155,7 +155,7 @@ describe("Local", function () {
 		invalid = 1234;
 
 	this.timeout(timeout);
-	tenso({port: port, routes: routes, logging: {level: "error"}, auth: {
+	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, auth: {
 		local: {
 			enabled: true,
 			auth: function (username, password, callback) {
@@ -242,7 +242,7 @@ describe("JWT", function () {
 		token = jwt.sign({username: "jason@attack.io"}, secret);
 
 	this.timeout(timeout);
-	tenso({port: port, routes: routes, logging: {level: "error"}, auth: {
+	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, auth: {
 		jwt: {
 			enabled: true,
 			auth: function (arg, cb) {

@@ -42,7 +42,7 @@ function factory (arg) {
 	config.template = fs.readFileSync(config.template || path.join(config.root, "template.html"), {encoding: "utf8"});
 	config.version = pkg.version;
 	obj = tenso();
-	utility.merge(obj.config, config);
+	merge(obj.config, config);
 	obj.hostname = hostname;
 
 	return utility.bootstrap(obj, config).start();

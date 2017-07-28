@@ -1,4 +1,5 @@
 const tinyhttptest = require("tiny-httptest"),
+	csv = require("csv.js"),
 	tenso = require("../index"),
 	routes = require("./routes.js"),
 	timeout = 5000;
@@ -16,6 +17,8 @@ describe("Renderers", function () {
 		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "text/csv"}})
 			.expectStatus(200)
 			.expectHeader("content-type", "text/csv")
+			.expectHeader("content-disposition", "attachment; filename=\"download.csv\"")
+			.expectBody(arg => csv.decode(arg) instanceof Object)
 			.end();
 	});
 
@@ -23,6 +26,8 @@ describe("Renderers", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/?format=text/csv"})
 			.expectStatus(200)
 			.expectHeader("content-type", "text/csv")
+			.expectHeader("content-disposition", "attachment; filename=\"download.csv\"")
+			.expectBody(arg => csv.decode(arg) instanceof Object)
 			.end();
 	});
 

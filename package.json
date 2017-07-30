@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tensō is an elastic REST API gateway for node.js",
-  "version": "5.0.2",
+  "version": "5.0.3",
   "homepage": "http://avoidwork.github.io/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -48,7 +48,7 @@
     "tiny-merge": "~1.0.0",
     "tiny-uuid4": "~1.0.1",
     "tiny-xml": "~1.0.6",
-    "uws": "~0.14.5",
+    "uws": "^8.14.0",
     "woodland": "^2.1.0",
     "yamljs": "~0.2.10"
   },

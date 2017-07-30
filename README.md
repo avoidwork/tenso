@@ -390,10 +390,24 @@ Standard log levels are supported, and are emitted to `stdout` & `stderr`. Stack
 ## WebSocket
 A companion WebSocket server can be enabled by configuration, with event handlers (`connection`, `message`, & `close`) set as a `socket` route.
 
-Parameters for `message` are `socket, message, binary, server, tenso`, and `socket, server, tenso` for `connection` & `close`.
+Parameter(s) for `connection` is `socket`, for `message` is `message, socket`, & `close` has no parameters.
 
-Server options can be found [here](https://github.com/alexhultman/node-lws#new-lwsserveroptions)
+```
+"routes": {
+    "socket": {
+        "connection": ws => {
+            console.log("connection");
+            ws.send("a text message");
+            ws.send(new Buffer("a binary message"));
+        },
+        "message": (message, ws) => {
+            ws.send("You sent me this: \"" + message + "\"");
+        },
+        "close": () => console.log("closed")
+    }
+}
 
+Server options:
 ```
 {
     "websocket": {

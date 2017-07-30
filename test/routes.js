@@ -84,18 +84,16 @@ module.exports.post = {
 };
 
 module.exports.socket = {
-	connection: function (socket, server) {
-		console.log("[Connection]");
-		server.send(socket, new Buffer("a text message"), false);
-		server.send(socket, new Buffer("a binary message"), true);
-		server.setUserData(socket, "persistent per socket data");
-	},
-	message: function (socket, message, binary, server) {
-		console.log("[Message: " + message + "]");
-		server.send(socket, new Buffer("You sent me this: \"" + message + "\""), false);
-	},
 	close: function () {
-		console.log("[Closed connection]");
+		console.log("closed");
+	},
+	connection: function (ws) {
+		ws.send("a text message");
+		ws.send(new Buffer("a binary message"));
+	},
+	message: function (message, ws) {
+		console.log("message: " + message);
+		ws.send(new Buffer("You sent me this: \"" + message + "\""), false);
 	}
 };
 

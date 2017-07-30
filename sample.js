@@ -2,7 +2,7 @@ require("./index.js")({
 	port: 8000,
 	routes: require("./test/routes.js"),
 	logging: {
-		level: "info"
+		level: "debug"
 	},
 	auth: {
 		local: {
@@ -25,5 +25,11 @@ require("./index.js")({
 	},
 	security: {
 		csrf: true
+	},
+	websocket: {
+		enabled: true,
+		options: {
+			port: 8001
+		}
 	}
 });

@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tensō is an elastic REST API gateway for node.js",
-  "version": "5.0.6",
+  "version": "5.1.0",
   "homepage": "http://avoidwork.github.io/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -39,6 +39,7 @@
     "passport-local": "~1.0.0",
     "passport-oauth2": "~1.3.0",
     "passport-saml": "~0.15.0",
+    "passport-slack": "0.0.7",
     "passport-twitter": "~1.0.4",
     "precise": "^1.1.0",
     "retsu": "~2.0.3",

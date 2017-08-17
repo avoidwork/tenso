@@ -23,6 +23,7 @@
 		},
 		"jwt": {
 			"enabled": false,
+			"auth": null,
 			"audience": "",
 			"algorithms": ["HS256", "HS384", "HS512"],
 			"ignoreExpiration": false,
@@ -52,6 +53,12 @@
 		"saml": {
 			"enabled": false,
 			"auth": null
+		},
+		"slack": {
+			"enabled": false,
+			"auth": null,
+			"client_id": "",
+			"client_secret": ""
 		},
 		"twitter": {
 			"enabled": false,

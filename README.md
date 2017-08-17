@@ -258,6 +258,23 @@ OAuth2 authentication will create `/auth`, `/auth/oauth2`, & `/auth/oauth2/callb
 }
 ```
 
+### Slack
+Slack authentication will create `/auth`, `/auth/slack`, & `/auth/slack/callback` routes. `auth(accessToken, refreshToken, profile, callback)` must execute `callback(err, user)`.
+
+```
+{
+	"auth": {
+		"slack": {
+			"enabled": true,
+			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
+			"client_id": "", /* Get this from Slack */
+			"client_secret": "" /* Get this from Slack */
+		},
+		"protect": ["/private"]
+	}
+}
+```
+
 ### SAML
 SAML authentication will create `/auth`, `/auth/saml`, & `/auth/saml/callback` routes. `auth(profile, callback)` must execute `callback(err, user)`.
 

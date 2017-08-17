@@ -64,9 +64,10 @@ describe("Renderers", function () {
 	});
 
 	it("GET HTML (header)", function () {
-		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "text/html"}})
+		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"}})
 			.expectStatus(200)
 			.expectHeader("content-type", /text\/html/)
+			.expectBody(/<!DOCTYPE/)
 			.end();
 	});
 

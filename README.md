@@ -423,6 +423,7 @@ Parameter(s) for `connection` is `socket`, for `message` is `message, socket`, &
         "close": () => console.log("closed")
     }
 }
+```
 
 Server options:
 ```

@@ -259,7 +259,7 @@ OAuth2 authentication will create `/auth`, `/auth/oauth2`, & `/auth/oauth2/callb
 ```
 
 ### Slack
-Slack authentication will create `/auth`, `/auth/slack`, & `/auth/slack/callback` routes. `auth(accessToken, scopes, team, { bot, incomingWebhook }, { user: userProfile , team: teamProfile }, callback)` must execute `callback(err, user)`. Default scopes are `["identity.basic", "identity.email", "identity.team", "identity.avatar"]`.
+Slack authentication will create `/auth`, `/auth/slack`, & `/auth/slack/callback` routes. `auth(accessToken, refreshToken, profile, callback)` must execute `callback(err, user)`.
 
 ```
 {
@@ -270,6 +270,7 @@ Slack authentication will create `/auth`, `/auth/slack`, & `/auth/slack/callback
 			"client_id": "", /* Get this from Slack */
 			"client_secret": "", /* Get this from Slack */
 			"scope": [], /* Custom scopes */
+			"skipUserProfile": false /* Gets User profile if false, requires identity scope */
 		},
 		"protect": ["/private"]
 	}

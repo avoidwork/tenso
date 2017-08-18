@@ -59,6 +59,7 @@
 			"auth": null,
 			"client_id": "",
 			"client_secret": "",
+			"skipUserProfile": false,
 			"scope": []
 		},
 		"twitter": {

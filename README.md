@@ -268,7 +268,9 @@ Slack authentication will create `/auth`, `/auth/slack`, & `/auth/slack/callback
 			"enabled": true,
 			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
 			"client_id": "", /* Get this from Slack */
-			"client_secret": "" /* Get this from Slack */
+			"client_secret": "", /* Get this from Slack */
+			"scope": [], /* Custom scopes */
+			"skipUserProfile": false /* Gets User profile if false, requires identity scope */
 		},
 		"protect": ["/private"]
 	}

@@ -58,7 +58,8 @@
 			"enabled": false,
 			"auth": null,
 			"client_id": "",
-			"client_secret": ""
+			"client_secret": "",
+			"scope": []
 		},
 		"twitter": {
 			"enabled": false,

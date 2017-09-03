@@ -111,6 +111,7 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 		"cert": null,
 		"key": null
 	},
+	"renderHeaders": true, /* false will disable headers in HTML interface */
 	"title": "My API", /* Page title for browsable API */
 	"uid": 33 /* Optional, system account uid to drop to after starting with elevated privileges to run on a low port */
 }

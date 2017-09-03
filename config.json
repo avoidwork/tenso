@@ -146,5 +146,6 @@
 		"id": "^(_id|id)$"
 	},
 	"static": "/assets/.*",
-	"staticCache": 300
+	"staticCache": 300,
+	"renderHeaders": true
 }

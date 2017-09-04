@@ -43,7 +43,7 @@ function factory (arg) {
 		config.headers = {};
 	}
 
-	config.headers.server = String.raw`tenso/${pkg.version}`;
+	config.headers.server = `tenso/${pkg.version}`;
 	config.root = path.resolve(config.root);
 	config.template = fs.readFileSync(config.template || path.join(config.root, "template.html"), {encoding: "utf8"});
 	config.version = pkg.version;

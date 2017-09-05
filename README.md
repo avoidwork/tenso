@@ -482,6 +482,13 @@ The browsable template assets have a default `public` cache of `300` seconds (5 
 }
 ```
 
+## Custom static routes
+Custom static routes can be defined like such:
+
+```
+   "/other": (req, res) => req.server.static(req, res);
+```
+
 ## License
 Copyright (c) 2017 Jason Mulligan
 Licensed under the BSD-3-Clause license.

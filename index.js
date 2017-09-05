@@ -12,9 +12,8 @@ const fs = require("fs"),
 function factory (arg) {
 	const hostname = arg ? arg.hostname || "localhost" : "localhost",
 		hosts = {},
-		config = arg ? merge(utility.clone(cfg), arg) : utility.clone(cfg);
-
-	let obj;
+		config = arg ? merge(utility.clone(cfg), arg) : utility.clone(cfg),
+		obj = tenso();
 
 	if (isNaN(config.port) === true || config.port < 1) {
 		console.error("Invalid configuration");
@@ -47,7 +46,6 @@ function factory (arg) {
 	config.root = path.resolve(config.root);
 	config.template = fs.readFileSync(config.template || path.join(config.root, "template.html"), {encoding: "utf8"});
 	config.version = pkg.version;
-	obj = tenso();
 	merge(obj.config, config);
 	obj.hostname = hostname;
 

@@ -16,7 +16,7 @@ function factory (arg) {
 
 	let obj;
 
-	if (isNaN(config.port) || config.port < 1) {
+	if (isNaN(config.port) === true || config.port < 1) {
 		console.error("Invalid configuration");
 		process.exit(1);
 	}

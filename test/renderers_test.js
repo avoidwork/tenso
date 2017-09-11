@@ -11,7 +11,7 @@ describe("Renderers", function () {
 
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
-	this.tenso.renderer("custom", arg => arg, "application/json");
+	this.tenso.renderer("custom", arg => arg);
 
 	it("GET CSV (header)", function () {
 		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "text/csv"}})
@@ -116,6 +116,20 @@ describe("Renderers", function () {
 
 	it("GET Custom (query string)", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/?format=application/custom"})
+			.expectStatus(200)
+			.expectHeader("content-type", "application/json")
+			.end();
+	});
+
+	it("GET Plain Text (header)", function () {
+		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "text/plain"}})
+			.expectStatus(200)
+			.expectHeader("content-type", "application/json")
+			.end();
+	});
+
+	it("GET Plain Text (query string)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/?format=text/plain"})
 			.expectStatus(200)
 			.expectHeader("content-type", "application/json")
 			.end();

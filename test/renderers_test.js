@@ -31,6 +31,12 @@ describe("Renderers", function () {
 			.end();
 	});
 
+	it("GET CSV (invalid)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/abc/?format=text/csv"})
+			.expectStatus(404)
+			.end();
+	});
+
 	it("GET JSONP (header)", function () {
 		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "application/javascript"}})
 			.expectStatus(200)
@@ -44,6 +50,12 @@ describe("Renderers", function () {
 			.expectStatus(200)
 			.expectHeader("content-type", "application/javascript")
 			.expectBody(/^callback\(/)
+			.end();
+	});
+
+	it("GET JSONP (invalid)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/abc/?format=application/javascript"})
+			.expectStatus(404)
 			.end();
 	});
 
@@ -63,6 +75,12 @@ describe("Renderers", function () {
 			.end();
 	});
 
+	it("GET JSONP (invalid)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/abc/?format=application/javascript&callback=custom"})
+			.expectStatus(404)
+			.end();
+	});
+
 	it("GET HTML (header)", function () {
 		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"}})
 			.expectStatus(200)
@@ -76,6 +94,12 @@ describe("Renderers", function () {
 			.expectStatus(200)
 			.expectHeader("content-type", /text\/html/)
 			.expectBody(/&lt;h1&gt;blahblah&lt;\/h1&gt;/)
+			.end();
+	});
+
+	it("GET HTML (invalid)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/abc/?format=text/html"})
+			.expectStatus(404)
 			.end();
 	});
 
@@ -93,6 +117,12 @@ describe("Renderers", function () {
 			.end();
 	});
 
+	it("GET YAML (invalid)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/abc/?format=application/yaml"})
+			.expectStatus(404)
+			.end();
+	});
+
 	it("GET XML (header)", function () {
 		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "application/xml"}})
 			.expectStatus(200)
@@ -104,6 +134,12 @@ describe("Renderers", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/?format=application/xml"})
 			.expectStatus(200)
 			.expectHeader("content-type", "application/xml")
+			.end();
+	});
+
+	it("GET XML (invalid)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/abc/?format=application/xml"})
+			.expectStatus(404)
 			.end();
 	});
 
@@ -121,6 +157,12 @@ describe("Renderers", function () {
 			.end();
 	});
 
+	it("GET Custom (invalid)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/abc/?format=application/custom"})
+			.expectStatus(404)
+			.end();
+	});
+
 	it("GET Plain Text (header)", function () {
 		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "text/plain"}})
 			.expectStatus(200)
@@ -132,6 +174,12 @@ describe("Renderers", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/?format=text/plain"})
 			.expectStatus(200)
 			.expectHeader("content-type", "application/json")
+			.end();
+	});
+
+	it("GET Plain Text (invalid)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/abc/?format=text/plain"})
+			.expectStatus(404)
 			.end();
 	});
 });

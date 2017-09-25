@@ -5,12 +5,6 @@
     "es6": true,
     "amd": false
   },
-  "ecmaFeatures": {
-    "jsx": false,
-    "superInFunctions": false,
-    "classes": false,
-    "modules": [2]
-  },
   "globals": {
     "describe": true,
     "it": true,

@@ -338,7 +338,6 @@ describe("CORS", function () {
 	it("OPTIONS /empty - returns an empty array", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/empty", method: "options"})
 			.cors("http://not.localhost")
-			.expectHeader("access-control-allow-credentials", "true")
 			.expectStatus(200)
 			.end();
 	});
@@ -346,7 +345,6 @@ describe("CORS", function () {
 	it("GET /empty - returns an empty array", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/empty"})
 			.cors("http://not.localhost")
-			.expectHeader("access-control-allow-credentials", "true")
 			.expectStatus(200)
 			.end();
 	});

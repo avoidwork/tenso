@@ -11,7 +11,6 @@ const fs = require("fs"),
 
 function factory (arg) {
 	const hostname = arg ? arg.hostname || "localhost" : "localhost",
-		hosts = {},
 		config = arg ? merge(utility.clone(cfg), arg) : utility.clone(cfg),
 		obj = tenso();
 
@@ -22,15 +21,6 @@ function factory (arg) {
 
 	if (config.root === void 0) {
 		config.root = root;
-	}
-
-	if (config.hosts === void 0) {
-		hosts[hostname] = "www";
-		config.hosts = hosts;
-	}
-
-	if (config.default === void 0) {
-		config.default = hostname;
 	}
 
 	if (config.routes.get === void 0) {

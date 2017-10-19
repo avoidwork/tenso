@@ -16,7 +16,7 @@ require("./index.js")({
 			}
 		},
 		jwt: {
-			enabled: true,
+			enabled: false,
 			auth: function (token, cb) {
 				cb(null, token);
 			},
@@ -24,10 +24,10 @@ require("./index.js")({
 		}
 	},
 	security: {
-		csrf: true
+		csrf: false
 	},
 	websocket: {
-		enabled: true,
+		enabled: false,
 		options: {
 			port: 8001
 		}

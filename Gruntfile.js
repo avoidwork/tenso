@@ -22,16 +22,8 @@ module.exports = function (grunt) {
 		},
 		watch: {
 			js: {
-				files: ["lib/*.js"],
-				tasks: "build"
-			},
-			pkg: {
-				files: "package.json",
-				tasks: "build"
-			},
-			readme: {
-				files: "README.md",
-				tasks: "build"
+				files: ["*.js", "lib/*.js"],
+				tasks: "default"
 			}
 		}
 	});

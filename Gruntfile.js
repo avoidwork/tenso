@@ -42,6 +42,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-contrib-watch");
 
 	// aliases
-	grunt.registerTask("test", ["eslint", "mochaTest", "nsp"]);
+	grunt.registerTask("mocha", ["mochaTest"]);
+	grunt.registerTask("test", ["eslint", "mocha", "nsp"]);
 	grunt.registerTask("default", ["test"]);
 };

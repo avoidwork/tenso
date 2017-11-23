@@ -3,7 +3,7 @@ Tensō
 
 [![build status](https://secure.travis-ci.org/avoidwork/tenso.svg)](http://travis-ci.org/avoidwork/tenso)
 
-Tensō is a REST API gateway for node.js, designed to simplify the implementation of APIs.
+Tensō is a REST API gateway for node.js, designed to simplify the implementation of APIs. HTTP2 is supported!
 
 Tensō will handle the serialization & creation of hypermedia links, all you have to do is give it `Arrays` or `Objects`.
 
@@ -91,6 +91,7 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 	"compress": false, /* Optional, enabled by default */
 	"headers": {}, /* Optional, custom headers */
 	"hostname": "localhost", /* Optional, default is 'localhost' */
+	"http2": false, /* Middleware signatures do not change, see woodland */
 	"json": 0, /* Optional, default indent for 'pretty' JSON */
 	"logging": {
 		"level": "info", /* Optional */

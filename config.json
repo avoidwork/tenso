@@ -1,4 +1,5 @@
 {
+	"address": "127.0.0.1",
 	"auth": {
 		"protect": [],
 		"unprotect": [],
@@ -25,7 +26,11 @@
 			"enabled": false,
 			"auth": null,
 			"audience": "",
-			"algorithms": ["HS256", "HS384", "HS512"],
+			"algorithms": [
+				"HS256",
+				"HS384",
+				"HS512"
+			],
 			"ignoreExpiration": false,
 			"issuer": "",
 			"scheme": "Bearer",
@@ -36,7 +41,10 @@
 			"auth": null,
 			"client_id": "",
 			"client_secret": "",
-			"scope": ["r_basicprofile", "r_emailaddress"]
+			"scope": [
+				"r_basicprofile",
+				"r_emailaddress"
+			]
 		},
 		"oauth2": {
 			"enabled": false,
@@ -69,16 +77,23 @@
 			"consumer_secret": ""
 		}
 	},
+	"coap": {
+		"enabled": false,
+		"options": {
+			"type": "udp4",
+			"port": 5683
+		}
+	},
+	"coerce": true,
+	"compress": true,
 	"etags": {
 		"ignore": []
 	},
-	"compress": true,
-	"coerce": true,
 	"headers": {
 		"cache-control": "max-age=60, must-revalidate"
 	},
-	"address": "127.0.0.1",
 	"hostname": "127.0.0.1",
+	"http2": false,
 	"index": [],
 	"json": 0,
 	"logging": {
@@ -86,6 +101,22 @@
 		"enabled": true,
 		"stack": false
 	},
+	"maxBytes": 1048576,
+	"port": 8000,
+	"rate": {
+		"enabled": false,
+		"limit": 450,
+		"reset": 900,
+		"status": 429,
+		"message": "Too many requests",
+		"override": null
+	},
+	"regex": {
+		"hypermedia": "[a-zA-Z]+_(guid|uuid|id|url|uri)$",
+		"id": "^(_id|id)$"
+	},
+	"renderHeaders": true,
+	"routes": {},
 	"security": {
 		"key": "x-csrf-token",
 		"secret": "tenso",
@@ -97,10 +128,7 @@
 		"xssProtection": true,
 		"nosniff": true
 	},
-	"maxBytes": 1048576,
-	"port": 8000,
-	"routes": {},
-	"session" : {
+	"session": {
 		"secret": null,
 		"store": "memory",
 		"redis": {
@@ -118,35 +146,15 @@
 		"key": null,
 		"cert": null
 	},
-	"rate": {
-		"enabled": false,
-		"limit": 450,
-		"reset": 900,
-		"status": 429,
-		"message": "Too many requests",
-		"override": null
-	},
+	"static": "/assets/.*",
+	"staticCache": 300,
+	"template": "",
+	"title": "Tensō",
 	"websocket": {
 		"enabled": false,
 		"options": {
 			"port": 3000,
 			"keepAliveInterval": 10000
 		}
-	},
-	"coap": {
-		"enabled": false,
-		"options": {
-			"type": "udp4",
-			"port": 5683
-		}
-	},
-	"title": "Tensō",
-	"template": "",
-	"regex": {
-		"hypermedia": "[a-zA-Z]+_(guid|uuid|id|url|uri)$",
-		"id": "^(_id|id)$"
-	},
-	"static": "/assets/.*",
-	"staticCache": 300,
-	"renderHeaders": true
+	}
 }

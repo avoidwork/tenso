@@ -73,7 +73,7 @@
 	}
 
 	function sanitize (arg = "") {
-		let tmp = typeof arg !== "string" ? JSON.stringify(arg) : arg;
+		let tmp = typeof arg !== "string" ? JSON.stringify(arg, null, 2) : arg;
 
 		return tmp.replace(/\</g, "&lt;").replace(/\>/g, "&gt;");
 	}

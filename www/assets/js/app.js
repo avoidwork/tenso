@@ -73,7 +73,7 @@
 	}
 
 	function sanitize() {
-		var arg = arguments.length > 0 && arguments[0] !== undefined ? typeof arguments[0] !== "string" ? JSON.stringify(arguments[0]) : arguments[0] : "";
+		var arg = arguments.length > 0 && arguments[0] !== undefined ? typeof arguments[0] !== "string" ? JSON.stringify(arguments[0], null, 2) : arguments[0] : "";
 
 		return arg.replace(/\</g, "&lt;").replace(/\>/g, "&gt;");
 	}

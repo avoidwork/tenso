@@ -18,7 +18,8 @@
     "node": ">=8.4.0"
   },
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "ssl": "mkdir ssl && openssl req -new -newkey rsa:2048 -subj \"/C=CA/ST=Ontario/L=Ottawa/O=CHANGEME/CN=localhost\" -days 365 -nodes -x509 -keyout ssl/localhost.key -out ssl/localhost.crt"
   },
   "dependencies": {
     "coap": "^0.21.0",

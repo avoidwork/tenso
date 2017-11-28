@@ -36,6 +36,6 @@ module.exports = function (grunt) {
 
 	// aliases
 	grunt.registerTask("mocha", ["mochaTest"]);
-	grunt.registerTask("test", ["eslint", "mocha", "nsp"]);
+	grunt.registerTask("test", ["eslint", "mocha"]);
 	grunt.registerTask("default", ["test"]);
 };

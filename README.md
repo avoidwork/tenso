@@ -47,6 +47,8 @@ The `/assets/*` route is reserved for the HTML browsable interface assets; pleas
 ### Request Helpers
 Tensō decorates `req` with "helpers" such as `req.ip`, & `req.parsed`. `PATCH`, `PUT`, & `POST` payloads are available as `req.body`. Sessions are available as `req.session` when using `local` authentication.
 
+Tensō decorates `res` with "helpers" such as `res.send()`, `res.status()`, & `res.json()`.
+
 ## Responses
 Responses will have a standard shape, and will be utf-8 by default. The result will be in `data`. Hypermedia (pagination & links) will be in `links:[ {"uri": "...", "rel": "..."}, ...]`, & also in the `Link` HTTP header.
 

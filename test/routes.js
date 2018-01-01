@@ -10,6 +10,7 @@ module.exports.get = {
 		"users",
 		"uuid"
 	],
+	"/null": null,
 	"/empty": [],
 	"/items(\/?)": [
 		1,

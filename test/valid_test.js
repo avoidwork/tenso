@@ -79,4 +79,14 @@ describe("Valid", function () {
 			.expectBody(/^:200}$/)
 			.end();
 	});
+
+	it("GET /null (200 / 'null')", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/null"})
+			.expectStatus(200)
+			.expectHeader("allow", "GET, HEAD, OPTIONS")
+			.expectValue("data", null)
+			.expectValue("error", null)
+			.expectValue("status", 200)
+			.end();
+	});
 });

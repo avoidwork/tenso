@@ -4,7 +4,7 @@ const path = require("path"),
 	routes = require("./routes.js"),
 	timeout = 5000;
 
-describe("Valid", function () {
+describe("Valid (HTTP2)", function () {
 	const port = 8071;
 
 	this.timeout(timeout);
@@ -17,22 +17,6 @@ describe("Valid", function () {
 		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/"})
 			.etags()
 			.expectStatus(200)
-			.end();
-	});
-
-	it("GET / (200 / 'Array' - gzip)", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/", headers: {"accept-encoding": "gzip"}})
-			.expectStatus(200)
-			.expectHeader("content-encoding", "gzip")
-			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.end();
-	});
-
-	it("GET / (200 / 'Array' - deflate)", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/", headers: {"accept-encoding": "deflate"}})
-			.expectStatus(200)
-			.expectHeader("content-encoding", "deflate")
-			.expectHeader("allow", "GET, HEAD, OPTIONS")
 			.end();
 	});
 

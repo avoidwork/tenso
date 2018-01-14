@@ -8,7 +8,7 @@ const path = require("path"),
 
 process.setMaxListeners(0);
 
-describe("Permissions (CSRF disabled)", function () {
+describe("Permissions (CSRF disabled) (HTTP2)", function () {
 	const port = 8051;
 
 	this.timeout(timeout);

@@ -5,7 +5,7 @@ const path = require("path"),
 	http = require("http"),
 	timeout = 5000;
 
-describe("Invalid", function () {
+describe("Invalid (HTTP2)", function () {
 	const port = 8060;
 
 	this.timeout(timeout);

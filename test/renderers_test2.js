@@ -7,7 +7,7 @@ const path = require("path"),
 
 process.setMaxListeners(0);
 
-describe("Renderers", function () {
+describe("Renderers (HTTP2)", function () {
 	const port = 8061;
 
 	this.timeout(timeout);

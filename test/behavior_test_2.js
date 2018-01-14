@@ -4,7 +4,7 @@ const path = require("path"),
 	routes = require("./routes.js"),
 	timeout = 5000;
 
-describe("Pagination", function () {
+describe("Pagination (HTTP2)", function () {
 	const port = 8052;
 
 	this.timeout(timeout);
@@ -123,11 +123,14 @@ describe("Pagination", function () {
 	});
 });
 
-describe("Hypermedia", function () {
-	const port = 8003;
+describe("Hypermedia (HTTP2)", function () {
+	const port = 8053;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+	this.tenso = tenso({port: port, http2: true, routes: routes, logging: {level: "error"}, security: {csrf: false}, ssl: {
+		key: path.join(__dirname, "..", "ssl", "localhost.key"),
+		cert: path.join(__dirname, "..", "ssl", "localhost.crt")
+	}});
 
 	it("GET /things - returns a collection of representations that has hypermedia properties", function () {
 		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/things"})
@@ -180,10 +183,13 @@ describe("Hypermedia", function () {
 });
 
 describe("Rate Limiting", function () {
-	const port = 8007;
+	const port = 8057;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}, rate: {enabled: true, limit: 2, reset: 900}});
+	this.tenso = tenso({port: port, http2: true, routes: routes, logging: {level: "error"}, security: {csrf: false}, rate: {enabled: true, limit: 2, reset: 900}, ssl: {
+		key: path.join(__dirname, "..", "ssl", "localhost.key"),
+		cert: path.join(__dirname, "..", "ssl", "localhost.crt")
+	}});
 
 	it("GET / - returns an array of endpoints (1/2)", function () {
 		return tinyhttptest({http2: true, url: "https://localhost:" + port})
@@ -233,11 +239,11 @@ describe("Rate Limiting", function () {
 });
 
 describe("Rate Limiting (Override)", function () {
-	const port = 8009;
+	const port = 8059;
 	let i = 1;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}, rate: {
+	this.tenso = tenso({port: port, http2: true, routes: routes, logging: {level: "error"}, security: {csrf: false}, rate: {
 		enabled: true,
 		limit: 2,
 		reset: 900,
@@ -249,6 +255,10 @@ describe("Rate Limiting (Override)", function () {
 
 			return rate;
 		}
+	},
+	ssl: {
+		key: path.join(__dirname, "..", "ssl", "localhost.key"),
+		cert: path.join(__dirname, "..", "ssl", "localhost.crt")
 	}});
 
 	it("GET / - returns an array of endpoints (1/2)", function () {
@@ -289,10 +299,13 @@ describe("Rate Limiting (Override)", function () {
 });
 
 describe("Request body max byte size", function () {
-	const port = 8008;
+	const port = 8058;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}, maxBytes: 10});
+	this.tenso = tenso({port: port, http2: true, routes: routes, logging: {level: "error"}, security: {csrf: false}, maxBytes: 10, ssl: {
+		key: path.join(__dirname, "..", "ssl", "localhost.key"),
+		cert: path.join(__dirname, "..", "ssl", "localhost.crt")
+	}});
 
 	it("POST /test - returns an a result", function () {
 		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/test", method: "post"})
@@ -317,10 +330,13 @@ describe("Request body max byte size", function () {
 });
 
 describe("Route parameters", function () {
-	const port = 8010;
+	const port = 8060;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+	this.tenso = tenso({port: port, http2: true, routes: routes, logging: {level: "error"}, security: {csrf: false}, ssl: {
+		key: path.join(__dirname, "..", "ssl", "localhost.key"),
+		cert: path.join(__dirname, "..", "ssl", "localhost.crt")
+	}});
 
 	it("GET /test/hidden - returns an a 'hidden' result", function () {
 		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/test/hidden"})
@@ -334,10 +350,13 @@ describe("Route parameters", function () {
 });
 
 describe("CORS", function () {
-	const port = 8013;
+	const port = 8063;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+	this.tenso = tenso({port: port, http2: true, routes: routes, logging: {level: "error"}, security: {csrf: false}, ssl: {
+		key: path.join(__dirname, "..", "ssl", "localhost.key"),
+		cert: path.join(__dirname, "..", "ssl", "localhost.crt")
+	}});
 
 	it("OPTIONS /empty - returns an empty array", function () {
 		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/empty", method: "options"})
@@ -355,10 +374,13 @@ describe("CORS", function () {
 });
 
 describe("Sorting", function () {
-	const port = 8014;
+	const port = 8064;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+	this.tenso = tenso({port: port, http2: true, routes: routes, logging: {level: "error"}, security: {csrf: false}, ssl: {
+		key: path.join(__dirname, "..", "ssl", "localhost.key"),
+		cert: path.join(__dirname, "..", "ssl", "localhost.crt")
+	}});
 
 	it("GET /things?order_by=user_id%20asc&order_by=name%20desc - returns a sorted array of objects", function () {
 		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/things?order_by=user_id%20asc&order_by=name%20desc"})

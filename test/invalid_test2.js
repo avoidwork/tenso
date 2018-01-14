@@ -6,7 +6,7 @@ const path = require("path"),
 	timeout = 5000;
 
 describe("Invalid (HTTP2)", function () {
-	const port = 8060;
+	const port = 8062;
 
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, http2: true, routes: routes, logging: {level: "error"}, security: {csrf: false}, ssl: {

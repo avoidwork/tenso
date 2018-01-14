@@ -4,6 +4,8 @@ const path = require("path"),
 	routes = require("./routes.js"),
 	timeout = 5000;
 
+process.on("uncaughtException", err => console.error(err.stack || err.message || err));
+
 describe("Pagination (HTTP2)", function () {
 	const port = 8052;
 

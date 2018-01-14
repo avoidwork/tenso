@@ -62,7 +62,7 @@
     "grunt-nsp": "^2.3.1",
     "jsonwebtoken": "^8.1.0",
     "mocha": "^4.0.1",
-    "tiny-httptest": "^1.0.12"
+    "tiny-httptest": "^1.0.13"
   },
   "keywords": [
     "rest",

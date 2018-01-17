@@ -137,7 +137,7 @@ describe("OAuth2 Token Bearer", function () {
 	}});
 
 	it("GET / - returns an array of endpoints (authorized)", function () {
-		return tinyhttptest({http2: true, url: "http://test:123@localhost:" + port, headers: {authorization: "Bearer abc-123"}})
+		return tinyhttptest({http2: true, url: "http://localhost:" + port, headers: {authorization: "Bearer abc-123"}})
 			.expectJson()
 			.expectStatus(200)
 			.expectValue("links", [{uri: "/empty", rel: "item"},
@@ -153,7 +153,7 @@ describe("OAuth2 Token Bearer", function () {
 	});
 
 	it("GET / - returns an 'unauthorized' error", function () {
-		return tinyhttptest({http2: true, url: "http://test:123@localhost:" + port})
+		return tinyhttptest({http2: true, url: "http://localhost:" + port})
 			.expectStatus(401)
 			.end();
 	});

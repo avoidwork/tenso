@@ -127,7 +127,7 @@ describe("OAuth2 Token Bearer", function () {
 	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, auth: {bearer: {enabled: true, tokens: ["abc-123"]}, protect: ["/"]}});
 
 	it("GET / - returns an array of endpoints (authorized)", function () {
-		return tinyhttptest({url: "http://test:123@localhost:" + port, headers: {authorization: "Bearer abc-123"}})
+		return tinyhttptest({url: "http://localhost:" + port, headers: {authorization: "Bearer abc-123"}})
 			.expectJson()
 			.expectStatus(200)
 			.expectValue("links", [{uri: "/empty", rel: "item"},
@@ -143,7 +143,7 @@ describe("OAuth2 Token Bearer", function () {
 	});
 
 	it("GET / - returns an 'unauthorized' error", function () {
-		return tinyhttptest({url: "http://test:123@localhost:" + port})
+		return tinyhttptest({url: "http://localhost:" + port})
 			.expectStatus(401)
 			.end();
 	});

@@ -184,7 +184,7 @@ describe("Hypermedia (HTTP2)", function () {
 	});
 });
 
-describe("Rate Limiting", function () {
+describe("Rate Limiting (HTTP2)", function () {
 	const port = 8057;
 
 	this.timeout(timeout);
@@ -240,7 +240,7 @@ describe("Rate Limiting", function () {
 	});
 });
 
-describe("Rate Limiting (Override)", function () {
+describe("Rate Limiting (Override) (HTTP2)", function () {
 	const port = 8059;
 	let i = 1;
 
@@ -300,7 +300,7 @@ describe("Rate Limiting (Override)", function () {
 	});
 });
 
-describe("Request body max byte size", function () {
+describe("Request body max byte size (HTTP2)", function () {
 	const port = 8058;
 
 	this.timeout(timeout);
@@ -331,7 +331,7 @@ describe("Request body max byte size", function () {
 	});
 });
 
-describe("Route parameters", function () {
+describe("Route parameters (HTTP2)", function () {
 	const port = 8060;
 
 	this.timeout(timeout);
@@ -351,7 +351,7 @@ describe("Route parameters", function () {
 	});
 });
 
-describe("CORS", function () {
+describe("CORS (HTTP2)", function () {
 	const port = 8063;
 
 	this.timeout(timeout);
@@ -375,7 +375,7 @@ describe("CORS", function () {
 	});
 });
 
-describe("Sorting", function () {
+describe("Sorting (HTTP2)", function () {
 	const port = 8064;
 
 	this.timeout(timeout);

@@ -1,13 +1,13 @@
 const path = require("path"),
 	tinyhttptest = require("tiny-httptest"),
-	//jwt = require("jsonwebtoken"),
+	jwt = require("jsonwebtoken"),
 	tenso = require("../index"),
 	routes = require("./routes.js"),
-	//csrf = "x-csrf-token",
+	csrf = "x-csrf-token",
 	timeout = 5000;
 
 process.setMaxListeners(0);
-/*
+
 describe("Permissions (CSRF disabled) (HTTP2)", function () {
 	const port = 8151;
 
@@ -84,7 +84,7 @@ describe("Permissions (CSRF disabled) (HTTP2)", function () {
 			.end();
 	});
 });
-*/
+/*
 describe("Basic Auth", function () {
 	const port = 8154;
 
@@ -94,7 +94,7 @@ describe("Basic Auth", function () {
 		cert: path.join(__dirname, "..", "ssl", "localhost.crt")
 	}});
 
-	/*it("GET / - returns links", function () {
+	it("GET / - returns links", function () {
 		return tinyhttptest({http2: true, url: "https://localhost:" + port})
 			.expectJson()
 			.expectStatus(200)
@@ -108,7 +108,7 @@ describe("Basic Auth", function () {
 			.expectValue("error", null)
 			.expectValue("status", 200)
 			.end();
-	});*/
+	});
 
 	it("GET /uuid - returns a uuid (authorized)", function () {
 		return tinyhttptest({http2: true, url: "https://test:123@localhost:" + port + "/uuid"})
@@ -120,13 +120,13 @@ describe("Basic Auth", function () {
 			.end();
 	});
 
-	/*it("GET /uuid - returns an 'unauthorized' error", function () {
+	it("GET /uuid - returns an 'unauthorized' error", function () {
 		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/uuid"})
 			.expectStatus(401)
 			.end();
-	});*/
+	});
 });
-/*
+*/
 describe("OAuth2 Token Bearer", function () {
 	const port = 8155;
 
@@ -292,4 +292,3 @@ describe("JWT", function () {
 			.end();
 	});
 });
-*/

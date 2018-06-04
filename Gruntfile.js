@@ -17,9 +17,6 @@ module.exports = function (grunt) {
 				src: ["test/*_test.js"/*, "test/*_test2.js"*/]
 			}
 		},
-		nsp: {
-			package: grunt.file.readJSON("package.json")
-		},
 		watch: {
 			js: {
 				files: ["*.js", "lib/*.js"],
@@ -31,7 +28,6 @@ module.exports = function (grunt) {
 	// tasks
 	grunt.loadNpmTasks("grunt-eslint");
 	grunt.loadNpmTasks("grunt-mocha-test");
-	grunt.loadNpmTasks("grunt-nsp");
 	grunt.loadNpmTasks("grunt-contrib-watch");
 
 	// aliases

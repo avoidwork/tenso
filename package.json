@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tensō is an elastic REST API gateway for node.js",
-  "version": "7.0.9",
+  "version": "7.0.10",
   "homepage": "http://avoidwork.github.io/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -22,7 +22,7 @@
     "ssl": "mkdir ssl && openssl req -new -newkey rsa:2048 -subj \"/C=CA/ST=Ontario/L=Ottawa/O=CHANGEME/CN=localhost\" -days 365 -nodes -x509 -keyout ssl/localhost.key -out ssl/localhost.crt"
   },
   "dependencies": {
-    "coap": "^0.21.0",
+    "coap": "^0.22.0",
     "connect-redis": "^3.3.3",
     "cookie-parser": "^1.4.3",
     "csv.js": "^1.0.4",
@@ -30,7 +30,7 @@
     "keysort": "^1.0.2",
     "lusca": "^1.6.0",
     "mimetype": "^0.0.8",
-    "moment": "^2.22.1",
+    "moment": "^2.22.2",
     "passport": "^0.4.0",
     "passport-facebook": "^2.1.1",
     "passport-google": "^0.3.0",
@@ -50,19 +50,18 @@
     "tiny-merge": "^1.0.0",
     "tiny-uuid4": "^1.0.1",
     "tiny-xml": "^1.0.6",
-    "uws": "^9.148.0",
+    "uws": "^10.148.0",
     "woodland": "^5.0.19",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
-    "grunt": "^1.0.1",
+    "grunt": "^1.0.3",
     "grunt-cli": "^1.2.0",
-    "grunt-contrib-watch": "^1.0.1",
+    "grunt-contrib-watch": "^1.1.0",
     "grunt-eslint": "^20.1.0",
     "grunt-mocha-test": "^0.13.3",
-    "grunt-nsp": "^2.3.1",
-    "jsonwebtoken": "^8.2.1",
-    "mocha": "^5.0.1",
+    "jsonwebtoken": "^8.2.2",
+    "mocha": "^5.2.0",
     "tiny-httptest": "^1.0.14"
   },
   "keywords": [

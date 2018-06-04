@@ -219,7 +219,7 @@ describe("Local", function () {
 			.reuseHeader(csrf)
 			.json({username: "test", password: valid})
 			.expectStatus(302)
-			.expectHeader("content-type", "text/html; charset=utf-8") // anti-pattern of strategy
+			.expectHeader("content-type", undefined) // anti-pattern of strategy
 			.expectHeader("location", "/")
 			.end();
 	});

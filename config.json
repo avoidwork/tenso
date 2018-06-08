@@ -12,16 +12,6 @@
 			"enabled": false,
 			"tokens": []
 		},
-		"facebook": {
-			"enabled": false,
-			"auth": null,
-			"client_id": "",
-			"client_secret": ""
-		},
-		"google": {
-			"enabled": false,
-			"auth": null
-		},
 		"jwt": {
 			"enabled": false,
 			"auth": null,
@@ -35,16 +25,6 @@
 			"issuer": "",
 			"scheme": "Bearer",
 			"secretOrKey": ""
-		},
-		"linkedin": {
-			"enabled": false,
-			"auth": null,
-			"client_id": "",
-			"client_secret": "",
-			"scope": [
-				"r_basicprofile",
-				"r_emailaddress"
-			]
 		},
 		"oauth2": {
 			"enabled": false,
@@ -61,20 +41,6 @@
 		"saml": {
 			"enabled": false,
 			"auth": null
-		},
-		"slack": {
-			"enabled": false,
-			"auth": null,
-			"client_id": "",
-			"client_secret": "",
-			"skipUserProfile": false,
-			"scope": []
-		},
-		"twitter": {
-			"enabled": false,
-			"auth": null,
-			"consumer_key": "",
-			"consumer_secret": ""
 		}
 	},
 	"coap": {
@@ -100,7 +66,7 @@
 		"enabled": true,
 		"stack": false
 	},
-	"maxBytes": 1048576,
+	"maxBytes": 20480,
 	"port": 8000,
 	"rate": {
 		"enabled": false,

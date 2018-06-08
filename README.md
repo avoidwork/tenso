@@ -305,7 +305,7 @@ Rate limiting can be overridden by providing an `override` function that takes `
 ```
 
 ## Limiting upload size
-A 'max byte' limit can be enforced on all routes that handle `PATCH`, `POST`, & `PUT` requests. The default limit is 1 MB (1048576 b).
+A 'max byte' limit can be enforced on all routes that handle `PATCH`, `POST`, & `PUT` requests. The default limit is 20 KB (20480 B).
 
 ```
 {

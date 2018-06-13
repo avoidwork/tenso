@@ -45,7 +45,7 @@ describe("Valid", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/", method: "options"})
 			.expectStatus(200)
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("content-length", 90)
+			.expectHeader("content-length", 320)
 			.expectValue("data", /\w/)
 			.expectValue("error", null)
 			.expectValue("status", 200)

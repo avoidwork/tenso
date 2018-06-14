@@ -46,7 +46,7 @@
     "tiny-uuid4": "^1.0.1",
     "tiny-xml": "^1.0.6",
     "uws": "^10.148.0",
-    "woodland": "^5.1.6",
+    "woodland": "^6.0.0",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {

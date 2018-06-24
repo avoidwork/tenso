@@ -27,7 +27,7 @@ function factory (config = {}) {
 		regex[key] = new RegExp(config.regex[key], "i");
 	});
 
-	if (obj.config.silent === false) {
+	if (process.env.NODE_PROCESS !== "production" && obj.config.silent === false) {
 		obj.config.headers.server = `tenso/${pkg.version}`;
 		obj.config.headers["x-powered-by"] = `nodejs/${process.version}, ${process.platform}/${process.arch}`
 	}

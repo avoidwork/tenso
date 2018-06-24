@@ -90,7 +90,6 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 	"auth": {}, /* Optional, see Authentication section */
 	"cacheSize": 1000, /* Optional, size of Etag & route LRU caches */
 	"cacheTTL": 0, /* Optional, TTL of items in Etag & route LRU caches */
-	"coerce": true, /* Optional - coerces query string parameters to primitives, enabled by default */
 	"compress": false, /* Optional, enabled by default */
 	"headers": {}, /* Optional, custom headers */
 	"hostname": "localhost", /* Optional, default is 'localhost' */

@@ -52,7 +52,6 @@
 	},
 	"cacheSize": 1e3,
 	"cacheTTL": 3e5,
-	"coerce": true,
 	"compress": true,
 	"etags": {
 		"enabled": true,

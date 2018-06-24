@@ -18,7 +18,6 @@ function factory (config = {}) {
 		process.exit(1);
 	}
 
-	obj.config.headers.server = `tenso/${pkg.version}`;
 	obj.config.root = path.resolve(config.root || obj.config.root);
 	obj.config.template = fs.readFileSync(config.template || path.join(obj.config.root, "template.html"), {encoding: "utf8"});
 	obj.config.version = pkg.version;
@@ -27,6 +26,11 @@ function factory (config = {}) {
 	each(Object.keys(config.regex || {}), key => {
 		regex[key] = new RegExp(config.regex[key], "i");
 	});
+
+	if (obj.config.silent === false) {
+		obj.config.headers.server = `tenso/${pkg.version}`;
+		obj.config.headers["x-powered-by"] = `nodejs/${process.version}, ${process.platform}/${process.arch}`
+	}
 
 	return bootstrap(obj).start();
 }

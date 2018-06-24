@@ -26,6 +26,10 @@
 			"scheme": "Bearer",
 			"secretOrKey": ""
 		},
+		"local": {
+			"enabled": false,
+			"auth": null
+		},
 		"oauth2": {
 			"enabled": false,
 			"auth": null,
@@ -33,10 +37,6 @@
 			"token_url": "",
 			"client_id": "",
 			"client_secret": ""
-		},
-		"local": {
-			"enabled": false,
-			"auth": null
 		},
 		"saml": {
 			"enabled": false,
@@ -55,15 +55,16 @@
 	"coerce": true,
 	"compress": true,
 	"etags": {
+		"enabled": true,
 		"ignore": []
 	},
-	"hostname": "127.0.0.1",
+	"hostname": "localhost",
 	"http2": false,
 	"index": [],
 	"json": 0,
 	"logging": {
-		"level": "info",
 		"enabled": true,
+		"level": "info",
 		"stack": false
 	},
 	"maxBytes": 20480,
@@ -71,14 +72,14 @@
 	"rate": {
 		"enabled": false,
 		"limit": 450,
-		"reset": 900,
-		"status": 429,
 		"message": "Too many requests",
-		"override": null
+		"override": null,
+		"reset": 900,
+		"status": 429
 	},
 	"regex": {
 		"hypermedia": "[a-zA-Z]+_(guid|uuid|id|url|uri)$",
-		"id": "^(_id|id)$"
+		"id": "^(_id|(uu|gu)?id)$"
 	},
 	"renderHeaders": true,
 	"routes": {},
@@ -94,22 +95,29 @@
 		"nosniff": true
 	},
 	"session": {
-		"secret": null,
-		"store": "memory",
+		"cookie": {
+			"httpOnly": true,
+			"maxAge": 900000,
+			"path": "/",
+			"sameSite": true,
+			"secure": false
+		},
+		"name": "tenso.sid",
+		"proxy": true,
 		"redis": {
 			"host": "127.0.0.1",
 			"port": 6379
 		},
-		"cookie": {
-			"path": "/",
-			"httpOnly": true,
-			"secure": false,
-			"maxAge": 900000
-		}
+		"resave": false,
+		"rolling": false,
+		"saveUninitialized": false,
+		"secret": "tensoABC",
+		"store": "memory"
 	},
 	"ssl": {
-		"key": null,
-		"cert": null
+		"cert": null,
+		"pfx": null,
+		"key": null
 	},
 	"static": "/assets/.*",
 	"staticCache": 300,

@@ -45,17 +45,17 @@
     "tiny-merge": "^1.0.0",
     "tiny-uuid4": "^1.0.1",
     "tiny-xml": "^1.0.6",
-    "uws": "^10.148.0",
-    "woodland": "^6.0.0",
+    "uws": "^10.148.1",
+    "woodland": "^7.0.3",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
     "grunt": "^1.0.3",
     "grunt-cli": "^1.2.0",
     "grunt-contrib-watch": "^1.1.0",
-    "grunt-eslint": "^20.1.0",
+    "grunt-eslint": "^21.0.0",
     "grunt-mocha-test": "^0.13.3",
-    "jsonwebtoken": "^8.2.2",
+    "jsonwebtoken": "^8.3.0",
     "mocha": "^5.2.0",
     "tiny-httptest": "^1.0.14"
   },

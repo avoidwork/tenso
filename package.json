@@ -46,7 +46,7 @@
     "tiny-uuid4": "^1.0.1",
     "tiny-xml": "^1.0.6",
     "uws": "^10.148.1",
-    "woodland": "^7.0.4",
+    "woodland": "git+https://github.com/avoidwork/woodland.git",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {

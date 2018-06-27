@@ -3,10 +3,8 @@
 const fs = require("fs"),
 	path = require("path"),
 	merge = require("tiny-merge"),
-	{each} = require("retsu"),
 	root = __dirname,
 	pkg = require(path.join(root, "package.json")),
-	regex = require(path.join(root, "lib", "regex.js")),
 	tenso = require(path.join(root, "lib", "tenso.js")),
 	{bootstrap} = require(path.join(root, "lib", "utility.js"));
 
@@ -22,10 +20,6 @@ function factory (config = {}) {
 	obj.config.template = fs.readFileSync(config.template || path.join(obj.config.root, "template.html"), {encoding: "utf8"});
 	obj.config.version = pkg.version;
 	merge(obj.config, config);
-
-	each(Object.keys(config.regex || {}), key => {
-		regex[key] = new RegExp(config.regex[key], "i");
-	});
 
 	if (process.env.NODE_PROCESS !== "production" && obj.config.silent === false) {
 		obj.config.headers.server = `tenso/${pkg.version}`;

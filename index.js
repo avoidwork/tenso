@@ -21,7 +21,7 @@ function factory (config = {}) {
 	obj.config.version = pkg.version;
 	merge(obj.config, config);
 
-	if (process.env.NODE_PROCESS !== "production" && obj.config.silent === false) {
+	if (obj.config.silent === false) {
 		obj.config.headers.server = `tenso/${pkg.version}`;
 		obj.config.headers["x-powered-by"] = `nodejs/${process.version}, ${process.platform}/${process.arch}`;
 	}

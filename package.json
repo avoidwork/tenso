@@ -40,7 +40,7 @@
     "passport-saml": "^0.33.0",
     "precise": "^1.1.0",
     "retsu": "^3.0.2",
-    "tiny-coerce": "^1.0.1",
+    "tiny-coerce": "^1.1.1",
     "tiny-etag": "^1.4.6",
     "tiny-merge": "^1.0.0",
     "tiny-uuid4": "^1.0.1",

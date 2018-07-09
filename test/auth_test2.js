@@ -85,7 +85,7 @@ describe("Permissions (CSRF disabled) (HTTP2)", function () {
 	});
 });
 
-describe("Basic Auth", function () {
+describe("Basic Auth (HTTP2)", function () {
 	const port = 8154;
 
 	this.timeout(timeout);
@@ -127,7 +127,7 @@ describe("Basic Auth", function () {
 	});
 });
 
-describe("OAuth2 Token Bearer", function () {
+describe("OAuth2 Token Bearer (HTTP2)", function () {
 	const port = 8155;
 
 	this.timeout(timeout);
@@ -159,7 +159,7 @@ describe("OAuth2 Token Bearer", function () {
 	});
 });
 
-describe("Local", function () {
+describe("Local (HTTP2)", function () {
 	const port = 8156,
 		valid = 123,
 		invalid = 1234;
@@ -254,7 +254,7 @@ describe("Local", function () {
 	});
 });
 
-describe("JWT", function () {
+describe("JWT (HTTP2)", function () {
 	const port = 8152,
 		secret = "jennifer",
 		token = jwt.sign({username: "jason@attack.io"}, secret);

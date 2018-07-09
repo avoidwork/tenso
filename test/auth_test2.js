@@ -84,7 +84,7 @@ describe("Permissions (CSRF disabled) (HTTP2)", function () {
 			.end();
 	});
 });
-/*
+
 describe("Basic Auth", function () {
 	const port = 8154;
 
@@ -126,7 +126,7 @@ describe("Basic Auth", function () {
 			.end();
 	});
 });
-*/
+
 describe("OAuth2 Token Bearer", function () {
 	const port = 8155;
 

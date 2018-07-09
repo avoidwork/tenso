@@ -16,7 +16,7 @@ describe("Valid", function () {
 			.end();
 	});
 
-	it("GET / (200 / 'Array' - gzip)", function () {
+	/*it("GET / (200 / 'Array' - gzip)", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/", headers: {"accept-encoding": "gzip"}})
 			.expectStatus(200)
 			.expectHeader("content-encoding", "gzip")
@@ -30,7 +30,7 @@ describe("Valid", function () {
 			.expectHeader("content-encoding", "deflate")
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
 			.end();
-	});
+	});*/
 
 	it("HEAD / (200 / empty)", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/", method: "head"})

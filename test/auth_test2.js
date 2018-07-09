@@ -187,7 +187,7 @@ describe("Local", function () {
 	it("GET /uuid (invalid) - returns an 'unauthorized' error", function () {
 		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/uuid"})
 			.cookies()
-			.expectStatus(301)
+			.expectStatus(302)
 			.expectHeader("location", login)
 			.end();
 	});
@@ -236,7 +236,7 @@ describe("Local", function () {
 			.cookies()
 			.reuseHeader(csrf)
 			.json({username: "test", password: valid})
-			.expectStatus(301)
+			.expectStatus(302)
 			.expectHeader("content-type", undefined)
 			.expectHeader("location", "/")
 			.end();

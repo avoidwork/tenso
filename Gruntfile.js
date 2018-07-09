@@ -14,12 +14,18 @@ module.exports = function (grunt) {
 				reporter: "spec"
 			},
 			test: {
-				src: ["test/*_test.js"/*, "test/*_test2.js"*/]
+				src: [
+					"test/*_test.js"//,
+					//"test/*_test2.js"
+				]
 			}
 		},
 		watch: {
 			js: {
-				files: ["*.js", "lib/*.js"],
+				files: [
+					"*.js",
+					"lib/*.js"
+				],
 				tasks: "default"
 			}
 		}

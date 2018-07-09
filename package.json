@@ -45,8 +45,13 @@
     "tiny-merge": "^1.0.0",
     "tiny-uuid4": "^1.0.1",
     "tiny-xml": "^1.0.6",
+<<<<<<< HEAD
     "uws": "^10.148.1",
     "woodland": "^7.1.12",
+=======
+    "uws": "^10.148.0",
+    "woodland": "^5.1.6",
+>>>>>>> master
     "yamljs": "^0.3.0"
   },
   "devDependencies": {

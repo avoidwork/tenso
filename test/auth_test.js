@@ -195,7 +195,7 @@ describe("Local", function () {
 			.end();
 	});
 
-	it("POST /login (invalid / no CSRF token) - returns an 'unauthorized' error", function () {
+	it("POST /auth/login (invalid / no CSRF token) - returns an 'unauthorized' error", function () {
 		return tinyhttptest({url: "http://localhost:" + port + login, method: "post"})
 			.cookies()
 			.json({username: "test", password: invalid})
@@ -206,7 +206,7 @@ describe("Local", function () {
 			.end();
 	});
 
-	it("POST /login (invalid) - returns an 'unauthorized' error", function () {
+	it("POST /auth/login (invalid) - returns an 'unauthorized' error", function () {
 		return tinyhttptest({url: "http://localhost:" + port + login, method: "post"})
 			.cookies()
 			.reuseHeader(csrf)
@@ -218,7 +218,7 @@ describe("Local", function () {
 			.end();
 	});
 
-	it("POST /login - redirects to a predetermined URI", function () {
+	it("POST /auth/login - redirects to a predetermined URI", function () {
 		return tinyhttptest({url: "http://localhost:" + port + login, method: "post"})
 			.cookies()
 			.reuseHeader(csrf)

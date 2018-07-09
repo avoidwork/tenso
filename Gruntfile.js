@@ -1,6 +1,5 @@
 module.exports = function (grunt) {
 	grunt.initConfig({
-		pkg: grunt.file.readJSON("package.json"),
 		eslint: {
 			target: [
 				"*.js",
@@ -15,8 +14,8 @@ module.exports = function (grunt) {
 			},
 			test: {
 				src: [
-					"test/*_test.js"//,
-					//"test/*_test2.js"
+					"test/*_test.js",
+					"test/*_test2.js"
 				]
 			}
 		},

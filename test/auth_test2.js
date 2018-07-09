@@ -84,8 +84,8 @@ describe("Permissions (CSRF disabled) (HTTP2)", function () {
 			.end();
 	});
 });
-/*
-describe("Basic Auth", function () {
+
+describe("Basic Auth (HTTP2)", function () {
 	const port = 8154;
 
 	this.timeout(timeout);
@@ -126,8 +126,8 @@ describe("Basic Auth", function () {
 			.end();
 	});
 });
-*/
-describe("OAuth2 Token Bearer", function () {
+
+describe("OAuth2 Token Bearer (HTTP2)", function () {
 	const port = 8155;
 
 	this.timeout(timeout);
@@ -159,7 +159,7 @@ describe("OAuth2 Token Bearer", function () {
 	});
 });
 
-describe("Local", function () {
+describe("Local (HTTP2)", function () {
 	const port = 8156,
 		valid = 123,
 		invalid = 1234;
@@ -182,29 +182,34 @@ describe("Local", function () {
 		cert: path.join(__dirname, "..", "ssl", "localhost.crt")
 	}});
 
+	const login = this.tenso.config.auth.uri.login;
+
 	it("GET /uuid (invalid) - returns an 'unauthorized' error", function () {
 		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/uuid"})
 			.cookies()
 			.expectStatus(302)
-			.expectHeader("location", "/login")
+			.expectHeader("location", login)
 			.end();
 	});
 
-	it("GET /login - returns an authentication message", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/login"})
+	it("GET /auth/login - returns an authentication message", function () {
+		return tinyhttptest({http2: true, url: "https://localhost:" + port + login})
 			.cookies()
 			.captureHeader(csrf)
 			.expectJson()
 			.expectStatus(200)
-			.expectValue("links", [{uri: "/", rel: "collection"}])
+			.expectValue("links", [{
+				"uri": "/auth",
+				"rel": "collection"
+			}])
 			.expectValue("data", {instruction: "POST 'username' & 'password' to authenticate"})
 			.expectValue("error", null)
 			.expectValue("status", 200)
 			.end();
 	});
 
-	it("POST /login (invalid / no CSRF token) - returns an 'unauthorized' error", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/login", method: "post"})
+	it("POST /auth/login (invalid / no CSRF token) - returns an 'unauthorized' error", function () {
+		return tinyhttptest({http2: true, url: "https://localhost:" + port + login, method: "post"})
 			.cookies()
 			.json({username: "test", password: invalid})
 			.expectStatus(403)
@@ -214,8 +219,8 @@ describe("Local", function () {
 			.end();
 	});
 
-	it("POST /login (invalid) - returns an 'unauthorized' error", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/login", method: "post"})
+	it("POST /auth/login (invalid) - returns an 'unauthorized' error", function () {
+		return tinyhttptest({http2: true, url: "https://localhost:" + port + login, method: "post"})
 			.cookies()
 			.reuseHeader(csrf)
 			.json({username: "test", password: invalid})
@@ -226,13 +231,13 @@ describe("Local", function () {
 			.end();
 	});
 
-	it("POST /login - redirects to a predetermined URI", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/login", method: "post"})
+	it("POST /auth/login - redirects to a predetermined URI", function () {
+		return tinyhttptest({http2: true, url: "https://localhost:" + port + login, method: "post"})
 			.cookies()
 			.reuseHeader(csrf)
 			.json({username: "test", password: valid})
 			.expectStatus(302)
-			.expectHeader("content-type", "text/html; charset=utf-8") // anti-pattern of strategy
+			.expectHeader("content-type", undefined)
 			.expectHeader("location", "/")
 			.end();
 	});
@@ -249,7 +254,7 @@ describe("Local", function () {
 	});
 });
 
-describe("JWT", function () {
+describe("JWT (HTTP2)", function () {
 	const port = 8152,
 		secret = "jennifer",
 		token = jwt.sign({username: "jason@attack.io"}, secret);

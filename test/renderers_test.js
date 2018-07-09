@@ -166,14 +166,14 @@ describe("Renderers", function () {
 	it("GET Plain Text (header)", function () {
 		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "text/plain"}})
 			.expectStatus(200)
-			.expectHeader("content-type", "application/json")
+			.expectHeader("content-type", "text/plain")
 			.end();
 	});
 
 	it("GET Plain Text (query string)", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/?format=text/plain"})
 			.expectStatus(200)
-			.expectHeader("content-type", "application/json")
+			.expectHeader("content-type", "text/plain")
 			.end();
 	});
 

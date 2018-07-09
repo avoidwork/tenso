@@ -90,8 +90,6 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 	"auth": {}, /* Optional, see Authentication section */
 	"cacheSize": 1000, /* Optional, size of Etag & route LRU caches */
 	"cacheTTL": 0, /* Optional, TTL of items in Etag & route LRU caches */
-	"coerce": true, /* Optional - coerces query string parameters to primitives, enabled by default */
-	"compress": false, /* Optional, enabled by default */
 	"headers": {}, /* Optional, custom headers */
 	"hostname": "localhost", /* Optional, default is 'localhost' */
 	"http2": false, /* Middleware signatures do not change, see woodland */
@@ -144,38 +142,6 @@ Authentication attempts have a random delay to deal with "timing attacks"; alway
 }
 ```
 
-### Facebook
-Facebook authentication will create `/auth`, `/auth/facebook`, & `/auth/facebook/callback` routes. `auth(accessToken, refreshToken, profile, callback)` must execute `callback(err, user)`.
- 
-```
-{
-	"auth": {
-		"facebook": {
-			"enabled": true,
-			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
-			"client_id": "", /* Get this from Facebook */
-			"client_secret": "" /* Get this from Facebook */
-		},
-		"protect": ["/private"]
-	}
-}
-```
-
-### Google
-Google authentication (OpenID) will create `/auth`, `/auth/google`, & `/auth/google/callback` routes. `auth(identifier, profile, callback)` must execute `callback(err, user)`.
- 
-```
-{
-	"auth": {
-		"google": {
-			"enabled": true,
-			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
-		},
-		"protect": ["/private"]
-	}
-}
-```
-
 ### JWT
 JWT (JSON Web Token) authentication is stateless and does not have an entry point. The `auth(token, callback)` function must verify `token.sub`, and must execute `callback(err, user)`.
 
@@ -193,24 +159,6 @@ This authentication strategy relies on out-of-band information for the `secret`,
 			"ignoreExpiration": false, /* Optional, set to `true` to ignore expired tokens */
 			"scheme": "Bearer", /* Optional, set to specify the `Authorization` scheme */
 			"secretOrKey": ""
-		}
-		"protect": ["/private"]
-	}
-}
-```
-
-### LinkedIn
-LinkedIn authentication will create `/auth`, `/auth/linkedin`, & `/auth/linkedin/callback` routes. `auth(token, tokenSecret, profile, callback)` must execute `callback(err, user)`.
- 
-```
-{
-	"auth": {
-		"linkedin": {
-			"enabled": true,
-			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
-			"client_id": "", /* Get this from LinkedIn */
-			"client_secret": "", /* Get this from LinkedIn */,
-			"scope": "" /* Optional, permission scope */
 		}
 		"protect": ["/private"]
 	}
@@ -264,25 +212,6 @@ OAuth2 authentication will create `/auth`, `/auth/oauth2`, & `/auth/oauth2/callb
 }
 ```
 
-### Slack
-Slack authentication will create `/auth`, `/auth/slack`, & `/auth/slack/callback` routes. `auth(accessToken, refreshToken, profile, callback)` must execute `callback(err, user)`.
-
-```
-{
-	"auth": {
-		"slack": {
-			"enabled": true,
-			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
-			"client_id": "", /* Get this from Slack */
-			"client_secret": "", /* Get this from Slack */
-			"scope": [], /* Custom scopes */
-			"skipUserProfile": false /* Gets User profile if false, requires identity scope */
-		},
-		"protect": ["/private"]
-	}
-}
-```
-
 ### SAML
 SAML authentication will create `/auth`, `/auth/saml`, & `/auth/saml/callback` routes. `auth(profile, callback)` must execute `callback(err, user)`.
 
@@ -294,23 +223,6 @@ Tensō uses [passport-saml](https://github.com/bergie/passport-saml), for config
 		"saml": {
 			"enabled": true,
 			...
-		},
-		"protect": ["/private"]
-	}
-}
-```
-
-### Twitter
-Twitter authentication will create `/auth`, `/auth/twitter`, & `/auth/twitter/callback` routes. `auth(token, tokenSecret, profile, callback)` must execute `callback(err, user)`.
- 
-```
-{
-	"auth": {
-		"twitter": {
-			"enabled": true,
-			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
-			"consumer_key": "", /* Get this from Twitter */
-			"consumer_secret": "" /* Get this from Twitter */
 		},
 		"protect": ["/private"]
 	}
@@ -391,7 +303,7 @@ Rate limiting can be overridden by providing an `override` function that takes `
 ```
 
 ## Limiting upload size
-A 'max byte' limit can be enforced on all routes that handle `PATCH`, `POST`, & `PUT` requests. The default limit is 1 MB (1048576 b).
+A 'max byte' limit can be enforced on all routes that handle `PATCH`, `POST`, & `PUT` requests. The default limit is 20 KB (20480 B).
 
 ```
 {

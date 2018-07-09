@@ -5,41 +5,28 @@ const fs = require("fs"),
 	merge = require("tiny-merge"),
 	root = __dirname,
 	pkg = require(path.join(root, "package.json")),
-	cfg = require(path.join(root, "config.json")),
 	tenso = require(path.join(root, "lib", "tenso.js")),
-	utility = require(path.join(root, "lib", "utility.js"));
+	{bootstrap} = require(path.join(root, "lib", "utility.js"));
 
-function factory (arg) {
-	const hostname = arg ? arg.hostname || "localhost" : "localhost",
-		config = arg ? merge(utility.clone(cfg), arg) : utility.clone(cfg),
-		obj = tenso();
+function factory (config = {}) {
+	const obj = tenso();
 
-	if (isNaN(config.port) === true || config.port < 1) {
+	if (isNaN(config.port) === false && config.port < 1) {
 		console.error("Invalid configuration");
 		process.exit(1);
 	}
 
-	if (config.root === void 0) {
-		config.root = root;
-	}
-
-	if (config.routes.get === void 0) {
-		config.routes.get = {};
-	}
-
-	// Setting headers
-	if (config.headers === void 0) {
-		config.headers = {};
-	}
-
-	config.headers.server = `tenso/${pkg.version}`;
-	config.root = path.resolve(config.root);
-	config.template = fs.readFileSync(config.template || path.join(config.root, "template.html"), {encoding: "utf8"});
-	config.version = pkg.version;
+	obj.config.root = path.resolve(config.root || obj.config.root);
+	obj.config.template = fs.readFileSync(config.template || path.join(obj.config.root, "template.html"), {encoding: "utf8"});
+	obj.config.version = pkg.version;
 	merge(obj.config, config);
-	obj.hostname = hostname;
 
-	return utility.bootstrap(obj).start();
+	if (obj.config.silent === false) {
+		obj.config.headers.server = `tenso/${pkg.version}`;
+		obj.config.headers["x-powered-by"] = `nodejs/${process.version}, ${process.platform}/${process.arch}`;
+	}
+
+	return bootstrap(obj).start();
 }
 
 module.exports = factory;

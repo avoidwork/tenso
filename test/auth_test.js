@@ -169,21 +169,26 @@ describe("Local", function () {
 		protect: ["/uuid"]
 	}});
 
+	const login = this.tenso.config.auth.uri.login;
+
 	it("GET /uuid (invalid) - returns an 'unauthorized' error", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/uuid"})
 			.cookies()
-			.expectStatus(302)
-			.expectHeader("location", "/login")
+			.expectStatus(301)
+			.expectHeader("location", login)
 			.end();
 	});
 
-	it("GET /login - returns an authentication message", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/login"})
+	it("GET /auth/login - returns an authentication message", function () {
+		return tinyhttptest({url: "http://localhost:" + port + login})
 			.cookies()
 			.captureHeader(csrf)
 			.expectJson()
 			.expectStatus(200)
-			.expectValue("links", [{uri: "/", rel: "collection"}])
+			.expectValue("links", [{
+				"uri": "/auth",
+				"rel": "collection"
+			}])
 			.expectValue("data", {instruction: "POST 'username' & 'password' to authenticate"})
 			.expectValue("error", null)
 			.expectValue("status", 200)
@@ -191,7 +196,7 @@ describe("Local", function () {
 	});
 
 	it("POST /login (invalid / no CSRF token) - returns an 'unauthorized' error", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/login", method: "post"})
+		return tinyhttptest({url: "http://localhost:" + port + login, method: "post"})
 			.cookies()
 			.json({username: "test", password: invalid})
 			.expectStatus(403)
@@ -202,7 +207,7 @@ describe("Local", function () {
 	});
 
 	it("POST /login (invalid) - returns an 'unauthorized' error", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/login", method: "post"})
+		return tinyhttptest({url: "http://localhost:" + port + login, method: "post"})
 			.cookies()
 			.reuseHeader(csrf)
 			.json({username: "test", password: invalid})
@@ -214,7 +219,7 @@ describe("Local", function () {
 	});
 
 	it("POST /login - redirects to a predetermined URI", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/login", method: "post"})
+		return tinyhttptest({url: "http://localhost:" + port + login, method: "post"})
 			.cookies()
 			.reuseHeader(csrf)
 			.json({username: "test", password: valid})

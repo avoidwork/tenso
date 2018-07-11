@@ -16,12 +16,12 @@ function factory (config = {}) {
 		process.exit(1);
 	}
 
-	obj.config.root = path.resolve(config.root || obj.config.root || __dirname);
+	obj.config.root = path.resolve(obj.config.root || __dirname);
 	obj.config.template = fs.readFileSync(config.template || path.join(obj.config.root, "template.html"), {encoding: "utf8"});
 	obj.config.version = pkg.version;
 	merge(obj.config, config);
 
-	if (obj.config.silent === false) {
+	if (obj.config.silent !== true) {
 		obj.config.headers.server = `tenso/${pkg.version}`;
 		obj.config.headers["x-powered-by"] = `nodejs/${process.version}, ${process.platform}/${process.arch}`;
 	}

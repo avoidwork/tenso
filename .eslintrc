@@ -5,6 +5,9 @@
     "es6": true,
     "amd": false
   },
+  "parserOptions": {
+    "ecmaVersion": 2018
+  },
   "globals": {
     "describe": true,
     "it": true,

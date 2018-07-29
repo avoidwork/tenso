@@ -407,5 +407,5 @@ Custom static routes can be defined like such:
 ```
 
 ## License
-Copyright (c) 2017 Jason Mulligan
+Copyright (c) 2018 Jason Mulligan
 Licensed under the BSD-3-Clause license.

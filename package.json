@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tensō is an elastic REST API gateway for node.js",
-  "version": "8.0.29",
+  "version": "8.0.30",
   "homepage": "http://avoidwork.github.io/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -25,7 +25,7 @@
     "coap": "^0.22.0",
     "connect-redis": "^3.3.3",
     "cookie-parser": "^1.4.3",
-    "csv.js": "^1.0.6",
+    "csv.js": "^1.0.7",
     "express-session": "^1.15.6",
     "keysort": "^1.0.2",
     "lusca": "^1.6.0",

@@ -74,7 +74,7 @@ module.exports.get = {
 		lastName: "Mulligan"
 	},
 	"/uuid": function (req, res) {
-		res.send(uuid());
+		res.send(uuid(), 200, {"cache-control": "no-cache, must-revalidate"});
 	}
 };
 

@@ -2,37 +2,35 @@
 
 (function (document, window, location, fetch, router) {
 	// Wiring up the request tab
-	var button = document.querySelector("button"),
-	    close = document.querySelector("#close"),
-	    form = document.querySelector("form"),
-	    formats = document.querySelector("#formats"),
-	    methods = document.querySelector("#methods"),
-	    modal = document.querySelector(".modal"),
-	    loading = modal.querySelector(".loading"),
-	    textarea = document.querySelector("textarea"),
-	    resBody = modal.querySelector(".body"),
-	    json = /^[\[\{"]/,
-	    isJson = /application\/json/;
+	const button = document.querySelector("button"),
+		close = document.querySelector("#close"),
+		form = document.querySelector("form"),
+		formats = document.querySelector("#formats"),
+		methods = document.querySelector("#methods"),
+		modal = document.querySelector(".modal"),
+		loading = modal.querySelector(".loading"),
+		textarea = document.querySelector("textarea"),
+		resBody = modal.querySelector(".body"),
+		json = /^[\[\{"]/,
+		isJson = /application\/json/;
 
 	if (methods.childElementCount > 0) {
 		form.setAttribute("method", methods.options[methods.selectedIndex].value);
 	}
 
-	function escape(arg) {
+	function escape (arg) {
 		return arg.replace(/[\-\[\]{}()*+?.,\\\/\^\$|#\s]/g, "\\$&");
 	}
 
 	// Stage 1 of prettifying a <code>
-	function prepare(html) {
-		var keys = Array.from(html.match(/\".*":/g)),
-		    matches = Array.from(keys.concat(html.match(/:\s(\".*\"|\d{3,3}|null)/g))),
-		    replaces = matches.map(function (i) {
-			return keys.includes(i) ? i.replace(/(\"(.*)\")/, "<span class='key $2'>$1</span>") : i.replace(/(\".*\"|\d{3,3}|null)/, "<span class='item'>$1</span>");
-		});
+	function prepare (html) {
+		const keys = Array.from(html.match(/\".*":/g)),
+			matches = Array.from(keys.concat(html.match(/:\s(\".*\"|\d{3,3}|null)/g))),
+			replaces = matches.map(i => keys.includes(i) ? i.replace(/(\"(.*)\")/, "<span class='key $2'>$1</span>") : i.replace(/(\".*\"|\d{3,3}|null)/, "<span class='item'>$1</span>"));
 
-		var output = html;
+		let output = html;
 
-		matches.forEach(function (i, idx) {
+		matches.forEach((i, idx) => {
 			output = output.replace(new RegExp(escape(i), "g"), replaces[idx]);
 		});
 
@@ -40,25 +38,27 @@
 	}
 
 	// Prettifies a <code>
-	function prettify(arg) {
+	function prettify (arg) {
 		// Changing <pre> into selectable Elements
-		arg.parentNode.parentNode.innerHTML = prepare(arg.innerHTML).replace(/\n/g, "<br>\n").replace(/(\s{2,2})/g, "<span class='spaces'></span>");
+		arg.parentNode.parentNode.innerHTML = prepare(arg.innerHTML)
+			.replace(/\n/g, "<br>\n")
+			.replace(/(\s{2,2})/g, "<span class='spaces'></span>");
 
 		// Changing URIs into anchors
-		Array.from(document.querySelectorAll(".item")).forEach(function (i) {
-			var html = i.innerHTML,
-			    val = html.replace(/(^\"|\"$)/g, "");
+		Array.from(document.querySelectorAll(".item")).forEach(i => {
+			let html = i.innerHTML,
+				val = html.replace(/(^\"|\"$)/g, "");
 
 			if (val.indexOf("/") === 0 || val.indexOf("//") > -1) {
-				html = html.replace(val, "<a href='" + val + "' title='View " + val + "'>" + val + "</a>");
+				html = html.replace(val, `<a href="${val}" title="View ${val}">${val}</a>`);
 			}
 
 			i.innerHTML = html;
 		});
 	}
 
-	function maybeJson(arg) {
-		var output = false;
+	function maybeJson (arg) {
+		let output = false;
 
 		if (json.test(arg)) {
 			try {
@@ -72,18 +72,18 @@
 		return output;
 	}
 
-	function sanitize() {
-		var arg = arguments.length > 0 && arguments[0] !== undefined ? typeof arguments[0] !== "string" ? JSON.stringify(arguments[0], null, 2) : arguments[0] : "";
+	function sanitize (arg = "") {
+		let tmp = typeof arg !== "string" ? JSON.stringify(arg, null, 2) : arg;
 
-		return arg.replace(/\</g, "&lt;").replace(/\>/g, "&gt;");
+		return tmp.replace(/\</g, "&lt;").replace(/\>/g, "&gt;");
 	}
 
 	// Intercepting the submission
-	form.onsubmit = function (ev) {
+	form.onsubmit = ev => {
 		ev.preventDefault();
 		ev.stopPropagation();
 
-		window.requestAnimationFrame(function () {
+		window.requestAnimationFrame(() => {
 			resBody.innerText = "";
 			resBody.classList.add("dr-hidden");
 			loading.classList.remove("dr-hidden");
@@ -91,24 +91,22 @@
 			modal.classList.add("is-active");
 		});
 
-		fetch(location.protocol + "//" + location.host + location.pathname, { method: methods.options[methods.selectedIndex].value, body: textarea.value, credentials: "include", headers: { "content-type": maybeJson(textarea.value) ? "application/json" : "application/x-www-form-urlencoded", "x-csrf-token": document.querySelector("#csrf").innerText } }).then(function (res) {
+		fetch(location.protocol + "//" + location.host + location.pathname, {method: methods.options[methods.selectedIndex].value, body: textarea.value, credentials: "include", headers: {"content-type": maybeJson(textarea.value) ? "application/json" : "application/x-www-form-urlencoded", "x-csrf-token": document.querySelector("#csrf").innerText}}).then(res => {
 			if (!res.ok) {
 				throw res;
 			}
 
 			return isJson.test(res.headers.get("content-type") || "") ? res.json() : res.text();
-		}).then(function (arg) {
-			window.requestAnimationFrame(function () {
-				resBody.innerHTML = arg.data !== undefined ? Array.isArray(arg.data) ? arg.data.map(function (i) {
-					return sanitize(i);
-				}).join("<br>\n") : sanitize(arg.data) : sanitize(arg.data) || sanitize(arg);
+		}).then(arg => {
+			window.requestAnimationFrame(() => {
+				resBody.innerHTML = arg.data !== undefined ? Array.isArray(arg.data) ? arg.data.map(i => sanitize(i)).join("<br>\n") : sanitize(arg.data) : sanitize(arg.data) || sanitize(arg);
 				resBody.parentNode.classList.remove("has-text-centered");
 				resBody.classList.remove("dr-hidden");
 				loading.classList.add("dr-hidden");
 				button.classList.remove("is-loading");
 			});
-		}).catch(function (res) {
-			window.requestAnimationFrame(function () {
+		}).catch(res => {
+			window.requestAnimationFrame(() => {
 				resBody.innerHTML = "<h1 class=\"title\">" + res.status + " - " + res.statusText + "</h1>";
 				resBody.parentNode.classList.add("has-text-centered");
 				resBody.classList.remove("dr-hidden");
@@ -120,22 +118,18 @@
 		});
 	};
 
-	methods.onchange = function () {
-		return form.setAttribute("method", methods.options[methods.selectedIndex].value);
-	};
+	methods.onchange = () => form.setAttribute("method", methods.options[methods.selectedIndex].value);
 
 	// Creating a DOM router
-	router({ css: { current: "is-active", hidden: "dr-hidden" }, callback: function callback(ev) {
-			window.requestAnimationFrame(function () {
-				Array.from(document.querySelectorAll("li.is-active")).forEach(function (i) {
-					return i.classList.remove("is-active");
-				});
-				ev.trigger.parentNode.classList.add("is-active");
-			});
-		} });
+	router({css: {current: "is-active", hidden: "dr-hidden"}, callback: ev => {
+		window.requestAnimationFrame(() => {
+			Array.from(document.querySelectorAll("li.is-active")).forEach(i => i.classList.remove("is-active"));
+			ev.trigger.parentNode.classList.add("is-active");
+		});
+	}});
 
 	// Wiring up format selection
-	close.onclick = function (ev) {
+	close.onclick = ev => {
 		ev.preventDefault();
 		ev.stopPropagation();
 		button.classList.remove("is-loading");
@@ -143,14 +137,14 @@
 	};
 
 	// Wiring up format selection
-	formats.onchange = function (ev) {
-		window.location = window.location.pathname + "?format=" + ev.target.options[ev.target.selectedIndex].value;
+	formats.onchange = ev => {
+		window.location = `${window.location.pathname}?format=${ev.target.options[ev.target.selectedIndex].value}${window.location.search.replace(/^\?/, "&")}`;
 	};
 
 	// Setting up the UI
-	window.requestAnimationFrame(function () {
+	window.requestAnimationFrame(() => {
 		// Hiding the request tab if read-only
-		if (!/(PATCH|PUT|POST)/.test(document.querySelector("#allow").innerText)) {
+		if (!(/(PATCH|PUT|POST)/).test(document.querySelector("#allow").innerText)) {
 			document.querySelector("li.request").classList.add("dr-hidden");
 		}
 
@@ -161,6 +155,21 @@
 		prettify(document.querySelector("#body"));
 	});
 
-	console.log(["        ,----,", "      ,/   .`|", "    ,`   .'  :", "  ;    ;     /", ".'___,/    ,'              ,---,              ,---.", "|    :     |           ,-+-. /  | .--.--.    '   ,'\\", ";    |.';  ;   ,---.  ,--.'|'   |/  /    '  /   /   |", "`----'  |  |  /     \\|   |  ,\"' |  :  /`./ .   ; ,. :", "    '   :  ; /    /  |   | /  | |  :  ;_   '   | |: :", "    |   |  '.    ' / |   | |  | |\\  \\    `.'   | .; :", "    '   :  |'   ;   /|   | |  |/  `----.   \\   :    |", "    ;   |.' '   |  / |   | |--'  /  /`--'  /\\   \\  /", "    '---'   |   :    |   |/     '--'.     /  `----'", "             \\   \\  /'---'        `--'---'", "              `----'"].join("\n"));
-})(document, window, location, fetch, router);
-//# sourceMappingURL=app.js.map
+	console.log([
+		"        ,----,",
+		"      ,/   .`|",
+		"    ,`   .'  :",
+		"  ;    ;     /",
+		".'___,/    ,'              ,---,              ,---.",
+		"|    :     |           ,-+-. /  | .--.--.    '   ,'\\",
+		";    |.';  ;   ,---.  ,--.'|'   |/  /    '  /   /   |",
+		"`----'  |  |  /     \\|   |  ,\"' |  :  /`./ .   ; ,. :",
+		"    '   :  ; /    /  |   | /  | |  :  ;_   '   | |: :",
+		"    |   |  '.    ' / |   | |  | |\\  \\    `.'   | .; :",
+		"    '   :  |'   ;   /|   | |  |/  `----.   \\   :    |",
+		"    ;   |.' '   |  / |   | |--'  /  /`--'  /\\   \\  /",
+		"    '---'   |   :    |   |/     '--'.     /  `----'",
+		"             \\   \\  /'---'        `--'---'",
+		"              `----'"
+	].join("\n"));
+}(document, window, location, fetch, router));

@@ -97,7 +97,8 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 	"logging": {
 		"level": "info", /* Optional */
 		"enabled": true, /* Optional */
-		"stack": true /* Optional */
+		"stack": false, /* Optional */
+		"stackWire": false /* Optional */
 	},
 	"port": 8000, /* Optional */
 	"routes": require("./routes.js"), /* Required! */

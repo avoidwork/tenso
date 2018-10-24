@@ -3,18 +3,16 @@ Tensō
 
 [![build status](https://secure.travis-ci.org/avoidwork/tenso.svg)](http://travis-ci.org/avoidwork/tenso)
 
-Tensō is a REST API gateway for node.js, designed to simplify the implementation of APIs. HTTP2 is supported!
-
-Tensō will handle the serialization & creation of hypermedia links, all you have to do is give it `Arrays` or `Objects`.
-
-## Sample application
-You can clone or fork the sample application at https://github.com/avoidwork/tenso-sample
+Tensō is an HTTP/HTTP2 REST API framework, that will handle the serialization & creation of hypermedia links; all you have to do is give it `Arrays` or `Objects`.
 
 ## Example
-Creating an API with Tensō can be as simple as one statement.
+Creating an API with Tensō can be this simple:
 
 ```javascript
-require("tenso")({routes: require(__dirname+"/routes.js")});
+const path = require('path'),
+    app = require("tenso")({routes: require(path.join(__dirname, "routes.js"))});
+
+module.exports = app;
 ```
 
 ### Creating Routes

@@ -325,54 +325,6 @@ Standard log levels are supported, and are emitted to `stdout` & `stderr`. Stack
 }
 ```
 
-## WebSocket
-A companion WebSocket server can be enabled by configuration, with event handlers (`connection`, `message`, & `close`) set as a `socket` route.
-
-Parameter(s) for `connection` is `socket`, for `message` is `message, socket`, & `close` has no parameters.
-
-```
-"routes": {
-    "socket": {
-        "connection": ws => {
-            console.log("connection");
-            ws.send("a text message");
-            ws.send(new Buffer("a binary message"));
-        },
-        "message": (message, ws) => {
-            ws.send("You sent me this: \"" + message + "\"");
-        },
-        "close": () => console.log("closed")
-    }
-}
-```
-
-Server options:
-```
-{
-    "websocket": {
-        "enabled": true,
-        "options": {
-            "port": 3000
-        }
-    }
-}
-```
-
-## COAP
-A companion COAP server can be enabled by configuration, with a `request` event handler set as a `coap` route.
-
-Parameters for `request` are `req, res, server, tenso`.
-
-Server details can be found [here](https://github.com/mcollina/node-coap#createserveroptions-requestlistener)
-
-```
-{
-    "coap": {
-        "enabled": true
-    }
-}
-```
-
 ## Template
 The browsable template can be overridden with a custom HTML document.
 

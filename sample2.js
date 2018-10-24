@@ -30,11 +30,5 @@ require("./index.js")({
 	ssl: {
 		key: "./ssl/localhost.key",
 		cert: "./ssl/localhost.crt"
-	},
-	websocket: {
-		enabled: false,
-		options: {
-			port: 8001
-		}
 	}
 });

@@ -25,11 +25,5 @@ require("./index.js")({
 	},
 	security: {
 		csrf: false
-	},
-	websocket: {
-		enabled: false,
-		options: {
-			port: 8001
-		}
 	}
 });

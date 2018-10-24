@@ -83,23 +83,3 @@ module.exports.post = {
 		res.send("OK!");
 	}
 };
-
-module.exports.socket = {
-	close: function () {
-		console.log("closed");
-	},
-	connection: function (ws) {
-		ws.send("a text message");
-		ws.send(new Buffer("a binary message"));
-	},
-	message: function (message, ws) {
-		console.log("message: " + message);
-		ws.send(new Buffer("You sent me this: \"" + message + "\""), false);
-	}
-};
-
-module.exports.coap = {
-	request: function (req, res) {
-		res.end("Hello World!");
-	}
-};

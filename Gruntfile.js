@@ -5,7 +5,7 @@ module.exports = function (grunt) {
 				"*.js",
 				"lib/*.js",
 				"test/*.js",
-				"www/assets/js/*.es6"
+				"www/assets/js/app.js"
 			]
 		},
 		mochaTest: {

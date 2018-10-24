@@ -1,7 +1,7 @@
 {
   "name": "tenso",
-  "description": "Tensō is an elastic REST API gateway for node.js",
-  "version": "8.2.0",
+  "description": "Tensō is an HTTP/HTTP2 REST API framework",
+  "version": "9.0.0",
   "homepage": "http://avoidwork.github.io/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -22,7 +22,6 @@
     "ssl": "mkdir ssl && openssl req -new -newkey rsa:2048 -subj \"/C=CA/ST=Ontario/L=Ottawa/O=CHANGEME/CN=localhost\" -days 365 -nodes -x509 -keyout ssl/localhost.key -out ssl/localhost.crt"
   },
   "dependencies": {
-    "coap": "^0.22.0",
     "connect-redis": "^3.4.0",
     "cookie-parser": "^1.4.3",
     "csv.js": "^1.0.7",
@@ -45,7 +44,6 @@
     "tiny-merge": "^1.0.0",
     "tiny-uuid4": "^1.0.1",
     "tiny-xml": "^1.0.6",
-    "uws": "9.148.0",
     "woodland": "^7.3.1",
     "yamljs": "^0.3.0",
     "yargs": "^12.0.2"
@@ -67,16 +65,7 @@
     "gateway",
     "server",
     "hypermedia",
-    "elastic",
-    "app",
-    "application",
-    "websockets",
-    "sockets",
-    "socket",
-    "coap",
-    "iot",
-    "http",
     "http2",
-    "https"
+    "framework"
   ]
 }

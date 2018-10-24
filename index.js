@@ -6,18 +6,18 @@ const fs = require("fs"),
 	args = require("yargs").argv,
 	root = __dirname,
 	pkg = require(path.join(root, "package.json")),
+	regex = require(path.join(root, "lib", "regex.js")),
 	tenso = require(path.join(root, "lib", "tenso.js")),
-	{bootstrap} = require(path.join(root, "lib", "utility.js")),
-	json = /^("|\[|\{)/;
+	{bootstrap, each} = require(path.join(root, "lib", "utility.js"));
 
 // Removing default properties
 delete args._;
 delete args.$0;
 
-Object.keys(args).forEach(k => {
-	let result = args[k];
+each(Object.keys(args), k => {
+	const result = args[k];
 
-	if (typeof result === "string" && json.test(result)) {
+	if (typeof result === "string" && regex.jsonWrap.test(result)) {
 		try {
 			args[k] = JSON.parse(result);
 		} catch (err) {

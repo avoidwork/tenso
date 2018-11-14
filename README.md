@@ -357,6 +357,30 @@ Custom static routes can be defined like such:
    "/other": (req, res) => req.server.static(req, res);
 ```
 
+## EventSource streams
+Create & cache an `EventSource` stream to send messages to a Client:
+
+```
+const streams = new Map();
+
+...
+
+"/stream": (req, res) => {
+ const id = req.user.userId;
+
+ if (streams.has(id) === false) {
+   streams.set(id, req.server.eventsource());
+ }
+
+ streams.get(id).init(req, res);
+}
+
+...
+
+// Send data to Clients
+streams.get(id).send({...});
+```
+
 ## License
 Copyright (c) 2018 Jason Mulligan
 Licensed under the BSD-3-Clause license.

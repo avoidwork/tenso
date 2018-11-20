@@ -41,6 +41,7 @@
     "retsu": "^3.0.2",
     "tiny-coerce": "^1.1.1",
     "tiny-etag": "^1.5.0",
+    "tiny-eventsource": "^1.0.0",
     "tiny-merge": "^1.0.0",
     "tiny-uuid4": "^1.0.1",
     "tiny-xml": "^1.0.6",

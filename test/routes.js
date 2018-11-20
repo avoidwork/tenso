@@ -65,6 +65,7 @@ module.exports.get = {
 		"user_id": 123,
 		"source_url": "http://source.tld"
 	},
+	"/stream": (req, res) => req.server.eventsource("initialized").init(req, res).send("Hello World!", "welcome"),
 	"/users": [
 		123
 	],

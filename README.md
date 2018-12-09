@@ -229,19 +229,14 @@ Tensō uses [passport-saml](https://github.com/bergie/passport-saml), for config
 ```
 
 ## ETags
-To enable state propagation set `notify` to `true`, and when receiving new state pass to `instance.server.etags.update()`.
+Generates `ETag` headers for `GET` requests
 
 ```
 {
 	"etags": {
-		"notify": true,
-		"ignore": [], // Paths to ignore
-		"onchange": (eventName, serializedCache) => {
-		... // serializedCache needs to be passed to other instances `etags.update()`
-		},
-		"update": serializedCache => {
-		... // Override if you want to do more than set new state
-		}
+		enabled: true, // Enabled or disabled
+		ignore: [], // Paths to ignore
+		mimetype: "application/json" // Default respose mimetype
 	}
 }
 ```
@@ -254,18 +249,23 @@ If the session `secret` is not provided, a version 4 `UUID` will be used.
 ```
 {
 	"session" : {
-		"secret": "my secret",
-		"store": "redis",
-		"redis": {
-			"host": "127.0.0.1",
-			"port": 6379
+		cookie: {
+			httpOnly: true,
+			path: "/",
+			sameSite: true,
+			secure: false
 		},
-		"cookie": {
-				"path": "/",
-				"httpOnly": true,
-				"secure": false,
-				"maxAge": 900000
-		}
+		name: "tenso.sid",
+		proxy: true,
+		redis: {
+			host: "127.0.0.1",
+			port: 6379
+		},
+		rolling: true,
+		resave: true,
+		saveUninitialized: true,
+		secret: "tensoABC",
+		store: "memory"
 	}
 }
 ```

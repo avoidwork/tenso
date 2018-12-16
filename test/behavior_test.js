@@ -148,7 +148,7 @@ describe("Hypermedia", function () {
 			.expectValue("links", [{
 				uri: "/somethings",
 				rel: "collection"
-			}, {uri: "/users/123", rel: "related"}])
+			}, {uri: "/users/123", rel: "related"}, {"uri": "http://source.tld", "rel": "related"}])
 			.expectValue("data", {
 				_id: "abc",
 				user_id: 123,
@@ -167,7 +167,7 @@ describe("Hypermedia", function () {
 			.expectValue("links", [{
 				uri: "/somethings",
 				rel: "collection"
-			}, {uri: "/users/123", rel: "related"}])
+			}, {uri: "/users/123", rel: "related"}, {"uri": "http://source.tld", "rel": "related"}])
 			.expectValue("data", {_id: "def", user_id: 123, source_url: "http://source.tld"})
 			.expectValue("error", null)
 			.expectValue("status", 200)
@@ -179,7 +179,13 @@ describe("Rate Limiting", function () {
 	const port = 8007;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}, rate: {enabled: true, limit: 2, reset: 900}});
+	this.tenso = tenso({
+		port: port,
+		routes: routes,
+		logging: {level: "error"},
+		security: {csrf: false},
+		rate: {enabled: true, limit: 2, reset: 900}
+	});
 
 	it("GET / - returns an array of endpoints (1/2)", function () {
 		return tinyhttptest({url: "http://localhost:" + port})
@@ -233,19 +239,21 @@ describe("Rate Limiting (Override)", function () {
 	let i = 1;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}, rate: {
-		enabled: true,
-		limit: 2,
-		reset: 900,
-		override: function (req, rate) {
-			if (++i > 1 && rate.limit < 100) {
-				rate.limit += 100;
-				rate.remaining += 100;
-			}
+	this.tenso = tenso({
+		port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}, rate: {
+			enabled: true,
+			limit: 2,
+			reset: 900,
+			override: function (req, rate) {
+				if (++i > 1 && rate.limit < 100) {
+					rate.limit += 100;
+					rate.remaining += 100;
+				}
 
-			return rate;
+				return rate;
+			}
 		}
-	}});
+	});
 
 	it("GET / - returns an array of endpoints (1/2)", function () {
 		return tinyhttptest({url: "http://localhost:" + port})

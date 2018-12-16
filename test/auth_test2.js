@@ -12,10 +12,12 @@ describe("Permissions (CSRF disabled) (HTTP2)", function () {
 	const port = 8151;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, http2: true, routes: routes, logging: {level: "error"}, security: {csrf: false}, ssl: {
-		key: path.join(__dirname, "..", "ssl", "localhost.key"),
-		cert: path.join(__dirname, "..", "ssl", "localhost.crt")
-	}});
+	this.tenso = tenso({
+		port: port, http2: true, routes: routes, logging: {level: "error"}, security: {csrf: false}, ssl: {
+			key: path.join(__dirname, "..", "ssl", "localhost.key"),
+			cert: path.join(__dirname, "..", "ssl", "localhost.crt")
+		}
+	});
 
 	it("GET / - returns an array of endpoints", function () {
 		return tinyhttptest({http2: true, url: "https://localhost:" + port})
@@ -89,10 +91,17 @@ describe("Basic Auth (HTTP2)", function () {
 	const port = 8154;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, http2: true, routes: routes, logging: {level: "error"}, auth: {basic: {enabled: true, list: ["test:123"]}, protect: ["/uuid"]}, ssl: {
-		key: path.join(__dirname, "..", "ssl", "localhost.key"),
-		cert: path.join(__dirname, "..", "ssl", "localhost.crt")
-	}});
+	this.tenso = tenso({
+		port: port,
+		http2: true,
+		routes: routes,
+		logging: {level: "error"},
+		auth: {basic: {enabled: true, list: ["test:123"]}, protect: ["/uuid"]},
+		ssl: {
+			key: path.join(__dirname, "..", "ssl", "localhost.key"),
+			cert: path.join(__dirname, "..", "ssl", "localhost.crt")
+		}
+	});
 
 	it("GET / - returns links", function () {
 		return tinyhttptest({http2: true, url: "https://localhost:" + port})
@@ -131,10 +140,17 @@ describe("OAuth2 Token Bearer (HTTP2)", function () {
 	const port = 8155;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, http2: true, routes: routes, logging: {level: "error"}, auth: {bearer: {enabled: true, tokens: ["abc-123"]}, protect: ["/"]}, ssl: {
-		key: path.join(__dirname, "..", "ssl", "localhost.key"),
-		cert: path.join(__dirname, "..", "ssl", "localhost.crt")
-	}});
+	this.tenso = tenso({
+		port: port,
+		http2: true,
+		routes: routes,
+		logging: {level: "error"},
+		auth: {bearer: {enabled: true, tokens: ["abc-123"]}, protect: ["/"]},
+		ssl: {
+			key: path.join(__dirname, "..", "ssl", "localhost.key"),
+			cert: path.join(__dirname, "..", "ssl", "localhost.crt")
+		}
+	});
 
 	it("GET / - returns an array of endpoints (authorized)", function () {
 		return tinyhttptest({http2: true, url: "https://localhost:" + port, headers: {authorization: "Bearer abc-123"}})
@@ -165,22 +181,24 @@ describe("Local (HTTP2)", function () {
 		invalid = 1234;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, http2: true, routes: routes, logging: {level: "error"}, auth: {
-		local: {
-			enabled: true,
-			auth: function (username, password, callback) {
-				if (username === "test" && password === valid) {
-					callback(null, {username: username, password: password});
-				} else {
-					callback(true, null);
+	this.tenso = tenso({
+		port: port, http2: true, routes: routes, logging: {level: "error"}, auth: {
+			local: {
+				enabled: true,
+				auth: function (username, password, callback) {
+					if (username === "test" && password === valid) {
+						callback(null, {username: username, password: password});
+					} else {
+						callback(true, null);
+					}
 				}
-			}
-		},
-		protect: ["/uuid"]
-	}, ssl: {
-		key: path.join(__dirname, "..", "ssl", "localhost.key"),
-		cert: path.join(__dirname, "..", "ssl", "localhost.crt")
-	}});
+			},
+			protect: ["/uuid"]
+		}, ssl: {
+			key: path.join(__dirname, "..", "ssl", "localhost.key"),
+			cert: path.join(__dirname, "..", "ssl", "localhost.crt")
+		}
+	});
 
 	const login = this.tenso.config.auth.uri.login;
 
@@ -260,29 +278,35 @@ describe("JWT (HTTP2)", function () {
 		token = jwt.sign({username: "jason@attack.io"}, secret);
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, http2: true, routes: routes, logging: {level: "error"}, auth: {
-		jwt: {
-			enabled: true,
-			auth: function (arg, cb) {
-				if (arg.username === "jason@attack.io") {
-					cb(null, arg);
-				} else {
-					cb(new Error("Invalid token"), null);
-				}
+	this.tenso = tenso({
+		port: port, http2: true, routes: routes, logging: {level: "error"}, auth: {
+			jwt: {
+				enabled: true,
+				auth: function (arg, cb) {
+					if (arg.username === "jason@attack.io") {
+						cb(null, arg);
+					} else {
+						cb(new Error("Invalid token"), null);
+					}
+				},
+				secretOrKey: secret
 			},
-			secretOrKey: secret
-		},
-		security: {
-			csrf: false
-		},
-		protect: ["/uuid"]
-	}, ssl: {
-		key: path.join(__dirname, "..", "ssl", "localhost.key"),
-		cert: path.join(__dirname, "..", "ssl", "localhost.crt")
-	}});
+			security: {
+				csrf: false
+			},
+			protect: ["/uuid"]
+		}, ssl: {
+			key: path.join(__dirname, "..", "ssl", "localhost.key"),
+			cert: path.join(__dirname, "..", "ssl", "localhost.crt")
+		}
+	});
 
 	it("GET /uuid - returns a uuid (authorized)", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/uuid", headers: {authorization: "Bearer " + token}})
+		return tinyhttptest({
+			http2: true,
+			url: "https://localhost:" + port + "/uuid",
+			headers: {authorization: "Bearer " + token}
+		})
 			.expectStatus(200)
 			.expectJson()
 			.expectValue("links", [{uri: "/", rel: "collection"}])

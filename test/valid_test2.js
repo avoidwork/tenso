@@ -8,10 +8,12 @@ describe("Valid (HTTP2)", function () {
 	const port = 8071;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, http2: true, routes: routes, logging: {level: "error"}, security: {csrf: false}, ssl: {
-		key: path.join(__dirname, "..", "ssl", "localhost.key"),
-		cert: path.join(__dirname, "..", "ssl", "localhost.crt")
-	}});
+	this.tenso = tenso({
+		port: port, http2: true, routes: routes, logging: {level: "error"}, security: {csrf: false}, ssl: {
+			key: path.join(__dirname, "..", "ssl", "localhost.key"),
+			cert: path.join(__dirname, "..", "ssl", "localhost.crt")
+		}
+	});
 
 	it("GET / (200 / 'Array' - ETag capture)", function () {
 		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/"})

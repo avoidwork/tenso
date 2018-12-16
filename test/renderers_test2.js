@@ -11,10 +11,12 @@ describe("Renderers (HTTP2)", function () {
 	const port = 8061;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, http2: true, routes: routes, logging: {level: "error"}, security: {csrf: false}, ssl: {
-		key: path.join(__dirname, "..", "ssl", "localhost.key"),
-		cert: path.join(__dirname, "..", "ssl", "localhost.crt")
-	}});
+	this.tenso = tenso({
+		port: port, http2: true, routes: routes, logging: {level: "error"}, security: {csrf: false}, ssl: {
+			key: path.join(__dirname, "..", "ssl", "localhost.key"),
+			cert: path.join(__dirname, "..", "ssl", "localhost.crt")
+		}
+	});
 	this.tenso.renderer("custom", arg => arg);
 
 	it("GET CSV (header)", function () {
@@ -42,7 +44,11 @@ describe("Renderers (HTTP2)", function () {
 	});
 
 	it("GET JSONP (header)", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port, headers: {accept: "application/javascript"}})
+		return tinyhttptest({
+			http2: true,
+			url: "https://localhost:" + port,
+			headers: {accept: "application/javascript"}
+		})
 			.expectStatus(200)
 			.expectHeader("content-type", "application/javascript")
 			.expectBody(/^callback\(/)
@@ -64,7 +70,11 @@ describe("Renderers (HTTP2)", function () {
 	});
 
 	it("GET JSONP (header - custom callback)", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/?callback=custom", headers: {accept: "application/javascript"}})
+		return tinyhttptest({
+			http2: true,
+			url: "https://localhost:" + port + "/?callback=custom",
+			headers: {accept: "application/javascript"}
+		})
 			.expectStatus(200)
 			.expectHeader("content-type", "application/javascript")
 			.expectBody(/^custom\(/)
@@ -72,7 +82,10 @@ describe("Renderers (HTTP2)", function () {
 	});
 
 	it("GET JSONP (query string - custom callback)", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/?format=application/javascript&callback=custom"})
+		return tinyhttptest({
+			http2: true,
+			url: "https://localhost:" + port + "/?format=application/javascript&callback=custom"
+		})
 			.expectStatus(200)
 			.expectHeader("content-type", "application/javascript")
 			.expectBody(/^custom\(/)
@@ -80,13 +93,20 @@ describe("Renderers (HTTP2)", function () {
 	});
 
 	it("GET JSONP (invalid)", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/abc/?format=application/javascript&callback=custom"})
+		return tinyhttptest({
+			http2: true,
+			url: "https://localhost:" + port + "/abc/?format=application/javascript&callback=custom"
+		})
 			.expectStatus(404)
 			.end();
 	});
 
 	it("GET HTML (header)", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port, headers: {accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"}})
+		return tinyhttptest({
+			http2: true,
+			url: "https://localhost:" + port,
+			headers: {accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"}
+		})
 			.expectStatus(200)
 			.expectHeader("content-type", /text\/html/)
 			.expectBody(/<!DOCTYPE/)

@@ -9,10 +9,12 @@ describe("Invalid (HTTP2)", function () {
 	const port = 8062;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, http2: true, routes: routes, logging: {level: "error"}, security: {csrf: false}, ssl: {
-		key: path.join(__dirname, "..", "ssl", "localhost.key"),
-		cert: path.join(__dirname, "..", "ssl", "localhost.crt")
-	}});
+	this.tenso = tenso({
+		port: port, http2: true, routes: routes, logging: {level: "error"}, security: {csrf: false}, ssl: {
+			key: path.join(__dirname, "..", "ssl", "localhost.key"),
+			cert: path.join(__dirname, "..", "ssl", "localhost.crt")
+		}
+	});
 
 	it("GET / (416 / 'Partial response - invalid')", function () {
 		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/", headers: {range: "a-b"}})
@@ -77,7 +79,10 @@ describe("Invalid (HTTP2)", function () {
 	});
 
 	it("GET /nothere.x_%22%3E%3Cimg%20src=x%20onerror=prompt(1)%3E.html (404 / 'Not Found')", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/nothere.x_%22%3E%3Cimg%20src=x%20onerror=prompt(1)%3E.html"})
+		return tinyhttptest({
+			http2: true,
+			url: "https://localhost:" + port + "/nothere.x_%22%3E%3Cimg%20src=x%20onerror=prompt(1)%3E.html"
+		})
 			.expectStatus(404)
 			.expectHeader("allow", undefined)
 			.expectValue("error", http.STATUS_CODES[404])

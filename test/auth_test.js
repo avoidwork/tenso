@@ -85,7 +85,12 @@ describe("Basic Auth", function () {
 	const port = 8004;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, auth: {basic: {enabled: true, list: ["test:123"]}, protect: ["/uuid"]}});
+	this.tenso = tenso({
+		port: port,
+		routes: routes,
+		logging: {level: "error"},
+		auth: {basic: {enabled: true, list: ["test:123"]}, protect: ["/uuid"]}
+	});
 
 	it("GET / - returns links", function () {
 		return tinyhttptest({url: "http://localhost:" + port})
@@ -124,7 +129,12 @@ describe("OAuth2 Token Bearer", function () {
 	const port = 8005;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, auth: {bearer: {enabled: true, tokens: ["abc-123"]}, protect: ["/"]}});
+	this.tenso = tenso({
+		port: port,
+		routes: routes,
+		logging: {level: "error"},
+		auth: {bearer: {enabled: true, tokens: ["abc-123"]}, protect: ["/"]}
+	});
 
 	it("GET / - returns an array of endpoints (authorized)", function () {
 		return tinyhttptest({url: "http://localhost:" + port, headers: {authorization: "Bearer abc-123"}})
@@ -155,19 +165,21 @@ describe("Local", function () {
 		invalid = 1234;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, auth: {
-		local: {
-			enabled: true,
-			auth: function (username, password, callback) {
-				if (username === "test" && password === valid) {
-					callback(null, {username: username, password: password});
-				} else {
-					callback(true, null);
+	this.tenso = tenso({
+		port: port, routes: routes, logging: {level: "error"}, auth: {
+			local: {
+				enabled: true,
+				auth: function (username, password, callback) {
+					if (username === "test" && password === valid) {
+						callback(null, {username: username, password: password});
+					} else {
+						callback(true, null);
+					}
 				}
-			}
-		},
-		protect: ["/uuid"]
-	}});
+			},
+			protect: ["/uuid"]
+		}
+	});
 
 	const login = this.tenso.config.auth.uri.login;
 
@@ -247,23 +259,25 @@ describe("JWT", function () {
 		token = jwt.sign({username: "jason@attack.io"}, secret);
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, auth: {
-		jwt: {
-			enabled: true,
-			auth: function (arg, cb) {
-				if (arg.username === "jason@attack.io") {
-					cb(null, arg);
-				} else {
-					cb(new Error("Invalid token"), null);
-				}
+	this.tenso = tenso({
+		port: port, routes: routes, logging: {level: "error"}, auth: {
+			jwt: {
+				enabled: true,
+				auth: function (arg, cb) {
+					if (arg.username === "jason@attack.io") {
+						cb(null, arg);
+					} else {
+						cb(new Error("Invalid token"), null);
+					}
+				},
+				secretOrKey: secret
 			},
-			secretOrKey: secret
-		},
-		security: {
-			csrf: false
-		},
-		protect: ["/uuid"]
-	}});
+			security: {
+				csrf: false
+			},
+			protect: ["/uuid"]
+		}
+	});
 
 	it("GET /uuid - returns a uuid (authorized)", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/uuid", headers: {authorization: "Bearer " + token}})

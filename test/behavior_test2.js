@@ -161,7 +161,7 @@ describe("Hypermedia (HTTP2)", function () {
 			.expectValue("links", [{
 				uri: "/somethings",
 				rel: "collection"
-			}, {uri: "/users/123", rel: "related"}, {"uri": "http://source.tld", "rel": "related"}])
+			}, {uri: "/users/123", rel: "related"}])
 			.expectValue("data", {
 				_id: "abc",
 				user_id: 123,
@@ -180,7 +180,7 @@ describe("Hypermedia (HTTP2)", function () {
 			.expectValue("links", [{
 				uri: "/somethings",
 				rel: "collection"
-			}, {uri: "/users/123", rel: "related"}, {"uri": "http://source.tld", "rel": "related"}])
+			}, {uri: "/users/123", rel: "related"}])
 			.expectValue("data", {_id: "def", user_id: 123, source_url: "http://source.tld"})
 			.expectValue("error", null)
 			.expectValue("status", 200)

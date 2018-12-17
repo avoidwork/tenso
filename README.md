@@ -358,7 +358,7 @@ Custom static routes can be defined like such:
 ```
 
 ## EventSource streams
-Create & cache an `EventSource` stream to send messages to a Client:
+Create & cache an `EventSource` stream to send messages to a Client. See [tiny-eventsource](https://github.com/avoidwork/tiny-eventsource) for configuration options:
 
 ```
 const streams = new Map();
@@ -369,7 +369,7 @@ const streams = new Map();
  const id = req.user.userId;
 
  if (streams.has(id) === false) {
-   streams.set(id, req.server.eventsource());
+   streams.set(id, req.server.eventsource({ms: 3e4), "initialized");
  }
 
  streams.get(id).init(req, res);

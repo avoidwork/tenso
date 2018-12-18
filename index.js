@@ -34,8 +34,8 @@ function factory (config = {}) {
 		process.exit(1);
 	}
 
-	obj.config.root = path.resolve(obj.config.root || __dirname);
-	obj.config.template = fs.readFileSync(config.template || path.join(obj.config.root, "template.html"), {encoding: "utf8"});
+	obj.config.root = path.resolve(path.join(obj.config.root || __dirname, "www"));
+	obj.config.template = fs.readFileSync(config.template || path.join(__dirname, "template.html"), {encoding: "utf8"});
 	obj.config.version = pkg.version;
 
 	if (Object.keys(args).length > 0) {

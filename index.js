@@ -34,15 +34,15 @@ function factory (config = {}) {
 		process.exit(1);
 	}
 
-	obj.config.root = path.resolve(path.join(obj.config.root || __dirname, "www"));
-	obj.config.template = fs.readFileSync(config.template || path.join(__dirname, "template.html"), {encoding: "utf8"});
-	obj.config.version = pkg.version;
-
 	if (Object.keys(args).length > 0) {
 		merge(config, args || {});
 	}
 
 	merge(obj.config, config);
+
+	obj.config.root = path.resolve(config.root || path.join(__dirname, "www"));
+	obj.config.template = fs.readFileSync(config.template || path.join(__dirname, "template.html"), {encoding: "utf8"});
+	obj.config.version = pkg.version;
 
 	if (obj.config.silent !== true) {
 		obj.config.headers.server = `tenso/${pkg.version}`;

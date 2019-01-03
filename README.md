@@ -91,6 +91,7 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 	"headers": {}, /* Optional, custom headers */
 	"hostname": "localhost", /* Optional, default is 'localhost' */
 	"http2": false, /* Middleware signatures do not change, see woodland */
+	"index": ["index.htm", "index.html"], /* Files served when accessing a static assets folder */
 	"json": 0, /* Optional, default indent for 'pretty' JSON */
 	"logging": {
 		"level": "info", /* Optional */
@@ -113,6 +114,7 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 		"cert": null,
 		"key": null
 	},
+	static: "/assets/.*", /* Optional, URI path to serve static assets from */
 	"renderHeaders": true, /* false will disable headers in HTML interface */
 	"title": "My API", /* Page title for browsable API */
 	"uid": 33 /* Optional, system account uid to drop to after starting with elevated privileges to run on a low port */

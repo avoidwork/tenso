@@ -3,7 +3,7 @@ require("./index.js")({
 	routes: require("./test/routes.js"),
 	http2: true,
 	logging: {
-		level: "debug"
+		level: "info"
 	},
 	auth: {
 		local: {
@@ -27,6 +27,7 @@ require("./index.js")({
 	security: {
 		csrf: false
 	},
+	static: "/sample(/)?",
 	ssl: {
 		key: "./ssl/localhost.key",
 		cert: "./ssl/localhost.crt"

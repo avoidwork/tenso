@@ -7,7 +7,7 @@ describe("Valid", function () {
 	const port = 8021;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}, static: "/sample(/)?"});
 
 	it("GET / (200 / 'Array' - ETag capture)", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/"})
@@ -71,6 +71,20 @@ describe("Valid", function () {
 			.expectValue("data", null)
 			.expectValue("error", null)
 			.expectValue("status", 200)
+			.end();
+	});
+
+	it("GET /sample (200 / redirect)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/sample"})
+			.expectStatus(301)
+			.expectHeader("location", "/sample/")
+			.end();
+	});
+
+	it("GET /sample/ (200 / HTML)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/sample/"})
+			.expectStatus(200)
+			.expectHeader("allow", "GET, HEAD, OPTIONS")
 			.end();
 	});
 });

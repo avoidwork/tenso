@@ -8,12 +8,10 @@ describe("Valid (HTTP2)", function () {
 	const port = 8071;
 
 	this.timeout(timeout);
-	this.tenso = tenso({
-		port: port, http2: true, routes: routes, logging: {level: "error"}, security: {csrf: false}, ssl: {
-			key: path.join(__dirname, "..", "ssl", "localhost.key"),
-			cert: path.join(__dirname, "..", "ssl", "localhost.crt")
-		}
-	});
+	this.tenso = tenso({http2: true, port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}, static: "/sample(/)?", ssl: {
+		key: path.join(__dirname, "..", "ssl", "localhost.key"),
+		cert: path.join(__dirname, "..", "ssl", "localhost.crt")
+	}});
 
 	it("GET / (200 / 'Array' - ETag capture)", function () {
 		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/"})
@@ -78,5 +76,19 @@ describe("Valid (HTTP2)", function () {
 			.expectValue("error", null)
 			.expectValue("status", 200)
 			.end();
+	});
+
+	it("GET /sample (301 / redirect)", function () {
+		return tinyhttptest({http2: true, url: "http://localhost:" + port + "/sample"})
+			.expectStatus(301)
+			.expectHeader("location", "/sample/")
+			.end();
+	});
+
+	it("GET /sample/ (200 / HTML)", function () {
+		return tinyhttptest({http2: true, url: "http://localhost:" + port + "/sample/"})
+			.expectStatus(200)
+			.expectHeader("allow", "GET, HEAD, OPTIONS")
+			.end().catch(err => console.error(err.stack));
 	});
 });

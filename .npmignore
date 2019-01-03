@@ -2,6 +2,7 @@
 /node_modules/
 /ssl/
 /test/
+/www/sample/
 .eslintrc
 .gitignore
 .travis.yml

@@ -79,16 +79,16 @@ describe("Valid (HTTP2)", function () {
 	});
 
 	it("GET /sample (301 / redirect)", function () {
-		return tinyhttptest({http2: true, url: "http://localhost:" + port + "/sample"})
+		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/sample"})
 			.expectStatus(301)
 			.expectHeader("location", "/sample/")
 			.end();
 	});
 
 	it("GET /sample/ (200 / HTML)", function () {
-		return tinyhttptest({http2: true, url: "http://localhost:" + port + "/sample/"})
+		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/sample/"})
 			.expectStatus(200)
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.end().catch(err => console.error(err.stack));
+			.end();
 	});
 });

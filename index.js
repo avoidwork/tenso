@@ -7,7 +7,8 @@ const fs = require("fs"),
 	root = __dirname,
 	pkg = require(path.join(root, "package.json")),
 	tenso = require(path.join(root, "lib", "tenso.js")),
-	{bootstrap, each, jsonWrap} = require(path.join(root, "lib", "utility.js"));
+	{bootstrap, each} = require(path.join(root, "lib", "utility.js")),
+	{jsonWrap} = require(path.join(root, "lib", "shared.js"));
 
 // Removing default properties
 delete args._;

@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tensō is an HTTP/HTTP2 REST API framework",
-  "version": "10.0.29",
+  "version": "10.0.30",
   "homepage": "http://avoidwork.github.io/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -40,12 +40,12 @@
     "precise": "^1.1.0",
     "retsu": "^3.0.2",
     "tiny-coerce": "^1.1.1",
-    "tiny-etag": "^2.0.9",
+    "tiny-etag": "^2.0.10",
     "tiny-eventsource": "^1.2.0",
     "tiny-merge": "^1.0.0",
     "tiny-uuid4": "^1.0.1",
     "tiny-xml": "^2.0.0",
-    "woodland": "^7.3.30",
+    "woodland": "^7.3.31",
     "yamljs": "^0.3.0",
     "yargs": "^12.0.2"
   },

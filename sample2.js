@@ -27,7 +27,6 @@ require("./index.js")({
 	security: {
 		csrf: false
 	},
-	static: "/sample(/)?",
 	ssl: {
 		key: "./ssl/localhost.key",
 		cert: "./ssl/localhost.crt"

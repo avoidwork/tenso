@@ -23,7 +23,6 @@ require("./index.js")({
 			secretOrKey: "jennifer"
 		}
 	},
-	static: "/sample(/)?",
 	security: {
 		csrf: false
 	}

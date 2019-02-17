@@ -22,6 +22,8 @@ You can use `res` to `res.send(body[, status, headers])`, `res.redirect(url)`, o
 
 The following example will create GET routes that will return an `Array` at `/`, an `Error` at `/reports/tps`, & a version 4 UUID at `/uuid`.
 
+As of 10.3.0 you can specify `always` as a method to run middleware before authorization middleware, which will skip `always` middleware registered after it (via instance methods).
+
 ```javascript
 const uuid = require("tiny-uuid4");
 

@@ -92,6 +92,7 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 	"auth": {}, /* Optional, see Authentication section */
 	"cacheSize": 1000, /* Optional, size of Etag & route LRU caches */
 	"cacheTTL": 0, /* Optional, TTL of items in Etag & route LRU caches */
+	"dtrace": false, /* Optional, enables DTrace probes (see dtrace.sh) */
 	"headers": {}, /* Optional, custom headers */
 	"hostname": "localhost", /* Optional, default is 'localhost' */
 	"http2": false, /* Middleware signatures do not change, see woodland */
@@ -233,6 +234,9 @@ Tensō uses [passport-saml](https://github.com/bergie/passport-saml), for config
 	}
 }
 ```
+
+## DTrace
+DTrace probes are in a set of core functions, which can be enabled by setting `dtrace: true` for factory options, and watched with `dtrace.sh`; not recommended for production.
 
 ## ETags
 Generates `ETag` headers for `GET` requests

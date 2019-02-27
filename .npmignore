@@ -6,7 +6,6 @@
 .eslintrc
 .gitignore
 .travis.yml
-dtrace.sh
 Gruntfile.js
 sample.js
 sample2.js

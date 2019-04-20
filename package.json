@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tensō is an HTTP/HTTP2 REST API framework",
-  "version": "10.5.0",
+  "version": "11.0.0",
   "homepage": "http://avoidwork.github.io/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -22,10 +22,10 @@
     "ssl": "mkdir ssl && openssl req -new -newkey rsa:2048 -subj \"/C=CA/ST=Ontario/L=Ottawa/O=CHANGEME/CN=localhost\" -days 365 -nodes -x509 -keyout ssl/localhost.key -out ssl/localhost.crt"
   },
   "dependencies": {
-    "connect-redis": "^3.4.0",
-    "cookie-parser": "^1.4.3",
+    "connect-redis": "^3.4.1",
+    "cookie-parser": "^1.4.4",
     "csv.js": "^1.0.7",
-    "express-session": "^1.15.6",
+    "express-session": "^1.16.1",
     "keysort": "^1.0.2",
     "lusca": "^1.6.1",
     "mimetype": "^0.0.8",
@@ -35,7 +35,7 @@
     "passport-http-bearer": "^1.0.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
-    "passport-oauth2": "^1.4.0",
+    "passport-oauth2": "^1.5.0",
     "passport-saml": "^0.35.0",
     "precise": "^1.1.0",
     "retsu": "^3.0.2",

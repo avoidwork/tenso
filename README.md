@@ -65,6 +65,8 @@ Sort order can be specified via then `order-by` which accepts `[field ]asc|desc`
 }
 ```
 
+Final modifications can be made to a response body after `hypermedia()` by overriding `tenso.final(req, res, body)`.
+
 ## REST / Hypermedia
 Hypermedia is a prerequisite of REST, and is best described by the [Richardson Maturity Model](http://martinfowler.com/articles/richardsonMaturityModel.html). Tensō will automagically paginate Arrays of results, or parse Entity representations for keys that imply
 relationships, and create the appropriate Objects in the `link` Array, as well as the `Link` HTTP header. Object keys that match this pattern: `/_(guid|uuid|id|uri|url)$/` will be considered

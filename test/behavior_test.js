@@ -22,13 +22,10 @@ describe("Pagination", function () {
 	it("GET /items/ - returns page 1/3 of an array of numbers", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/items/"})
 			.expectStatus(200)
-			.expectValue("links", [{
-				uri: "/",
-				rel: "collection"
-			}, {
-				uri: "/items/?page=3&page_size=5",
-				rel: "last"
-			}, {uri: "/items/?page=2&page_size=5", rel: "next"}])
+			.expectValue("links", [{"uri": "/", "rel": "collection"}, {
+				"uri": "/items/?page=3&page_size=5",
+				"rel": "last"
+			}, {"uri": "/items/?page=2&page_size=5", "rel": "next"}])
 			.expectValue("data", [1, 2, 3, 4, 5])
 			.expectValue("error", null)
 			.expectValue("status", 200)
@@ -38,13 +35,10 @@ describe("Pagination", function () {
 	it("GET /items - returns page 1/3 of an array of numbers", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/items"})
 			.expectStatus(200)
-			.expectValue("links", [{
-				uri: "/",
-				rel: "collection"
-			}, {
-				uri: "/items?page=3&page_size=5",
-				rel: "last"
-			}, {uri: "/items?page=2&page_size=5", rel: "next"}])
+			.expectValue("links", [{"uri": "/", "rel": "collection"}, {
+				"uri": "/items?page=3&page_size=5",
+				"rel": "last"
+			}, {"uri": "/items?page=2&page_size=5", "rel": "next"}])
 			.expectValue("data", [1, 2, 3, 4, 5])
 			.expectValue("error", null)
 			.expectValue("status", 200)
@@ -54,13 +48,10 @@ describe("Pagination", function () {
 	it("GET /items?page=2&page_size=5 - returns page 2/3 of an array of numbers", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/items?page=2&page_size=5"})
 			.expectStatus(200)
-			.expectValue("links", [{
-				uri: "/",
-				rel: "collection"
-			}, {
-				uri: "/items?page=1&page_size=5",
-				rel: "first"
-			}, {uri: "/items?page=3&page_size=5", rel: "last"}])
+			.expectValue("links", [{"uri": "/", "rel": "collection"}, {
+				"uri": "/items?page=1&page_size=5",
+				"rel": "first"
+			}, {"uri": "/items?page=3&page_size=5", "rel": "last"}])
 			.expectValue("data", [6, 7, 8, 9, 10])
 			.expectValue("error", null)
 			.expectValue("status", 200)
@@ -70,13 +61,10 @@ describe("Pagination", function () {
 	it("GET /items?page=3&page_size=5 - returns page 3/3 of an array of numbers", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/items?page=3&page_size=5"})
 			.expectStatus(200)
-			.expectValue("links", [{
-				uri: "/",
-				rel: "collection"
-			}, {
-				uri: "/items?page=1&page_size=5",
-				rel: "first"
-			}, {uri: "/items?page=2&page_size=5", rel: "prev"}])
+			.expectValue("links", [{"uri": "/", "rel": "collection"}, {
+				"uri": "/items?page=1&page_size=5",
+				"rel": "first"
+			}, {"uri": "/items?page=2&page_size=5", "rel": "prev"}])
 			.expectValue("data", [11, 12, 13, 14, 15])
 			.expectValue("error", null)
 			.expectValue("status", 200)
@@ -86,13 +74,10 @@ describe("Pagination", function () {
 	it("GET /items?page=4&page_size=5 - returns page 4/3 of an array of numbers (empty)", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/items?page=4&page_size=5"})
 			.expectStatus(200)
-			.expectValue("links", [{
-				uri: "/",
-				rel: "collection"
-			}, {
-				uri: "/items?page=1&page_size=5",
-				rel: "first"
-			}, {uri: "/items?page=3&page_size=5", rel: "last"}])
+			.expectValue("links", [{"uri": "/", "rel": "collection"}, {
+				"uri": "/items?page=1&page_size=5",
+				"rel": "first"
+			}, {"uri": "/items?page=3&page_size=5", "rel": "last"}])
 			.expectValue("data", [])
 			.expectValue("error", null)
 			.expectValue("status", 200)
@@ -145,10 +130,10 @@ describe("Hypermedia", function () {
 	it("GET /somethings/abc - returns an entity that has hypermedia properties, and data", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/somethings/abc"})
 			.expectStatus(200)
-			.expectValue("links", [{
-				uri: "/somethings",
-				rel: "collection"
-			}, {uri: "/users/123", rel: "related"}])
+			.expectValue("links", [{"uri": "/somethings", "rel": "collection"}, {
+				"uri": "/somethings/abc",
+				"rel": "item"
+			}, {"uri": "/users/123", "rel": "related"}])
 			.expectValue("data", {
 				_id: "abc",
 				user_id: 123,
@@ -164,10 +149,10 @@ describe("Hypermedia", function () {
 	it("GET /somethings/def - returns an entity that has hypermedia properties, and no data", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/somethings/def"})
 			.expectStatus(200)
-			.expectValue("links", [{
-				uri: "/somethings",
-				rel: "collection"
-			}, {uri: "/users/123", rel: "related"}])
+			.expectValue("links", [{"uri": "/somethings", "rel": "collection"}, {
+				"uri": "/somethings/def",
+				"rel": "item"
+			}, {"uri": "/users/123", "rel": "related"}])
 			.expectValue("data", {_id: "def", user_id: 123, source_url: "http://source.tld"})
 			.expectValue("error", null)
 			.expectValue("status", 200)

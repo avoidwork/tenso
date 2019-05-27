@@ -18,7 +18,7 @@ describe("Pagination (HTTP2)", function () {
 	});
 
 	it("GET /empty - returns an empty array", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/empty"})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}/empty`})
 			.expectStatus(200)
 			.expectValue("links", [{uri: "/", rel: "collection"}])
 			.expectValue("data", [])
@@ -28,15 +28,12 @@ describe("Pagination (HTTP2)", function () {
 	});
 
 	it("GET /items/ - returns page 1/3 of an array of numbers", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/items/"})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}/items/`})
 			.expectStatus(200)
-			.expectValue("links", [{
-				uri: "/",
-				rel: "collection"
-			}, {
-				uri: "/items/?page=3&page_size=5",
-				rel: "last"
-			}, {uri: "/items/?page=2&page_size=5", rel: "next"}])
+			.expectValue("links", [{"uri": "/", "rel": "collection"}, {
+				"uri": "/items/?page=3&page_size=5",
+				"rel": "last"
+			}, {"uri": "/items/?page=2&page_size=5", "rel": "next"}])
 			.expectValue("data", [1, 2, 3, 4, 5])
 			.expectValue("error", null)
 			.expectValue("status", 200)
@@ -44,15 +41,12 @@ describe("Pagination (HTTP2)", function () {
 	});
 
 	it("GET /items - returns page 1/3 of an array of numbers", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/items"})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}/items`})
 			.expectStatus(200)
-			.expectValue("links", [{
-				uri: "/",
-				rel: "collection"
-			}, {
-				uri: "/items?page=3&page_size=5",
-				rel: "last"
-			}, {uri: "/items?page=2&page_size=5", rel: "next"}])
+			.expectValue("links", [{"uri": "/", "rel": "collection"}, {
+				"uri": "/items?page=3&page_size=5",
+				"rel": "last"
+			}, {"uri": "/items?page=2&page_size=5", "rel": "next"}])
 			.expectValue("data", [1, 2, 3, 4, 5])
 			.expectValue("error", null)
 			.expectValue("status", 200)
@@ -60,15 +54,12 @@ describe("Pagination (HTTP2)", function () {
 	});
 
 	it("GET /items?page=2&page_size=5 - returns page 2/3 of an array of numbers", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/items?page=2&page_size=5"})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}/items?page=2&page_size=5`})
 			.expectStatus(200)
-			.expectValue("links", [{
-				uri: "/",
-				rel: "collection"
-			}, {
-				uri: "/items?page=1&page_size=5",
-				rel: "first"
-			}, {uri: "/items?page=3&page_size=5", rel: "last"}])
+			.expectValue("links", [{"uri": "/", "rel": "collection"}, {
+				"uri": "/items?page=1&page_size=5",
+				"rel": "first"
+			}, {"uri": "/items?page=3&page_size=5", "rel": "last"}])
 			.expectValue("data", [6, 7, 8, 9, 10])
 			.expectValue("error", null)
 			.expectValue("status", 200)
@@ -76,15 +67,12 @@ describe("Pagination (HTTP2)", function () {
 	});
 
 	it("GET /items?page=3&page_size=5 - returns page 3/3 of an array of numbers", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/items?page=3&page_size=5"})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}/items?page=3&page_size=5`})
 			.expectStatus(200)
-			.expectValue("links", [{
-				uri: "/",
-				rel: "collection"
-			}, {
-				uri: "/items?page=1&page_size=5",
-				rel: "first"
-			}, {uri: "/items?page=2&page_size=5", rel: "prev"}])
+			.expectValue("links", [{"uri": "/", "rel": "collection"}, {
+				"uri": "/items?page=1&page_size=5",
+				"rel": "first"
+			}, {"uri": "/items?page=2&page_size=5", "rel": "prev"}])
 			.expectValue("data", [11, 12, 13, 14, 15])
 			.expectValue("error", null)
 			.expectValue("status", 200)
@@ -92,15 +80,12 @@ describe("Pagination (HTTP2)", function () {
 	});
 
 	it("GET /items?page=4&page_size=5 - returns page 4/3 of an array of numbers (empty)", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/items?page=4&page_size=5"})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}/items?page=4&page_size=5`})
 			.expectStatus(200)
-			.expectValue("links", [{
-				uri: "/",
-				rel: "collection"
-			}, {
-				uri: "/items?page=1&page_size=5",
-				rel: "first"
-			}, {uri: "/items?page=3&page_size=5", rel: "last"}])
+			.expectValue("links", [{"uri": "/", "rel": "collection"}, {
+				"uri": "/items?page=1&page_size=5",
+				"rel": "first"
+			}, {"uri": "/items?page=3&page_size=5", "rel": "last"}])
 			.expectValue("data", [])
 			.expectValue("error", null)
 			.expectValue("status", 200)
@@ -108,7 +93,7 @@ describe("Pagination (HTTP2)", function () {
 	});
 
 	it("GET /items?email=user@domain.com - returns page 1/3 of an array of numbers, preserving the query string via encoding", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/items?email=user@domain.com"})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}/items?email=user@domain.com`})
 			.expectStatus(200)
 			.expectValue("links", [{
 				uri: "/",
@@ -139,7 +124,7 @@ describe("Hypermedia (HTTP2)", function () {
 	});
 
 	it("GET /things - returns a collection of representations that has hypermedia properties", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/things"})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}/things`})
 			.expectStatus(200)
 			.expectValue("links", [{
 				uri: "/",
@@ -156,12 +141,13 @@ describe("Hypermedia (HTTP2)", function () {
 	});
 
 	it("GET /somethings/abc - returns an entity that has hypermedia properties, and data", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/somethings/abc"})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}/somethings/abc`})
 			.expectStatus(200)
-			.expectValue("links", [{
-				uri: "/somethings",
-				rel: "collection"
-			}, {uri: "/users/123", rel: "related"}])
+			.expectValue("links", [{"uri": "/somethings", "rel": "collection"}, {
+				"uri": "/somethings/abc",
+				"rel": "item"
+			},
+			{"uri": "/users/123", "rel": "related"}])
 			.expectValue("data", {
 				_id: "abc",
 				user_id: 123,
@@ -175,12 +161,13 @@ describe("Hypermedia (HTTP2)", function () {
 	});
 
 	it("GET /somethings/def - returns an entity that has hypermedia properties, and no data", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/somethings/def"})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}/somethings/def`})
 			.expectStatus(200)
-			.expectValue("links", [{
-				uri: "/somethings",
-				rel: "collection"
-			}, {uri: "/users/123", rel: "related"}])
+			.expectValue("links", [{"uri": "/somethings", "rel": "collection"}, {
+				"uri": "/somethings/def",
+				"rel": "item"
+			},
+			{"uri": "/users/123", "rel": "related"}])
 			.expectValue("data", {_id: "def", user_id: 123, source_url: "http://source.tld"})
 			.expectValue("error", null)
 			.expectValue("status", 200)
@@ -206,7 +193,7 @@ describe("Rate Limiting (HTTP2)", function () {
 	});
 
 	it("GET / - returns an array of endpoints (1/2)", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}`})
 			.cookies()
 			.expectStatus(200)
 			.expectHeader("x-ratelimit-limit", "2")
@@ -224,7 +211,7 @@ describe("Rate Limiting (HTTP2)", function () {
 	});
 
 	it("GET / - returns an array of endpoints (2/2)", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}`})
 			.cookies()
 			.expectStatus(200)
 			.expectHeader("x-ratelimit-limit", "2")
@@ -242,7 +229,7 @@ describe("Rate Limiting (HTTP2)", function () {
 	});
 
 	it("GET / - returns a 'too many requests' error", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}`})
 			.cookies()
 			.expectStatus(429)
 			.expectValue("data", null)
@@ -278,7 +265,7 @@ describe("Rate Limiting (Override) (HTTP2)", function () {
 	});
 
 	it("GET / - returns an array of endpoints (1/2)", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}`})
 			.cookies()
 			.expectStatus(200)
 			.expectHeader("x-ratelimit-limit", "102")
@@ -296,7 +283,7 @@ describe("Rate Limiting (Override) (HTTP2)", function () {
 	});
 
 	it("GET / - returns an array of endpoints (2/2)", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}`})
 			.cookies()
 			.expectStatus(200)
 			.expectHeader("x-ratelimit-limit", "102")
@@ -332,7 +319,7 @@ describe("Request body max byte size (HTTP2)", function () {
 	});
 
 	it("POST /test - returns an a result", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/test", method: "post"})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}/test`, method: "post"})
 			.json({"x": 1})
 			.expectStatus(200)
 			.expectValue("links", [{uri: "/", rel: "collection"}])
@@ -343,7 +330,7 @@ describe("Request body max byte size (HTTP2)", function () {
 	});
 
 	it("POST /test (invalid) - returns a 'request entity too large' error", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/test", method: "post"})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}/test`, method: "post"})
 			.json({"abc": true})
 			.expectStatus(413)
 			.expectValue("data", null)
@@ -365,7 +352,7 @@ describe("Route parameters (HTTP2)", function () {
 	});
 
 	it("GET /test/hidden - returns an a 'hidden' result", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/test/hidden"})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}/test/hidden`})
 			.expectStatus(200)
 			.expectValue("links", [{uri: "/test", rel: "collection"}])
 			.expectValue("data", "hidden")
@@ -387,14 +374,14 @@ describe("CORS (HTTP2)", function () {
 	});
 
 	it("OPTIONS /empty - returns an empty array", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/empty", method: "options"})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}/empty`, method: "options"})
 			.cors("http://not.localhost")
 			.expectStatus(200)
 			.end();
 	});
 
 	it("GET /empty - returns an empty array", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/empty"})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}/empty`})
 			.cors("http://not.localhost")
 			.expectStatus(200)
 			.end();
@@ -415,7 +402,7 @@ describe("Sorting (HTTP2)", function () {
 	it("GET /things?order_by=user_id%20asc&order_by=name%20desc - returns a sorted array of objects", function () {
 		return tinyhttptest({
 			http2: true,
-			url: "https://localhost:" + port + "/things?order_by=user_id%20asc&order_by=name%20desc"
+			url: `https://localhost:${port}/things?order_by=user_id%20asc&order_by=name%20desc`
 		})
 			.expectStatus(200)
 			.expectValue("data", [
@@ -442,7 +429,7 @@ describe("Sorting (HTTP2)", function () {
 	});
 
 	it("GET /items?order_by=asc - returns a sorted array of primitives", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/items?order_by=asc"})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}/items?order_by=asc`})
 			.expectStatus(200)
 			.expectValue("data", [
 				1,
@@ -457,7 +444,7 @@ describe("Sorting (HTTP2)", function () {
 	});
 
 	it("GET /items?order_by=desc - returns a sorted array of primitives", function () {
-		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/items?order_by=desc"})
+		return tinyhttptest({http2: true, url: `https://localhost:${port}/items?order_by=desc`})
 			.expectStatus(200)
 			.expectValue("data", [
 				15,

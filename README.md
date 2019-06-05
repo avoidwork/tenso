@@ -106,6 +106,7 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 		"stack": false, /* Optional */
 		"stackWire": false /* Optional */
 	},
+	"corsExpose": "x-custom-header, x-custom-header-abc",
 	"origins": ["*"], /* Optional, allowed origins of CORS requests */
 	"port": 8000, /* Optional */
 	"routes": require("./routes.js"), /* Required! */

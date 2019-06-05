@@ -388,6 +388,27 @@ describe("CORS (HTTP2)", function () {
 	});
 });
 
+describe("CORS Headers (HTTP2)", function () {
+	const port = 8065;
+
+	this.timeout(timeout);
+	this.tenso = tenso({
+		port: port, http2: true, routes: routes, logging: {level: "error"}, security: {csrf: true}, ssl: {
+			key: path.join(__dirname, "..", "ssl", "localhost.key"),
+			cert: path.join(__dirname, "..", "ssl", "localhost.crt")
+		}
+	});
+
+	it("GET /test - exposes x-csrf-token header", function () {
+		return tinyhttptest({http2: true, url: `https://localhost:${port}/test`})
+			.cors("http://not.localhost")
+			.expectHeader("access-control-expose-headers", /x-csrf-token/)
+			.expectHeader("x-csrf-token", /\w/)
+			.expectStatus(200)
+			.end();
+	});
+});
+
 describe("Sorting (HTTP2)", function () {
 	const port = 8064;
 

@@ -343,6 +343,22 @@ describe("CORS", function () {
 	});
 });
 
+describe("CORS Headers", function () {
+	const port = 8015;
+
+	this.timeout(timeout);
+	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: true}});
+
+	it("GET /test - exposes x-csrf-token header", function () {
+		return tinyhttptest({url: "http://localhost:" + port + "/test"})
+			.cors("http://not.localhost")
+			.expectHeader("access-control-expose-headers", /x-csrf-token/)
+			.expectHeader("x-csrf-token", /\w/)
+			.expectStatus(200)
+			.end();
+	});
+});
+
 describe("Sorting", function () {
 	const port = 8014;
 

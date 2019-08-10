@@ -81,10 +81,10 @@ describe("Valid", function () {
 			.end();
 	});
 
-	/*it("GET /sample/ (200 / HTML)", function () {
+	it("GET /sample/ (200 / HTML)", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/sample/"})
 			.expectStatus(200)
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
 			.end();
-	});*/
+	});
 });

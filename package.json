@@ -48,7 +48,7 @@
     "tiny-xml": "^2.0.0",
     "woodland": "^8.0.2",
     "yamljs": "^0.3.0",
-    "yargs": "^14.0.0S"
+    "yargs": "^14.0.0"
   },
   "devDependencies": {
     "grunt": "^1.0.4",

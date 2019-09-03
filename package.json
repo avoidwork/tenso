@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tensō is an HTTP/HTTP2 REST API framework",
-  "version": "11.4.0",
+  "version": "12.0.0",
   "homepage": "http://avoidwork.github.io/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -22,7 +22,7 @@
     "ssl": "mkdir ssl && openssl req -new -newkey rsa:2048 -subj \"/C=CA/ST=Ontario/L=Ottawa/O=CHANGEME/CN=localhost\" -days 365 -nodes -x509 -keyout ssl/localhost.key -out ssl/localhost.crt"
   },
   "dependencies": {
-    "connect-redis": "^3.4.2",
+    "connect-redis": "^4.0.1",
     "cookie-parser": "^1.4.4",
     "csv.js": "^1.0.7",
     "express-session": "^1.16.2",
@@ -36,8 +36,9 @@
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "passport-oauth2": "^1.5.0",
-    "passport-saml": "^0.35.0",
+    "passport-saml": "^1.1.0",
     "precise": "^1.1.0",
+    "redis": "^2.8.0",
     "retsu": "^3.0.2",
     "tiny-coerce": "^1.1.1",
     "tiny-etag": "^2.0.15",
@@ -45,9 +46,9 @@
     "tiny-merge": "^1.0.0",
     "tiny-uuid4": "^1.0.1",
     "tiny-xml": "^2.0.0",
-    "woodland": "^7.7.0",
+    "woodland": "^8.0.1",
     "yamljs": "^0.3.0",
-    "yargs": "^13.3.0"
+    "yargs": "^14.0.0S"
   },
   "devDependencies": {
     "grunt": "^1.0.4",

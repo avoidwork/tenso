@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tensō is an HTTP/HTTP2 REST API framework",
-  "version": "12.0.0",
+  "version": "12.0.1",
   "homepage": "http://avoidwork.github.io/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -58,7 +58,7 @@
     "grunt-mocha-test": "^0.13.3",
     "jsonwebtoken": "^8.5.1",
     "mocha": "^6.2.0",
-    "tiny-httptest": "^1.1.0"
+    "tiny-httptest": "^1.1.1"
   },
   "keywords": [
     "rest",

@@ -40,6 +40,19 @@ describe("Pagination (HTTP2)", function () {
 			.end();
 	});
 
+	it("GET /items?page=a&page_size=b - returns page 1/3 of an array of numbers", function () {
+		return tinyhttptest({http2: true, url: `https://localhost:${port}/items?page=a&page_size=b`})
+			.expectStatus(200)
+			.expectValue("links", [{"uri": "/", "rel": "collection"}, {
+				"uri": "/items?page=3&page_size=5",
+				"rel": "last"
+			}, {"uri": "/items?page=2&page_size=5", "rel": "next"}])
+			.expectValue("data", [1, 2, 3, 4, 5])
+			.expectValue("error", null)
+			.expectValue("status", 200)
+			.end();
+	});
+
 	it("GET /items?page=0&page_size=5 - returns page 1/3 of an array of numbers", function () {
 		return tinyhttptest({http2: true, url: `https://localhost:${port}/items?page=0&page_size=5`})
 			.expectStatus(200)

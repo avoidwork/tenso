@@ -18,22 +18,12 @@ module.exports = function (grunt) {
 					"test/*_test2.js"
 				]
 			}
-		},
-		watch: {
-			js: {
-				files: [
-					"*.js",
-					"lib/*.js"
-				],
-				tasks: "default"
-			}
 		}
 	});
 
 	// tasks
 	grunt.loadNpmTasks("grunt-eslint");
 	grunt.loadNpmTasks("grunt-mocha-test");
-	grunt.loadNpmTasks("grunt-contrib-watch");
 
 	// aliases
 	grunt.registerTask("mocha", ["mochaTest"]);

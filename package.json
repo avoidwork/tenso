@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tensō is an HTTP/HTTP2 REST API framework",
-  "version": "12.0.8",
+  "version": "12.0.9",
   "homepage": "http://avoidwork.github.io/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -22,7 +22,7 @@
     "ssl": "mkdir ssl && openssl req -new -newkey rsa:2048 -subj \"/C=CA/ST=Ontario/L=Ottawa/O=CHANGEME/CN=localhost\" -days 365 -nodes -x509 -keyout ssl/localhost.key -out ssl/localhost.crt"
   },
   "dependencies": {
-    "connect-redis": "^4.0.1",
+    "connect-redis": "^4.0.3",
     "cookie-parser": "^1.4.4",
     "csv.js": "^1.0.7",
     "express-session": "^1.16.2",
@@ -36,7 +36,7 @@
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "passport-oauth2": "^1.5.0",
-    "passport-saml": "^1.1.0",
+    "passport-saml": "^1.2.0",
     "precise": "^1.1.0",
     "redis": "^2.8.0",
     "retsu": "^3.0.2",
@@ -53,11 +53,10 @@
   "devDependencies": {
     "grunt": "^1.0.4",
     "grunt-cli": "^1.3.2",
-    "grunt-contrib-watch": "^1.1.0",
     "grunt-eslint": "^22.0.0",
     "grunt-mocha-test": "^0.13.3",
     "jsonwebtoken": "^8.5.1",
-    "mocha": "^6.2.0",
+    "mocha": "^6.2.1",
     "tiny-httptest": "^1.1.1"
   },
   "keywords": [

@@ -91,7 +91,9 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 
 ```
 {
-	"auth": {}, /* Optional, see Authentication section */
+	"auth": { /* Optional, see Authentication section */
+		"delay": 0 /* Random delay on authorization validation */
+	},
 	"cacheSize": 1000, /* Optional, size of Etag & route LRU caches */
 	"cacheTTL": 0, /* Optional, TTL of items in Etag & route LRU caches */
 	"dtrace": false, /* Optional, enables DTrace probes (see dtrace.sh) */

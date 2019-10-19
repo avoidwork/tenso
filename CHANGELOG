@@ -1,4 +1,7 @@
-[2019-10-02] d2d51e9 (HEAD -> master, tag: 12.0.9, origin/master, origin/HEAD) Fixing a regex bug in `keymaster()` middleware, updating dependencies, removing 'watch' grunt module & task - Jason Mulligan (jamullig@adobe.com)
+[2019-10-19] fc495a4 (HEAD -> master, tag: 12.1.0, origin/master, origin/HEAD) Creating `auth.delay: 0` config value to afford random timing of authorization validation on protected routes - Jason Mulligan (jason.mulligan@avoidwork.com)
+[2019-10-13] 38460cf Create FUNDING.yml - GitHub (noreply@github.com)
+[2019-10-08] f9e4080 Creating `changelog` npm script & `CHANGELOG` output - Jason Mulligan (jason.mulligan@avoidwork.com)
+[2019-10-02] d2d51e9 (tag: 12.0.9) Fixing a regex bug in `keymaster()` middleware, updating dependencies, removing 'watch' grunt module & task - Jason Mulligan (jamullig@adobe.com)
 [2019-09-19] bb2d327 (tag: 12.0.8) Fixing a regression in `hypermedia()` regarding pagination - returning original `or` for `NaN` outputs of `Number()` - Jason Mulligan (jamullig@adobe.com)
 [2019-09-19] 8bab09c (tag: 12.0.7) Fixing a bug in `hypermedia()` regarding pagination - Jason Mulligan (jamullig@adobe.com)
 [2019-09-19] e9a7e33 (tag: 12.0.6) Fixing a bug in `hypermedia()` regarding pagination - Jason Mulligan (jamullig@adobe.com)

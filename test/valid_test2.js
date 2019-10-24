@@ -62,7 +62,7 @@ describe("Valid (HTTP2)", function () {
 	it("GET / (206 / 'Partial response - bytes=-5')", function () {
 		return tinyhttptest({http2: true, url: "https://localhost:" + port + "/", headers: {range: "bytes=-5"}})
 			.expectStatus(206)
-			.expectHeader("content-range", /^bytes 285-290\/290$/)
+			.expectHeader("content-range", /^bytes 286-290\/290$/)
 			.expectHeader("content-length", undefined)
 			.expectBody(/^:200}$/)
 			.end();

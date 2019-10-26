@@ -9,10 +9,9 @@ require("./index.js")({
 		enabled: false
 	},
 	security: {
-		csrf: false
+		csrf: false,
+		xssProtection: false,
+		nosniff: false
 	},
 	dtrace: false,
-	etags: {
-		enabled: false
-	}
 });

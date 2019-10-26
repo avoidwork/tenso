@@ -8,7 +8,7 @@ describe("Valid (HTTP2)", function () {
 	const port = 8071;
 
 	this.timeout(timeout);
-	this.tenso = tenso({http2: true, port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}, static: "/sample(/)?", ssl: {
+	this.tenso = tenso({http2: true, port: port, routes: routes, etags: {enabled: true}, logging: {level: "error"}, security: {csrf: false}, static: "/sample(/)?", ssl: {
 		key: path.join(__dirname, "..", "ssl", "localhost.key"),
 		cert: path.join(__dirname, "..", "ssl", "localhost.crt")
 	}});

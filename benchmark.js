@@ -13,5 +13,5 @@ require("./index.js")({
 		xssProtection: false,
 		nosniff: false
 	},
-	dtrace: false,
+	dtrace: false
 });

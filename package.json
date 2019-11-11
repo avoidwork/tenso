@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tensō is an HTTP/HTTP2 REST API framework",
-  "version": "14.0.1",
+  "version": "15.0.0",
   "homepage": "http://avoidwork.github.io/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -29,7 +29,7 @@
     "express-session": "^1.17.0",
     "keysort": "^1.0.2",
     "lusca": "^1.6.1",
-    "mimetype": "^0.0.8",
+    "mime-db": "^1.42.0",
     "moment": "^2.24.0",
     "passport": "^0.4.0",
     "passport-http": "^0.3.0",

@@ -7,14 +7,14 @@ const fs = require("fs"),
 	root = __dirname,
 	pkg = require(path.join(root, "package.json")),
 	tenso = require(path.join(root, "lib", "tenso.js")),
-	{bootstrap, each} = require(path.join(root, "lib", "utility.js")),
+	{bootstrap} = require(path.join(root, "lib", "utility.js")),
 	{jsonWrap} = require(path.join(root, "lib", "shared.js"));
 
 // Removing default properties
 delete args._;
 delete args.$0;
 
-each(Object.keys(args), k => {
+for (const k of Object.keys(args)) {
 	const result = args[k];
 
 	if (typeof result === "string" && jsonWrap(result)) {
@@ -24,7 +24,7 @@ each(Object.keys(args), k => {
 			args[k] = result;
 		}
 	}
-});
+}
 
 function factory (config = {}) {
 	const obj = tenso();

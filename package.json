@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tensō is an HTTP/HTTP2 REST API framework",
-  "version": "15.0.11",
+  "version": "15.0.12",
   "homepage": "https://github.com/avoidwork/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -23,23 +23,23 @@
     "ssl": "mkdir ssl && openssl req -new -newkey rsa:2048 -subj \"/C=CA/ST=Ontario/L=Ottawa/O=CHANGEME/CN=localhost\" -days 365 -nodes -x509 -keyout ssl/localhost.key -out ssl/localhost.crt"
   },
   "dependencies": {
-    "connect-redis": "^4.0.3",
-    "cookie-parser": "^1.4.4",
+    "connect-redis": "^4.0.4",
+    "cookie-parser": "^1.4.5",
     "csv.js": "^1.0.7",
-    "express-session": "^1.17.0",
+    "express-session": "^1.17.1",
     "keysort": "^1.0.2",
     "lusca": "^1.6.1",
-    "mime-db": "^1.42.0",
-    "moment": "^2.24.0",
+    "mime-db": "^1.44.0",
+    "moment": "^2.25.0",
     "passport": "^0.4.1",
     "passport-http": "^0.3.0",
     "passport-http-bearer": "^1.0.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "passport-oauth2": "^1.5.0",
-    "passport-saml": "^1.2.0",
+    "passport-saml": "^1.3.3",
     "precise": "^1.1.0",
-    "redis": "^2.8.0",
+    "redis": "^3.0.2",
     "retsu": "^3.0.2",
     "tiny-coerce": "^1.1.1",
     "tiny-etag": "^2.0.16",
@@ -49,16 +49,16 @@
     "tiny-xml": "^2.0.0",
     "woodland": "^9.1.8",
     "yamljs": "^0.3.0",
-    "yargs": "^15.0.2"
+    "yargs": "^15.3.1"
   },
   "devDependencies": {
-    "auto-changelog": "^1.16.2",
-    "grunt": "^1.0.4",
+    "auto-changelog": "^1.16.4",
+    "grunt": "^1.1.0",
     "grunt-cli": "^1.3.2",
     "grunt-eslint": "^22.0.0",
     "grunt-mocha-test": "^0.13.3",
     "jsonwebtoken": "^8.5.1",
-    "mocha": "^6.2.2",
+    "mocha": "^7.1.2",
     "tiny-httptest": "^1.1.1"
   },
   "keywords": [

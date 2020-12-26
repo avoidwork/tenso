@@ -1,7 +1,7 @@
 {
   "name": "tenso",
-  "description": "Tensō is an HTTP/HTTP2 REST API framework",
-  "version": "15.0.15",
+  "description": "Tenso is an HTTP REST API framework",
+  "version": "16.0.0",
   "homepage": "https://github.com/avoidwork/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {

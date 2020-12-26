@@ -1,12 +1,12 @@
-Tensō
+Tenso
 =====
 
 [![build status](https://secure.travis-ci.org/avoidwork/tenso.svg)](http://travis-ci.org/avoidwork/tenso)
 
-Tensō is an HTTP/HTTP2 REST API framework, that will handle the serialization & creation of hypermedia links; all you have to do is give it `Arrays` or `Objects`.
+Tenso is an HTTP REST API framework, that will handle the serialization & creation of hypermedia links; all you have to do is give it `Arrays` or `Objects`.
 
 ## Example
-Creating an API with Tensō can be this simple:
+Creating an API with Tenso can be this simple:
 
 ```javascript
 const path = require('path'),
@@ -45,9 +45,9 @@ Unprotected routes are routes that do not require authorization for access, and 
 The `/assets/*` route is reserved for the HTML browsable interface assets; please do not try to reuse this for data.
 
 ### Request Helpers
-Tensō decorates `req` with "helpers" such as `req.ip`, & `req.parsed`. `PATCH`, `PUT`, & `POST` payloads are available as `req.body`. Sessions are available as `req.session` when using `local` authentication.
+Tenso decorates `req` with "helpers" such as `req.ip`, & `req.parsed`. `PATCH`, `PUT`, & `POST` payloads are available as `req.body`. Sessions are available as `req.session` when using `local` authentication.
 
-Tensō decorates `res` with "helpers" such as `res.send()`, `res.status()`, & `res.json()`.
+Tenso decorates `res` with "helpers" such as `res.send()`, `res.status()`, & `res.json()`.
 
 ## Responses
 Responses will have a standard shape, and will be utf-8 by default. The result will be in `data`. Hypermedia (pagination & links) will be in `links:[ {"uri": "...", "rel": "..."}, ...]`, & also in the `Link` HTTP header.
@@ -68,18 +68,18 @@ Sort order can be specified via then `order-by` which accepts `[field ]asc|desc`
 Final modifications can be made to a response body after `hypermedia()` by overriding `tenso.final(req, res, body)`.
 
 ## REST / Hypermedia
-Hypermedia is a prerequisite of REST, and is best described by the [Richardson Maturity Model](http://martinfowler.com/articles/richardsonMaturityModel.html). Tensō will automagically paginate Arrays of results, or parse Entity representations for keys that imply
+Hypermedia is a prerequisite of REST, and is best described by the [Richardson Maturity Model](http://martinfowler.com/articles/richardsonMaturityModel.html). Tenso will automagically paginate Arrays of results, or parse Entity representations for keys that imply
 relationships, and create the appropriate Objects in the `link` Array, as well as the `Link` HTTP header. Object keys that match this pattern: `/_(guid|uuid|id|uri|url)$/` will be considered
 hypermedia links.
 
 For example, if the key `user_id` was found, it would be mapped to `/users/:id` with a link `rel` of `related`.
 
-Tensō will bend the rules of REST when using authentication strategies provided by passport.js, or CSRF if is enabled, because they rely on a session. Session storage is in memory, or Redis. You have the option of a stateless or stateful API.
+Tenso will bend the rules of REST when using authentication strategies provided by passport.js, or CSRF if is enabled, because they rely on a session. Session storage is in memory, or Redis. You have the option of a stateless or stateful API.
 
 Hypermedia processing of the response body can be disabled as of `10.2.0`, by setting `req.hypermedia = false` via middleware.
 
 ## Browsable API / Renderers / Serializers
-Tensō 1.4.0 added a few common format renderers, such as CSV, HTML, YAML, & XML. The HTML interface is a browsable API! You can use it to verify requests & responses, or simply poke around your API to see how it behaves.
+Tenso 1.4.0 added a few common format renderers, such as CSV, HTML, YAML, & XML. The HTML interface is a browsable API! You can use it to verify requests & responses, or simply poke around your API to see how it behaves.
 
 Custom renderers can be registered with `server.renderer('mimetype', fn);` or directly on `server.renderers`. The parameters for a renderer are `(req, res, arg)`. Custom serializes can be registered with `server.serializer('mimetype', fn);` or directly on `server.serializers`. The parameters for a serializer are `(arg, err, status = 200, stack = false)`; if `arg` is `null` then `err` must be an `Error` & `stack` determines if the response body is the `Error.message` or `Error.stack` property.
 
@@ -87,7 +87,7 @@ Custom renderers can be registered with `server.renderer('mimetype', fn);` or di
 ETags are built in! Caching can be disabled by setting the `cache-control` header to a "private" or "no cache" directive (see the above `/uuid` example).
  
 ## Configuration
-This is a sample configuration for Tensō, without authentication or SSL. This would be ideal for development, but not production! Enabling SSL is as easy as providing file paths for the two keys.
+This is a sample configuration for Tenso, without authentication or SSL. This would be ideal for development, but not production! Enabling SSL is as easy as providing file paths for the two keys.
 
 ```
 {
@@ -99,7 +99,6 @@ This is a sample configuration for Tensō, without authentication or SSL. This w
 	"dtrace": false, /* Optional, enables DTrace probes (see dtrace.sh) */
 	"headers": {}, /* Optional, custom headers */
 	"hostname": "localhost", /* Optional, default is 'localhost' */
-	"http2": false, /* Middleware signatures do not change, see woodland */
 	"index": ["index.htm", "index.html"], /* Files served when accessing a static assets folder */
 	"json": 0, /* Optional, default indent for 'pretty' JSON */
 	"logging": {
@@ -227,7 +226,7 @@ OAuth2 authentication will create `/auth`, `/auth/oauth2`, & `/auth/oauth2/callb
 ### SAML
 SAML authentication will create `/auth`, `/auth/saml`, & `/auth/saml/callback` routes. `auth(profile, callback)` must execute `callback(err, user)`.
 
-Tensō uses [passport-saml](https://github.com/bergie/passport-saml), for configuration options please visit it's homepage.
+Tenso uses [passport-saml](https://github.com/bergie/passport-saml), for configuration options please visit it's homepage.
  
 ```
 {
@@ -288,16 +287,13 @@ If the session `secret` is not provided, a version 4 `UUID` will be used.
 
 
 ## Security
-Tensō uses [lusca](https://github.com/krakenjs/lusca#api) for security as a middleware. Please see it's documentation for how to configure it; each method & argument is a key:value pair for `security`.
+Tenso uses [lusca](https://github.com/krakenjs/lusca#api) for security as a middleware. Please see it's documentation for how to configure it; each method & argument is a key:value pair for `security`.
 
 ```
 {
 	"security": { ... }
 }
 ```
-
-## Compression
-Compression is enabled by default, for Clients that support `gzip` or `deflate`. Compression will be disabled if `SSL` is enabled.
 
 ## Rate Limiting
 Rate limiting is controlled by configuration, and is disabled by default. Rate limiting is based on `token`, `session`, or `ip`, depending upon authentication method.
@@ -331,11 +327,11 @@ Standard log levels are supported, and are emitted to `stdout` & `stderr`. Stack
 
 ```
 {
-    "logging": {
-        "level": "warn",
-        "enabled": true,
-        "stack": true
-    }
+	"logging": {
+		"level": "warn",
+		"enabled": true,
+		"stack": true
+	}
 }
 ```
 
@@ -349,7 +345,7 @@ The browsable template can be overridden with a custom HTML document.
 ```
 
 ## Static assets folder
-The browsable template can load assets from this folder. assets.
+The browsable template can load assets from this folder.
 
 ```
 {

@@ -26,7 +26,6 @@
     "cookie-parser": "^1.4.5",
     "csv.js": "^1.0.7",
     "express-session": "^1.17.1",
-    "jsonwebtoken": "^8.5.1",
     "keysort": "^1.0.2",
     "lusca": "^1.6.1",
     "mime-db": "^1.45.0",
@@ -54,6 +53,7 @@
   "devDependencies": {
     "auto-changelog": "^2.2.1",
     "eslint": "^7.16.0",
+    "jsonwebtoken": "^8.5.1",
     "mocha": "^8.2.1",
     "tiny-httptest": "^1.1.1"
   },

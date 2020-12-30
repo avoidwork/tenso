@@ -46,7 +46,7 @@
     "tiny-merge": "^1.0.0",
     "tiny-uuid4": "^1.0.1",
     "tiny-xml": "^2.0.0",
-    "woodland": "^13.1.1",
+    "woodland": "^13.1.4",
     "yamljs": "^0.3.0",
     "yargs": "^16.2.0"
   },

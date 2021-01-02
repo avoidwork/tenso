@@ -7,7 +7,7 @@ describe("Pagination", function () {
 	const port = 8002;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}});
 
 	it("GET /empty - returns an empty array", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/empty"})

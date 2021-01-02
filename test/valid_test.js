@@ -7,7 +7,7 @@ describe("Valid", function () {
 	const port = 8021;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, etags: {enabled: true}, logging: {level: "error"}, security: {csrf: false}, static: "/sample(/)?"});
+	this.tenso = tenso({port: port, routes: routes, etags: {enabled: true}, logging: {enabled: false}, security: {csrf: false}, static: "/sample(/)?"});
 
 	it("GET / (200 / 'Array' - ETag capture)", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/"})

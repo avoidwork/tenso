@@ -49,6 +49,11 @@ function factory (config = {}) {
 		obj.config.headers["x-powered-by"] = `nodejs/${process.version}, ${process.platform}/${process.arch}`;
 	}
 
+	process.on("SIGTERM", async () => {
+		await obj.server.close();
+		process.exit(0);
+	});
+
 	return bootstrap(obj).start();
 }
 

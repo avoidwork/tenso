@@ -5,6 +5,7 @@
 /node_modules/
 /test/
 /www/sample/
+/www/assets/css/.sass-cache/
 .eslintrc
 .gitignore
 .travis.yml

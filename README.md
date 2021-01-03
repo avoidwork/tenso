@@ -100,7 +100,6 @@ This is a sample configuration for Tenso, without authentication or SSL. This wo
 	},
 	"cacheSize": 1000, /* Optional, size of Etag & route LRU caches */
 	"cacheTTL": 0, /* Optional, TTL of items in Etag & route LRU caches */
-	"dtrace": false, /* Optional, enables DTrace probes (see dtrace.sh) */
 	"headers": {}, /* Optional, custom headers */
 	"hostname": "localhost", /* Optional, default is 'localhost' */
 	"index": ["index.htm", "index.html"], /* Files served when accessing a static assets folder */
@@ -327,7 +326,7 @@ The browsable template can be overridden with a custom HTML document.
 
 ```
 {
-    "template": "/var/www/api/template.html"
+    "template": ""
 }
 ```
 
@@ -336,7 +335,7 @@ The browsable template can load assets from this folder.
 
 ```
 {
-    "static": "/var/www/api/assets/.*"
+    "static": "/assets"
 }
 ```
 

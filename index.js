@@ -41,7 +41,7 @@ function factory (config = {}) {
 	merge(obj.config, config);
 
 	obj.config.root = path.resolve(config.root || path.join(__dirname, "www"));
-	obj.config.template = fs.readFileSync(config.template || path.join(__dirname, "template.html"), {encoding: "utf8"});
+	obj.config.template = fs.readFileSync(config.template || path.join(obj.config.root, "template.html"), {encoding: "utf8"});
 	obj.config.version = pkg.version;
 
 	if (obj.config.silent !== true) {

@@ -7,6 +7,14 @@ body {
 body {
   background: whitesmoke; }
 
+.app {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 100vh; }
+  .app > * {
+    width: 100% !important;
+    max-width: 100%; }
+
 .dr-hidden {
   display: none !important; }
 

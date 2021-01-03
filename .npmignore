@@ -2,7 +2,6 @@
 /.idea/
 /.nyc_output/
 /node_modules/
-/ssl/
 /test/
 /www/sample/
 .eslintrc

@@ -40,7 +40,7 @@ describe("Renderers", function () {
 	it("GET JSONP (header)", function () {
 		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "application/javascript"}})
 			.expectStatus(200)
-			.expectHeader("content-type", "application/javascript; charset=utf-8")
+			.expectHeader("content-type", "application/javascript")
 			.expectBody(/^callback\(/)
 			.end();
 	});
@@ -48,7 +48,7 @@ describe("Renderers", function () {
 	it("GET JSONP (query string)", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/?format=application/javascript"})
 			.expectStatus(200)
-			.expectHeader("content-type", "application/javascript; charset=utf-8")
+			.expectHeader("content-type", "application/javascript")
 			.expectBody(/^callback\(/)
 			.end();
 	});
@@ -65,7 +65,7 @@ describe("Renderers", function () {
 			headers: {accept: "application/javascript"}
 		})
 			.expectStatus(200)
-			.expectHeader("content-type", "application/javascript; charset=utf-8")
+			.expectHeader("content-type", "application/javascript")
 			.expectBody(/^custom\(/)
 			.end();
 	});
@@ -73,7 +73,7 @@ describe("Renderers", function () {
 	it("GET JSONP (query string - custom callback)", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/?format=application/javascript&callback=custom"})
 			.expectStatus(200)
-			.expectHeader("content-type", "application/javascript; charset=utf-8")
+			.expectHeader("content-type", "application/javascript")
 			.expectBody(/^custom\(/)
 			.end();
 	});

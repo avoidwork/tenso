@@ -237,22 +237,6 @@ Tenso uses [passport-saml](https://github.com/bergie/passport-saml), for configu
 }
 ```
 
-## DTrace
-DTrace probes are in a set of core functions, which can be enabled by setting `dtrace: true` for factory options, and watched with `dtrace.sh`; not recommended for production.
-
-## ETags
-Generates `ETag` headers for `GET` requests
-
-```
-{
-	"etags": {
-		enabled: true, // Enabled or disabled
-		ignore: [], // Paths to ignore
-		mimetype: "application/json" // Default respose mimetype
-	}
-}
-```
-
 ## Sessions
 Sessions can use a memory (default) or redis store. Memory will limit your sessions to a single server instance, while redis will allow you to share sessions across a cluster of processes, or machines. To use redis, set the `store` property to "redis".
 

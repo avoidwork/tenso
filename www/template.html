@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>{{title}}</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" type="text/css" href="/assets/css/bulma.min.css" media="print,screen">
+	<link rel="stylesheet" type="text/css" href="/assets/css/style.css" media="print,screen">
+	<link rel="shortcut icon" href="/assets/img/favicon.png">
+</head>
+<body>
+<div class="app is-flex is-flex-direction-column flex-grow is-align-content-stretch is-align-items-start">
+	<div class="is-flex-grow-1 is-flex-shrink-1">
+		<section class="hero">
+		<div class="hero-body">
+			<div class="container">
+				<h1 class="title">
+					{{title}}
+				</h1>
+			</div>
+		</div>
+	</section>
+		<section class="section">
+		<div class="container spaced">
+			<div class="tabs">
+				<ul>
+					<li class="response">
+						<a href="#response">Response</a>
+					</li>
+					<li class="request">
+						<a href="#request">Send Request</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="content">
+			<div class="container">
+				<div id="response" class="dr-hidden">
+					<div class="field">
+						<label class="label">Formats</label>
+						<p class="control spaced">
+							<span class="select">
+								<select id="formats">
+									{{formats}}
+								</select>
+							</span>
+						</p>
+					</div>
+					<div class="columns">
+						<div class="headers column is-hidden-mobile">
+							<div class="box">
+								<table class="table">
+									<thead>
+									<tr>
+										<th>Header</th>
+										<th>Value</th>
+									</tr>
+									</thead>
+									<tbody>
+									{{headers}}
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="column">
+							<div class="box code">
+								<code class="is-marginless is-paddingless">
+									<pre id="body">{{body}}</pre>
+								</code>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="request" class="dr-hidden">
+					<div class="container">
+						<form>
+							<div class="field">
+								<label class="label">Method</label>
+								<p class="control spaced">
+									<span class="select">
+										<select id="methods">
+											{{methods}}
+										</select>
+									</span>
+								</p>
+							</div>
+							<div class="field">
+								<label class="label">Body</label>
+								<p class="control">
+									<textarea class="textarea" name="input" placeholder="Enter request body here"></textarea>
+								</p>
+							</div>
+
+							<div class="field is-grouped">
+								<p class="control">
+									<button type="submit" class="button is-primary">Submit</button>
+								</p>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	</div>
+	<div class="is-flex-grow-0 is-flex-shrink-1">
+		<footer class="footer">
+		<div class="container">
+			<div class="content has-text-centered">
+				<p><a href="https://avoidwork.com" title="Visit avoidwork.com"><img src="/assets/img/avoidwork.svg" class="avoidwork logo" /></a><br>
+					<a href="https://github.com/avoidwork/tenso" title="View project homepage">Tenso</a> {{version}}</p>
+			</div>
+		</div>
+	</footer>
+	</div>
+</div>
+<div id="result" class="modal">
+	<div class="modal-background"></div>
+	<div class="modal-content">
+		<div class="box">
+			<div class="loading has-text-centered">
+				<div class="button is-large is-white is-loading"></div>
+			</div>
+			<div class="body dr-hidden">
+				<code class="is-marginless is-paddingless">
+					<pre></pre>
+				</code>
+			</div>
+		</div>
+	</div>
+	<button id="close" class="modal-close"></button>
+</div>
+<div id="allow" class="dr-hidden">{{allow}}</div>
+<div id="csrf" class="dr-hidden">{{csrf}}</div>
+<script type="application/javascript" src="/assets/js/dom-router.js"></script>
+<script type="application/javascript" src="/assets/js/app.js"></script>
+</body>
+</html>

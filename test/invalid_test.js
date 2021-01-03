@@ -59,7 +59,7 @@ describe("Invalid", function () {
 	it("GET /nothere.html (404 / 'Not Found')", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/nothere.html"})
 			.expectStatus(404)
-			.expectHeader("allow", undefined)
+			.expectHeader("allow", "")
 			.expectValue("error", http.STATUS_CODES[404])
 			.end();
 	});
@@ -67,7 +67,7 @@ describe("Invalid", function () {
 	it("GET /nothere.html%3fa=b?=c (404 / 'Not Found')", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/nothere.html%3fa=b?=c"})
 			.expectStatus(404)
-			.expectHeader("allow", undefined)
+			.expectHeader("allow", "")
 			.expectValue("error", http.STATUS_CODES[404])
 			.end();
 	});
@@ -75,7 +75,7 @@ describe("Invalid", function () {
 	it("GET /nothere.x_%22%3E%3Cimg%20src=x%20onerror=prompt(1)%3E.html (404 / 'Not Found')", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/nothere.x_%22%3E%3Cimg%20src=x%20onerror=prompt(1)%3E.html"})
 			.expectStatus(404)
-			.expectHeader("allow", undefined)
+			.expectHeader("allow", "")
 			.expectValue("error", http.STATUS_CODES[404])
 			.end();
 	});
@@ -83,7 +83,7 @@ describe("Invalid", function () {
 	it("POST /nothere.html (404 / 'Not Found')", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/nothere.html", method: "post"})
 			.expectStatus(404)
-			.expectHeader("allow", undefined)
+			.expectHeader("allow", "")
 			.expectValue("error", http.STATUS_CODES[404])
 			.end();
 	});
@@ -91,7 +91,7 @@ describe("Invalid", function () {
 	it("PUT /nothere.html (404 / 'Not Found')", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/nothere.html", method: "put"})
 			.expectStatus(404)
-			.expectHeader("allow", undefined)
+			.expectHeader("allow", "")
 			.expectValue("error", http.STATUS_CODES[404])
 			.end();
 	});
@@ -99,7 +99,7 @@ describe("Invalid", function () {
 	it("PATCH /nothere.html (404 / 'Not Found')", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/nothere.html", method: "patch"})
 			.expectStatus(404)
-			.expectHeader("allow", undefined)
+			.expectHeader("allow", "")
 			.expectValue("error", http.STATUS_CODES[404])
 			.end();
 	});
@@ -107,7 +107,7 @@ describe("Invalid", function () {
 	it("DELETE /nothere.html (404 / 'Not Found')", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/nothere.html", method: "delete"})
 			.expectStatus(404)
-			.expectHeader("allow", undefined)
+			.expectHeader("allow", "")
 			.expectValue("error", http.STATUS_CODES[404])
 			.end();
 	});
@@ -115,7 +115,7 @@ describe("Invalid", function () {
 	it("GET /../README (404 / 'Not Found')", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/../README"})
 			.expectStatus(404)
-			.expectHeader("allow", undefined)
+			.expectHeader("allow", "")
 			.expectValue("error", http.STATUS_CODES[404])
 			.end();
 	});
@@ -123,7 +123,7 @@ describe("Invalid", function () {
 	it("GET /././../README (404 / 'Not Found')", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/././../README"})
 			.expectStatus(404)
-			.expectHeader("allow", undefined)
+			.expectHeader("allow", "")
 			.expectValue("error", http.STATUS_CODES[404])
 			.end();
 	});

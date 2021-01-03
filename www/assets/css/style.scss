@@ -65,6 +65,12 @@ code {
 
 .key {
   font-weight: bold;
+
+  &.title,
+  &.subtitle {
+    font-size: unset;
+    line-height: unset;
+  }
 }
 
 .spaces {

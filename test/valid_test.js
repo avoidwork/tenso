@@ -9,9 +9,8 @@ describe("Valid", function () {
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, routes: routes, etags: {enabled: true}, logging: {enabled: false}, security: {csrf: false}, static: "/sample"});
 
-	it("GET / (200 / 'Array' - ETag capture)", function () {
+	it("GET / (200 / 'Array')", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/"})
-			.etags()
 			.expectStatus(200)
 			.end();
 	});
@@ -33,16 +32,6 @@ describe("Valid", function () {
 			.expectValue("data", /\w/)
 			.expectValue("error", null)
 			.expectValue("status", 200)
-			.end();
-	});
-
-	it("GET / (304 / empty - ETag reuse)", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/"})
-			.etags()
-			.expectStatus(304)
-			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("content-length", undefined)
-			.expectBody(/^$/)
 			.end();
 	});
 

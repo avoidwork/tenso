@@ -82,9 +82,6 @@ Hypermedia processing of the response body can be disabled as of `10.2.0`, by se
 Tenso 1.4.0 added a few common format renderers, such as CSV, HTML, YAML, & XML. The HTML interface is a browsable API! You can use it to verify requests & responses, or simply poke around your API to see how it behaves.
 
 Custom renderers can be registered with `server.renderer('mimetype', fn);` or directly on `server.renderers`. The parameters for a renderer are `(req, res, arg)`. Custom serializes can be registered with `server.serializer('mimetype', fn);` or directly on `server.serializers`. The parameters for a serializer are `(arg, err, status = 200, stack = false)`; if `arg` is `null` then `err` must be an `Error` & `stack` determines if the response body is the `Error.message` or `Error.stack` property.
-
-## Cache
-ETags are built in! Caching can be disabled by setting the `cache-control` header to a "private" or "no cache" directive (see the above `/uuid` example).
  
 ## Configuration
 This is a sample configuration for Tenso, without authentication or SSL. This would be ideal for development, but not production! Enabling SSL is as easy as providing file paths for the two keys.

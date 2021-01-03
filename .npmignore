@@ -9,6 +9,5 @@
 .eslintrc
 .gitignore
 .travis.yml
-Gruntfile.js
 benchmark.js
 sample.js

@@ -121,7 +121,6 @@ This is a sample configuration for Tenso, without authentication or SSL. This wo
 		"cert": null,
 		"key": null
 	},
-	static: "/assets/.*", /* Optional, URI path to serve static assets from */
 	"renderHeaders": true, /* false will disable headers in HTML interface */
 	"title": "My API", /* Page title for browsable API */
 	"uid": 33 /* Optional, system account uid to drop to after starting with elevated privileges to run on a low port */
@@ -375,5 +374,6 @@ streams.get(id).send({...});
 ```
 
 ## License
-Copyright (c) 2020 Jason Mulligan
+Copyright (c) 2021 Jason Mulligan
+
 Licensed under the BSD-3-Clause license.

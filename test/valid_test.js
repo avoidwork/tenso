@@ -9,6 +9,8 @@ describe("Valid", function () {
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, routes: routes, etags: {enabled: true}, logging: {enabled: false}, security: {csrf: false}, static: "/sample"});
 
+	const server = this.tenso.server;
+
 	it("GET / (200 / 'Array')", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/"})
 			.expectStatus(200)
@@ -74,6 +76,6 @@ describe("Valid", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/sample/"})
 			.expectStatus(200)
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.end();
+			.end().then(() => server.close());
 	});
 });

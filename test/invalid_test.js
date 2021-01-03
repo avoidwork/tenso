@@ -10,6 +10,8 @@ describe("Invalid", function () {
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}});
 
+	const server = this.tenso.server;
+
 	it("GET / (416 / 'Partial response - invalid')", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/", headers: {range: "a-b"}})
 			.expectStatus(416)
@@ -125,6 +127,6 @@ describe("Invalid", function () {
 			.expectStatus(404)
 			.expectHeader("allow", "")
 			.expectValue("error", http.STATUS_CODES[404])
-			.end();
+			.end().then(() => server.close());
 	});
 });

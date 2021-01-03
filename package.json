@@ -19,7 +19,7 @@
   },
   "scripts": {
     "changelog": "auto-changelog -p",
-    "test": "eslint *.js lib/*.js test/*.js && mocha test/*.js"
+    "test": "eslint *.js lib/*.js test/*.js && mocha test/*.js --exit"
   },
   "dependencies": {
     "connect-redis": "^5.0.0",
@@ -29,7 +29,6 @@
     "keysort": "^1.0.2",
     "lusca": "^1.6.1",
     "mime-db": "^1.45.0",
-    "moment": "^2.29.1",
     "passport": "^0.4.1",
     "passport-http": "^0.3.0",
     "passport-http-bearer": "^1.0.1",
@@ -52,7 +51,7 @@
   },
   "devDependencies": {
     "auto-changelog": "^2.2.1",
-    "eslint": "^7.16.0",
+    "eslint": "^7.17.0",
     "jsonwebtoken": "^8.5.1",
     "mocha": "^8.2.1",
     "tiny-httptest": "^1.1.1"

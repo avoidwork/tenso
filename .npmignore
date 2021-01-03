@@ -1,5 +1,6 @@
 /.github/
 /.idea/
+/.nyc_output/
 /node_modules/
 /ssl/
 /test/

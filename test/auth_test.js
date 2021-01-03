@@ -11,7 +11,9 @@ describe("Permissions (CSRF disabled)", function () {
 	const port = 8001;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}});
+
+	const server = this.tenso.server;
 
 	it("GET / - returns an array of endpoints", function () {
 		return tinyhttptest({url: "http://localhost:" + port})
@@ -77,7 +79,7 @@ describe("Permissions (CSRF disabled)", function () {
 			.expectValue("data", null)
 			.expectValue("error", "Method Not Allowed")
 			.expectValue("status", 405)
-			.end();
+			.end().then(() => server.close());
 	});
 });
 
@@ -91,6 +93,8 @@ describe("Basic Auth", function () {
 		logging: {level: "error"},
 		auth: {basic: {enabled: true, list: ["test:123"]}, protect: ["/uuid"]}
 	});
+
+	const server = this.tenso.server;
 
 	it("GET / - returns links", function () {
 		return tinyhttptest({url: "http://localhost:" + port})
@@ -121,7 +125,7 @@ describe("Basic Auth", function () {
 	it("GET /uuid - returns an 'unauthorized' error", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/uuid"})
 			.expectStatus(401)
-			.end();
+			.end().then(() => server.close());
 	});
 });
 
@@ -135,6 +139,8 @@ describe("OAuth2 Token Bearer", function () {
 		logging: {level: "error"},
 		auth: {bearer: {enabled: true, tokens: ["abc-123"]}, protect: ["/"]}
 	});
+
+	const server = this.tenso.server;
 
 	it("GET / - returns an array of endpoints (authorized)", function () {
 		return tinyhttptest({url: "http://localhost:" + port, headers: {authorization: "Bearer abc-123"}})
@@ -155,7 +161,7 @@ describe("OAuth2 Token Bearer", function () {
 	it("GET / - returns an 'unauthorized' error", function () {
 		return tinyhttptest({url: "http://localhost:" + port})
 			.expectStatus(401)
-			.end();
+			.end().then(() => server.close());
 	});
 });
 
@@ -181,7 +187,8 @@ describe("Local", function () {
 		}
 	});
 
-	const login = this.tenso.config.auth.uri.login;
+	const server = this.tenso.server,
+		login = this.tenso.config.auth.uri.login;
 
 	it("GET /uuid (invalid) - returns an 'unauthorized' error", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/uuid"})
@@ -248,7 +255,7 @@ describe("Local", function () {
 			.expectValue("links", [{uri: "/", rel: "collection"}])
 			.expectValue("error", null)
 			.expectValue("status", 200)
-			.end();
+			.end().then(() => server.close());
 	});
 });
 
@@ -278,6 +285,8 @@ describe("JWT", function () {
 		}
 	});
 
+	const server = this.tenso.server;
+
 	it("GET /uuid - returns a uuid (authorized)", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/uuid", headers: {authorization: "Bearer " + token}})
 			.expectStatus(200)
@@ -291,6 +300,6 @@ describe("JWT", function () {
 	it("GET /uuid - returns an 'unauthorized' error", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/uuid"})
 			.expectStatus(401)
-			.end();
+			.end().then(() => server.close());
 	});
 });

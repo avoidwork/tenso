@@ -25,6 +25,5 @@ require("./index.js")({
 	},
 	security: {
 		csrf: false
-	},
-	dtrace: true
+	}
 });

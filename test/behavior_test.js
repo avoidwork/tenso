@@ -7,7 +7,9 @@ describe("Pagination", function () {
 	const port = 8002;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}});
+
+	const server = this.tenso.server;
 
 	it("GET /empty - returns an empty array", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/empty"})
@@ -139,7 +141,7 @@ describe("Pagination", function () {
 			.expectValue("data", [1, 2, 3, 4, 5])
 			.expectValue("error", null)
 			.expectValue("status", 200)
-			.end();
+			.end().then(() => server.close());
 	});
 });
 
@@ -148,6 +150,8 @@ describe("Hypermedia", function () {
 
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+
+	const server = this.tenso.server;
 
 	it("GET /things - returns a collection of representations that has hypermedia properties", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/things"})
@@ -195,7 +199,7 @@ describe("Hypermedia", function () {
 			.expectValue("data", {_id: "def", user_id: 123, source_url: "http://source.tld"})
 			.expectValue("error", null)
 			.expectValue("status", 200)
-			.end();
+			.end().then(() => server.close());
 	});
 });
 
@@ -210,6 +214,8 @@ describe("Rate Limiting", function () {
 		security: {csrf: false},
 		rate: {enabled: true, limit: 2, reset: 900}
 	});
+
+	const server = this.tenso.server;
 
 	it("GET / - returns an array of endpoints (1/2)", function () {
 		return tinyhttptest({url: "http://localhost:" + port})
@@ -254,7 +260,7 @@ describe("Rate Limiting", function () {
 			.expectValue("data", null)
 			.expectValue("error", "Too Many Requests")
 			.expectValue("status", 429)
-			.end();
+			.end().then(() => server.close());
 	});
 });
 
@@ -278,6 +284,8 @@ describe("Rate Limiting (Override)", function () {
 			}
 		}
 	});
+
+	const server = this.tenso.server;
 
 	it("GET / - returns an array of endpoints (1/2)", function () {
 		return tinyhttptest({url: "http://localhost:" + port})
@@ -312,7 +320,7 @@ describe("Rate Limiting (Override)", function () {
 			.expectValue("data", ["empty", "items", "somethings", "test", "things"])
 			.expectValue("error", null)
 			.expectValue("status", 200)
-			.end();
+			.end().then(() => server.close());
 	});
 });
 
@@ -321,6 +329,8 @@ describe("Request body max byte size", function () {
 
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}, maxBytes: 10});
+
+	const server = this.tenso.server;
 
 	it("POST /test - returns an a result", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/test", method: "post"})
@@ -340,7 +350,7 @@ describe("Request body max byte size", function () {
 			.expectValue("data", null)
 			.expectValue("error", "Payload Too Large")
 			.expectValue("status", 413)
-			.end();
+			.end().then(() => server.close());
 	});
 });
 
@@ -388,13 +398,15 @@ describe("CORS Headers", function () {
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: true}});
 
+	const server = this.tenso.server;
+
 	it("GET /test - exposes x-csrf-token header", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/test"})
 			.cors("http://not.localhost")
 			.expectHeader("access-control-expose-headers", /x-csrf-token/)
 			.expectHeader("x-csrf-token", /\w/)
 			.expectStatus(200)
-			.end();
+			.end().then(() => server.close());
 	});
 });
 
@@ -403,6 +415,8 @@ describe("Sorting", function () {
 
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+
+	const server = this.tenso.server;
 
 	it("GET /things?order_by=user_id%20asc&order_by=name%20desc - returns a sorted array of objects", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/things?order_by=user_id%20asc&order_by=name%20desc"})
@@ -457,6 +471,6 @@ describe("Sorting", function () {
 			])
 			.expectValue("error", null)
 			.expectValue("status", 200)
-			.end();
+			.end().then(() => server.close());
 	});
 });

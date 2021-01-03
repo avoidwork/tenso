@@ -10,8 +10,10 @@ describe("Renderers", function () {
 	const port = 8011;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}});
 	this.tenso.renderer("custom", arg => arg);
+
+	const server = this.tenso.server;
 
 	it("GET CSV (header)", function () {
 		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "text/csv"}})
@@ -186,6 +188,6 @@ describe("Renderers", function () {
 	it("GET Plain Text (invalid)", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/abc/?format=text/plain"})
 			.expectStatus(404)
-			.end();
+			.end().then(() => server.close());
 	});
 });

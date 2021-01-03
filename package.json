@@ -1,7 +1,7 @@
 {
   "name": "tenso",
-  "description": "Tensō is an HTTP/HTTP2 REST API framework",
-  "version": "15.0.15",
+  "description": "Tenso is an HTTP REST API framework",
+  "version": "16.0.0",
   "homepage": "https://github.com/avoidwork/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -15,48 +15,43 @@
   "main": "index",
   "engineStrict": true,
   "engines": {
-    "node": ">=8.4.0"
+    "node": ">=12.0.0"
   },
   "scripts": {
     "changelog": "auto-changelog -p",
-    "test": "grunt test",
-    "ssl": "mkdir ssl && openssl req -new -newkey rsa:2048 -subj \"/C=CA/ST=Ontario/L=Ottawa/O=CHANGEME/CN=localhost\" -days 365 -nodes -x509 -keyout ssl/localhost.key -out ssl/localhost.crt"
+    "test": "eslint *.js lib/*.js test/*.js && mocha test/*.js --exit"
   },
   "dependencies": {
-    "connect-redis": "^4.0.4",
+    "connect-redis": "^5.0.0",
     "cookie-parser": "^1.4.5",
     "csv.js": "^1.0.7",
     "express-session": "^1.17.1",
     "keysort": "^1.0.2",
     "lusca": "^1.6.1",
     "mime-db": "^1.45.0",
-    "moment": "^2.29.1",
     "passport": "^0.4.1",
     "passport-http": "^0.3.0",
     "passport-http-bearer": "^1.0.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "passport-oauth2": "^1.5.0",
-    "passport-saml": "^1.5.0",
+    "passport-saml": "^2.0.2",
     "precise": "^1.1.0",
     "redis": "^3.0.2",
     "retsu": "^3.0.2",
     "tiny-coerce": "^1.1.1",
-    "tiny-etag": "^2.0.16",
+    "tiny-etag": "^2.1.0",
     "tiny-eventsource": "^1.2.1",
     "tiny-merge": "^1.0.0",
     "tiny-uuid4": "^1.0.1",
     "tiny-xml": "^2.0.0",
-    "woodland": "^9.1.8",
+    "woodland": "^16.1.0",
     "yamljs": "^0.3.0",
     "yargs": "^16.2.0"
   },
   "devDependencies": {
     "auto-changelog": "^2.2.1",
-    "grunt": "^1.3.0",
-    "grunt-cli": "^1.3.2",
-    "grunt-eslint": "^23.0.0",
-    "grunt-mocha-test": "^0.13.3",
+    "eslint": "^7.17.0",
     "jsonwebtoken": "^8.5.1",
     "mocha": "^8.2.1",
     "tiny-httptest": "^1.1.1"
@@ -68,7 +63,6 @@
     "gateway",
     "server",
     "hypermedia",
-    "http2",
     "framework"
   ]
 }

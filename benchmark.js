@@ -1,3 +1,5 @@
+"use strict";
+
 require("./index.js")({
 	port: 8000,
 	routes: {
@@ -12,6 +14,5 @@ require("./index.js")({
 		csrf: false,
 		xssProtection: false,
 		nosniff: false
-	},
-	dtrace: false
+	}
 });

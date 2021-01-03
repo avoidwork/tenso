@@ -5,6 +5,13 @@ Tenso
 
 Tenso is an HTTP REST API framework, that will handle the serialization & creation of hypermedia links; all you have to do is give it `Arrays` or `Objects`.
 
+## Benchmark
+Please benchmark `woodland` on your target hardware to understand the overhead; expected to be 15-20%, e.g. if `http` can handle 50k req/s, then `woodland` should handle >= 40k req/s.
+
+1. Clone repository from [GitHub](https://github.com/avoidwork/tenso).
+1. Install dependencies with `npm` or `yarn`.
+1. Execute `benchmark` script with `npm` or `yarn`.
+
 ## Example
 Creating an API with Tenso can be this simple:
 
@@ -371,6 +378,28 @@ const streams = new Map();
 
 // Send data to Clients
 streams.get(id).send({...});
+```
+
+## Testing Code Coverage
+
+```console
+-----------------|---------|----------|---------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------
+File             | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-----------------|---------|----------|---------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------
+All files        |   79.05 |     69.1 |   66.18 |   78.81 |                                                                                                                                                       
+ tenso           |      80 |    63.16 |      50 |      80 |                                                                                                                                                       
+  index.js       |      80 |    63.16 |      50 |      80 | 21-24,33-34,53-54                                                                                                                                     
+ tenso/lib       |      79 |    69.35 |   66.42 |   78.75 |                                                                                                                                                       
+  base.js        |    22.5 |      100 |   17.86 |    22.5 | 6-30,44-58,68-76,86-94                                                                                                                                
+  middleware.js  |   89.86 |    77.36 |   83.33 |   91.18 | 13-14,43-44,87,132                                                                                                                                    
+  parsers.js     |   58.33 |        0 |      50 |   58.33 | 12-19                                                                                                                                                 
+  regex.js       |     100 |      100 |     100 |     100 |                                                                                                                                                       
+  renderers.js   |    97.3 |    68.75 |   93.33 |     100 | 10-19,35,41-48,58                                                                                                                                     
+  serializers.js |     100 |    55.56 |     100 |     100 | 6-16                                                                                                                                                  
+  shared.js      |      40 |    33.33 |      50 |      40 | 8-11                                                                                                                                                  
+  tenso.js       |   73.39 |    53.62 |      65 |    72.9 | 167-168,181-191,199-206,248-249,262,296-298,306-312,322-341                                                                                           
+  utility.js     |   83.33 |    74.37 |   81.13 |   82.97 | 34,46-49,53,72,118-120,137-138,147-148,152-153,187,203,207,218-219,228,236,238,249-250,271,301,315-337,339-361,382,388-392,438-439,498,543,567,629-630
+-----------------|---------|----------|---------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------
 ```
 
 ## License

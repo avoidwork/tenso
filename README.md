@@ -6,7 +6,6 @@ Tenso
 Tenso is an HTTP REST API framework, that will handle the serialization & creation of hypermedia links; all you have to do is give it `Arrays` or `Objects`.
 
 ## Benchmark
-Please benchmark `woodland` on your target hardware to understand the overhead; expected to be 15-20%, e.g. if `http` can handle 50k req/s, then `woodland` should handle >= 40k req/s.
 
 1. Clone repository from [GitHub](https://github.com/avoidwork/tenso).
 1. Install dependencies with `npm` or `yarn`.

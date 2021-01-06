@@ -1,6 +1,7 @@
 "use strict";
 
-const path = require("path"),
+const {join} = require("path"),
+	{platform} = require("os"),
 	{readdir} = require("fs").promises,
 	{spawn} = require("child_process");
 
@@ -26,15 +27,16 @@ function shell (arg = "") {
 }
 
 (async function () {
-	const apath = path.join("node_modules", "autocannon", "autocannon.js"),
-		cpath = path.join("node_modules", "concurrently", "bin", "concurrently.js"),
-		fpath = path.join(__dirname, "benchmarks"),
+	const apath = join("node_modules", "autocannon", "autocannon.js"),
+		cpath = join("node_modules", "concurrently", "bin", "concurrently.js"),
+		fpath = join(__dirname, "benchmarks"),
 		files = await readdir(fpath),
+		sep = platform() === "win32" ? "\\" : "/",
 		result = [];
 
 	for (const file of files) {
 		try {
-			const stdout = await shell(`node ${cpath} -k --success first \"node benchmarks\\${file}\" \"node ${apath} -c 100 -d 40 -p 10 localhost:8000\"`);
+			const stdout = await shell(`node ${cpath} -k --success first \"node benchmarks${sep}${file}\" \"node ${apath} -c 100 -d 40 -p 10 localhost:8000\"`);
 
 			result.push({file: file.replace(".js", ""), stdout});
 		} catch (err) {

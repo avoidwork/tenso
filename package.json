@@ -27,7 +27,7 @@
   "dependencies": {
     "connect-redis": "^5.0.0",
     "cookie-parser": "^1.4.5",
-    "csv.js": "^1.0.7",
+    "csv.js": "^2.0.1",
     "express-session": "^1.17.1",
     "keysort": "^1.0.2",
     "lusca": "^1.6.1",

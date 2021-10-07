@@ -51,7 +51,7 @@ Unprotected routes are routes that do not require authorization for access, and 
 The `/assets/*` route is reserved for the HTML browsable interface assets; please do not try to reuse this for data.
 
 ### Request Helpers
-Tenso decorates `req` with "helpers" such as `req.ip`, & `req.parsed`. `PATCH`, `PUT`, & `POST` payloads are available as `req.body`. Sessions are available as `req.session` when using `local` authentication.
+Tenso decorates `req` with "helpers" such as `req.allow`, `req.csrf`, `req.ip`, `req.parsed`, & `req.private`. `PATCH`, `PUT`, & `POST` payloads are available as `req.body`. Sessions are available as `req.session` when using `local` authentication.
 
 Tenso decorates `res` with "helpers" such as `res.send()`, `res.status()`, & `res.json()`.
 

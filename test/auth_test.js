@@ -247,6 +247,18 @@ describe("Local", function () {
 			.end();
 	});
 
+	it("POST /auth/login - redirects to a predetermined URI (CORS)", function () {
+		return tinyhttptest({url: "http://localhost:" + port + login, method: "post"})
+			.cors("http://not.localhost")
+			.cookies()
+			.reuseHeader(csrf)
+			.json({username: "test", password: valid})
+			.expectStatus(302)
+			.expectHeader("content-type", undefined)
+			.expectHeader("location", "/")
+			.end();
+	});
+
 	it("GET /uuid (session) - returns a version 4 uuid", function () {
 		return tinyhttptest({url: "http://localhost:" + port + "/uuid"})
 			.cookies()

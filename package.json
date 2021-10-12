@@ -60,7 +60,7 @@
     "jsonwebtoken": "^8.5.1",
     "mocha": "^9.1.2",
     "nyc": "^15.1.0",
-    "tiny-httptest": "^1.1.1"
+    "tiny-httptest": "^2.0.0"
   },
   "keywords": [
     "rest",

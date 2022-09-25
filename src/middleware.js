@@ -1,25 +1,23 @@
-"use strict";
+import {parsers} from "./parsers.js";
+import {hasBody} from "./shared.js";
 
-const path = require("path"),
-	parsers = require(path.join(__dirname, "parsers.js")),
-	{hasBody} = require(path.join(__dirname, "shared.js")),
-	rateHeaders = [
-		"x-ratelimit-limit",
-		"x-ratelimit-remaining",
-		"x-ratelimit-reset"
-	];
+const rateHeaders = [
+	"x-ratelimit-limit",
+	"x-ratelimit-remaining",
+	"x-ratelimit-reset"
+];
 
-function asyncFlag (req, res, next) {
+export function asyncFlag (req, res, next) {
 	req.protectAsync = true;
 	next();
 }
 
-function bypass (req, res, next) {
+export function bypass (req, res, next) {
 	req.unprotect = (req.cors && req.method === "OPTIONS") || req.server.config.auth.unprotect.filter(i => i.test(req.url)).length > 0; // eslint-disable-line no-extra-parens
 	next();
 }
 
-function guard (req, res, next) {
+export function guard (req, res, next) {
 	const login = req.server.config.auth.uri.login;
 
 	if (req.parsed.pathname === login || req.isAuthenticated()) {
@@ -29,7 +27,7 @@ function guard (req, res, next) {
 	}
 }
 
-function parse (req, res, next) {
+export function parse (req, res, next) {
 	let valid = true,
 		exception;
 
@@ -49,7 +47,7 @@ function parse (req, res, next) {
 	next(valid === false ? exception : void 0);
 }
 
-function payload (req, res, next) {
+export function payload (req, res, next) {
 	if (hasBody(req.method) && (req.headers["content-type"] || "").includes("multipart") === false) {
 		const obj = req,
 			max = req.server.config.maxBytes;
@@ -88,7 +86,7 @@ function keymaster (req, res) {
 	}
 }
 
-function rate (req, res, next) {
+export function rate (req, res, next) {
 	const config = req.server.config.rate;
 
 	if (config.enabled === false || req.unprotect) {
@@ -110,7 +108,7 @@ function rate (req, res, next) {
 	}
 }
 
-function zuul (req, res, next) {
+export function zuul (req, res, next) {
 	const uri = req.parsed.pathname;
 	let protectd = false;
 
@@ -137,13 +135,3 @@ function zuul (req, res, next) {
 		}
 	});
 }
-
-module.exports = {
-	asyncFlag,
-	bypass,
-	guard,
-	parse,
-	payload,
-	rate,
-	zuul
-};

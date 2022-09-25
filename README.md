@@ -1,8 +1,6 @@
 Tenso
 =====
 
-[![build status](https://secure.travis-ci.org/avoidwork/tenso.svg)](http://travis-ci.org/avoidwork/tenso)
-
 Tenso is an HTTP REST API framework, that will handle the serialization & creation of hypermedia links; all you have to do is give it `Arrays` or `Objects`.
 
 ## Benchmark
@@ -15,10 +13,9 @@ Tenso is an HTTP REST API framework, that will handle the serialization & creati
 Creating an API with Tenso can be this simple:
 
 ```javascript
-const path = require('path'),
-    app = require("tenso")({routes: require(path.join(__dirname, "routes.js"))});
-
-module.exports = app;
+import {tenso} from "tenso";
+import {routes} from "./src/routes.js";
+export const app = tenso({routes});
 ```
 
 ### Creating Routes
@@ -406,6 +403,6 @@ All files        |   79.05 |     69.1 |   66.18 |   78.81 |
 ```
 
 ## License
-Copyright (c) 2021 Jason Mulligan
+Copyright (c) 2022 Jason Mulligan
 
 Licensed under the BSD-3-Clause license.

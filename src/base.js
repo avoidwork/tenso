@@ -1,6 +1,4 @@
-"use strict";
-
-class Base {
+export class Base {
 	constructor () {
 		this.router = {
 			all: () => void 0,
@@ -93,6 +91,4 @@ class Base {
 
 		return this;
 	}
-}
-
-module.exports = Base;
+};

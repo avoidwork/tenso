@@ -1,22 +1,18 @@
-"use strict";
-
-function hasBody (arg) {
-	return arg.includes("PATCH") || arg.includes("POST") || arg.includes("PUT");
+function includes (a = "", b = "") {
+	return a.indexOf(b) !== -1;
 }
 
-function hasRead (arg) {
-	return arg.includes("GET") || arg.includes("HEAD") || arg.includes("OPTIONS");
+export function hasBody (arg) {
+	return includes(arg, "PATCH") || includes(arg, "POST") || includes(arg, "PUT");
 }
 
-function jsonWrap (arg) {
+export function hasRead (arg) {
+	return includes(arg, "GET") || includes(arg, "HEAD") || includes(arg, "OPTIONS");
+}
+
+export function jsonWrap (arg) {
 	const a = arg[0],
 		b = arg[arg.length - 1];
 
 	return (a === "\"" && b === "\"") || (a === "[" && b === "]") || (a === "{" && b === "}"); // eslint-disable-line no-extra-parens
 }
-
-module.exports = {
-	hasBody,
-	hasRead,
-	jsonWrap
-};

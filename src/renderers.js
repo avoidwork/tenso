@@ -1,11 +1,8 @@
-"use strict";
+import xml from "xml";
+import yaml from "yamljs";
+import {writeToString} from "@fast-csv/format";
 
-const xml = require("tiny-xml"),
-	yaml = require("yamljs"),
-	path = require("path"),
-	csv = require("csv.js"),
-	utility = require(path.join(__dirname, "utility.js")),
-	renderers = new Map();
+export const renderers = new Map();
 
 function indent (arg = "", fallback = 0) {
 	return arg.includes("indent=") ? parseInt(arg.match(/indent=(\d+)/)[1], 10) : fallback;
@@ -21,7 +18,7 @@ function text (req, res, arg) {
 
 renderers.set("application/json", (req, res, arg) => JSON.stringify(arg, null, indent(req.headers.accept, req.server.config.json)));
 renderers.set("application/yaml", (req, res, arg) => yaml.stringify(arg));
-renderers.set("application/xml", (req, res, arg) => xml.serialize(arg));
+renderers.set("application/xml", (req, res, arg) => xml(arg));
 renderers.set("text/plain", text);
 
 renderers.set("application/javascript", (req, res, arg) => {
@@ -38,7 +35,7 @@ renderers.set("text/csv", (req, res, arg) => {
 	res.header("content-type", "text/csv");
 	res.header("content-disposition", `attachment; filename="${(req.parsed.pathname.replace(/.*\//g, "") || "download").replace(/\..*/, "_")}.csv"`);
 
-	return csv.encode(Array.isArray(val) ? val : val instanceof Object === false ? {data: val} : val);
+	return writeToString(val);
 });
 
 renderers.set("text/html", (req, res, arg, tpl = "") => {
@@ -57,5 +54,3 @@ renderers.set("text/html", (req, res, arg, tpl = "") => {
 		.replace("{{csrf}}", headers["x-csrf-token"] || "")
 		.replace("class=\"headers", req.server.config.renderHeaders === false ? "class=\"headers dr-hidden" : "class=\"headers") : "";
 });
-
-module.exports = renderers;

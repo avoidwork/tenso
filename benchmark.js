@@ -1,9 +1,7 @@
-"use strict";
-
-const {join} = require("path"),
-	{platform} = require("os"),
-	{readdir} = require("fs").promises,
-	{spawn} = require("child_process");
+import {join} from "node:path";
+import {platform} from "node:os";
+import {readdir} from "node:fs/promises";
+import {spawn} from "node:child_process";
 
 function shell (arg = "") {
 	return new Promise((resolve, reject) => {

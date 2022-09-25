@@ -1,11 +1,8 @@
-"use strict";
+import {coerce} from "tiny-coerce";
+import {bodySplit} from "./regex.js";
+import {chunk} from "./utility.js";
 
-const path = require("path"),
-	{chunk} = require("retsu"),
-	coerce = require("tiny-coerce"),
-	{bodySplit} = require(path.join(__dirname, "regex.js"));
-
-const parsers = new Map([
+export const parsers = new Map([
 	[
 		"application/x-www-form-urlencoded",
 		arg => {
@@ -24,5 +21,3 @@ const parsers = new Map([
 		arg => JSON.parse(arg)
 	]
 ]);
-
-module.exports = parsers;

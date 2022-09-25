@@ -1,7 +1,6 @@
-"use strict";
+import {STATUS_CODES} from "node:http";
 
-const {STATUS_CODES} = require("http"),
-	serializers = new Map();
+export const serializers = new Map();
 
 function custom (arg, err, status = 200, stack = false) {
 	return {
@@ -23,5 +22,3 @@ serializers.set("application/xml", custom);
 serializers.set("text/csv", custom);
 serializers.set("text/html", custom);
 serializers.set("text/plain", reduce);
-
-module.exports = serializers;

@@ -59,8 +59,8 @@
     "tiny-etag": "^3.0.1",
     "tiny-eventsource": "^1.2.1",
     "tiny-merge": "^1.0.0",
-    "xml": "^1.0.1",
     "woodland": "^17.0.1",
+    "xml": "^1.0.1",
     "yamljs": "^0.3.0",
     "yargs-parser": "^21.1.1"
   },

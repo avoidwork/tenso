@@ -1,12 +1,8 @@
-"use strict";
-
-module.exports = {
-	bodySplit: /&|=/,
-	collection: /(.*)(\/.*)$/,
-	hypermedia: /(([a-z]+(_)?)?id|url|uri)$/i,
-	mimetype: /;.*/,
-	trailing: /_.*$/,
-	trailingS: /s$/,
-	trailingSlash: /\/$/,
-	trailingY: /y$/
-};
+export const bodySplit = /&|=/;
+export const collection = /(.*)(\/.*)$/;
+export const hypermedia = /(([a-z]+(_)?)?id|url|uri)$/i;
+export const mimetype = /;.*/;
+export const trailing = /_.*$/;
+export const trailingS = /s$/;
+export const trailingSlash = /\/$/;
+export const trailingY = /y$/;

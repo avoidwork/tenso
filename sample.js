@@ -1,6 +1,9 @@
-require("./index.js")({
+import {tenso} from "./dist/tenso.esm.js";
+import {routes} from "./test/routes.js";
+
+tenso({
 	port: 8000,
-	routes: require("./test/routes.js"),
+	routes,
 	logging: {
 		level: "info"
 	},

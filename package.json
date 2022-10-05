@@ -57,8 +57,8 @@
     "redis": "^4.3.1",
     "tiny-coerce": "^2.0.0",
     "tiny-etag": "^3.0.1",
-    "tiny-eventsource": "^1.2.1",
-    "tiny-merge": "^1.0.0",
+    "tiny-eventsource": "^2.0.0",
+    "tiny-merge": "^2.0.0",
     "woodland": "^17.0.1",
     "xml": "^1.0.1",
     "yamljs": "^0.3.0",
@@ -74,7 +74,7 @@
     "nyc": "^15.1.0",
     "rollup": "^2.79.1",
     "rollup-plugin-terser": "^7.0.2",
-    "tiny-httptest": "^3.0.0"
+    "tiny-httptest": "^3.0.3"
   },
   "keywords": [
     "rest",

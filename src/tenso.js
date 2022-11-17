@@ -3,141 +3,16 @@ import {createServer as https} from "node:https";
 import * as fs from "node:fs";
 import {eventsource} from "tiny-eventsource";
 import {parsers} from "./parsers.js";
-import {bodySplit, collection, hypermedia, mimetype, trailing, trailingS, trailingSlash, trailingY} from "./regex.js";
 import {hasBody} from "./utility.js";
 import {renderers} from "./renderers.js";
 import {serializers} from "./serializers.js";
 import {Base} from "./base.js";
+import config from "../config.json" assert {type: "json"};
 
 class Tenso extends Base {
 	constructor () {
 		super();
-		this.config = {
-			auth: {
-				delay: 0,
-				protect: [],
-				unprotect: [],
-				basic: {
-					enabled: false,
-					list: []
-				},
-				bearer: {
-					enabled: false,
-					tokens: []
-				},
-				jwt: {
-					enabled: false,
-					auth: null,
-					audience: "",
-					algorithms: [
-						"HS256",
-						"HS384",
-						"HS512"
-					],
-					ignoreExpiration: false,
-					issuer: "",
-					scheme: "Bearer",
-					secretOrKey: ""
-				},
-				local: {
-					enabled: false,
-					auth: null
-				},
-				msg: {
-					login: "POST 'username' & 'password' to authenticate"
-				},
-				oauth2: {
-					enabled: false,
-					auth: null,
-					auth_url: "",
-					token_url: "",
-					client_id: "",
-					client_secret: ""
-				},
-				uri: {
-					login: "/auth/login",
-					logout: "/auth/logout",
-					redirect: "/",
-					root: "/auth"
-				},
-				saml: {
-					enabled: false,
-					auth: null
-				}
-			},
-			cacheSize: 1e3,
-			cacheTTL: 3e5,
-			catchAll: true,
-			coerce: true,
-			corsExpose: "cache-control, content-language, content-type, expires, last-modified, pragma, x-csrf-token",
-			headers: {
-				"content-type": "application/json; charset=utf-8",
-				"vary": "accept, accept-encoding, accept-language, origin"
-			},
-			host: "0.0.0.0",
-			index: ["index.htm", "index.html"],
-			json: 0,
-			logging: {
-				enabled: true,
-				stack: false
-			},
-			maxBytes: 0,
-			mimeType: "application/json",
-			origins: ["*"],
-			port: 8000,
-			rate: {
-				enabled: false,
-				limit: 450,
-				message: "Too many requests",
-				override: null,
-				reset: 900,
-				status: 429
-			},
-			root: "",
-			renderHeaders: true,
-			routes: {},
-			security: {
-				key: "x-csrf-token",
-				secret: "tenso",
-				csrf: true,
-				csp: null,
-				xframe: "SAMEORIGIN",
-				p3p: "",
-				hsts: null,
-				xssProtection: true,
-				nosniff: true
-			},
-			session: {
-				cookie: {
-					httpOnly: true,
-					path: "/",
-					sameSite: true,
-					secure: "auto"
-				},
-				name: "tenso.sid",
-				proxy: true,
-				redis: {
-					host: "127.0.0.1",
-					port: 6379
-				},
-				rolling: true,
-				resave: true,
-				saveUninitialized: true,
-				secret: "tensoABC",
-				store: "memory"
-			},
-			silent: false,
-			ssl: {
-				cert: null,
-				key: null,
-				pfx: null
-			},
-			static: "/assets",
-			staticCache: 300,
-			template: "",
-			title: "Tenso",
-			uid: 0
-		};
+		this.config = config;
 		this.parsers = parsers;
 		this.rates = new Map();
 		this.renderers = renderers;

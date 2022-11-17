@@ -17,8 +17,8 @@ import {Strategy as OAuth2Strategy} from "passport-oauth2";
 import {Strategy as SAMLStrategy} from "passport-saml";
 import connectRedis from "connect-redis";
 import {serializers} from "./serializers.js";
-import {collection, hypermedia, trailing, trailingS, trailingSlash, trailingY} from "./regex.js";
-import middleware from "./middleware.js";
+import {hypermedia as regexHypermedia, trailing, trailingS, trailingSlash, trailingY} from "./regex.js";
+import {asyncFlag, zuul, rate, guard, payload, parse, bypass} from "./";
 
 const RedisStore = connectRedis(session),
 	groups = ["protect", "unprotect"];
@@ -103,7 +103,7 @@ export function auth (obj, config) {
 		res.redirect(config.auth.uri.redirect, false);
 	}
 
-	obj.router.ignore(middleware.asyncFlag);
+	obj.router.ignore(asyncFlag);
 
 	for (const k of groups) {
 		config.auth[k] = (config.auth[k] || []).map(i => new RegExp(`^${i !== config.auth.uri.login ? i.replace(/\.\*/g, "*").replace(/\*/g, ".*") : ""}(\/|$)`, "i"));
@@ -141,7 +141,7 @@ export function auth (obj, config) {
 
 		obj.always(fnCookie).ignore(fnCookie);
 		obj.always(fnSession).ignore(fnSession);
-		obj.always(middleware.bypass).ignore(middleware.bypass);
+		obj.always(bypass).ignore(bypass);
 
 		if (config.security.csrf) {
 			luscaCsrf = lusca.csrf({key: config.security.key, secret: config.security.secret});
@@ -179,8 +179,8 @@ export function auth (obj, config) {
 		obj.always(luscaNoSniff).ignore(luscaNoSniff);
 	}
 
-	// Can fork to `middleware.keymaster()`
-	obj.always(middleware.zuul).ignore(middleware.zuul);
+	// Can fork to `keymaster()`
+	obj.always(zuul).ignore(zuul);
 
 	passportInit = passport.initialize();
 	obj.always(passportInit).ignore(passportInit);
@@ -346,9 +346,9 @@ export function auth (obj, config) {
 			}, authDelay);
 		}));
 
-		obj.get("/auth/oauth2", middleware.asyncFlag);
+		obj.get("/auth/oauth2", asyncFlag);
 		obj.get("/auth/oauth2", passport.authenticate("oauth2"));
-		obj.get("/auth/oauth2/callback", middleware.asyncFlag);
+		obj.get("/auth/oauth2/callback", asyncFlag);
 		obj.get("/auth/oauth2/callback", passport.authenticate("oauth2", {failureRedirect: config.auth.uri.login}));
 		obj.get("/auth/oauth2/callback", redirect);
 	} else if (config.auth.saml.enabled) {
@@ -370,9 +370,9 @@ export function auth (obj, config) {
 			}, authDelay);
 		}));
 
-		obj.get("/auth/saml", middleware.asyncFlag);
+		obj.get("/auth/saml", asyncFlag);
 		obj.get("/auth/saml", passport.authenticate("saml"));
-		obj.get("/auth/saml/callback", middleware.asyncFlag);
+		obj.get("/auth/saml/callback", asyncFlag);
 		obj.get("/auth/saml/callback", passport.authenticate("saml", {failureRedirect: config.auth.uri.login}));
 		obj.get("/auth/saml/callback", redirect);
 	}
@@ -389,7 +389,7 @@ export function auth (obj, config) {
 		}
 
 		r = r.replace(/\|$/, "") + ")).*$";
-		obj.always(r, middleware.guard).ignore(middleware.guard);
+		obj.always(r, guard).ignore(guard);
 
 		config.routes.get[config.auth.uri.login] = {
 			instruction: config.auth.msg.login
@@ -447,8 +447,8 @@ export function bootstrap (obj) {
 	};
 
 	// Payload handling
-	obj.always(middleware.payload).ignore(middleware.payload);
-	obj.always(middleware.parse).ignore(middleware.parse);
+	obj.always(payload).ignore(payload);
+	obj.always(parse).ignore(parse);
 
 	// Setting 'always' routes before authorization runs
 	const routes = obj.config.routes.always || {};
@@ -522,7 +522,7 @@ export function hypermedia (req, res, rep) {
 					let lcollection, uri;
 
 					// If ID like keys are found, and are not URIs, they are assumed to be root collections
-					if (lid || hypermedia.test(i)) {
+					if (lid || regexHypermedia.test(i)) {
 						const lkey = obj[i].toString();
 
 						if (lid === false) {

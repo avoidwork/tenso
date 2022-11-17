@@ -1,5 +1,6 @@
 import pkg from "./package.json" assert {type: "json"};
 import terser from '@rollup/plugin-terser';
+import json from '@rollup/plugin-json';
 
 const year = new Date().getFullYear();
 const bannerLong = `/**
@@ -13,10 +14,10 @@ const bannerShort = `/*!
  ${year} ${pkg.author}
  @version ${pkg.version}
 */`;
-const defaultOutBase = {compact: true, banner: bannerLong, name: pkg.name};
+const defaultOutBase = {compact: true, banner: bannerLong, name: pkg.name, plugins: [json()]};
 const cjOutBase = {...defaultOutBase, compact: false, format: "cjs", exports: "named"};
 const esmOutBase = {...defaultOutBase, format: "esm"};
-const minOutBase = {banner: bannerShort, name: pkg.name, plugins: [terser()], sourcemap: true};
+const minOutBase = {banner: bannerShort, name: pkg.name, plugins: [json(), terser()], sourcemap: true};
 
 export default {
 	external: [

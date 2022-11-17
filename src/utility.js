@@ -26,27 +26,47 @@ const path = require("path"),
 	RedisStore = require("connect-redis")(session),
 	groups = ["protect", "unprotect"];
 
-function explode (arg = "", delimiter = ",") {
+import {STATUS_CODES} from "node:http";
+import {URL} from "node:url";
+import retsu from "retsu";
+import {keysort} from "keysort";
+
+export function hasBody (arg) {
+	return includes(arg, "PATCH") || includes(arg, "POST") || includes(arg, "PUT");
+}
+
+export function hasRead (arg) {
+	return includes(arg, "GET") || includes(arg, "HEAD") || includes(arg, "OPTIONS");
+}
+
+export function jsonWrap (arg) {
+	const a = arg[0],
+		b = arg[arg.length - 1];
+
+	return (a === "\"" && b === "\"") || (a === "[" && b === "]") || (a === "{" && b === "}"); // eslint-disable-line no-extra-parens
+}
+
+export function explode (arg = "", delimiter = ",") {
 	return arg.trim().split(new RegExp(`\\s*${delimiter}\\s*`));
 }
 
-function capitalize (obj, e = false, delimiter = " ") {
+export function capitalize (obj, e = false, delimiter = " ") {
 	return e ? explode(obj, delimiter).map(capitalize).join(delimiter) : obj.charAt(0).toUpperCase() + obj.slice(1);
 }
 
-function clone (arg) {
+export function clone (arg) {
 	return JSON.parse(JSON.stringify(arg));
 }
 
-function isEmpty (obj) {
+export function isEmpty (obj) {
 	return obj.length === 0;
 }
 
-function random (n = 100) {
+export function random (n = 100) {
 	return Math.floor(Math.random() * n) + 1;
 }
 
-function delay (fn = () => void 0, n = 0) {
+export function delay (fn = () => void 0, n = 0) {
 	if (n === 0) {
 		fn();
 	} else {
@@ -54,7 +74,7 @@ function delay (fn = () => void 0, n = 0) {
 	}
 }
 
-function auth (obj, config) {
+export function auth (obj, config) {
 	const ssl = config.ssl.cert && config.ssl.key,
 		realm = `http${ssl ? "s" : ""}://${config.host}${config.port !== 80 && config.port !== 443 ? ":" + config.port : ""}`,
 		async = config.auth.oauth2.enabled || config.auth.saml.enabled,
@@ -395,7 +415,7 @@ function auth (obj, config) {
 	return config;
 }
 
-function bootstrap (obj) {
+export function bootstrap (obj) {
 	const authorization = Object.keys(obj.config.auth).filter(i => {
 		const x = obj.config.auth[i];
 
@@ -474,15 +494,15 @@ function bootstrap (obj) {
 	return obj;
 }
 
-function id (arg = "") {
+export function id (arg = "") {
 	return arg === "id" || arg === "_id" || arg === "ID" || arg === "_ID";
 }
 
-function scheme (arg = "") {
+export function scheme (arg = "") {
 	return arg.includes("://") || arg[0] === "/";
 }
 
-function hypermedia (req, res, rep) {
+export function hypermedia (req, res, rep) {
 	const server = req.server,
 		headers = res.getHeaders(),
 		collection = req.parsed.pathname,
@@ -647,7 +667,7 @@ function hypermedia (req, res, rep) {
 	return rep;
 }
 
-function sort (arg, req) {
+export function sort (arg, req) {
 	let output = clone(arg);
 
 	if (typeof req.parsed.search === "string" && req.parsed.searchParams.has("order_by") && Array.isArray(arg)) {
@@ -669,7 +689,7 @@ function sort (arg, req) {
 	return output;
 }
 
-function serialize (req, res, arg) {
+export function serialize (req, res, arg) {
 	const status = res.statusCode;
 	let format = req.server.config.mimeType,
 		accepts = explode(req.parsed.searchParams.get("format") || req.headers.accept || res.getHeader("content-type") || format, ","),
@@ -697,14 +717,3 @@ function serialize (req, res, arg) {
 
 	return result;
 }
-
-module.exports = {
-	auth,
-	bootstrap,
-	capitalize,
-	clone,
-	explode,
-	hypermedia,
-	serialize,
-	sort
-};

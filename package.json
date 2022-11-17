@@ -18,8 +18,6 @@
   },
   "main": "dist/tenso.cjs",
   "module": "dist/tenso.esm.js",
-  "type": "module",
-  "sourceType": "module",
   "types": "types/tenso.d.ts",
   "files": [
     "dist",
@@ -43,7 +41,7 @@
     "connect-redis": "^6.1.3",
     "cookie-parser": "^1.4.6",
     "express-session": "^1.17.3",
-    "keysort": "^1.0.2",
+    "keysort": "^2.0.1",
     "lusca": "^1.7.0",
     "mime-db": "^1.52.0",
     "passport": "^0.6.0",
@@ -52,14 +50,14 @@
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "passport-oauth2": "^1.6.1",
-    "passport-saml": "^3.2.1",
+    "@node-saml/passport-saml": "^4.0.1",
     "precise": "^2.0.0",
-    "redis": "^4.3.1",
+    "redis": "^4.5.0",
     "tiny-coerce": "^2.0.0",
-    "tiny-etag": "^3.0.1",
+    "tiny-etag": "^3.0.2",
     "tiny-eventsource": "^2.0.0",
     "tiny-merge": "^2.0.0",
-    "woodland": "^17.0.1",
+    "woodland": "^17.0.2",
     "xml": "^1.0.1",
     "yamljs": "^0.3.0",
     "yargs-parser": "^21.1.1"
@@ -67,13 +65,13 @@
   "devDependencies": {
     "auto-changelog": "^2.4.0",
     "autocannon": "^7.10.0",
-    "concurrently": "^7.4.0",
-    "eslint": "^8.24.0",
+    "concurrently": "^7.5.0",
+    "eslint": "^8.27.0",
     "jsonwebtoken": "^8.5.1",
-    "mocha": "^10.0.0",
+    "mocha": "^10.1.0",
     "nyc": "^15.1.0",
-    "rollup": "^2.79.1",
-    "rollup-plugin-terser": "^7.0.2",
+    "rollup": "^3.3.0",
+    "@rollup/plugin-terser": "^0.1.0",
     "tiny-httptest": "^3.0.3"
   },
   "keywords": [
@@ -84,5 +82,6 @@
     "server",
     "hypermedia",
     "framework"
-  ]
+  ],
+  "type": "module"
 }

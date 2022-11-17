@@ -1,3 +1,9 @@
+import * as path from "node:path";
+import * as http from "node:http";
+import * as https from "node:https";
+import * as fs from "node:fs";
+
+
 "use strict";
 
 const path = require("path"),

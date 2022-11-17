@@ -10,7 +10,7 @@ import lusca from "lusca";
 import {woodland} from "woodland";
 import passport from "passport";
 import {Strategy as JWTStrategy, ExtractJwt} from "passport-jwt";
-import {Strategy as BasicStrategy} from "passport-http";
+import {BasicStrategy} from "passport-http";
 import {Strategy as BearerStrategy} from "passport-http-bearer";
 import {Strategy as LocalStrategy} from "passport-local";
 import {Strategy as OAuth2Strategy} from "passport-oauth2";

@@ -1,22 +1,13 @@
-import * as path from "node:path";
-import * as http from "node:http";
-import * as https from "node:https";
+import {createServer as http} from "node:http";
+import {createServer as https} from "node:https";
 import * as fs from "node:fs";
-
-
-"use strict";
-
-const path = require("path"),
-	http = require("http"),
-	https = require("https"),
-	fs = require("fs"),
-	eventsource = require("tiny-eventsource"),
-	parsers = require(path.join(__dirname, "parsers.js")),
-	regex = require(path.join(__dirname, "regex.js")),
-	{hasBody} = require(path.join(__dirname, "shared.js")),
-	renderers = require(path.join(__dirname, "renderers.js")),
-	serializers = require(path.join(__dirname, "serializers.js")),
-	Base = require(path.join(__dirname, "base.js"));
+import {eventsource} from "tiny-eventsource";
+import {parsers} from "./parsers.js";
+import {bodySplit, collection, hypermedia, mimetype, trailing, trailingS, trailingSlash, trailingY} from "./regex.js";
+import {hasBody} from "./utility.js";
+import {renderers} from "./renderers.js";
+import {serializers} from "./serializers.js";
+import {Base} from "./base.js";
 
 class Tenso extends Base {
 	constructor () {
@@ -274,7 +265,7 @@ class Tenso extends Base {
 			renderer, result;
 
 		for (const media of accepts) {
-			const mimetype = media.replace(regex.mimetype, "");
+			const mimetype = media.replace(mimetype, "");
 
 			if (renderers.has(mimetype)) {
 				format = mimetype;

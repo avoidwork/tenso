@@ -1,6 +1,7 @@
 import xml from "xml";
 import yaml from "yamljs";
 import {writeToString} from "@fast-csv/format";
+import {explode} from "./utility.js";
 
 export const renderers = new Map();
 
@@ -50,7 +51,7 @@ renderers.set("text/html", (req, res, arg, tpl = "") => {
 		.replace("{{year}}", new Date().getFullYear())
 		.replace("{{version}}", req.server.config.version)
 		.replace("{{allow}}", headers.allow)
-		.replace("{{methods}}", utility.explode((headers.allow || "").replace("GET, HEAD, OPTIONS", "")).filter(i => i !== "").map(i => `<option value='${i.trim()}'>$i.trim()}</option>`).join("\n"))
+		.replace("{{methods}}", explode((headers.allow || "").replace("GET, HEAD, OPTIONS", "")).filter(i => i !== "").map(i => `<option value='${i.trim()}'>$i.trim()}</option>`).join("\n"))
 		.replace("{{csrf}}", headers["x-csrf-token"] || "")
 		.replace("class=\"headers", req.server.config.renderHeaders === false ? "class=\"headers dr-hidden" : "class=\"headers") : "";
 });

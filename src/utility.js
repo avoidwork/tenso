@@ -1,35 +1,31 @@
-"use strict";
-
-const path = require("path"),
-	{STATUS_CODES} = require("http"),
-	{URL} = require("url"),
-	retsu = require("retsu"),
-	keysort = require("keysort"),
-	redis = require("redis"),
-	session = require("express-session"),
-	cookie = require("cookie-parser"),
-	lusca = require("lusca"),
-	uuid = require("tiny-uuid4"),
-	woodland = require("woodland"),
-	middleware = require(path.join(__dirname, "middleware.js")),
-	regex = require(path.join(__dirname, "regex.js")),
-	serializers = require(path.join(__dirname, "serializers.js")),
-	passport = require("passport"),
-	jwt = require("passport-jwt"),
-	BasicStrategy = require("passport-http").BasicStrategy,
-	BearerStrategy = require("passport-http-bearer").Strategy,
-	JWTStrategy = jwt.Strategy,
-	ExtractJwt = jwt.ExtractJwt,
-	LocalStrategy = require("passport-local").Strategy,
-	OAuth2Strategy = require("passport-oauth2").Strategy,
-	SAMLStrategy = require("passport-saml").Strategy,
-	RedisStore = require("connect-redis")(session),
-	groups = ["protect", "unprotect"];
-
 import {STATUS_CODES} from "node:http";
 import {URL} from "node:url";
+import {randomUUID as uuid} from "node:crypto";
+import redis from "redis";
+import session from "express-session";
+import cookie from "cookie-parser";
 import retsu from "retsu";
 import {keysort} from "keysort";
+import lusca from "lusca";
+import {woodland} from "woodland";
+import passport from "passport";
+import {Strategy as JWTStrategy, ExtractJwt} from "passport-jwt";
+import {Strategy as BasicStrategy} from "passport-http";
+import {Strategy as BearerStrategy} from "passport-http-bearer";
+import {Strategy as LocalStrategy} from "passport-local";
+import {Strategy as OAuth2Strategy} from "passport-oauth2";
+import {Strategy as SAMLStrategy} from "passport-saml";
+import connectRedis from "connect-redis";
+import {serializers} from "./serializers.js";
+import {collection, hypermedia, trailing, trailingS, trailingSlash, trailingY} from "./regex.js";
+import middleware from "./middleware.js";
+
+const RedisStore = connectRedis(session),
+	groups = ["protect", "unprotect"];
+
+export function includes (a = "", b = "") {
+	return a.indexOf(b) !== -1;
+}
 
 export function hasBody (arg) {
 	return includes(arg, "PATCH") || includes(arg, "POST") || includes(arg, "PUT");
@@ -526,11 +522,11 @@ export function hypermedia (req, res, rep) {
 					let lcollection, uri;
 
 					// If ID like keys are found, and are not URIs, they are assumed to be root collections
-					if (lid || regex.hypermedia.test(i)) {
+					if (lid || hypermedia.test(i)) {
 						const lkey = obj[i].toString();
 
 						if (lid === false) {
-							lcollection = i.replace(regex.trailing, "").replace(regex.trailingS, "").replace(regex.trailingY, "ie") + "s";
+							lcollection = i.replace(trailing, "").replace(trailingS, "").replace(trailingY, "ie") + "s";
 							lrel = "related";
 						} else {
 							lcollection = item_collection;
@@ -575,7 +571,7 @@ export function hypermedia (req, res, rep) {
 	root.searchParams.delete("page_size");
 
 	if (root.pathname !== "/") {
-		const proot = root.pathname.replace(regex.trailingSlash, "").replace(regex.collection, "$1") || "/";
+		const proot = root.pathname.replace(trailingSlash, "").replace(collection, "$1") || "/";
 
 		if (server.allowed("GET", proot)) {
 			links.push({uri: proot, rel: "collection"});
@@ -622,7 +618,7 @@ export function hypermedia (req, res, rep) {
 			if (req.hypermedia) {
 				for (const i of rep.data) {
 					if (i instanceof Object) {
-						marshal(i, "item", req.parsed.pathname.replace(regex.trailingSlash, ""));
+						marshal(i, "item", req.parsed.pathname.replace(trailingSlash, ""));
 					} else {
 						const li = i.toString();
 
@@ -697,7 +693,7 @@ export function serialize (req, res, arg) {
 		result, serializer;
 
 	for (const i of accepts) {
-		let mimetype = i.replace(regex.mimetype, "");
+		let mimetype = i.replace(mimetype, "");
 
 		if (serializers.has(mimetype)) {
 			format = mimetype;

@@ -18,6 +18,7 @@
   },
   "main": "dist/tenso.cjs",
   "module": "dist/tenso.esm.js",
+  "type": "module",
   "types": "types/tenso.d.ts",
   "files": [
     "dist",
@@ -82,6 +83,5 @@
     "server",
     "hypermedia",
     "framework"
-  ],
-  "type": "module"
+  ]
 }

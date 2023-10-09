@@ -14,6 +14,7 @@ var node_url = require('node:url');
 var woodland = require('woodland');
 var defaults = require('defaults');
 var yaml$1 = require('yaml');
+var http = require('http');
 
 var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
 const __dirname$2 = node_url.fileURLToPath(new node_url.URL(".", (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.src || new URL('tenso.cjs', document.baseURI).href))));
@@ -194,7 +195,7 @@ function xml (req, res, arg) {
 	return serialize$1(arg)
 }
 
-function plain (req, res, arg) {
+function plain$1 (req, res, arg) {
 	return Array.isArray(arg) ? arg.map(i => text(req, res, i)).join(",") : arg instanceof Object ? JSON.stringify(arg, null, indent(req.headers.accept, req.server.config.json)) : arg.toString()
 }
 
@@ -235,21 +236,33 @@ const renderers$1 = new Map([
 	["application/json", json],
 	["application/yaml", yaml],
 	["application/xml", xml],
-	["text/plain", plain],
+	["text/plain", plain$1],
 	["application/javascript", javascript],
 	["text/csv", csv],
 	["text/html", html]
 ]);
 
+function custom (arg, err, status = 200, stack = false) {
+	return {
+		data: arg,
+		error: err !== null ? (stack ? err.stack : err.message) || err || http.STATUS_CODES[status] : null,
+		links: [],
+		status: status
+	};
+}
+
+function plain (arg, err, status = 200, stack = false) {
+	return err !== null ? (stack ? err.stack : err.message) || err || http.STATUS_CODES[status] : arg;
+}
+
 const serializers = new Map([
-	[
-		"application/x-www-form-urlencoded",
-		arg => arg
-	],
-	[
-		"application/json",
-		arg => JSON.parse(arg)
-	]
+	["application/json", custom],
+	["application/yaml", custom],
+	["application/xml", custom],
+	["text/plain", plain],
+	["application/javascript", custom],
+	["text/csv", custom],
+	["text/html", custom]
 ]);
 
 const __dirname$1 = node_url.fileURLToPath(new node_url.URL(".", (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.src || new URL('tenso.cjs', document.baseURI).href))));

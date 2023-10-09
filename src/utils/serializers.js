@@ -1,10 +1,12 @@
+import {custom} from "../serializers/custom.js";
+import {plain} from "../serializers/plain.js";
+
 export const serializers = new Map([
-	[
-		"application/x-www-form-urlencoded",
-		arg => arg
-	],
-	[
-		"application/json",
-		arg => JSON.parse(arg)
-	]
+	["application/json", custom],
+	["application/yaml", custom],
+	["application/xml", custom],
+	["text/plain", plain],
+	["application/javascript", custom],
+	["text/csv", custom],
+	["text/html", custom]
 ]);

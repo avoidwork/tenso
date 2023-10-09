@@ -5,7 +5,7 @@
  * @license BSD-3-Clause
  * @version 17.0.0
  */
-import {readFileSync}from'node:fs';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL}from'node:url';import {Woodland}from'woodland';import defaults from'defaults';import {stringify}from'yaml';const __dirname$1 = fileURLToPath(new URL(".", import.meta.url));
+import {readFileSync}from'node:fs';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL}from'node:url';import {Woodland}from'woodland';import defaults from'defaults';import {stringify}from'yaml';import {STATUS_CODES}from'http';const __dirname$1 = fileURLToPath(new URL(".", import.meta.url));
 const {name, version: version$1} = require(join(__dirname$1, "..", "..", "package.json"));
 
 const config = {
@@ -169,7 +169,7 @@ function serialize$1 (arg) {
 
 function xml (req, res, arg) {
 	return serialize$1(arg)
-}function plain (req, res, arg) {
+}function plain$1 (req, res, arg) {
 	return Array.isArray(arg) ? arg.map(i => text(req, res, i)).join(",") : arg instanceof Object ? JSON.stringify(arg, null, indent(req.headers.accept, req.server.config.json)) : arg.toString()
 }function javascript (req, res, arg) {
 	req.headers.accept = "application/javascript";
@@ -202,19 +202,27 @@ function csv (req, res, arg) {
 	["application/json", json],
 	["application/yaml", yaml],
 	["application/xml", xml],
-	["text/plain", plain],
+	["text/plain", plain$1],
 	["application/javascript", javascript],
 	["text/csv", csv],
 	["text/html", html]
-]);const serializers = new Map([
-	[
-		"application/x-www-form-urlencoded",
-		arg => arg
-	],
-	[
-		"application/json",
-		arg => JSON.parse(arg)
-	]
+]);function custom (arg, err, status = 200, stack = false) {
+	return {
+		data: arg,
+		error: err !== null ? (stack ? err.stack : err.message) || err || STATUS_CODES[status] : null,
+		links: [],
+		status: status
+	};
+}function plain (arg, err, status = 200, stack = false) {
+	return err !== null ? (stack ? err.stack : err.message) || err || STATUS_CODES[status] : arg;
+}const serializers = new Map([
+	["application/json", custom],
+	["application/yaml", custom],
+	["application/xml", custom],
+	["text/plain", plain],
+	["application/javascript", custom],
+	["text/csv", custom],
+	["text/html", custom]
 ]);const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const require$1 = createRequire(import.meta.url);
 const {version} = require$1(join(__dirname, "..", "..", "package.json"));

@@ -22,10 +22,13 @@ import fs from "fs";
 class Tenso extends Woodland {
 	constructor (config = defaultConfig) {
 		super(config);
+
 		for (const [key, value] of Object.entries(config)) {
-			this[key] = value;
+			if (key in this === false) {
+				this[key] = value;
+			}
 		}
-		this.config = config; // @todo remove once all code is updated
+
 		this.parsers = parsers;
 		this.rates = new Map();
 		this.renderers = renderers;
@@ -39,7 +42,7 @@ class Tenso extends Woodland {
 	}
 
 	connect (req, res) {
-		req.csrf = this.canModify(req.method) === false && this.canModify(req.allow) && this.config.security.csrf === true;
+		req.csrf = this.canModify(req.method) === false && this.canModify(req.allow) && this.security.csrf === true;
 		req.hypermedia = true;
 		req.private = false;
 		req.protect = false;
@@ -51,7 +54,7 @@ class Tenso extends Woodland {
 			const header = `access-control-${req.method === "OPTIONS" ? "allow" : "expose"}-headers`;
 
 			res.removeHeader(header);
-			res.header(header, `cache-control, content-language, content-type, expires, last-modified, pragma${req.csrf ? `, ${this.config.security.key}` : ""}${this.config.corsExpose.length > 0 ? `, ${this.config.corsExpose}` : ""}`);
+			res.header(header, `cache-control, content-language, content-type, expires, last-modified, pragma${req.csrf ? `, ${this.security.key}` : ""}${this.corsExpose.length > 0 ? `, ${this.corsExpose}` : ""}`);
 		}
 	}
 
@@ -81,8 +84,8 @@ class Tenso extends Woodland {
 		return this;
 	}
 
-	rate (req, fn) {
-		const config = this.config.rate,
+	rateLimit (req, fn) {
+		const config = this.rate,
 			id = req.sessionID || req.ip;
 		let valid = true,
 			seconds = Math.floor(new Date().getTime() / 1000),
@@ -138,12 +141,12 @@ class Tenso extends Woodland {
 		}
 
 		if (format.length === 0) {
-			format = this.config.mimeType;
+			format = this.mimeType;
 		}
 
 		renderer = renderers.get(format);
 		res.header("content-type", format);
-		result = renderer(req, res, arg, this.config.template);
+		result = renderer(req, res, arg, this.template);
 
 		return result;
 	}
@@ -162,19 +165,19 @@ class Tenso extends Woodland {
 
 	start () {
 		if (this.server === null) {
-			if (this.config.ssl.cert === null && this.config.ssl.pfx === null && this.config.ssl.key === null) {
-				this.server = http.createServer(this.route).listen(this.config.port, this.config.host, () => this.drop());
+			if (this.ssl.cert === null && this.ssl.pfx === null && this.ssl.key === null) {
+				this.server = http.createServer(this.route).listen(this.port, this.host);
 			} else {
 				this.server = https.createServer({
-					cert: this.config.ssl.cert ? fs.readFileSync(this.config.ssl.cert) : void 0,
-					pfx: this.config.ssl.pfx ? fs.readFileSync(this.config.ssl.pfx) : void 0,
-					key: this.config.ssl.key ? fs.readFileSync(this.config.ssl.key) : void 0,
-					port: this.config.port,
-					host: this.config.host
-				}, this.route).listen(this.config.port, this.config.host, () => this.drop());
+					cert: this.ssl.cert ? fs.readFileSync(this.ssl.cert) : void 0,
+					pfx: this.ssl.pfx ? fs.readFileSync(this.ssl.pfx) : void 0,
+					key: this.ssl.key ? fs.readFileSync(this.ssl.key) : void 0,
+					port: this.port,
+					host: this.host
+				}, this.route).listen(this.port, this.host);
 			}
 
-			this.log(`Started server on port ${this.config.host}:${this.config.port}`);
+			this.log(`Started server on port ${this.host}:${this.port}`);
 		}
 
 		return this;
@@ -192,7 +195,7 @@ class Tenso extends Woodland {
 			this.server = null;
 		}
 
-		this.log(`Stopped server on port ${this.config.host}:${this.config.port}`);
+		this.log(`Stopped server on port ${this.host}:${this.port}`);
 
 		return this;
 	}
@@ -217,6 +220,9 @@ export function tenso (userConfig = {}) {
 	}
 
 	const app = new Tenso(config);
+
+	app.decorate = app.decorate.bind(app);
+	app.route = app.route.bind(app);
 
 	process.on("SIGTERM", async () => {
 		await app.server.close();

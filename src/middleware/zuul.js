@@ -1,3 +1,5 @@
+import {rate} from "./rate.js";
+
 export function zuul (req, res, next) {
 	const uri = req.parsed.pathname;
 	let protectd = false;

@@ -85,6 +85,7 @@ export const config = {
 		status: 429
 	},
 	renderHeaders: true,
+	time: true,
 	security: {
 		key: "x-csrf-token",
 		secret: "tenso",

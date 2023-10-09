@@ -5,13 +5,13 @@ import {fileURLToPath, URL} from "node:url";
 import {Woodland} from "woodland";
 import defaults from "defaults";
 import {config as defaultConfig} from "./utils/config.js";
+import {parsers} from "./utils/parsers.js";
+import {renderers} from "./utils/renderers.js";
+import {serializers} from "./utils/serializers.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const require = createRequire(import.meta.url);
 const {version} = require(join(__dirname, "..", "..", "package.json"));
-const parsers = new Map();
-const renderers = new Map();
-const serializers = new Map();
 
 class Tenso extends Woodland {
 	constructor (config = defaultConfig) {

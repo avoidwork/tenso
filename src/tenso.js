@@ -7,16 +7,16 @@ const renderers = new Map();
 const serializers = new Map();
 
 class Tenso extends Woodland {
-  constructor(config = defaultConfig) {
-	super(config);
-	this.config = config;
-	this.parsers = parsers;
-	this.rates = new Map();
-	this.renderers = renderers;
-	this.serializers = serializers;
-	this.server = null;
-	this.version = config?.version ?? version;
-  }
+	constructor (config = defaultConfig) {
+		super(config);
+		this.config = config;
+		this.parsers = parsers;
+		this.rates = new Map();
+		this.renderers = renderers;
+		this.serializers = serializers;
+		this.server = null;
+		this.version = config.version;
+	}
 }
 
 export function tenso (userConfig = {}) {

@@ -1,4 +1,5 @@
-import { stringify } from 'yaml';
+import YAML from "yamljs";
+
 export function yaml (req, res, arg) {
-	return stringify(arg);
+	return YAML.stringify(arg);
 }

@@ -5,10 +5,7 @@
  * @license BSD-3-Clause
  * @version 17.0.0
  */
-import {readFileSync}from'node:fs';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL}from'node:url';import {Woodland}from'woodland';import defaults from'defaults';import {stringify}from'yaml';import {STATUS_CODES}from'http';const __dirname$1 = fileURLToPath(new URL(".", import.meta.url));
-const {name, version: version$1} = require(join(__dirname$1, "..", "..", "package.json"));
-
-const config = {
+import {readFileSync}from'node:fs';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL}from'node:url';import {Woodland}from'woodland';import defaults from'defaults';import {eventsource}from'tiny-eventsource';import {coerce}from'tiny-coerce';import YAML from'yamljs';import http,{STATUS_CODES}from'http';import https from'https';import fs from'fs';const config = {
 	auth: {
 		delay: 0,
 		protect: [],
@@ -135,33 +132,34 @@ const config = {
 		root: "",
 		static: "/assets",
 		template: ""
-	},
-	title: name,
-	version: version$1
-};const bodySplit = /&|=/;const parsers = new Map([
+	}
+};function json$1 (arg = "") {
+	return JSON.parse(arg);
+}const bodySplit = /&|=/;
+const mimetype = /;.*/;function xWwwFormURLEncoded (arg) {
+	const args = arg ? chunk(arg.split(bodySplit), 2) : [],
+		result = {};
+
+	for (const i of args) {
+		result[decodeURIComponent(i[0].replace(/\+/g, "%20"))] = coerce(decodeURIComponent(i[1].replace(/\+/g, "%20")));
+	}
+
+	return result;
+}const parsers = new Map([
 	[
 		"application/x-www-form-urlencoded",
-		arg => {
-			const args = arg ? chunk(arg.split(bodySplit), 2) : [],
-				result = {};
-
-			for (const i of args) {
-				result[decodeURIComponent(i[0].replace(/\+/g, "%20"))] = coerce(decodeURIComponent(i[1].replace(/\+/g, "%20")));
-			}
-
-			return result;
-		}
+		xWwwFormURLEncoded
 	],
 	[
 		"application/json",
-		arg => JSON.parse(arg)
+		json$1
 	]
 ]);function indent (arg = "", fallback = 0) {
 	return arg.includes("indent=") ? parseInt(arg.match(/indent=(\d+)/)[1], 10) : fallback;
 }function json (req, res, arg) {
 	return JSON.stringify(arg, null, indent(req.headers.accept, req.server.config.json))
 }function yaml (req, res, arg) {
-	return stringify(arg);
+	return YAML.stringify(arg);
 }// @todo replace with a good library
 function serialize$1 (arg) {
 	return arg;
@@ -223,14 +221,19 @@ function csv (req, res, arg) {
 	["application/javascript", custom],
 	["text/csv", custom],
 	["text/html", custom]
-]);const __dirname = fileURLToPath(new URL(".", import.meta.url));
-const require$1 = createRequire(import.meta.url);
-const {version} = require$1(join(__dirname, "..", "..", "package.json"));
+]);function hasBody (arg) {
+	return arg.includes("PATCH") || arg.includes("POST") || arg.includes("PUT");
+}const __dirname = fileURLToPath(new URL(".", import.meta.url));
+const require = createRequire(import.meta.url);
+const {name, version} = require(join(__dirname, "..", "package.json"));
 
 class Tenso extends Woodland {
 	constructor (config$1 = config) {
 		super(config$1);
-		this.config = config$1;
+		for (const [key, value] of Object.entries(config$1)) {
+			this[key] = value;
+		}
+		this.config = config$1; // @todo remove once all code is updated
 		this.parsers = parsers;
 		this.rates = new Map();
 		this.renderers = renderers$1;
@@ -239,11 +242,168 @@ class Tenso extends Woodland {
 		this.version = config$1.version;
 	}
 
-	bootstrap () {}
+	canModify (arg) {
+		return arg.includes("DELETE") || hasBody(arg);
+	}
 
-	start () {}
+	connect (req, res) {
+		req.csrf = this.canModify(req.method) === false && this.canModify(req.allow) && this.config.security.csrf === true;
+		req.hypermedia = true;
+		req.private = false;
+		req.protect = false;
+		req.protectAsync = false;
+		req.unprotect = false;
+		req.server = this;
 
-	stop () {}
+		if (req.cors) {
+			const header = `access-control-${req.method === "OPTIONS" ? "allow" : "expose"}-headers`;
+
+			res.removeHeader(header);
+			res.header(header, `cache-control, content-language, content-type, expires, last-modified, pragma${req.csrf ? `, ${this.config.security.key}` : ""}${this.config.corsExpose.length > 0 ? `, ${this.config.corsExpose}` : ""}`);
+		}
+	}
+
+	eventsource (...args) {
+		return eventsource(...args);
+	}
+
+	final (req, res, arg) {
+		return arg;
+	}
+
+	headers (req, res) {
+		const key = "cache-control",
+			cache = res.getHeader(key) || "";
+
+		if ((req.protect || req.csrf || req.private) && cache.includes("private") === false) {
+			const lcache = cache.replace(/(private|public)(,\s)?/g, "");
+
+			res.removeHeader(key);
+			res.header(key, `private${lcache.length > 0 ? ", " : ""}${lcache || ""}`);
+		}
+	}
+
+	parser (mediatype = "", fn = arg => arg) {
+		this.parsers.set(mediatype, fn);
+
+		return this;
+	}
+
+	rate (req, fn) {
+		const config = this.config.rate,
+			id = req.sessionID || req.ip;
+		let valid = true,
+			seconds = Math.floor(new Date().getTime() / 1000),
+			limit, remaining, reset, state;
+
+		if (this.rates.has(id) === false) {
+			this.rates.set(id, {
+				limit: config.limit,
+				remaining: config.limit,
+				reset: seconds + config.reset,
+				time_reset: config.reset
+			});
+		}
+
+		if (typeof fn === "function") {
+			this.rates.set(id, fn(req, this.rates.get(id)));
+		}
+
+		state = this.rates.get(id);
+		limit = state.limit;
+		remaining = state.remaining;
+		reset = state.reset;
+
+		if (seconds >= reset) {
+			reset = state.reset = seconds + config.reset;
+			remaining = state.remaining = limit - 1;
+		} else if (remaining > 0) {
+			state.remaining--;
+			remaining = state.remaining;
+		} else {
+			valid = false;
+		}
+
+		return [valid, limit, remaining, reset];
+	}
+
+	render (req, res, arg) {
+		if (arg === null) {
+			arg = "null";
+		}
+
+		const accepts = (req.parsed.searchParams.get("format") || req.headers.accept || res.getHeader("content-type")).split(",");
+		let format = "",
+			renderer, result;
+
+		for (const media of accepts) {
+			const lmimetype = media.replace(mimetype, "");
+
+			if (renderers$1.has(lmimetype)) {
+				format = lmimetype;
+				break;
+			}
+		}
+
+		if (format.length === 0) {
+			format = this.config.mimeType;
+		}
+
+		renderer = renderers$1.get(format);
+		res.header("content-type", format);
+		result = renderer(req, res, arg, this.config.template);
+
+		return result;
+	}
+
+	renderer (mediatype, fn) {
+		this.renderers.set(mediatype, fn);
+
+		return this;
+	}
+
+	serializer (mediatype, fn) {
+		this.serializers.set(mediatype, fn);
+
+		return this;
+	}
+
+	start () {
+		if (this.server === null) {
+			if (this.config.ssl.cert === null && this.config.ssl.pfx === null && this.config.ssl.key === null) {
+				this.server = http.createServer(this.route).listen(this.config.port, this.config.host, () => this.drop());
+			} else {
+				this.server = https.createServer({
+					cert: this.config.ssl.cert ? fs.readFileSync(this.config.ssl.cert) : void 0,
+					pfx: this.config.ssl.pfx ? fs.readFileSync(this.config.ssl.pfx) : void 0,
+					key: this.config.ssl.key ? fs.readFileSync(this.config.ssl.key) : void 0,
+					port: this.config.port,
+					host: this.config.host
+				}, this.route).listen(this.config.port, this.config.host, () => this.drop());
+			}
+
+			this.log(`Started server on port ${this.config.host}:${this.config.port}`);
+		}
+
+		return this;
+	}
+
+	"static" (uri = "", localPath = "", folder = "") {
+		this.serve(uri, localPath, folder);
+
+		return this;
+	}
+
+	stop () {
+		if (this.server !== null) {
+			this.server.close();
+			this.server = null;
+		}
+
+		this.log(`Stopped server on port ${this.config.host}:${this.config.port}`);
+
+		return this;
+	}
 }
 
 function tenso (userConfig = {}) {
@@ -254,11 +414,13 @@ function tenso (userConfig = {}) {
 		process.exit(1);
 	}
 
-	config$1.webroot.root = resolve(config$1.webroot.root || join(__dirname, "www"));
+	config$1.title = name;
+	config$1.version = version;
+	config$1.webroot.root = resolve(config$1.webroot.root || join(__dirname, "..", "www"));
 	config$1.webroot.template = readFileSync(config$1.webroot.template || join(config$1.webroot.root, "template.html"), {encoding: "utf8"});
 
 	if (config$1.silent !== true) {
-		config$1.defaultHeaders.server = `tenso/${version}`;
+		config$1.defaultHeaders.server = `tenso/${config$1.version}`;
 		config$1.defaultHeaders["x-powered-by"] = `nodejs/${process.version}, ${process.platform}/${process.arch}`;
 	}
 
@@ -269,5 +431,5 @@ function tenso (userConfig = {}) {
 		process.exit(0);
 	});
 
-	return app.bootstrap().start();
+	return app;
 }export{tenso};

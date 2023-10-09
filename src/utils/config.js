@@ -1,9 +1,3 @@
-import {join} from "node:path";
-import {fileURLToPath, URL} from "node:url";
-
-const __dirname = fileURLToPath(new URL(".", import.meta.url));
-const {name, version} = require(join(__dirname, "..", "..", "package.json"));
-
 export const config = {
 	auth: {
 		delay: 0,
@@ -131,7 +125,5 @@ export const config = {
 		root: "",
 		static: "/assets",
 		template: ""
-	},
-	title: name,
-	version
+	}
 };

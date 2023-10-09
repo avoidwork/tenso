@@ -5,8 +5,8 @@
  * @license BSD-3-Clause
  * @version 17.0.0
  */
-import {Woodland}from'woodland';import defaults from'defaults';import {join}from'node:path';import {fileURLToPath,URL}from'node:url';const __dirname = fileURLToPath(new URL(".", import.meta.url));
-const {name, version} = require(join(__dirname, "..", "..", "package.json"));
+import {readFileSync}from'node:fs';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL}from'node:url';import {Woodland}from'woodland';import defaults from'defaults';const __dirname$1 = fileURLToPath(new URL(".", import.meta.url));
+const {name, version: version$1} = require(join(__dirname$1, "..", "..", "package.json"));
 
 const config = {
 	auth: {
@@ -137,8 +137,11 @@ const config = {
 		template: ""
 	},
 	title: name,
-	version
-};const parsers = new Map();
+	version: version$1
+};const __dirname = fileURLToPath(new URL(".", import.meta.url));
+const require$1 = createRequire(import.meta.url);
+const {version} = require$1(join(__dirname, "..", "..", "package.json"));
+const parsers = new Map();
 const renderers = new Map();
 const serializers = new Map();
 
@@ -153,8 +156,36 @@ class Tenso extends Woodland {
 		this.server = null;
 		this.version = config$1.version;
 	}
+
+	bootstrap () {}
+
+	start () {}
+
+	stop () {}
 }
 
 function tenso (userConfig = {}) {
-	return new Tenso(defaults(userConfig, structuredClone(config)));
+	const config$1 = defaults(userConfig, structuredClone(config));
+
+	if ((/^[^\d+]$/).test(config$1.port) && config$1.port < 1) {
+		console.error("Invalid configuration");
+		process.exit(1);
+	}
+
+	config$1.webroot.root = resolve(config$1.webroot.root || join(__dirname, "www"));
+	config$1.webroot.template = readFileSync(config$1.webroot.template || join(config$1.webroot.root, "template.html"), {encoding: "utf8"});
+
+	if (config$1.silent !== true) {
+		config$1.defaultHeaders.server = `tenso/${version}`;
+		config$1.defaultHeaders["x-powered-by"] = `nodejs/${process.version}, ${process.platform}/${process.arch}`;
+	}
+
+	const app = new Tenso(config$1);
+
+	process.on("SIGTERM", async () => {
+		await app.server.close();
+		process.exit(0);
+	});
+
+	return app.bootstrap().start();
 }export{tenso};

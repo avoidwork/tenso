@@ -7,14 +7,16 @@
  */
 'use strict';
 
-var woodland = require('woodland');
-var defaults = require('defaults');
+var node_fs = require('node:fs');
+var node_module = require('node:module');
 var node_path = require('node:path');
 var node_url = require('node:url');
+var woodland = require('woodland');
+var defaults = require('defaults');
 
 var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
-const __dirname$1 = node_url.fileURLToPath(new node_url.URL(".", (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.src || new URL('tenso.cjs', document.baseURI).href))));
-const {name, version} = require(node_path.join(__dirname$1, "..", "..", "package.json"));
+const __dirname$2 = node_url.fileURLToPath(new node_url.URL(".", (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.src || new URL('tenso.cjs', document.baseURI).href))));
+const {name, version: version$1} = require(node_path.join(__dirname$2, "..", "..", "package.json"));
 
 const config = {
 	auth: {
@@ -145,9 +147,12 @@ const config = {
 		template: ""
 	},
 	title: name,
-	version
+	version: version$1
 };
 
+const __dirname$1 = node_url.fileURLToPath(new node_url.URL(".", (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.src || new URL('tenso.cjs', document.baseURI).href))));
+const require$1 = node_module.createRequire((typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.src || new URL('tenso.cjs', document.baseURI).href)));
+const {version} = require$1(node_path.join(__dirname$1, "..", "..", "package.json"));
 const parsers = new Map();
 const renderers = new Map();
 const serializers = new Map();
@@ -163,10 +168,38 @@ class Tenso extends woodland.Woodland {
 		this.server = null;
 		this.version = config$1.version;
 	}
+
+	bootstrap () {}
+
+	start () {}
+
+	stop () {}
 }
 
 function tenso (userConfig = {}) {
-	return new Tenso(defaults(userConfig, structuredClone(config)));
+	const config$1 = defaults(userConfig, structuredClone(config));
+
+	if ((/^[^\d+]$/).test(config$1.port) && config$1.port < 1) {
+		console.error("Invalid configuration");
+		process.exit(1);
+	}
+
+	config$1.webroot.root = node_path.resolve(config$1.webroot.root || node_path.join(__dirname$1, "www"));
+	config$1.webroot.template = node_fs.readFileSync(config$1.webroot.template || node_path.join(config$1.webroot.root, "template.html"), {encoding: "utf8"});
+
+	if (config$1.silent !== true) {
+		config$1.defaultHeaders.server = `tenso/${version}`;
+		config$1.defaultHeaders["x-powered-by"] = `nodejs/${process.version}, ${process.platform}/${process.arch}`;
+	}
+
+	const app = new Tenso(config$1);
+
+	process.on("SIGTERM", async () => {
+		await app.server.close();
+		process.exit(0);
+	});
+
+	return app.bootstrap().start();
 }
 
 exports.tenso = tenso;

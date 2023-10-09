@@ -15,52 +15,49 @@
   "main": "index",
   "engineStrict": true,
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=17.0.0"
   },
   "scripts": {
     "benchmark": "node benchmark.js",
     "changelog": "auto-changelog -p",
-    "coverage": "nyc npm run test",
     "sample": "node sample.js",
-    "test": "eslint *.js lib/*.js test/*.js && mocha test/*.js --exit"
+    "lint": "eslint *.js lib/*.js test/*.js",
+    "fix": "eslint --fix *.js lib/*.js test/*.js",
+    "mocha": "nyc mocha test/*.test.js",
+    "test": "npm run lint && npm run mocha"
   },
   "dependencies": {
-    "connect-redis": "^6.0.0",
-    "cookie-parser": "^1.4.5",
-    "csv.js": "^2.0.1",
-    "express-session": "^1.17.2",
-    "keysort": "^1.0.2",
-    "lusca": "^1.7.0",
-    "mime-db": "^1.50.0",
-    "passport": "^0.5.0",
+    "@node-saml/passport-saml": "^4.0.4",
+    "connect-redis": "^7.1.0",
+    "cookie-parser": "^1.4.6",
+    "express-session": "^1.17.3",
+    "helmet": "^7.0.0",
+    "keysort": "^2.0.1",
+    "mime-db": "^1.52.0",
+    "passport": "^0.6.0",
     "passport-http": "^0.3.0",
     "passport-http-bearer": "^1.0.1",
-    "passport-jwt": "^4.0.0",
+    "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
-    "passport-oauth2": "^1.6.1",
-    "passport-saml": "^3.2.0",
-    "precise": "^1.1.0",
-    "redis": "^3.1.2",
-    "retsu": "^3.0.2",
-    "tiny-coerce": "^1.1.1",
-    "tiny-etag": "^2.1.0",
-    "tiny-eventsource": "^1.2.1",
-    "tiny-merge": "^1.0.0",
-    "tiny-uuid4": "^1.0.1",
-    "tiny-xml": "^2.0.1",
-    "woodland": "^16.1.3",
+    "passport-oauth2": "^1.7.0",
+    "precise": "^4.0.2",
+    "redis": "^4.6.10",
+    "tiny-coerce": "^3.0.0",
+    "tiny-etag": "^4.0.1",
+    "tiny-eventsource": "^3.0.0",
+    "woodland": "^18.0.11",
     "yamljs": "^0.3.0",
-    "yargs": "^17.2.1"
+    "yargs-parser": "^21.1.1"
   },
   "devDependencies": {
-    "auto-changelog": "^2.3.0",
-    "autocannon": "^7.4.0",
-    "concurrently": "^6.3.0",
-    "eslint": "^7.32.0",
-    "jsonwebtoken": "^8.5.1",
-    "mocha": "^9.1.2",
+    "auto-changelog": "^2.4.0",
+    "autocannon": "^7.12.0",
+    "concurrently": "^8.2.1",
+    "eslint": "^8.51.0",
+    "jsonwebtoken": "^9.0.2",
+    "mocha": "^10.2.0",
     "nyc": "^15.1.0",
-    "tiny-httptest": "^2.0.0"
+    "tiny-httptest": "^4.0.6"
   },
   "keywords": [
     "rest",
@@ -69,6 +66,8 @@
     "gateway",
     "server",
     "hypermedia",
-    "framework"
+    "framework",
+    "http",
+    "https"
   ]
 }

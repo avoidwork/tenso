@@ -44,7 +44,7 @@
     "defaults": "^2.0.2",
     "express-session": "^1.17.3",
     "helmet": "^7.0.0",
-    "keysort": "^2.0.1",
+    "keysort": "^3.0.1",
     "mime-db": "^1.52.0",
     "passport": "^0.6.0",
     "passport-http": "^0.3.0",
@@ -52,14 +52,14 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "passport-oauth2": "^1.7.0",
-    "precise": "^4.0.2",
+    "precise": "^4.0.3",
     "redis": "^4.6.10",
     "rollup": "^3.29.2",
-    "tiny-coerce": "^3.0.0",
-    "tiny-etag": "^4.0.1",
-    "tiny-eventsource": "^3.0.0",
+    "tiny-coerce": "^3.0.1",
+    "tiny-etag": "^4.0.2",
+    "tiny-eventsource": "^3.0.1",
     "typescript": "^5.2.2",
-    "woodland": "^18.0.11",
+    "woodland": "^18.0.13",
     "yamljs": "^0.3.0",
     "yargs-parser": "^21.1.1"
   },
@@ -72,7 +72,7 @@
     "jsonwebtoken": "^9.0.2",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
-    "tiny-httptest": "^4.0.6"
+    "tiny-httptest": "^4.0.7"
   },
   "keywords": [
     "rest",

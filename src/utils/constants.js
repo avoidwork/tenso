@@ -1,5 +1,6 @@
 export const DATA = "data";
 export const EMPTY = "";
+export const ENCODED_SPACE = "%20";
 export const END = "end";
 export const HEADER_CONTENT_TYPE = "content-type";
 export const INT_200 = 200;

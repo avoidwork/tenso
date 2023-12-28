@@ -1,9 +1,11 @@
+import {EMPTY, HEADER_CONTENT_TYPE} from "../utils/constants.js";
+
 export function parse (req, res, next) {
 	let valid = true,
 		exception;
 
 	if (req.body !== "") {
-		const type = "content-type" in req.headers ? req.headers["content-type"].replace(/\s.*$/, "") : "";
+		const type = req.headers?.[HEADER_CONTENT_TYPE]?.replace(/\s.*$/, EMPTY) ?? EMPTY;
 		const parsers = req.server.parsers;
 
 		if (type.length > 0 && parsers.has(type)) {

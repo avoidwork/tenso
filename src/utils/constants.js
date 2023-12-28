@@ -1,0 +1,14 @@
+export const DATA = "data";
+export const EMPTY = "";
+export const END = "end";
+export const HEADER_CONTENT_TYPE = "content-type";
+export const INT_200 = 200;
+export const INT_413 = 413;
+export const INT_429 = 429;
+export const MULTIPART = "multipart";
+export const OPTIONS = "OPTIONS";
+export const RETRY_AFTER = "retry-after";
+export const UTF8 = "utf8";
+export const X_RATELIMIT_LIMIT = "x-ratelimit-limit";
+export const X_RATELIMIT_REMAINING = "x-ratelimit-remaining";
+export const X_RATELIMIT_RESET = "x-ratelimit-reset";

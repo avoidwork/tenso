@@ -1,7 +1,9 @@
+import {INT_429, RETRY_AFTER, X_RATELIMIT_LIMIT, X_RATELIMIT_REMAINING, X_RATELIMIT_RESET} from "../utils/constants.js";
+
 const rateHeaders = [
-	"x-ratelimit-limit",
-	"x-ratelimit-remaining",
-	"x-ratelimit-reset"
+	X_RATELIMIT_LIMIT,
+	X_RATELIMIT_REMAINING,
+	X_RATELIMIT_RESET
 ];
 
 export function rate (req, res, next) {
@@ -20,8 +22,8 @@ export function rate (req, res, next) {
 
 			next();
 		} else {
-			res.header("retry-after", config.reset);
-			res.error(config.status || 429);
+			res.header(RETRY_AFTER, config.reset);
+			res.error(config.status || INT_429);
 		}
 	}
 }

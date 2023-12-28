@@ -1,4 +1,5 @@
 import {COLON, EMPTY, HEADER_ALLOW_GET, HTML, X_CSRF_TOKEN, X_FORWARDED_PROTO} from "../utils/constants.js";
+import {explode} from "../utils/explode.js";
 
 export function html (req, res, arg, tpl = "") {
 	const protocol = X_FORWARDED_PROTO in req.headers ? req.headers[X_FORWARDED_PROTO] + COLON : req.parsed.protocol,
@@ -12,7 +13,7 @@ export function html (req, res, arg, tpl = "") {
 		.replace("{{year}}", new Date().getFullYear())
 		.replace("{{version}}", req.server.config.version)
 		.replace("{{allow}}", headers.allow)
-		.replace("{{methods}}", utility.explode((headers?.allow ?? EMPTY).replace(HEADER_ALLOW_GET, EMPTY)).filter(i => i !== EMPTY).map(i => `<option value='${i.trim()}'>$i.trim()}</option>`).join("\n"))
+		.replace("{{methods}}", explode((headers?.allow ?? EMPTY).replace(HEADER_ALLOW_GET, EMPTY)).filter(i => i !== EMPTY).map(i => `<option value='${i.trim()}'>$i.trim()}</option>`).join("\n"))
 		.replace("{{csrf}}", headers?.[X_CSRF_TOKEN] ?? EMPTY)
 		.replace("class=\"headers", req.server.config.renderHeaders === false ? "class=\"headers dr-hidden" : "class=\"headers") : EMPTY;
 }

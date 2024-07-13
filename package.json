@@ -37,6 +37,11 @@
   },
   "type": "module",
   "types": "types/tenso.d.ts",
+  "files": [
+    "dist/tenso.cjs",
+    "dist/tenso.js",
+    "types/tenso.d.ts"
+  ],
   "dependencies": {
     "@node-saml/passport-saml": "^5.0.0",
     "connect-redis": "^7.1.1",

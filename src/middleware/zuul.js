@@ -1,4 +1,5 @@
 import {rate} from "./rate.js";
+import {keymaster} from "./keymaster.js";
 
 export function zuul (req, res, next) {
 	const uri = req.parsed.pathname;

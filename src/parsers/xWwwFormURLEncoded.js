@@ -1,6 +1,7 @@
 import {coerce} from "tiny-coerce";
 import {bodySplit} from "../utils/regex.js";
 import {ENCODED_SPACE} from "../utils/constants.js";
+import {chunk} from "../utils/chunk.js";
 
 export function xWwwFormURLEncoded (arg) {
 	const args = arg ? chunk(arg.split(bodySplit), 2) : [],

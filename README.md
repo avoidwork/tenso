@@ -406,6 +406,6 @@ All files        |   79.05 |     69.1 |   66.18 |   78.81 |
 ```
 
 ## License
-Copyright (c) 2023 Jason Mulligan
+Copyright (c) 2024 Jason Mulligan
 
 Licensed under the BSD-3-Clause license.

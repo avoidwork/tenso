@@ -13,9 +13,10 @@ const defaultOutBase = {compact: true, banner: bannerLong, name: pkg.name};
 const cjOutBase = {...defaultOutBase, compact: false, format: "cjs", exports: "named"};
 const esmOutBase = {...defaultOutBase, format: "esm"};
 
+
 export default [
 	{
-		input: "./src/tenso.js",
+		input: `./src/${pkg.name}.js`,
 		output: [
 			{
 				...cjOutBase,

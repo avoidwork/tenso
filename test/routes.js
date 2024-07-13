@@ -12,7 +12,7 @@ module.exports.get = {
 	],
 	"/null": null,
 	"/empty": [],
-	"/items(\/?)": [
+	"/items(/?)": [
 		1,
 		2,
 		3,

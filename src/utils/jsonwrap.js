@@ -1,6 +1,5 @@
-export function jsonWrap (arg) {
-	const a = arg[0],
-		b = arg[arg.length - 1];
+import { jsonWrap as regex } from "./regex.js"
 
-	return (a === "\"" && b === "\"") || (a === "[" && b === "]") || (a === "{" && b === "}"); // eslint-disable-line no-extra-parens
+export function jsonWrap (arg) {
+	return regex.test(arg);
 }

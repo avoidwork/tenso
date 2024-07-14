@@ -1,4 +1,9 @@
-function serialize (req, res, arg) {
+import { serializers } from "./serializers.js";
+import { explode } from "./explode.js";
+import { mimetype as regex } from "./regex.js";
+import { sort } from "./sort.js";
+
+export function serialize (req, res, arg) {
 	const status = res.statusCode;
 	let format = req.server.config.mimeType,
 		accepts = explode(req.parsed.searchParams.get("format") || req.headers.accept || res.getHeader("content-type") || format, ","),
@@ -6,7 +11,7 @@ function serialize (req, res, arg) {
 		result, serializer;
 
 	for (const i of accepts) {
-		let mimetype = i.replace(regex.mimetype, "");
+		let mimetype = i.replace(regex, "");
 
 		if (serializers.has(mimetype)) {
 			format = mimetype;

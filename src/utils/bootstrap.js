@@ -1,7 +1,11 @@
-const woodland = require("woodland");
-const path = require("path");
+import { woodland } from "woodland";
+import { join } from "path";
+import { hypermedia } from "./regex.js";
+import { serialize } from "./serialize.js";
+import { payload, parse } from "./middleware.js";
+import { auth } from "./auth.js";
 
-function bootstrap (obj) {
+export function bootstrap (obj) {
 	const authorization = Object.keys(obj.config.auth).filter(i => {
 		const x = obj.config.auth[i];
 
@@ -37,15 +41,13 @@ function bootstrap (obj) {
 	};
 
 	// Payload handling
-	obj.always(middleware.payload).ignore(middleware.payload);
-	obj.always(middleware.parse).ignore(middleware.parse);
+	obj.always(payload).ignore(payload);
+	obj.always(parse).ignore(parse);
 
 	// Setting 'always' routes before authorization runs
-	const routes = obj.config.routes.always || {};
-
-	for (const i of Object.keys(routes)) {
-		if (typeof routes[i] === "function") {
-			obj.always(i, routes[i]).ignore(routes[i]);
+	for (const [key, value] of Object.entries(obj.config.routes.always ?? {})) {
+		if (typeof value === "function") {
+			obj.always(key, value).ignore(value);
 		}
 	}
 
@@ -55,24 +57,22 @@ function bootstrap (obj) {
 		auth(obj, obj.config);
 	}
 
-	// Static assets on disk for browseable interface
+	// Static assets on disk for browsable interface
 	if (obj.config.static !== "") {
 		const spath = obj.config.static.endsWith("/") ? obj.config.static.replace(/\/$/, "") : obj.config.static,
-			sfolder = path.join(__dirname, "..", "www", obj.config.static),
+			sfolder = join(__dirname, "..", "www", obj.config.static),
 			sregex = new RegExp(`${spath.replace(/\//g, "\\/")}(\\/)?`);
 
 		obj.config.routes.get[`${spath}(/.*)?`] = (req, res) => req.server.router.serve(req, res, req.url.replace(sregex, ""), sfolder);
 	}
 
 	// Setting routes
-	for (const method of Object.keys(obj.config.routes)) {
-		const lroutes = obj.config.routes[method];
-
-		for (const i of Object.keys(lroutes)) {
-			if (typeof lroutes[i] === "function") {
-				obj[method](i, lroutes[i]);
+	for (const [method, routes] of Object.entries(obj.config.routes ?? {})) {
+		for (const [route, target] of Object.entries(routes ?? {})) {
+			if (typeof target === "function") {
+				obj[method](route, target);
 			} else {
-				obj[method](i, (req, res) => res.send(lroutes[i]));
+				obj[method](route, (req, res) => res.send(target));
 			}
 		}
 	}

@@ -40,7 +40,8 @@
   "files": [
     "dist/tenso.cjs",
     "dist/tenso.js",
-    "types/tenso.d.ts"
+    "types/tenso.d.ts",
+    "www"
   ],
   "dependencies": {
     "@node-saml/passport-saml": "^5.0.0",

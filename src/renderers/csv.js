@@ -1,4 +1,3 @@
-
 // @todo replace with a good library
 function serialize (arg) {
 	return arg;

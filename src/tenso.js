@@ -10,14 +10,14 @@ import {parsers} from "./utils/parsers.js";
 import {renderers} from "./utils/renderers.js";
 import {serializers} from "./utils/serializers.js";
 import {mimetype} from "./utils/regex.js";
-
-const __dirname = fileURLToPath(new URL(".", import.meta.url));
-const require = createRequire(import.meta.url);
-const {name, version} = require(join(__dirname, "..", "package.json"));
 import {hasBody} from "./utils/hasbody.js";
 import http from "http";
 import https from "https";
 import fs from "fs";
+
+const __dirname = fileURLToPath(new URL(".", import.meta.url));
+const require = createRequire(import.meta.url);
+const {name, version} = require(join(__dirname, "..", "package.json"));
 
 class Tenso extends Woodland {
 	constructor (config = defaultConfig) {

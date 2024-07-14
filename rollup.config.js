@@ -1,4 +1,5 @@
-import { createRequire } from "node:module";
+import {createRequire} from "node:module";
+
 const require = createRequire(import.meta.url);
 const pkg = require("./package.json");
 const year = new Date().getFullYear();

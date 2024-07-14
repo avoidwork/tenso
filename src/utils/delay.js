@@ -1,4 +1,4 @@
-import { random } from './random';
+import {random} from './random';
 
 export function delay (fn = () => void 0, n = 0) {
 	if (n === 0) {

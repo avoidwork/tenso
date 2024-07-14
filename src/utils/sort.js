@@ -1,5 +1,5 @@
-import { keysort } from "keysort";
-import { clone } from "./clone";
+import {keysort} from "keysort";
+import {clone} from "./clone";
 
 export function sort (arg, req) {
 	let output = clone(arg);

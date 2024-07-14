@@ -1,7 +1,7 @@
-import { serializers } from "./serializers.js";
-import { explode } from "./explode.js";
-import { mimetype as regex } from "./regex.js";
-import { sort } from "./sort.js";
+import {serializers} from "./serializers.js";
+import {explode} from "./explode.js";
+import {mimetype as regex} from "./regex.js";
+import {sort} from "./sort.js";
 
 export function serialize (req, res, arg) {
 	const status = res.statusCode;

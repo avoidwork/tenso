@@ -1,9 +1,9 @@
-import { woodland } from "woodland";
-import { join } from "path";
-import { hypermedia } from "./regex.js";
-import { serialize } from "./serialize.js";
-import { payload, parse } from "./middleware.js";
-import { auth } from "./auth.js";
+import {woodland} from "woodland";
+import {join} from "path";
+import {hypermedia} from "./regex.js";
+import {serialize} from "./serialize.js";
+import {parse, payload} from "./middleware.js";
+import {auth} from "./auth.js";
 
 export function bootstrap (obj) {
 	const authorization = Object.keys(obj.config.auth).filter(i => {
@@ -59,11 +59,7 @@ export function bootstrap (obj) {
 
 	// Static assets on disk for browsable interface
 	if (obj.config.static !== "") {
-		const spath = obj.config.static.endsWith("/") ? obj.config.static.replace(/\/$/, "") : obj.config.static,
-			sfolder = join(__dirname, "..", "www", obj.config.static),
-			sregex = new RegExp(`${spath.replace(/\//g, "\\/")}(\\/)?`);
-
-		obj.config.routes.get[`${spath}(/.*)?`] = (req, res) => req.server.router.serve(req, res, req.url.replace(sregex, ""), sfolder);
+		obj.router.staticFiles(join(__dirname, "..", "www", obj.config.static));
 	}
 
 	// Setting routes

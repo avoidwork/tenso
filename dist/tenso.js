@@ -154,7 +154,10 @@ const X_CSRF_TOKEN = "x-csrf-token";
 const X_FORWARDED_PROTO = "x-forwarded-proto";
 const SIGHUP = "SIGHUP";
 const SIGINT = "SIGINT";
-const SIGTERM = "SIGTERM";function json$1 (arg = EMPTY) {
+const SIGTERM = "SIGTERM";
+const STRING = "string";
+const LESS_THAN = "&lt;";
+const GREATER_THAN = "&gt;";function json$1 (arg = EMPTY) {
 	return JSON.parse(arg);
 }const bodySplit = /&|=/;
 const mimetype = /;.*/;function chunk (arg = [], size = 2) {
@@ -163,8 +166,7 @@ const mimetype = /;.*/;function chunk (arg = [], size = 2) {
 	let i = 0;
 
 	while (i < nth) {
-		result.push(arg.slice(i * size, (i + 1) * size));
-		i++;
+		result.push(arg.slice(i * size, ++i * size));
 	}
 
 	return result;
@@ -217,6 +219,8 @@ function csv (req, res, arg) {
 	return serialize$1(arg)
 }function explode (arg = "", delimiter = ",") {
 	return arg.trim().split(new RegExp(`\\s*${delimiter}\\s*`));
+}function sanitize (arg) {
+	return typeof arg === STRING ? arg.replace(/</g, LESS_THAN).replace(/>/g, GREATER_THAN) : arg;
 }function html (req, res, arg, tpl = "") {
 	const protocol = X_FORWARDED_PROTO in req.headers ? req.headers[X_FORWARDED_PROTO] + COLON : req.parsed.protocol,
 		headers = res.getHeaders();
@@ -232,7 +236,7 @@ function csv (req, res, arg) {
 		.replace("{{methods}}", explode((headers?.allow ?? EMPTY).replace(HEADER_ALLOW_GET, EMPTY)).filter(i => i !== EMPTY).map(i => `<option value='${i.trim()}'>$i.trim()}</option>`).join("\n"))
 		.replace("{{csrf}}", headers?.[X_CSRF_TOKEN] ?? EMPTY)
 		.replace("class=\"headers", req.server.config.renderHeaders === false ? "class=\"headers dr-hidden" : "class=\"headers") : EMPTY;
-}const renderers$1 = new Map([
+}const renderers = new Map([
 	["application/json", json],
 	["application/yaml", yaml],
 	["application/xml", xml],
@@ -934,7 +938,7 @@ class Tenso extends Woodland {
 
 		this.parsers = parsers;
 		this.rates = new Map();
-		this.renderers = renderers$1;
+		this.renderers = renderers;
 		this.serializers = serializers;
 		this.server = null;
 		this.version = config$1.version;
@@ -1037,7 +1041,7 @@ class Tenso extends Woodland {
 		for (const media of accepts) {
 			const lmimetype = media.replace(mimetype, "");
 
-			if (renderers$1.has(lmimetype)) {
+			if (renderers.has(lmimetype)) {
 				format = lmimetype;
 				break;
 			}
@@ -1047,7 +1051,7 @@ class Tenso extends Woodland {
 			format = this.mimeType;
 		}
 
-		renderer = renderers$1.get(format);
+		renderer = renderers.get(format);
 		res.header("content-type", format);
 		result = renderer(req, res, arg, this.template);
 

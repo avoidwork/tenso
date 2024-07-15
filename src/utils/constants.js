@@ -25,3 +25,6 @@ export const X_FORWARDED_PROTO = "x-forwarded-proto";
 export const SIGHUP = "SIGHUP";
 export const SIGINT = "SIGINT";
 export const SIGTERM = "SIGTERM";
+export const STRING = "string";
+export const LESS_THAN = "&lt;";
+export const GREATER_THAN = "&gt;";

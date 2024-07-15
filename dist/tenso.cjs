@@ -182,6 +182,9 @@ const X_FORWARDED_PROTO = "x-forwarded-proto";
 const SIGHUP = "SIGHUP";
 const SIGINT = "SIGINT";
 const SIGTERM = "SIGTERM";
+const STRING = "string";
+const LESS_THAN = "&lt;";
+const GREATER_THAN = "&gt;";
 
 function json$1 (arg = EMPTY) {
 	return JSON.parse(arg);
@@ -196,8 +199,7 @@ function chunk (arg = [], size = 2) {
 	let i = 0;
 
 	while (i < nth) {
-		result.push(arg.slice(i * size, (i + 1) * size));
-		i++;
+		result.push(arg.slice(i * size, ++i * size));
 	}
 
 	return result;
@@ -272,6 +274,10 @@ function explode (arg = "", delimiter = ",") {
 	return arg.trim().split(new RegExp(`\\s*${delimiter}\\s*`));
 }
 
+function sanitize (arg) {
+	return typeof arg === STRING ? arg.replace(/</g, LESS_THAN).replace(/>/g, GREATER_THAN) : arg;
+}
+
 function html (req, res, arg, tpl = "") {
 	const protocol = X_FORWARDED_PROTO in req.headers ? req.headers[X_FORWARDED_PROTO] + COLON : req.parsed.protocol,
 		headers = res.getHeaders();
@@ -289,7 +295,7 @@ function html (req, res, arg, tpl = "") {
 		.replace("class=\"headers", req.server.config.renderHeaders === false ? "class=\"headers dr-hidden" : "class=\"headers") : EMPTY;
 }
 
-const renderers$1 = new Map([
+const renderers = new Map([
 	["application/json", json],
 	["application/yaml", yaml],
 	["application/xml", xml],
@@ -1019,7 +1025,7 @@ class Tenso extends woodland.Woodland {
 
 		this.parsers = parsers;
 		this.rates = new Map();
-		this.renderers = renderers$1;
+		this.renderers = renderers;
 		this.serializers = serializers;
 		this.server = null;
 		this.version = config$1.version;
@@ -1122,7 +1128,7 @@ class Tenso extends woodland.Woodland {
 		for (const media of accepts) {
 			const lmimetype = media.replace(mimetype, "");
 
-			if (renderers$1.has(lmimetype)) {
+			if (renderers.has(lmimetype)) {
 				format = lmimetype;
 				break;
 			}
@@ -1132,7 +1138,7 @@ class Tenso extends woodland.Woodland {
 			format = this.mimeType;
 		}
 
-		renderer = renderers$1.get(format);
+		renderer = renderers.get(format);
 		res.header("content-type", format);
 		result = renderer(req, res, arg, this.template);
 

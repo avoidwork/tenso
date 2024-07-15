@@ -1,5 +1,7 @@
 import {COLON, EMPTY, HEADER_ALLOW_GET, HTML, X_CSRF_TOKEN, X_FORWARDED_PROTO} from "../utils/constants.js";
 import {explode} from "../utils/explode.js";
+import {sanitize} from "../utils/sanitize.js";
+import {renderers} from "../utils/renderers.js";
 
 export function html (req, res, arg, tpl = "") {
 	const protocol = X_FORWARDED_PROTO in req.headers ? req.headers[X_FORWARDED_PROTO] + COLON : req.parsed.protocol,

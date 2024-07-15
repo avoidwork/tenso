@@ -1,7 +1,7 @@
 import {URL} from "url";
 import keysort from "keysort";
 
-function hypermedia (req, res, rep) {
+export function hypermedia (req, res, rep) {
 	const server = req.server,
 		headers = res.getHeaders(),
 		collection = req.parsed.pathname,

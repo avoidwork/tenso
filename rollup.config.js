@@ -38,7 +38,17 @@ export default [
 			"node:http",
 			"node:https",
 			"tiny-coerce",
-			"yamljs"
+			"yamljs",
+			"url",
+			"keysort",
+			"cookie-parser",
+			"redis",
+			"express-session",
+			"passport",
+			"passport-http",
+			"passport-http-bearer",
+			"passport-local",
+			"passport-oauth2"
 		]
 	}
 ];

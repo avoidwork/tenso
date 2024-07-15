@@ -14,6 +14,7 @@ import {serializers} from "./utils/serializers.js";
 import {mimetype} from "./utils/regex.js";
 import {hasBody} from "./utils/hasbody.js";
 import {signals} from "./utils/signals.js";
+import {bootstrap} from "./utils/bootstrap.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const require = createRequire(import.meta.url);
@@ -224,6 +225,7 @@ export function tenso (userConfig = {}) {
 	app.decorate = app.decorate.bind(app);
 	app.route = app.route.bind(app);
 	signals(app);
+	bootstrap(app);
 
 	return app;
 }

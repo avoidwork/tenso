@@ -2,7 +2,7 @@ import redis from "redis";
 import cookie from "cookie-parser";
 import session from "express-session";
 import passport from "passport";
-import {STATUS_CODES} from "http";
+import {STATUS_CODES} from "node:http";
 import {BasicStrategy} from "passport-http";
 import {Strategy as BearerStrategy} from "passport-http-bearer";
 import {Strategy as LocalStrategy} from "passport-local";

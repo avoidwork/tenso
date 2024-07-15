@@ -1,9 +1,9 @@
-import {woodland} from "woodland";
-import {join} from "path";
-import {hypermedia} from "./regex.js";
+import {join} from "node:path";
+import {hypermedia} from "./hypermedia.js";
 import {serialize} from "./serialize.js";
-import {parse, payload} from "./middleware.js";
 import {auth} from "./auth.js";
+import {parse} from "../middleware/parse.js";
+import {payload} from "../middleware/payload.js";
 
 export function bootstrap (obj) {
 	const authorization = Object.keys(obj.config.auth).filter(i => {
@@ -14,22 +14,9 @@ export function bootstrap (obj) {
 
 	obj.version = obj.config.version;
 
-	// Creating router
-	obj.router = woodland({
-		cacheSize: obj.config.cacheSize,
-		cacheTTL: obj.config.cacheTTL,
-		corsExpose: obj.config.corsExpose,
-		defaultHeaders: obj.config.headers,
-		indexes: obj.config.index,
-		logging: obj.config.logging,
-		origins: obj.config.origins,
-		sendError: true,
-		time: true
-	});
-
 	// Setting up router
-	obj.router.addListener("connect", obj.connect.bind(obj));
-	obj.router.onsend = (req, res, body = "", status = 200, headers) => {
+	obj.addListener("connect", obj.connect.bind(obj));
+	obj.onsend = (req, res, body = "", status = 200, headers) => {
 		obj.headers(req, res);
 		res.statusCode = status;
 
@@ -59,7 +46,7 @@ export function bootstrap (obj) {
 
 	// Static assets on disk for browsable interface
 	if (obj.config.static !== "") {
-		obj.router.staticFiles(join(__dirname, "..", "www", obj.config.static));
+		obj.staticFiles(join(__dirname, "..", "www", obj.config.static));
 	}
 
 	// Setting routes

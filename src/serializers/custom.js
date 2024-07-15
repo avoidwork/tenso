@@ -1,4 +1,4 @@
-import {STATUS_CODES} from "http";
+import {STATUS_CODES} from "node:http";
 import {INT_200} from "../utils/constants.js";
 
 export function custom (arg, err, status = INT_200, stack = false) {

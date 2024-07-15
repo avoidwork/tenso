@@ -22,3 +22,6 @@ export const X_RATELIMIT_LIMIT = "x-ratelimit-limit";
 export const X_RATELIMIT_REMAINING = "x-ratelimit-remaining";
 export const X_RATELIMIT_RESET = "x-ratelimit-reset";
 export const X_FORWARDED_PROTO = "x-forwarded-proto";
+export const SIGHUP = "SIGHUP";
+export const SIGINT = "SIGINT";
+export const SIGTERM = "SIGTERM";

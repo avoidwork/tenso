@@ -5,7 +5,7 @@
  * @license BSD-3-Clause
  * @version 17.0.0
  */
-import {readFileSync}from'node:fs';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL}from'node:url';import {Woodland}from'woodland';import defaults from'defaults';import {eventsource}from'tiny-eventsource';import {coerce}from'tiny-coerce';import YAML from'yamljs';import http,{STATUS_CODES}from'http';import https from'https';import fs from'fs';const config = {
+import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL}from'node:url';import {Woodland}from'woodland';import defaults from'defaults';import {eventsource}from'tiny-eventsource';import {coerce}from'tiny-coerce';import YAML from'yamljs';const config = {
 	auth: {
 		delay: 0,
 		protect: [],
@@ -146,7 +146,10 @@ const HTML = "html";
 const INT_0 = 0;
 const INT_200 = 200;
 const X_CSRF_TOKEN = "x-csrf-token";
-const X_FORWARDED_PROTO = "x-forwarded-proto";function json$1 (arg = EMPTY) {
+const X_FORWARDED_PROTO = "x-forwarded-proto";
+const SIGHUP = "SIGHUP";
+const SIGINT = "SIGINT";
+const SIGTERM = "SIGTERM";function json$1 (arg = EMPTY) {
 	return JSON.parse(arg);
 }const bodySplit = /&|=/;
 const mimetype = /;.*/;function chunk (arg = [], size = 2) {
@@ -251,6 +254,13 @@ function csv (req, res, arg) {
 	["text/html", custom]
 ]);function hasBody (arg) {
 	return arg.includes("PATCH") || arg.includes("POST") || arg.includes("PUT");
+}function signals (app) {
+	[SIGHUP, SIGINT, SIGTERM].forEach(signal => {
+		process.on(signal, async () => {
+			await app.server?.close();
+			process.exit(0);
+		});
+	});
 }const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const require = createRequire(import.meta.url);
 const {name, version} = require(join(__dirname, "..", "package.json"));
@@ -405,9 +415,9 @@ class Tenso extends Woodland {
 				this.server = http.createServer(this.route).listen(this.port, this.host);
 			} else {
 				this.server = https.createServer({
-					cert: this.ssl.cert ? fs.readFileSync(this.ssl.cert) : void 0,
-					pfx: this.ssl.pfx ? fs.readFileSync(this.ssl.pfx) : void 0,
-					key: this.ssl.key ? fs.readFileSync(this.ssl.key) : void 0,
+					cert: this.ssl.cert ? readFileSync(this.ssl.cert) : void 0,
+					pfx: this.ssl.pfx ? readFileSync(this.ssl.pfx) : void 0,
+					key: this.ssl.key ? readFileSync(this.ssl.key) : void 0,
 					port: this.port,
 					host: this.host
 				}, this.route).listen(this.port, this.host);
@@ -459,11 +469,7 @@ function tenso (userConfig = {}) {
 
 	app.decorate = app.decorate.bind(app);
 	app.route = app.route.bind(app);
-
-	process.on("SIGTERM", async () => {
-		await app.server.close();
-		process.exit(0);
-	});
+	signals(app);
 
 	return app;
 }export{tenso};

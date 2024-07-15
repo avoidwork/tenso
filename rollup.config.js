@@ -14,7 +14,6 @@ const defaultOutBase = {compact: true, banner: bannerLong, name: pkg.name};
 const cjOutBase = {...defaultOutBase, compact: false, format: "cjs", exports: "named"};
 const esmOutBase = {...defaultOutBase, format: "esm"};
 
-
 export default [
 	{
 		input: `./src/${pkg.name}.js`,
@@ -27,6 +26,19 @@ export default [
 				...esmOutBase,
 				file: `dist/${pkg.name}.js`
 			}
+		],
+		external: [
+			"node:fs",
+			"node:module",
+			"node:path",
+			"node:url",
+			"woodland",
+			"defaults",
+			"tiny-eventsource",
+			"node:http",
+			"node:https",
+			"tiny-coerce",
+			"yamljs"
 		]
 	}
 ];

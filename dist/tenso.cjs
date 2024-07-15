@@ -8,6 +8,8 @@
 'use strict';
 
 var node_fs = require('node:fs');
+var http = require('node:http');
+var https = require('node:https');
 var node_module = require('node:module');
 var node_path = require('node:path');
 var node_url = require('node:url');
@@ -16,9 +18,6 @@ var defaults = require('defaults');
 var tinyEventsource = require('tiny-eventsource');
 var tinyCoerce = require('tiny-coerce');
 var YAML = require('yamljs');
-var http = require('http');
-var https = require('https');
-var fs = require('fs');
 
 var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
 const config = {
@@ -165,6 +164,9 @@ const INT_0 = 0;
 const INT_200 = 200;
 const X_CSRF_TOKEN = "x-csrf-token";
 const X_FORWARDED_PROTO = "x-forwarded-proto";
+const SIGHUP = "SIGHUP";
+const SIGINT = "SIGINT";
+const SIGTERM = "SIGTERM";
 
 function json$1 (arg = EMPTY) {
 	return JSON.parse(arg);
@@ -307,6 +309,15 @@ const serializers = new Map([
 
 function hasBody (arg) {
 	return arg.includes("PATCH") || arg.includes("POST") || arg.includes("PUT");
+}
+
+function signals (app) {
+	[SIGHUP, SIGINT, SIGTERM].forEach(signal => {
+		process.on(signal, async () => {
+			await app.server?.close();
+			process.exit(0);
+		});
+	});
 }
 
 const __dirname$1 = node_url.fileURLToPath(new node_url.URL(".", (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.src || new URL('tenso.cjs', document.baseURI).href))));
@@ -463,9 +474,9 @@ class Tenso extends woodland.Woodland {
 				this.server = http.createServer(this.route).listen(this.port, this.host);
 			} else {
 				this.server = https.createServer({
-					cert: this.ssl.cert ? fs.readFileSync(this.ssl.cert) : void 0,
-					pfx: this.ssl.pfx ? fs.readFileSync(this.ssl.pfx) : void 0,
-					key: this.ssl.key ? fs.readFileSync(this.ssl.key) : void 0,
+					cert: this.ssl.cert ? node_fs.readFileSync(this.ssl.cert) : void 0,
+					pfx: this.ssl.pfx ? node_fs.readFileSync(this.ssl.pfx) : void 0,
+					key: this.ssl.key ? node_fs.readFileSync(this.ssl.key) : void 0,
 					port: this.port,
 					host: this.host
 				}, this.route).listen(this.port, this.host);
@@ -517,11 +528,7 @@ function tenso (userConfig = {}) {
 
 	app.decorate = app.decorate.bind(app);
 	app.route = app.route.bind(app);
-
-	process.on("SIGTERM", async () => {
-		await app.server.close();
-		process.exit(0);
-	});
+	signals(app);
 
 	return app;
 }

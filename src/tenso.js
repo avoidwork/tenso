@@ -1,4 +1,6 @@
 import {readFileSync} from "node:fs";
+import http from "node:http";
+import https from "node:https";
 import {createRequire} from "node:module";
 import {join, resolve} from "node:path";
 import {fileURLToPath, URL} from "node:url";
@@ -11,9 +13,7 @@ import {renderers} from "./utils/renderers.js";
 import {serializers} from "./utils/serializers.js";
 import {mimetype} from "./utils/regex.js";
 import {hasBody} from "./utils/hasbody.js";
-import http from "http";
-import https from "https";
-import fs from "fs";
+import {signals} from "./utils/signals.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const require = createRequire(import.meta.url);
@@ -169,9 +169,9 @@ class Tenso extends Woodland {
 				this.server = http.createServer(this.route).listen(this.port, this.host);
 			} else {
 				this.server = https.createServer({
-					cert: this.ssl.cert ? fs.readFileSync(this.ssl.cert) : void 0,
-					pfx: this.ssl.pfx ? fs.readFileSync(this.ssl.pfx) : void 0,
-					key: this.ssl.key ? fs.readFileSync(this.ssl.key) : void 0,
+					cert: this.ssl.cert ? readFileSync(this.ssl.cert) : void 0,
+					pfx: this.ssl.pfx ? readFileSync(this.ssl.pfx) : void 0,
+					key: this.ssl.key ? readFileSync(this.ssl.key) : void 0,
 					port: this.port,
 					host: this.host
 				}, this.route).listen(this.port, this.host);
@@ -223,11 +223,7 @@ export function tenso (userConfig = {}) {
 
 	app.decorate = app.decorate.bind(app);
 	app.route = app.route.bind(app);
-
-	process.on("SIGTERM", async () => {
-		await app.server.close();
-		process.exit(0);
-	});
+	signals(app);
 
 	return app;
 }

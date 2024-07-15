@@ -1,7 +1,7 @@
 /**
  * tenso
  *
- * @copyright 2023 Jason Mulligan <jason.mulligan@avoidwork.com>
+ * @copyright 2024 Jason Mulligan <jason.mulligan@avoidwork.com>
  * @license BSD-3-Clause
  * @version 17.0.0
  */
@@ -152,19 +152,46 @@ const config = {
 	}
 };
 
-function json$1 (arg = "") {
+const CALLBACK = "callback";
+const COMMA = ",";
+const COLON = ":";
+const EMPTY = "";
+const ENCODED_SPACE = "%20";
+const HEADER_ALLOW_GET = "GET, HEAD, OPTIONS";
+const HEADER_APPLICATION_JSON = "application/json";
+const HEADER_CONTENT_TYPE = "content-type";
+const HTML = "html";
+const INT_0 = 0;
+const INT_200 = 200;
+const X_CSRF_TOKEN = "x-csrf-token";
+const X_FORWARDED_PROTO = "x-forwarded-proto";
+
+function json$1 (arg = EMPTY) {
 	return JSON.parse(arg);
 }
 
 const bodySplit = /&|=/;
 const mimetype = /;.*/;
 
+function chunk (arg = [], size = 2) {
+	const result = [];
+	const nth = Math.ceil(arg.length / size);
+	let i = 0;
+
+	while (i < nth) {
+		result.push(arg.slice(i * size, (i + 1) * size));
+		i++;
+	}
+
+	return result;
+}
+
 function xWwwFormURLEncoded (arg) {
 	const args = arg ? chunk(arg.split(bodySplit), 2) : [],
 		result = {};
 
 	for (const i of args) {
-		result[decodeURIComponent(i[0].replace(/\+/g, "%20"))] = tinyCoerce.coerce(decodeURIComponent(i[1].replace(/\+/g, "%20")));
+		result[decodeURIComponent(i[0].replace(/\+/g, ENCODED_SPACE))] = tinyCoerce.coerce(decodeURIComponent(i[1].replace(/\+/g, ENCODED_SPACE)));
 	}
 
 	return result;
@@ -181,8 +208,10 @@ const parsers = new Map([
 	]
 ]);
 
+const str_indent = "indent=";
+
 function indent (arg = "", fallback = 0) {
-	return arg.includes("indent=") ? parseInt(arg.match(/indent=(\d+)/)[1], 10) : fallback;
+	return arg.includes(str_indent) ? parseInt(arg.match(/indent=(\d+)/)[1], 10) : fallback;
 }
 
 function json (req, res, arg) {
@@ -203,14 +232,14 @@ function xml (req, res, arg) {
 }
 
 function plain$1 (req, res, arg) {
-	return Array.isArray(arg) ? arg.map(i => text(req, res, i)).join(",") : arg instanceof Object ? JSON.stringify(arg, null, indent(req.headers.accept, req.server.config.json)) : arg.toString()
+	return Array.isArray(arg) ? arg.map(i => text(req, res, i)).join(COMMA) : arg instanceof Object ? JSON.stringify(arg, null, indent(req.headers.accept, req.server.config.json)) : arg.toString()
 }
 
 function javascript (req, res, arg) {
-	req.headers.accept = "application/javascript";
-	res.header("content-type", "application/javascript");
+	req.headers.accept = HEADER_APPLICATION_JSON;
+	res.header(HEADER_CONTENT_TYPE, HEADER_APPLICATION_JSON);
 
-	return `${req.parsed.searchParams.get("callback") || "callback"}(${JSON.stringify(arg, null, 0)});`;
+	return `${req.parsed.searchParams.get(CALLBACK) ?? CALLBACK}(${JSON.stringify(arg, null, INT_0)});`;
 }
 
 // @todo replace with a good library
@@ -222,21 +251,25 @@ function csv (req, res, arg) {
 	return serialize(arg)
 }
 
+function explode (arg = "", delimiter = ",") {
+	return arg.trim().split(new RegExp(`\\s*${delimiter}\\s*`));
+}
+
 function html (req, res, arg, tpl = "") {
-	const protocol = "x-forwarded-proto" in req.headers ? req.headers["x-forwarded-proto"] + ":" : req.parsed.protocol,
+	const protocol = X_FORWARDED_PROTO in req.headers ? req.headers[X_FORWARDED_PROTO] + COLON : req.parsed.protocol,
 		headers = res.getHeaders();
 
 	return tpl.length > 0 ? tpl.replace(/\{\{title\}\}/g, req.server.config.title)
 		.replace("{{url}}", req.parsed.href.replace(req.parsed.protocol, protocol))
 		.replace("{{headers}}", Object.keys(headers).sort().map(i => `<tr><td>${i}</td><td>${sanitize(headers[i])}</td></tr>`).join("\n"))
-		.replace("{{formats}}", `<option value=''></option>${Array.from(renderers.keys()).filter(i => i.indexOf("html") === -1).map(i => `<option value='${i.trim()}'>${i.replace(/^.*\//, "").toUpperCase()}</option>`).join("\n")}`)
+		.replace("{{formats}}", `<option value=''></option>${Array.from(renderers.keys()).filter(i => i.indexOf(HTML) === -1).map(i => `<option value='${i.trim()}'>${i.replace(/^.*\//, "").toUpperCase()}</option>`).join("\n")}`)
 		.replace("{{body}}", sanitize(JSON.stringify(arg, null, 2)))
 		.replace("{{year}}", new Date().getFullYear())
 		.replace("{{version}}", req.server.config.version)
 		.replace("{{allow}}", headers.allow)
-		.replace("{{methods}}", utility.explode((headers.allow || "").replace("GET, HEAD, OPTIONS", "")).filter(i => i !== "").map(i => `<option value='${i.trim()}'>$i.trim()}</option>`).join("\n"))
-		.replace("{{csrf}}", headers["x-csrf-token"] || "")
-		.replace("class=\"headers", req.server.config.renderHeaders === false ? "class=\"headers dr-hidden" : "class=\"headers") : "";
+		.replace("{{methods}}", explode((headers?.allow ?? EMPTY).replace(HEADER_ALLOW_GET, EMPTY)).filter(i => i !== EMPTY).map(i => `<option value='${i.trim()}'>$i.trim()}</option>`).join("\n"))
+		.replace("{{csrf}}", headers?.[X_CSRF_TOKEN] ?? EMPTY)
+		.replace("class=\"headers", req.server.config.renderHeaders === false ? "class=\"headers dr-hidden" : "class=\"headers") : EMPTY;
 }
 
 const renderers$1 = new Map([
@@ -249,7 +282,7 @@ const renderers$1 = new Map([
 	["text/html", html]
 ]);
 
-function custom (arg, err, status = 200, stack = false) {
+function custom (arg, err, status = INT_200, stack = false) {
 	return {
 		data: arg,
 		error: err !== null ? (stack ? err.stack : err.message) || err || http.STATUS_CODES[status] : null,
@@ -258,7 +291,7 @@ function custom (arg, err, status = 200, stack = false) {
 	};
 }
 
-function plain (arg, err, status = 200, stack = false) {
+function plain (arg, err, status = INT_200, stack = false) {
 	return err !== null ? (stack ? err.stack : err.message) || err || http.STATUS_CODES[status] : arg;
 }
 

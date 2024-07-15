@@ -4,8 +4,7 @@ export function chunk (arg = [], size = 2) {
 	let i = 0;
 
 	while (i < nth) {
-		result.push(arg.slice(i * size, (i + 1) * size));
-		i++;
+		result.push(arg.slice(i * size, ++i * size));
 	}
 
 	return result;

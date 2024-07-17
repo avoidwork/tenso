@@ -5,7 +5,7 @@
  * @license BSD-3-Clause
  * @version 17.0.0
  */
-import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import defaults from'defaults';import {eventsource}from'tiny-eventsource';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {URL}from'url';import keysort,{keysort as keysort$1}from'keysort';import redis from'redis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-local';import {Strategy as Strategy$2}from'passport-oauth2';const config = {
+import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import defaults from'defaults';import {eventsource}from'tiny-eventsource';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {jsonl as jsonl$1}from'tiny-jsonl';import {URL}from'url';import keysort,{keysort as keysort$1}from'keysort';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';const config = {
 	auth: {
 		delay: 0,
 		protect: [],
@@ -157,7 +157,9 @@ const SIGINT = "SIGINT";
 const SIGTERM = "SIGTERM";
 const STRING = "string";
 const LESS_THAN = "&lt;";
-const GREATER_THAN = "&gt;";function json$1 (arg = EMPTY) {
+const GREATER_THAN = "&gt;";
+const XML_PROLOG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+const XML_ARRAY_NODE_NAME = "item";function json$1 (arg = EMPTY) {
 	return JSON.parse(arg);
 }const bodySplit = /&|=/;
 const mimetype = /;.*/;function chunk (arg = [], size = 2) {
@@ -193,16 +195,18 @@ const mimetype = /;.*/;function chunk (arg = [], size = 2) {
 function indent (arg = "", fallback = 0) {
 	return arg.includes(str_indent) ? parseInt(arg.match(/indent=(\d+)/)[1], 10) : fallback;
 }function json (req, res, arg) {
-	return JSON.stringify(arg, null, indent(req.headers.accept, req.server.config.json))
+	return JSON.stringify(arg, null, indent(req.headers.accept, req.server.config.json));
 }function yaml (req, res, arg) {
 	return YAML.stringify(arg);
-}// @todo replace with a good library
-function serialize$2 (arg) {
-	return arg;
-}
+}function xml (req, res, arg) {
+	const builder = new XMLBuilder({
+		processEntities: true,
+		format: true,
+		ignoreAttributes: false,
+		arrayNodeName: Array.isArray(arg) ? XML_ARRAY_NODE_NAME : undefined
+	});
 
-function xml (req, res, arg) {
-	return serialize$2(arg)
+	return `${XML_PROLOG}\n${builder.build(arg)}`;
 }function plain$1 (req, res, arg) {
 	return Array.isArray(arg) ? arg.map(i => text(req, res, i)).join(COMMA) : arg instanceof Object ? JSON.stringify(arg, null, indent(req.headers.accept, req.server.config.json)) : arg.toString()
 }function javascript (req, res, arg) {
@@ -210,13 +214,17 @@ function xml (req, res, arg) {
 	res.header(HEADER_CONTENT_TYPE, HEADER_APPLICATION_JSON);
 
 	return `${req.parsed.searchParams.get(CALLBACK) ?? CALLBACK}(${JSON.stringify(arg, null, INT_0)});`;
-}// @todo replace with a good library
-function serialize$1 (arg) {
-	return arg;
-}
-
-function csv (req, res, arg) {
-	return serialize$1(arg)
+}function csv (req, res, arg) {
+	return stringify(Array.isArray(arg) ? arg : [arg], {
+		cast: {
+			boolean: value => value ? "true" : "false",
+			date: value => value.toISOString(),
+			number: value => value.toString()
+		},
+		delimiter: ",",
+		header: true,
+		quoted: false
+	});
 }function explode (arg = "", delimiter = ",") {
 	return arg.trim().split(new RegExp(`\\s*${delimiter}\\s*`));
 }function sanitize (arg) {
@@ -236,6 +244,8 @@ function csv (req, res, arg) {
 		.replace("{{methods}}", explode((headers?.allow ?? EMPTY).replace(HEADER_ALLOW_GET, EMPTY)).filter(i => i !== EMPTY).map(i => `<option value='${i.trim()}'>$i.trim()}</option>`).join("\n"))
 		.replace("{{csrf}}", headers?.[X_CSRF_TOKEN] ?? EMPTY)
 		.replace("class=\"headers", req.server.config.renderHeaders === false ? "class=\"headers dr-hidden" : "class=\"headers") : EMPTY;
+}function jsonl (req, res, arg) {
+	return jsonl$1(arg);
 }const renderers = new Map([
 	["application/json", json],
 	["application/yaml", yaml],
@@ -243,7 +253,10 @@ function csv (req, res, arg) {
 	["text/plain", plain$1],
 	["application/javascript", javascript],
 	["text/csv", csv],
-	["text/html", html]
+	["text/html", html],
+	["application/json-lines", jsonl],
+	["application/jsonl", jsonl],
+	["text/jsonl", jsonl]
 ]);function custom (arg, err, status = INT_200, stack = false) {
 	return {
 		data: arg,
@@ -655,7 +668,7 @@ function csv (req, res, arg) {
 			}
 		};
 
-		passport.use(new Strategy((token, done) => {
+		passport.use(new BearerStrategy((token, done) => {
 			delay(() => {
 				validate(token, (err, user) => {
 					if (err !== null) {
@@ -705,7 +718,7 @@ function csv (req, res, arg) {
 		const passportAuth = passport.authenticate("jwt", {session: false});
 		obj.always(passportAuth).ignore(passportAuth);
 	} else if (config.auth.local.enabled) {
-		passport.use(new Strategy$1((username, password, done) => {
+		passport.use(new LocalStrategy((username, password, done) => {
 			delay(() => {
 				config.auth.local.auth(username, password, (err, user) => {
 					if (err !== null) {
@@ -738,7 +751,7 @@ function csv (req, res, arg) {
 			passportInit(req, res, mid);
 		};
 	} else if (config.auth.oauth2.enabled) {
-		passport.use(new Strategy$2({
+		passport.use(new OAuth2Strategy({
 			authorizationURL: config.auth.oauth2.auth_url,
 			tokenURL: config.auth.oauth2.token_url,
 			clientID: config.auth.oauth2.client_id,

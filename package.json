@@ -26,7 +26,7 @@
     "mocha": "nyc mocha test/*.test.js",
     "rollup": "rollup --config",
     "test": "npm run lint && npm run mocha",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "source": "src/tenso.js",
   "main": "dist/tenso.cjs",
@@ -44,7 +44,6 @@
     "www"
   ],
   "dependencies": {
-    "@node-saml/passport-saml": "^5.0.0",
     "connect-redis": "^7.1.1",
     "cookie-parser": "^1.4.6",
     "csv-stringify": "^6.5.0",
@@ -56,6 +55,12 @@
     "jsonwebtoken": "^9.0.2",
     "keysort": "^3.0.1",
     "mime-db": "^1.53.0",
+    "passport": "^0.7.0",
+    "passport-http": "^0.3.0",
+    "passport-http-bearer": "^1.0.1",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0",
+    "passport-oauth2": "^1.8.0",
     "precise": "^4.0.3",
     "tiny-coerce": "^3.0.2",
     "tiny-etag": "^4.0.5",

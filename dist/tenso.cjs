@@ -18,16 +18,15 @@ var defaults = require('defaults');
 var tinyEventsource = require('tiny-eventsource');
 var tinyCoerce = require('tiny-coerce');
 var YAML = require('yamljs');
+var fastXmlParser = require('fast-xml-parser');
+var sync = require('csv-stringify/sync');
+var tinyJsonl = require('tiny-jsonl');
 var url = require('url');
 var keysort = require('keysort');
-var redis = require('redis');
+var redis = require('ioredis');
 var cookie = require('cookie-parser');
 var session = require('express-session');
 var passport = require('passport');
-var passportHttp = require('passport-http');
-var passportHttpBearer = require('passport-http-bearer');
-var passportLocal = require('passport-local');
-var passportOauth2 = require('passport-oauth2');
 
 var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
 const config = {
@@ -185,6 +184,8 @@ const SIGTERM = "SIGTERM";
 const STRING = "string";
 const LESS_THAN = "&lt;";
 const GREATER_THAN = "&gt;";
+const XML_PROLOG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+const XML_ARRAY_NODE_NAME = "item";
 
 function json$1 (arg = EMPTY) {
 	return JSON.parse(arg);
@@ -234,20 +235,22 @@ function indent (arg = "", fallback = 0) {
 }
 
 function json (req, res, arg) {
-	return JSON.stringify(arg, null, indent(req.headers.accept, req.server.config.json))
+	return JSON.stringify(arg, null, indent(req.headers.accept, req.server.config.json));
 }
 
 function yaml (req, res, arg) {
 	return YAML.stringify(arg);
 }
 
-// @todo replace with a good library
-function serialize$2 (arg) {
-	return arg;
-}
-
 function xml (req, res, arg) {
-	return serialize$2(arg)
+	const builder = new fastXmlParser.XMLBuilder({
+		processEntities: true,
+		format: true,
+		ignoreAttributes: false,
+		arrayNodeName: Array.isArray(arg) ? XML_ARRAY_NODE_NAME : undefined
+	});
+
+	return `${XML_PROLOG}\n${builder.build(arg)}`;
 }
 
 function plain$1 (req, res, arg) {
@@ -261,13 +264,17 @@ function javascript (req, res, arg) {
 	return `${req.parsed.searchParams.get(CALLBACK) ?? CALLBACK}(${JSON.stringify(arg, null, INT_0)});`;
 }
 
-// @todo replace with a good library
-function serialize$1 (arg) {
-	return arg;
-}
-
 function csv (req, res, arg) {
-	return serialize$1(arg)
+	return sync.stringify(Array.isArray(arg) ? arg : [arg], {
+		cast: {
+			boolean: value => value ? "true" : "false",
+			date: value => value.toISOString(),
+			number: value => value.toString()
+		},
+		delimiter: ",",
+		header: true,
+		quoted: false
+	});
 }
 
 function explode (arg = "", delimiter = ",") {
@@ -295,6 +302,10 @@ function html (req, res, arg, tpl = "") {
 		.replace("class=\"headers", req.server.config.renderHeaders === false ? "class=\"headers dr-hidden" : "class=\"headers") : EMPTY;
 }
 
+function jsonl (req, res, arg) {
+	return tinyJsonl.jsonl(arg);
+}
+
 const renderers = new Map([
 	["application/json", json],
 	["application/yaml", yaml],
@@ -302,7 +313,10 @@ const renderers = new Map([
 	["text/plain", plain$1],
 	["application/javascript", javascript],
 	["text/csv", csv],
-	["text/html", html]
+	["text/html", html],
+	["application/json-lines", jsonl],
+	["application/jsonl", jsonl],
+	["text/jsonl", jsonl]
 ]);
 
 function custom (arg, err, status = INT_200, stack = false) {
@@ -701,7 +715,7 @@ function auth (obj, config) {
 			}
 		}
 
-		passport.use(new passportHttp.BasicStrategy((username, password, done) => {
+		passport.use(new BasicStrategy((username, password, done) => {
 			delay(() => {
 				validate(username, (err, user) => {
 					if (err !== null) {
@@ -734,7 +748,7 @@ function auth (obj, config) {
 			}
 		};
 
-		passport.use(new passportHttpBearer.Strategy((token, done) => {
+		passport.use(new BearerStrategy((token, done) => {
 			delay(() => {
 				validate(token, (err, user) => {
 					if (err !== null) {
@@ -784,7 +798,7 @@ function auth (obj, config) {
 		const passportAuth = passport.authenticate("jwt", {session: false});
 		obj.always(passportAuth).ignore(passportAuth);
 	} else if (config.auth.local.enabled) {
-		passport.use(new passportLocal.Strategy((username, password, done) => {
+		passport.use(new LocalStrategy((username, password, done) => {
 			delay(() => {
 				config.auth.local.auth(username, password, (err, user) => {
 					if (err !== null) {
@@ -817,7 +831,7 @@ function auth (obj, config) {
 			passportInit(req, res, mid);
 		};
 	} else if (config.auth.oauth2.enabled) {
-		passport.use(new passportOauth2.Strategy({
+		passport.use(new OAuth2Strategy({
 			authorizationURL: config.auth.oauth2.auth_url,
 			tokenURL: config.auth.oauth2.token_url,
 			clientID: config.auth.oauth2.client_id,

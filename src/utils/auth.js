@@ -1,12 +1,26 @@
-import redis from "redis";
+import redis from "ioredis";
 import cookie from "cookie-parser";
 import session from "express-session";
 import passport from "passport";
-import {STATUS_CODES} from "node:http";
+import jwt from "passport-jwt";
 import {BasicStrategy} from "passport-http";
 import {Strategy as BearerStrategy} from "passport-http-bearer";
 import {Strategy as LocalStrategy} from "passport-local";
 import {Strategy as OAuth2Strategy} from "passport-oauth2";
+import {STATUS_CODES} from "node:http";
+import {asyncFlag} from "../middleware/asyncFlag.js";
+import {bypass} from "../middleware/bypass.js";
+import {guard} from "../middleware/guard.js";
+import {zuul} from "../middleware/zuul.js";
+import {clone} from "./clone.js";
+import {delay} from "./delay.js";
+import {isEmpty} from "./isEmpty.js";
+import {randomUUID as uuid} from "node:crypto";
+import {PROTECT, UNPROTECT} from "./constants.js";
+
+const {JWTStrategy, ExtractJwt} = jwt.Strategy,
+	RedisStore = require("connect-redis")(session),
+	groups = [PROTECT, UNPROTECT];
 
 export function auth (obj, config) {
 	const ssl = config.ssl.cert && config.ssl.key,
@@ -41,7 +55,7 @@ export function auth (obj, config) {
 		res.redirect(config.auth.uri.redirect, false);
 	}
 
-	obj.router.ignore(middleware.asyncFlag);
+	obj.router.ignore(asyncFlag);
 
 	for (const k of groups) {
 		config.auth[k] = (config.auth[k] || []).map(i => new RegExp(`^${i !== config.auth.uri.login ? i.replace(/\.\*/g, "*").replace(/\*/g, ".*") : ""}(\/|$)`, "i"));
@@ -51,7 +65,7 @@ export function auth (obj, config) {
 		if (config.auth[i].enabled) {
 			authMap[`${i}_uri`] = `/auth/${i}`;
 			authUris.push(`/auth/${i}`);
-			config.auth.protect.push(new RegExp(`^/auth/${i}(\/|$)`));
+			config.auth.protect.push(new RegExp(`^/auth/${i}(/|$)`));
 		}
 	}
 
@@ -79,7 +93,7 @@ export function auth (obj, config) {
 
 		obj.always(fnCookie).ignore(fnCookie);
 		obj.always(fnSession).ignore(fnSession);
-		obj.always(middleware.bypass).ignore(middleware.bypass);
+		obj.always(bypass).ignore(bypass);
 
 		if (config.security.csrf) {
 			luscaCsrf = lusca.csrf({key: config.security.key, secret: config.security.secret});
@@ -118,7 +132,7 @@ export function auth (obj, config) {
 	}
 
 	// Can fork to `middleware.keymaster()`
-	obj.always(middleware.zuul).ignore(middleware.zuul);
+	obj.always(zuul).ignore(zuul);
 
 	passportInit = passport.initialize();
 	obj.always(passportInit).ignore(passportInit);
@@ -271,7 +285,7 @@ export function auth (obj, config) {
 			tokenURL: config.auth.oauth2.token_url,
 			clientID: config.auth.oauth2.client_id,
 			clientSecret: config.auth.oauth2.client_secret,
-			callbackURL: realm + "/auth/oauth2/callback"
+			callbackURL: `${realm}/auth/oauth2/callback`
 		}, (accessToken, refreshToken, profile, done) => {
 			delay(() => {
 				config.auth.oauth2.auth(accessToken, refreshToken, profile, (err, user) => {
@@ -284,35 +298,11 @@ export function auth (obj, config) {
 			}, authDelay);
 		}));
 
-		obj.get("/auth/oauth2", middleware.asyncFlag);
+		obj.get("/auth/oauth2", asyncFlag);
 		obj.get("/auth/oauth2", passport.authenticate("oauth2"));
-		obj.get("/auth/oauth2/callback", middleware.asyncFlag);
+		obj.get("/auth/oauth2/callback", asyncFlag);
 		obj.get("/auth/oauth2/callback", passport.authenticate("oauth2", {failureRedirect: config.auth.uri.login}));
 		obj.get("/auth/oauth2/callback", redirect);
-	} else if (config.auth.saml.enabled) {
-		let arg = config.auth.saml;
-
-		arg.callbackURL = realm + "/auth/saml/callback";
-		delete arg.enabled;
-		delete arg.path;
-
-		passport.use(new SAMLStrategy(arg, (profile, done) => {
-			delay(() => {
-				config.auth.saml.auth(profile, (err, user) => {
-					if (err !== null) {
-						done(err);
-					} else {
-						done(null, user);
-					}
-				});
-			}, authDelay);
-		}));
-
-		obj.get("/auth/saml", middleware.asyncFlag);
-		obj.get("/auth/saml", passport.authenticate("saml"));
-		obj.get("/auth/saml/callback", middleware.asyncFlag);
-		obj.get("/auth/saml/callback", passport.authenticate("saml", {failureRedirect: config.auth.uri.login}));
-		obj.get("/auth/saml/callback", redirect);
 	}
 
 	if (authUris.length > 0) {
@@ -327,7 +317,7 @@ export function auth (obj, config) {
 		}
 
 		r = r.replace(/\|$/, "") + ")).*$";
-		obj.always(r, middleware.guard).ignore(middleware.guard);
+		obj.always(r, guard).ignore(guard);
 
 		config.routes.get[config.auth.uri.login] = {
 			instruction: config.auth.msg.login

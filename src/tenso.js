@@ -13,8 +13,13 @@ import {renderers} from "./utils/renderers.js";
 import {serializers} from "./utils/serializers.js";
 import {mimetype} from "./utils/regex.js";
 import {hasBody} from "./utils/hasbody.js";
-import {signals} from "./utils/signals.js";
-import {bootstrap} from "./utils/bootstrap.js";
+import {CONNECT, EMPTY, FUNCTION, INT_200, INT_204, INT_304, SIGHUP, SIGINT, SIGTERM} from "./utils/constants.js";
+import {serialize} from "./utils/serialize.js";
+import {hypermedia} from "./utils/hypermedia.js";
+import {payload} from "./middleware/payload.js";
+import {parse} from "./middleware/parse.js";
+import {auth} from "./utils/auth.js";
+import {clone} from "./utils/clone.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const require = createRequire(import.meta.url);
@@ -77,6 +82,63 @@ class Tenso extends Woodland {
 			res.removeHeader(key);
 			res.header(key, `private${lcache.length > 0 ? ", " : ""}${lcache || ""}`);
 		}
+	}
+
+	init () {
+		const authorization = Object.keys(this.config.auth).filter(i => this.config.auth?.[i]?.enabled === true).length > 0 || this.config.rate.enabled || this.config.security.csrf;
+
+		this.decorate = this.decorate.bind(this);
+		this.route = this.route.bind(this);
+		this.signals();
+		this.version = this.config.version;
+		this.addListener(CONNECT, this.connect.bind(this));
+		this.onsend = (req, res, body = EMPTY, status = INT_200, headers) => {
+			this.headers(req, res);
+			res.statusCode = status;
+
+			if (status !== INT_204 && status !== INT_304 && (body === null || typeof body.on !== FUNCTION)) {
+				for (const fn of [serialize, hypermedia, this.final, this.render]) {
+					body = fn(req, res, body);
+				}
+			}
+
+			return [body, status, headers];
+		};
+
+		// Payload handling
+		this.always(payload).ignore(payload);
+		this.always(parse).ignore(parse);
+
+		// Setting 'always' routes before authorization runs
+		for (const [key, value] of Object.entries(this.config.routes.always ?? {})) {
+			if (typeof value === FUNCTION) {
+				this.always(key, value).ignore(value);
+			}
+		}
+
+		delete this.config.routes.always;
+
+		if (authorization) {
+			auth(this, this.config);
+		}
+
+		// Static assets on disk for browsable interface
+		if (this.config.static !== EMPTY) {
+			this.staticFiles(join(__dirname, "..", "www", this.config.static));
+		}
+
+		// Setting routes
+		for (const [method, routes] of Object.entries(this.config.routes ?? {})) {
+			for (const [route, target] of Object.entries(routes ?? {})) {
+				if (typeof target === FUNCTION) {
+					this[method](route, target);
+				} else {
+					this[method](route, (req, res) => res.send(target));
+				}
+			}
+		}
+
+		return this;
 	}
 
 	parser (mediatype = "", fn = arg => arg) {
@@ -164,6 +226,17 @@ class Tenso extends Woodland {
 		return this;
 	}
 
+	signals () {
+		for (const signal of [SIGHUP, SIGINT, SIGTERM]) {
+			process.on(signal, async () => {
+				await this.server?.close();
+				process.exit(0);
+			});
+		}
+
+		return this;
+	}
+
 	start () {
 		if (this.server === null) {
 			if (this.ssl.cert === null && this.ssl.pfx === null && this.ssl.key === null) {
@@ -203,7 +276,7 @@ class Tenso extends Woodland {
 }
 
 export function tenso (userConfig = {}) {
-	const config = defaults(userConfig, structuredClone(defaultConfig));
+	const config = defaults(userConfig, clone(defaultConfig));
 
 	if ((/^[^\d+]$/).test(config.port) && config.port < 1) {
 		console.error("Invalid configuration");
@@ -222,10 +295,5 @@ export function tenso (userConfig = {}) {
 
 	const app = new Tenso(config);
 
-	app.decorate = app.decorate.bind(app);
-	app.route = app.route.bind(app);
-	signals(app);
-	bootstrap(app);
-
-	return app;
+	return app.init();
 }

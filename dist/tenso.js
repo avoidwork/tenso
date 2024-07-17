@@ -5,7 +5,7 @@
  * @license BSD-3-Clause
  * @version 17.0.0
  */
-import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import defaults from'defaults';import {eventsource}from'tiny-eventsource';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {jsonl as jsonl$1}from'tiny-jsonl';import {URL}from'url';import {keysort}from'keysort';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import jwt from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-local';import {Strategy as Strategy$2}from'passport-oauth2';import {randomInt,randomUUID}from'node:crypto';const config = {
+import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import defaults from'defaults';import {eventsource}from'tiny-eventsource';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {jsonl as jsonl$1}from'tiny-jsonl';import {keysort}from'keysort';import {URL}from'url';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import jwt from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-local';import {Strategy as Strategy$2}from'passport-oauth2';import {randomInt,randomUUID}from'node:crypto';const config = {
 	auth: {
 		delay: 0,
 		protect: [],
@@ -288,13 +288,53 @@ function indent (arg = "", fallback = 0) {
 	["text/html", custom]
 ]);function hasBody (arg) {
 	return arg.includes("PATCH") || arg.includes("POST") || arg.includes("PUT");
-}function signals (app) {
-	[SIGHUP, SIGINT, SIGTERM].forEach(signal => {
-		process.on(signal, async () => {
-			await app.server?.close();
-			process.exit(0);
-		});
-	});
+}const clone = typeof structuredClone === "function" ? structuredClone : arg => JSON.parse(JSON.stringify(arg));function sort (arg, req) {
+	let output = clone(arg);
+
+	if (typeof req.parsed.search === "string" && req.parsed.searchParams.has("order_by") && Array.isArray(arg)) {
+		const type = typeof arg[0];
+
+		if (type !== "boolean" && type !== "number" && type !== "string" && type !== "undefined" && arg[0] !== null) {
+			const args = req.parsed.searchParams.getAll("order_by").filter(i => i !== "desc").join(", ");
+
+			if (args.length > 0) {
+				output = keysort(output, args);
+			}
+		}
+
+		if (req.parsed.search.includes("order_by=desc")) {
+			output = output.reverse();
+		}
+	}
+
+	return output;
+}function serialize (req, res, arg) {
+	const status = res.statusCode;
+	let format = req.server.config.mimeType,
+		accepts = explode(req.parsed.searchParams.get("format") || req.headers.accept || res.getHeader("content-type") || format, ","),
+		errz = arg instanceof Error,
+		result, serializer;
+
+	for (const i of accepts) {
+		let mimetype$1 = i.replace(mimetype, "");
+
+		if (serializers.has(mimetype$1)) {
+			format = mimetype$1;
+			break;
+		}
+	}
+
+	serializer = serializers.get(format);
+	res.removeHeader("content-type");
+	res.header("content-type", `${format}; charset=utf-8`);
+
+	if (errz) {
+		result = serializer(null, arg, status < 400 ? 500 : status, req.server.config.logging.stackWire);
+	} else {
+		result = serializer(sort(arg, req), null, status);
+	}
+
+	return result;
 }function hypermedia (req, res, rep) {
 	const server = req.server,
 		headers = res.getHeaders(),
@@ -458,53 +498,53 @@ function indent (arg = "", fallback = 0) {
 	}
 
 	return rep;
-}const clone = typeof structuredClone === "function" ? structuredClone : arg => JSON.parse(JSON.stringify(arg));function sort (arg, req) {
-	let output = clone(arg);
+}function payload (req, res, next) {
+	if (hasBody(req.method) && req.headers?.[HEADER_CONTENT_TYPE]?.includes(MULTIPART) === false) {
+		const max = req.server.config.maxBytes;
+		let body = EMPTY,
+			invalid = false;
 
-	if (typeof req.parsed.search === "string" && req.parsed.searchParams.has("order_by") && Array.isArray(arg)) {
-		const type = typeof arg[0];
+		req.setEncoding(UTF8);
 
-		if (type !== "boolean" && type !== "number" && type !== "string" && type !== "undefined" && arg[0] !== null) {
-			const args = req.parsed.searchParams.getAll("order_by").filter(i => i !== "desc").join(", ");
+		req.on(DATA, data => {
+			if (invalid === false) {
+				body += data;
 
-			if (args.length > 0) {
-				output = keysort(output, args);
+				if (max > 0 && Buffer.byteLength(body) > max) {
+					invalid = true;
+					res.error(INT_413);
+				}
+			}
+		});
+
+		req.on(END, () => {
+			if (invalid === false) {
+				req.body = body;
+				next();
+			}
+		});
+	} else {
+		next();
+	}
+}function parse (req, res, next) {
+	let valid = true,
+		exception;
+
+	if (req.body !== "") {
+		const type = req.headers?.[HEADER_CONTENT_TYPE]?.replace(/\s.*$/, EMPTY) ?? EMPTY;
+		const parsers = req.server.parsers;
+
+		if (type.length > 0 && parsers.has(type)) {
+			try {
+				req.body = parsers.get(type)(req.body);
+			} catch (err) {
+				valid = false;
+				exception = err;
 			}
 		}
-
-		if (req.parsed.search.includes("order_by=desc")) {
-			output = output.reverse();
-		}
 	}
 
-	return output;
-}function serialize (req, res, arg) {
-	const status = res.statusCode;
-	let format = req.server.config.mimeType,
-		accepts = explode(req.parsed.searchParams.get("format") || req.headers.accept || res.getHeader("content-type") || format, ","),
-		errz = arg instanceof Error,
-		result, serializer;
-
-	for (const i of accepts) {
-		let mimetype$1 = i.replace(mimetype, "");
-
-		if (serializers.has(mimetype$1)) {
-			format = mimetype$1;
-			break;
-		}
-	}
-
-	serializer = serializers.get(format);
-	res.removeHeader("content-type");
-	res.header("content-type", `${format}; charset=utf-8`);
-
-	if (errz) {
-		result = serializer(null, arg, status < 400 ? 500 : status, req.server.config.logging.stackWire);
-	} else {
-		result = serializer(sort(arg, req), null, status);
-	}
-
-	return result;
+	next(valid === false ? exception : void 0);
 }function asyncFlag (req, res, next) {
 	req.protectAsync = true;
 	next();
@@ -906,108 +946,9 @@ function auth (obj, config) {
 	};
 
 	return config;
-}function parse (req, res, next) {
-	let valid = true,
-		exception;
-
-	if (req.body !== "") {
-		const type = req.headers?.[HEADER_CONTENT_TYPE]?.replace(/\s.*$/, EMPTY) ?? EMPTY;
-		const parsers = req.server.parsers;
-
-		if (type.length > 0 && parsers.has(type)) {
-			try {
-				req.body = parsers.get(type)(req.body);
-			} catch (err) {
-				valid = false;
-				exception = err;
-			}
-		}
-	}
-
-	next(valid === false ? exception : void 0);
-}function payload (req, res, next) {
-	if (hasBody(req.method) && req.headers?.[HEADER_CONTENT_TYPE]?.includes(MULTIPART) === false) {
-		const max = req.server.config.maxBytes;
-		let body = EMPTY,
-			invalid = false;
-
-		req.setEncoding(UTF8);
-
-		req.on(DATA, data => {
-			if (invalid === false) {
-				body += data;
-
-				if (max > 0 && Buffer.byteLength(body) > max) {
-					invalid = true;
-					res.error(INT_413);
-				}
-			}
-		});
-
-		req.on(END, () => {
-			if (invalid === false) {
-				req.body = body;
-				next();
-			}
-		});
-	} else {
-		next();
-	}
-}function bootstrap (obj) {
-	const authorization = Object.keys(obj.config.auth).filter(i => obj.config.auth?.[i]?.enabled === true).length > 0 || obj.config.rate.enabled || obj.config.security.csrf;
-
-	obj.version = obj.config.version;
-	obj.addListener(CONNECT, obj.connect.bind(obj));
-	obj.onsend = (req, res, body = EMPTY, status = INT_200, headers) => {
-		obj.headers(req, res);
-		res.statusCode = status;
-
-		if (status !== INT_204 && status !== INT_304 && (body === null || typeof body.on !== FUNCTION)) {
-			for (const fn of [serialize, hypermedia, obj.final, obj.render]) {
-				body = fn(req, res, body);
-			}
-		}
-
-		return [body, status, headers];
-	};
-
-	// Payload handling
-	obj.always(payload).ignore(payload);
-	obj.always(parse).ignore(parse);
-
-	// Setting 'always' routes before authorization runs
-	for (const [key, value] of Object.entries(obj.config.routes.always ?? {})) {
-		if (typeof value === FUNCTION) {
-			obj.always(key, value).ignore(value);
-		}
-	}
-
-	delete obj.config.routes.always;
-
-	if (authorization) {
-		auth(obj, obj.config);
-	}
-
-	// Static assets on disk for browsable interface
-	if (obj.config.static !== EMPTY) {
-		obj.staticFiles(join(__dirname, "..", "www", obj.config.static));
-	}
-
-	// Setting routes
-	for (const [method, routes] of Object.entries(obj.config.routes ?? {})) {
-		for (const [route, target] of Object.entries(routes ?? {})) {
-			if (typeof target === FUNCTION) {
-				obj[method](route, target);
-			} else {
-				obj[method](route, (req, res) => res.send(target));
-			}
-		}
-	}
-
-	return obj;
-}const __dirname$1 = fileURLToPath(new URL$1(".", import.meta.url));
+}const __dirname = fileURLToPath(new URL$1(".", import.meta.url));
 const require$1 = createRequire(import.meta.url);
-const {name, version} = require$1(join(__dirname$1, "..", "package.json"));
+const {name, version} = require$1(join(__dirname, "..", "package.json"));
 
 class Tenso extends Woodland {
 	constructor (config$1 = config) {
@@ -1066,6 +1007,63 @@ class Tenso extends Woodland {
 			res.removeHeader(key);
 			res.header(key, `private${lcache.length > 0 ? ", " : ""}${lcache || ""}`);
 		}
+	}
+
+	init () {
+		const authorization = Object.keys(this.config.auth).filter(i => this.config.auth?.[i]?.enabled === true).length > 0 || this.config.rate.enabled || this.config.security.csrf;
+
+		this.decorate = this.decorate.bind(this);
+		this.route = this.route.bind(this);
+		this.signals();
+		this.version = this.config.version;
+		this.addListener(CONNECT, this.connect.bind(this));
+		this.onsend = (req, res, body = EMPTY, status = INT_200, headers) => {
+			this.headers(req, res);
+			res.statusCode = status;
+
+			if (status !== INT_204 && status !== INT_304 && (body === null || typeof body.on !== FUNCTION)) {
+				for (const fn of [serialize, hypermedia, this.final, this.render]) {
+					body = fn(req, res, body);
+				}
+			}
+
+			return [body, status, headers];
+		};
+
+		// Payload handling
+		this.always(payload).ignore(payload);
+		this.always(parse).ignore(parse);
+
+		// Setting 'always' routes before authorization runs
+		for (const [key, value] of Object.entries(this.config.routes.always ?? {})) {
+			if (typeof value === FUNCTION) {
+				this.always(key, value).ignore(value);
+			}
+		}
+
+		delete this.config.routes.always;
+
+		if (authorization) {
+			auth(this, this.config);
+		}
+
+		// Static assets on disk for browsable interface
+		if (this.config.static !== EMPTY) {
+			this.staticFiles(join(__dirname, "..", "www", this.config.static));
+		}
+
+		// Setting routes
+		for (const [method, routes] of Object.entries(this.config.routes ?? {})) {
+			for (const [route, target] of Object.entries(routes ?? {})) {
+				if (typeof target === FUNCTION) {
+					this[method](route, target);
+				} else {
+					this[method](route, (req, res) => res.send(target));
+				}
+			}
+		}
+
+		return this;
 	}
 
 	parser (mediatype = "", fn = arg => arg) {
@@ -1153,6 +1151,17 @@ class Tenso extends Woodland {
 		return this;
 	}
 
+	signals () {
+		for (const signal of [SIGHUP, SIGINT, SIGTERM]) {
+			process.on(signal, async () => {
+				await this.server?.close();
+				process.exit(0);
+			});
+		}
+
+		return this;
+	}
+
 	start () {
 		if (this.server === null) {
 			if (this.ssl.cert === null && this.ssl.pfx === null && this.ssl.key === null) {
@@ -1192,7 +1201,7 @@ class Tenso extends Woodland {
 }
 
 function tenso (userConfig = {}) {
-	const config$1 = defaults(userConfig, structuredClone(config));
+	const config$1 = defaults(userConfig, clone(config));
 
 	if ((/^[^\d+]$/).test(config$1.port) && config$1.port < 1) {
 		console.error("Invalid configuration");
@@ -1201,7 +1210,7 @@ function tenso (userConfig = {}) {
 
 	config$1.title = name;
 	config$1.version = version;
-	config$1.webroot.root = resolve(config$1.webroot.root || join(__dirname$1, "..", "www"));
+	config$1.webroot.root = resolve(config$1.webroot.root || join(__dirname, "..", "www"));
 	config$1.webroot.template = readFileSync(config$1.webroot.template || join(config$1.webroot.root, "template.html"), {encoding: "utf8"});
 
 	if (config$1.silent !== true) {
@@ -1211,10 +1220,5 @@ function tenso (userConfig = {}) {
 
 	const app = new Tenso(config$1);
 
-	app.decorate = app.decorate.bind(app);
-	app.route = app.route.bind(app);
-	signals(app);
-	bootstrap(app);
-
-	return app;
+	return app.init();
 }export{tenso};

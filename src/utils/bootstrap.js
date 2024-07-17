@@ -4,24 +4,21 @@ import {serialize} from "./serialize.js";
 import {auth} from "./auth.js";
 import {parse} from "../middleware/parse.js";
 import {payload} from "../middleware/payload.js";
+import {CONNECT, EMPTY, FUNCTION, INT_200, INT_204, INT_304} from "./constants.js";
 
 export function bootstrap (obj) {
-	const authorization = Object.keys(obj.config.auth).filter(i => {
-		const x = obj.config.auth[i];
-
-		return x instanceof Object && x.enabled === true;
-	}).length > 0 || obj.config.rate.enabled || obj.config.security.csrf;
+	const authorization = Object.keys(obj.config.auth).filter(i => obj.config.auth?.[i]?.enabled === true).length > 0 || obj.config.rate.enabled || obj.config.security.csrf;
 
 	obj.version = obj.config.version;
-
-	// Setting up router
-	obj.addListener("connect", obj.connect.bind(obj));
-	obj.onsend = (req, res, body = "", status = 200, headers) => {
+	obj.addListener(CONNECT, obj.connect.bind(obj));
+	obj.onsend = (req, res, body = EMPTY, status = INT_200, headers) => {
 		obj.headers(req, res);
 		res.statusCode = status;
 
-		if (status !== 204 && status !== 304 && (body === null || typeof body.on !== "function")) {
-			body = obj.render(req, res, obj.final(req, res, hypermedia(req, res, serialize(req, res, body)))); // eslint-disable-line no-use-before-define
+		if (status !== INT_204 && status !== INT_304 && (body === null || typeof body.on !== FUNCTION)) {
+			for (const fn of [serialize, hypermedia, obj.final, obj.render]) {
+				body = fn(req, res, body);
+			}
 		}
 
 		return [body, status, headers];
@@ -33,7 +30,7 @@ export function bootstrap (obj) {
 
 	// Setting 'always' routes before authorization runs
 	for (const [key, value] of Object.entries(obj.config.routes.always ?? {})) {
-		if (typeof value === "function") {
+		if (typeof value === FUNCTION) {
 			obj.always(key, value).ignore(value);
 		}
 	}
@@ -45,14 +42,14 @@ export function bootstrap (obj) {
 	}
 
 	// Static assets on disk for browsable interface
-	if (obj.config.static !== "") {
+	if (obj.config.static !== EMPTY) {
 		obj.staticFiles(join(__dirname, "..", "www", obj.config.static));
 	}
 
 	// Setting routes
 	for (const [method, routes] of Object.entries(obj.config.routes ?? {})) {
 		for (const [route, target] of Object.entries(routes ?? {})) {
-			if (typeof target === "function") {
+			if (typeof target === FUNCTION) {
 				obj[method](route, target);
 			} else {
 				obj[method](route, (req, res) => res.send(target));

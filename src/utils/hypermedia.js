@@ -1,5 +1,5 @@
 import {URL} from "url";
-import keysort from "keysort";
+import {keysort} from "keysort";
 
 export function hypermedia (req, res, rep) {
 	const server = req.server,

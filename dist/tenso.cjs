@@ -179,6 +179,8 @@ const HEADER_CONTENT_TYPE = "content-type";
 const HTML = "html";
 const INT_0 = 0;
 const INT_200 = 200;
+const INT_204 = 204;
+const INT_304 = 304;
 const INT_413 = 413;
 const INT_429 = 429;
 const MULTIPART = "multipart";
@@ -200,6 +202,8 @@ const XML_PROLOG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 const XML_ARRAY_NODE_NAME = "item";
 const PROTECT = "protect";
 const UNPROTECT = "unprotect";
+const FUNCTION = "function";
+const CONNECT = "connect";
 
 function json$1 (arg = EMPTY) {
 	return JSON.parse(arg);
@@ -524,7 +528,7 @@ function hypermedia (req, res, rep) {
 			}
 		}
 
-		res.header("link", keysort(links, "rel, uri").map(i => `<${i.uri}>; rel="${i.rel}"`).join(", "));
+		res.header("link", keysort.keysort(links, "rel, uri").map(i => `<${i.uri}>; rel="${i.rel}"`).join(", "));
 
 		if (exists && rep.links !== void 0) {
 			rep.links = links;
@@ -1060,22 +1064,18 @@ function payload (req, res, next) {
 }
 
 function bootstrap (obj) {
-	const authorization = Object.keys(obj.config.auth).filter(i => {
-		const x = obj.config.auth[i];
-
-		return x instanceof Object && x.enabled === true;
-	}).length > 0 || obj.config.rate.enabled || obj.config.security.csrf;
+	const authorization = Object.keys(obj.config.auth).filter(i => obj.config.auth?.[i]?.enabled === true).length > 0 || obj.config.rate.enabled || obj.config.security.csrf;
 
 	obj.version = obj.config.version;
-
-	// Setting up router
-	obj.addListener("connect", obj.connect.bind(obj));
-	obj.onsend = (req, res, body = "", status = 200, headers) => {
+	obj.addListener(CONNECT, obj.connect.bind(obj));
+	obj.onsend = (req, res, body = EMPTY, status = INT_200, headers) => {
 		obj.headers(req, res);
 		res.statusCode = status;
 
-		if (status !== 204 && status !== 304 && (body === null || typeof body.on !== "function")) {
-			body = obj.render(req, res, obj.final(req, res, hypermedia(req, res, serialize(req, res, body)))); // eslint-disable-line no-use-before-define
+		if (status !== INT_204 && status !== INT_304 && (body === null || typeof body.on !== FUNCTION)) {
+			for (const fn of [serialize, hypermedia, obj.final, obj.render]) {
+				body = fn(req, res, body);
+			}
 		}
 
 		return [body, status, headers];
@@ -1087,7 +1087,7 @@ function bootstrap (obj) {
 
 	// Setting 'always' routes before authorization runs
 	for (const [key, value] of Object.entries(obj.config.routes.always ?? {})) {
-		if (typeof value === "function") {
+		if (typeof value === FUNCTION) {
 			obj.always(key, value).ignore(value);
 		}
 	}
@@ -1099,14 +1099,14 @@ function bootstrap (obj) {
 	}
 
 	// Static assets on disk for browsable interface
-	if (obj.config.static !== "") {
+	if (obj.config.static !== EMPTY) {
 		obj.staticFiles(node_path.join(__dirname, "..", "www", obj.config.static));
 	}
 
 	// Setting routes
 	for (const [method, routes] of Object.entries(obj.config.routes ?? {})) {
 		for (const [route, target] of Object.entries(routes ?? {})) {
-			if (typeof target === "function") {
+			if (typeof target === FUNCTION) {
 				obj[method](route, target);
 			} else {
 				obj[method](route, (req, res) => res.send(target));

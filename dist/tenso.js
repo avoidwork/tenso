@@ -5,7 +5,7 @@
  * @license BSD-3-Clause
  * @version 17.0.0
  */
-import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import defaults from'defaults';import {eventsource}from'tiny-eventsource';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {jsonl as jsonl$1}from'tiny-jsonl';import {URL}from'url';import keysort,{keysort as keysort$1}from'keysort';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import jwt from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-local';import {Strategy as Strategy$2}from'passport-oauth2';import {randomInt,randomUUID}from'node:crypto';const config = {
+import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import defaults from'defaults';import {eventsource}from'tiny-eventsource';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {jsonl as jsonl$1}from'tiny-jsonl';import {URL}from'url';import {keysort}from'keysort';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import jwt from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-local';import {Strategy as Strategy$2}from'passport-oauth2';import {randomInt,randomUUID}from'node:crypto';const config = {
 	auth: {
 		delay: 0,
 		protect: [],
@@ -147,6 +147,8 @@ const HEADER_CONTENT_TYPE = "content-type";
 const HTML = "html";
 const INT_0 = 0;
 const INT_200 = 200;
+const INT_204 = 204;
+const INT_304 = 304;
 const INT_413 = 413;
 const INT_429 = 429;
 const MULTIPART = "multipart";
@@ -167,7 +169,9 @@ const GREATER_THAN = "&gt;";
 const XML_PROLOG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 const XML_ARRAY_NODE_NAME = "item";
 const PROTECT = "protect";
-const UNPROTECT = "unprotect";function json$1 (arg = EMPTY) {
+const UNPROTECT = "unprotect";
+const FUNCTION = "function";
+const CONNECT = "connect";function json$1 (arg = EMPTY) {
 	return JSON.parse(arg);
 }const bodySplit = /&|=/;
 const mimetype = /;.*/;function chunk (arg = [], size = 2) {
@@ -464,7 +468,7 @@ function indent (arg = "", fallback = 0) {
 			const args = req.parsed.searchParams.getAll("order_by").filter(i => i !== "desc").join(", ");
 
 			if (args.length > 0) {
-				output = keysort$1(output, args);
+				output = keysort(output, args);
 			}
 		}
 
@@ -950,22 +954,18 @@ function auth (obj, config) {
 		next();
 	}
 }function bootstrap (obj) {
-	const authorization = Object.keys(obj.config.auth).filter(i => {
-		const x = obj.config.auth[i];
-
-		return x instanceof Object && x.enabled === true;
-	}).length > 0 || obj.config.rate.enabled || obj.config.security.csrf;
+	const authorization = Object.keys(obj.config.auth).filter(i => obj.config.auth?.[i]?.enabled === true).length > 0 || obj.config.rate.enabled || obj.config.security.csrf;
 
 	obj.version = obj.config.version;
-
-	// Setting up router
-	obj.addListener("connect", obj.connect.bind(obj));
-	obj.onsend = (req, res, body = "", status = 200, headers) => {
+	obj.addListener(CONNECT, obj.connect.bind(obj));
+	obj.onsend = (req, res, body = EMPTY, status = INT_200, headers) => {
 		obj.headers(req, res);
 		res.statusCode = status;
 
-		if (status !== 204 && status !== 304 && (body === null || typeof body.on !== "function")) {
-			body = obj.render(req, res, obj.final(req, res, hypermedia(req, res, serialize(req, res, body)))); // eslint-disable-line no-use-before-define
+		if (status !== INT_204 && status !== INT_304 && (body === null || typeof body.on !== FUNCTION)) {
+			for (const fn of [serialize, hypermedia, obj.final, obj.render]) {
+				body = fn(req, res, body);
+			}
 		}
 
 		return [body, status, headers];
@@ -977,7 +977,7 @@ function auth (obj, config) {
 
 	// Setting 'always' routes before authorization runs
 	for (const [key, value] of Object.entries(obj.config.routes.always ?? {})) {
-		if (typeof value === "function") {
+		if (typeof value === FUNCTION) {
 			obj.always(key, value).ignore(value);
 		}
 	}
@@ -989,14 +989,14 @@ function auth (obj, config) {
 	}
 
 	// Static assets on disk for browsable interface
-	if (obj.config.static !== "") {
+	if (obj.config.static !== EMPTY) {
 		obj.staticFiles(join(__dirname, "..", "www", obj.config.static));
 	}
 
 	// Setting routes
 	for (const [method, routes] of Object.entries(obj.config.routes ?? {})) {
 		for (const [route, target] of Object.entries(routes ?? {})) {
-			if (typeof target === "function") {
+			if (typeof target === FUNCTION) {
 				obj[method](route, target);
 			} else {
 				obj[method](route, (req, res) => res.send(target));

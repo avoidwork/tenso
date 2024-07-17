@@ -1122,7 +1122,7 @@ class Tenso extends Woodland {
 		for (const media of accepts) {
 			const lmimetype = media.replace(mimetype, "");
 
-			if (renderers.has(lmimetype)) {
+			if (this.renderers.has(lmimetype)) {
 				format = lmimetype;
 				break;
 			}
@@ -1132,23 +1132,11 @@ class Tenso extends Woodland {
 			format = this.mimeType;
 		}
 
-		renderer = renderers.get(format);
+		renderer = this.renderers.get(format);
 		res.header("content-type", format);
 		result = renderer(req, res, arg, this.template);
 
 		return result;
-	}
-
-	renderer (mediatype, fn) {
-		this.renderers.set(mediatype, fn);
-
-		return this;
-	}
-
-	serializer (mediatype, fn) {
-		this.serializers.set(mediatype, fn);
-
-		return this;
 	}
 
 	signals () {

@@ -27,6 +27,12 @@ var redis = require('ioredis');
 var cookie = require('cookie-parser');
 var session = require('express-session');
 var passport = require('passport');
+var jwt = require('passport-jwt');
+var passportHttp = require('passport-http');
+var passportHttpBearer = require('passport-http-bearer');
+var passportLocal = require('passport-local');
+var passportOauth2 = require('passport-oauth2');
+var node_crypto = require('node:crypto');
 
 var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
 const config = {
@@ -174,9 +180,15 @@ const HTML = "html";
 const INT_0 = 0;
 const INT_200 = 200;
 const INT_413 = 413;
+const INT_429 = 429;
 const MULTIPART = "multipart";
+const OPTIONS = "OPTIONS";
+const RETRY_AFTER = "retry-after";
 const UTF8 = "utf8";
 const X_CSRF_TOKEN = "x-csrf-token";
+const X_RATELIMIT_LIMIT = "x-ratelimit-limit";
+const X_RATELIMIT_REMAINING = "x-ratelimit-remaining";
+const X_RATELIMIT_RESET = "x-ratelimit-reset";
 const X_FORWARDED_PROTO = "x-forwarded-proto";
 const SIGHUP = "SIGHUP";
 const SIGINT = "SIGINT";
@@ -186,6 +198,8 @@ const LESS_THAN = "&lt;";
 const GREATER_THAN = "&gt;";
 const XML_PROLOG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 const XML_ARRAY_NODE_NAME = "item";
+const PROTECT = "protect";
+const UNPROTECT = "unprotect";
 
 function json$1 (arg = EMPTY) {
 	return JSON.parse(arg);
@@ -520,10 +534,10 @@ function hypermedia (req, res, rep) {
 	return rep;
 }
 
-const clone$1 = typeof structuredClone === "function" ? structuredClone : arg => JSON.parse(JSON.stringify(arg));
+const clone = typeof structuredClone === "function" ? structuredClone : arg => JSON.parse(JSON.stringify(arg));
 
 function sort (arg, req) {
-	let output = clone$1(arg);
+	let output = clone(arg);
 
 	if (typeof req.parsed.search === "string" && req.parsed.searchParams.has("order_by") && Array.isArray(arg)) {
 		const type = typeof arg[0];
@@ -573,6 +587,110 @@ function serialize (req, res, arg) {
 	return result;
 }
 
+function asyncFlag (req, res, next) {
+	req.protectAsync = true;
+	next();
+}
+
+function bypass (req, res, next) {
+	req.unprotect = req.cors && req.method === OPTIONS || req.server.config.auth.unprotect.some(i => i.test(req.url));
+	next();
+}
+
+function guard (req, res, next) {
+	const login = req.server.config.auth.uri.login;
+
+	if (req.parsed.pathname === login || req.isAuthenticated()) {
+		next();
+	} else {
+		res.error(401);
+	}
+}
+
+const rateHeaders = [
+	X_RATELIMIT_LIMIT,
+	X_RATELIMIT_REMAINING,
+	X_RATELIMIT_RESET
+];
+
+function rate (req, res, next) {
+	const config = req.server.config.rate;
+
+	if (config.enabled === false || req.unprotect) {
+		next();
+	} else {
+		const results = req.server.rate(req, config.override),
+			good = results.shift();
+
+		if (good) {
+			for (const [idx, i] of rateHeaders.entries()) {
+				res.header(i, results[idx]);
+			}
+
+			next();
+		} else {
+			res.header(RETRY_AFTER, config.reset);
+			res.error(config.status || INT_429);
+		}
+	}
+}
+
+function keymaster (req, res) {
+	if (req.protect === false || req.protectAsync === false || req.session !== void 0 && req.isAuthenticated()) {
+		req.last(req, res);
+	} else {
+		res.error(401);
+	}
+}
+
+function zuul (req, res, next) {
+	const uri = req.parsed.pathname;
+	let protect = false;
+
+	if (req.unprotect === false) {
+		for (const i of req.server.config.auth.protect) {
+			if (i.test(uri)) {
+				protect = true;
+				break;
+			}
+		}
+	}
+
+	// Setting state so the connection can be terminated properly
+	req.protect = protect;
+	req.protectAsync = false;
+
+	rate(req, res, e => {
+		if (e !== void 0) {
+			res.error(e);
+		} else if (protect) {
+			next();
+		} else {
+			keymaster(req, res);
+		}
+	});
+}
+
+function random (n = 1e2) {
+	return node_crypto.randomInt(1, n);
+}
+
+function delay (fn = () => void 0, n = 0) {
+	if (n === 0) {
+		fn();
+	} else {
+		setTimeout(fn, random(n));
+	}
+}
+
+function isEmpty (arg = EMPTY) {
+	return arg === EMPTY;
+}
+
+const {JWTStrategy, ExtractJwt} = jwt.Strategy,
+	RedisStore = require("connect-redis")(session),
+	groups = [PROTECT, UNPROTECT];
+
 function auth (obj, config) {
 	const ssl = config.ssl.cert && config.ssl.key,
 		realm = `http${ssl ? "s" : ""}://${config.host}${config.port !== 80 && config.port !== 443 ? ":" + config.port : ""}`,
@@ -606,7 +724,7 @@ function auth (obj, config) {
 		res.redirect(config.auth.uri.redirect, false);
 	}
 
-	obj.router.ignore(middleware.asyncFlag);
+	obj.router.ignore(asyncFlag);
 
 	for (const k of groups) {
 		config.auth[k] = (config.auth[k] || []).map(i => new RegExp(`^${i !== config.auth.uri.login ? i.replace(/\.\*/g, "*").replace(/\*/g, ".*") : ""}(\/|$)`, "i"));
@@ -616,7 +734,7 @@ function auth (obj, config) {
 		if (config.auth[i].enabled) {
 			authMap[`${i}_uri`] = `/auth/${i}`;
 			authUris.push(`/auth/${i}`);
-			config.auth.protect.push(new RegExp(`^/auth/${i}(\/|$)`));
+			config.auth.protect.push(new RegExp(`^/auth/${i}(/|$)`));
 		}
 	}
 
@@ -631,7 +749,7 @@ function auth (obj, config) {
 		delete configSession.redis;
 		delete configSession.store;
 
-		sesh = Object.assign({secret: uuid()}, configSession);
+		sesh = Object.assign({secret: node_crypto.randomUUID()}, configSession);
 
 		if (config.session.store === "redis") {
 			const client = redis.createClient(clone(config.session.redis));
@@ -644,7 +762,7 @@ function auth (obj, config) {
 
 		obj.always(fnCookie).ignore(fnCookie);
 		obj.always(fnSession).ignore(fnSession);
-		obj.always(middleware.bypass).ignore(middleware.bypass);
+		obj.always(bypass).ignore(bypass);
 
 		if (config.security.csrf) {
 			luscaCsrf = lusca.csrf({key: config.security.key, secret: config.security.secret});
@@ -683,7 +801,7 @@ function auth (obj, config) {
 	}
 
 	// Can fork to `middleware.keymaster()`
-	obj.always(middleware.zuul).ignore(middleware.zuul);
+	obj.always(zuul).ignore(zuul);
 
 	passportInit = passport.initialize();
 	obj.always(passportInit).ignore(passportInit);
@@ -715,7 +833,7 @@ function auth (obj, config) {
 			}
 		}
 
-		passport.use(new BasicStrategy((username, password, done) => {
+		passport.use(new passportHttp.BasicStrategy((username, password, done) => {
 			delay(() => {
 				validate(username, (err, user) => {
 					if (err !== null) {
@@ -748,7 +866,7 @@ function auth (obj, config) {
 			}
 		};
 
-		passport.use(new BearerStrategy((token, done) => {
+		passport.use(new passportHttpBearer.Strategy((token, done) => {
 			delay(() => {
 				validate(token, (err, user) => {
 					if (err !== null) {
@@ -798,7 +916,7 @@ function auth (obj, config) {
 		const passportAuth = passport.authenticate("jwt", {session: false});
 		obj.always(passportAuth).ignore(passportAuth);
 	} else if (config.auth.local.enabled) {
-		passport.use(new LocalStrategy((username, password, done) => {
+		passport.use(new passportLocal.Strategy((username, password, done) => {
 			delay(() => {
 				config.auth.local.auth(username, password, (err, user) => {
 					if (err !== null) {
@@ -831,12 +949,12 @@ function auth (obj, config) {
 			passportInit(req, res, mid);
 		};
 	} else if (config.auth.oauth2.enabled) {
-		passport.use(new OAuth2Strategy({
+		passport.use(new passportOauth2.Strategy({
 			authorizationURL: config.auth.oauth2.auth_url,
 			tokenURL: config.auth.oauth2.token_url,
 			clientID: config.auth.oauth2.client_id,
 			clientSecret: config.auth.oauth2.client_secret,
-			callbackURL: realm + "/auth/oauth2/callback"
+			callbackURL: `${realm}/auth/oauth2/callback`
 		}, (accessToken, refreshToken, profile, done) => {
 			delay(() => {
 				config.auth.oauth2.auth(accessToken, refreshToken, profile, (err, user) => {
@@ -849,35 +967,11 @@ function auth (obj, config) {
 			}, authDelay);
 		}));
 
-		obj.get("/auth/oauth2", middleware.asyncFlag);
+		obj.get("/auth/oauth2", asyncFlag);
 		obj.get("/auth/oauth2", passport.authenticate("oauth2"));
-		obj.get("/auth/oauth2/callback", middleware.asyncFlag);
+		obj.get("/auth/oauth2/callback", asyncFlag);
 		obj.get("/auth/oauth2/callback", passport.authenticate("oauth2", {failureRedirect: config.auth.uri.login}));
 		obj.get("/auth/oauth2/callback", redirect);
-	} else if (config.auth.saml.enabled) {
-		let arg = config.auth.saml;
-
-		arg.callbackURL = realm + "/auth/saml/callback";
-		delete arg.enabled;
-		delete arg.path;
-
-		passport.use(new SAMLStrategy(arg, (profile, done) => {
-			delay(() => {
-				config.auth.saml.auth(profile, (err, user) => {
-					if (err !== null) {
-						done(err);
-					} else {
-						done(null, user);
-					}
-				});
-			}, authDelay);
-		}));
-
-		obj.get("/auth/saml", middleware.asyncFlag);
-		obj.get("/auth/saml", passport.authenticate("saml"));
-		obj.get("/auth/saml/callback", middleware.asyncFlag);
-		obj.get("/auth/saml/callback", passport.authenticate("saml", {failureRedirect: config.auth.uri.login}));
-		obj.get("/auth/saml/callback", redirect);
 	}
 
 	if (authUris.length > 0) {
@@ -892,7 +986,7 @@ function auth (obj, config) {
 		}
 
 		r = r.replace(/\|$/, "") + ")).*$";
-		obj.always(r, middleware.guard).ignore(middleware.guard);
+		obj.always(r, guard).ignore(guard);
 
 		config.routes.get[config.auth.uri.login] = {
 			instruction: config.auth.msg.login

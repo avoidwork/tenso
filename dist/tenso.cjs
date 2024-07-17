@@ -1294,9 +1294,8 @@ class Tenso extends woodland.Woodland {
 		if (this.server !== null) {
 			this.server.close();
 			this.server = null;
+			this.log(`Stopped server on port ${this.host}:${this.port}`);
 		}
-
-		this.log(`Stopped server on port ${this.host}:${this.port}`);
 
 		return this;
 	}

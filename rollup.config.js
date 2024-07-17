@@ -28,6 +28,7 @@ export default [
 			}
 		],
 		external: [
+			"node:crypto",
 			"node:fs",
 			"node:module",
 			"node:path",
@@ -48,7 +49,12 @@ export default [
 			"passport-http",
 			"passport-http-bearer",
 			"passport-local",
-			"passport-oauth2"
+			"passport-oauth2",
+			"passport-jwt",
+			"ioredis",
+			"csv-stringify/sync",
+			"fast-xml-parser",
+			"tiny-jsonl"
 		]
 	}
 ];

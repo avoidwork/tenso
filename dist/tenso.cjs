@@ -1290,12 +1290,6 @@ class Tenso extends woodland.Woodland {
 		return this;
 	}
 
-	"static" (uri = "", localPath = "", folder = "") {
-		this.serve(uri, localPath, folder);
-
-		return this;
-	}
-
 	stop () {
 		if (this.server !== null) {
 			this.server.close();

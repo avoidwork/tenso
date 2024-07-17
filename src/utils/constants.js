@@ -28,3 +28,5 @@ export const SIGTERM = "SIGTERM";
 export const STRING = "string";
 export const LESS_THAN = "&lt;";
 export const GREATER_THAN = "&gt;";
+export const XML_PROLOG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+export const XML_ARRAY_NODE_NAME = "item";

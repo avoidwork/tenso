@@ -251,7 +251,7 @@ class Tenso extends Woodland {
 				}, this.route).listen(this.port, this.host);
 			}
 
-			this.log(`Started server on port ${this.host}:${this.port}`);
+			this.log(`Started server on ${this.host}:${this.port}`);
 		}
 
 		return this;
@@ -261,7 +261,7 @@ class Tenso extends Woodland {
 		if (this.server !== null) {
 			this.server.close();
 			this.server = null;
-			this.log(`Stopped server on port ${this.host}:${this.port}`);
+			this.log(`Stopped server on ${this.host}:${this.port}`);
 		}
 
 		return this;

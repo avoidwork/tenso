@@ -228,7 +228,7 @@ class Tenso extends Woodland {
 
 	signals () {
 		for (const signal of [SIGHUP, SIGINT, SIGTERM]) {
-			process.on(signal, async () => {
+			process.on(signal, () => {
 				this.stop();
 				process.exit(0);
 			});

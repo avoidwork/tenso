@@ -1,5 +1,5 @@
-import {jsonl as renderer} from "tiny-jsonl";
+import {stringify} from "tiny-jsonl";
 
 export function jsonl (req, res, arg) {
-	return renderer(arg);
+	return stringify(arg);
 }

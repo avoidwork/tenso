@@ -321,7 +321,7 @@ function html (req, res, arg, tpl = "") {
 }
 
 function jsonl (req, res, arg) {
-	return tinyJsonl.jsonl(arg);
+	return tinyJsonl.stringify(arg);
 }
 
 const renderers = new Map([

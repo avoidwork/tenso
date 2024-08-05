@@ -46,10 +46,10 @@
   "dependencies": {
     "connect-redis": "^7.1.1",
     "cookie-parser": "^1.4.6",
-    "csv-stringify": "^6.5.0",
+    "csv-stringify": "^6.5.1",
     "defaults": "^3.0.0",
     "express-session": "^1.18.0",
-    "fast-xml-parser": "^4.4.0",
+    "fast-xml-parser": "^4.4.1",
     "helmet": "^7.1.0",
     "ioredis": "^5.4.1",
     "jsonwebtoken": "^9.0.2",
@@ -65,8 +65,8 @@
     "tiny-coerce": "^3.0.2",
     "tiny-etag": "^4.0.5",
     "tiny-eventsource": "^3.0.8",
-    "tiny-jsonl": "^1.0.10",
-    "woodland": "^18.2.5",
+    "tiny-jsonl": "^2.0.1",
+    "woodland": "^19.0.1",
     "yamljs": "^0.3.0",
     "yargs-parser": "^21.1.1"
   },
@@ -74,13 +74,13 @@
     "auto-changelog": "^2.4.0",
     "autocannon": "^7.15.0",
     "concurrently": "^8.2.2",
-    "eslint": "^9.7.0",
-    "husky": "^9.0.11",
-    "mocha": "^10.6.0",
+    "eslint": "^9.8.0",
+    "husky": "^9.1.4",
+    "mocha": "^10.7.0",
     "nyc": "^17.0.0",
-    "rollup": "^4.18.1",
+    "rollup": "^4.20.0",
     "tiny-httptest": "^4.0.11",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.4"
   },
   "keywords": [
     "rest",

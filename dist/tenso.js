@@ -5,7 +5,7 @@
  * @license BSD-3-Clause
  * @version 17.0.0
  */
-import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import defaults from'defaults';import {eventsource}from'tiny-eventsource';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {jsonl as jsonl$1}from'tiny-jsonl';import {keysort}from'keysort';import {URL}from'url';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import jwt from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-local';import {Strategy as Strategy$2}from'passport-oauth2';import {randomInt,randomUUID}from'node:crypto';const config = {
+import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import defaults from'defaults';import {eventsource}from'tiny-eventsource';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {stringify as stringify$1}from'tiny-jsonl';import {keysort}from'keysort';import {URL}from'url';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import jwt from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-local';import {Strategy as Strategy$2}from'passport-oauth2';import {randomInt,randomUUID}from'node:crypto';const config = {
 	auth: {
 		delay: 0,
 		protect: [],
@@ -257,7 +257,7 @@ function indent (arg = "", fallback = 0) {
 		.replace("{{csrf}}", headers?.[X_CSRF_TOKEN] ?? EMPTY)
 		.replace("class=\"headers", req.server.config.renderHeaders === false ? "class=\"headers dr-hidden" : "class=\"headers") : EMPTY;
 }function jsonl (req, res, arg) {
-	return jsonl$1(arg);
+	return stringify$1(arg);
 }const renderers = new Map([
 	["application/json", json],
 	["application/yaml", yaml],

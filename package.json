@@ -41,7 +41,8 @@
     "dist/tenso.cjs",
     "dist/tenso.js",
     "types/tenso.d.ts",
-    "www"
+    "www/template.html",
+    "www/assets"
   ],
   "dependencies": {
     "connect-redis": "^7.1.1",
@@ -74,11 +75,11 @@
     "auto-changelog": "^2.4.0",
     "autocannon": "^7.15.0",
     "concurrently": "^8.2.2",
-    "eslint": "^9.8.0",
-    "husky": "^9.1.4",
-    "mocha": "^10.7.0",
+    "eslint": "^9.9.1",
+    "husky": "^9.1.5",
+    "mocha": "^10.7.3",
     "nyc": "^17.0.0",
-    "rollup": "^4.20.0",
+    "rollup": "^4.21.1",
     "tiny-httptest": "^4.0.11",
     "typescript": "^5.5.4"
   },

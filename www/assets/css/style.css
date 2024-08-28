@@ -11,20 +11,20 @@ body {
 
 body {
   background: whitesmoke;
-  color: black;
+  color: #292929;
 }
 body.dark {
   background: #292929 !important;
-  color: white !important;
+  color: #dbdbdb !important;
 }
 body.dark h1 {
-  color: white !important;
+  color: #dbdbdb !important;
 }
 body.dark a:focus, body.dark a:hover, body.dark a:active, body.dark a.is-active {
-  color: white !important;
+  color: #dbdbdb !important;
 }
 body.dark .label, body.dark .table, body.dark .table th, body.dark .box {
-  color: white !important;
+  color: #dbdbdb !important;
 }
 body.dark .box {
   background: #363636 !important;
@@ -59,7 +59,7 @@ body.dark .tabs li.is-active a {
 }
 body.dark code {
   background: #4a4a4a !important;
-  color: white !important;
+  color: #dbdbdb !important;
 }
 body.dark footer {
   background: #272727 !important;
@@ -125,7 +125,7 @@ pre {
 
 code {
   background: whitesmoke;
-  color: white;
+  color: #dbdbdb;
 }
 
 .key {

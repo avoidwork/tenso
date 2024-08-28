@@ -2,7 +2,7 @@ $ten: 10px;
 $blue: #00527D;
 $darkBlue: #3298dc;
 $lightCodeBackground: whitesmoke;
-$lightCodeColor: white;
+$lightCodeColor: #dbdbdb;
 $darkBackground: #292929;
 $darkCode: #4a4a4a;
 $darkFooter: #272727;
@@ -19,8 +19,8 @@ body {
 }
 
 body {
-  background: whitesmoke;
-  color: black;
+  background: $lightCodeBackground;
+  color: $darkBackground;
 
   &.dark {
     background: $darkBackground !important;

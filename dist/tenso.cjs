@@ -401,7 +401,7 @@ function serialize (req, res, arg) {
 	const status = res.statusCode;
 	let format = req.server.mimeType,
 		accepts = explode(req.parsed.searchParams.get("format") || req.headers.accept || res.getHeader("content-type") || format, ","),
-		errz = arg instanceof Error,
+		errz = arg instanceof Error || status >= 400,
 		result, serializer;
 
 	for (const i of accepts) {

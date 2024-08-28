@@ -1,6 +1,6 @@
 const tinyhttptest = require("tiny-httptest"),
 	jwt = require("jsonwebtoken"),
-	tenso = require("../index"),
+	tenso = require("../dist/tenso.cjs"),
 	routes = require("./routes.js"),
 	csrf = "x-csrf-token",
 	timeout = 5000;
@@ -11,7 +11,7 @@ describe("Permissions (CSRF disabled)", function () {
 	const port = 8001;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}});
+	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: false}});
 
 	const server = this.tenso.server;
 

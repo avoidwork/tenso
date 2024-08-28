@@ -16,7 +16,7 @@ Creating an API with Tenso can be this simple:
 
 ```javascript
 const path = require('path'),
-    app = require("tenso")({routes: require(path.join(__dirname, "routes.js"))});
+    app = require("tenso")({initRoutes: require(path.join(__dirname, "routes.js"))});
 
 module.exports = app;
 ```
@@ -106,6 +106,7 @@ This is a sample configuration for Tenso, without authentication or SSL. This wo
 	"headers": {}, /* Optional, custom headers */
 	"hostname": "localhost", /* Optional, default is 'localhost' */
 	"index": ["index.htm", "index.html"], /* Files served when accessing a static assets folder */
+	"initRoutes": require("./routes.js"), /* Required! */
 	"json": 0, /* Optional, default indent for 'pretty' JSON */
 	"logging": {
 		"level": "info", /* Optional */
@@ -116,7 +117,6 @@ This is a sample configuration for Tenso, without authentication or SSL. This wo
 	"corsExpose": "x-custom-header, x-custom-header-abc",
 	"origins": ["*"], /* Optional, allowed origins of CORS requests */
 	"port": 8000, /* Optional */
-	"routes": require("./routes.js"), /* Required! */
 	"regex": {
 		"hypermedia": "[a-zA-Z]+_(guid|uuid|id|url|uri)$", /* Optional, changes hypermedia detection / generation */
 		"id": "^(_id|id)$" /* Optional, changes hypermedia detection / generation */

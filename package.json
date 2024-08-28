@@ -41,7 +41,7 @@
   "files": [
     "dist/tenso.cjs",
     "dist/tenso.js",
-    "types",
+    "types/tenso.d.ts",
     "www/template.html",
     "www/assets"
   ],

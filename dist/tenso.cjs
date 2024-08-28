@@ -373,7 +373,7 @@ function hasBody (arg) {
 	return arg.includes("PATCH") || arg.includes("POST") || arg.includes("PUT");
 }
 
-const clone = typeof structuredClone === "function" ? structuredClone : arg => JSON.parse(JSON.stringify(arg));
+const clone = arg => JSON.parse(JSON.stringify(arg));
 
 function sort (arg, req) {
 	let output = clone(arg);
@@ -1327,7 +1327,19 @@ class Tenso extends woodland.Woodland {
 }
 
 function tenso (userConfig = {}) {
+	const initRoutes = userConfig?.initRoutes ?? null;
+	const initAuth = userConfig?.auth ?? null;
+	delete userConfig.initRoutes;
+	delete userConfig.auth;
 	const config$1 = defaults(userConfig, clone(config));
+
+	if (initRoutes !== null) {
+		config$1.initRoutes = initRoutes;
+	}
+
+	if (initAuth !== null) {
+		config$1.auth = initAuth;
+	}
 
 	if ((/^[^\d+]$/).test(config$1.port) && config$1.port < 1) {
 		console.error("Invalid configuration");

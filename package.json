@@ -82,6 +82,7 @@
     "nyc": "^17.0.0",
     "rollup": "^4.21.1",
     "tiny-httptest": "^4.0.11",
+    "tiny-uuid4": "^1.0.1",
     "typescript": "^5.5.4"
   },
   "keywords": [

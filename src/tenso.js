@@ -269,7 +269,19 @@ class Tenso extends Woodland {
 }
 
 export function tenso (userConfig = {}) {
+	const initRoutes = userConfig?.initRoutes ?? null;
+	const initAuth = userConfig?.auth ?? null;
+	delete userConfig.initRoutes;
+	delete userConfig.auth;
 	const config = defaults(userConfig, clone(defaultConfig));
+
+	if (initRoutes !== null) {
+		config.initRoutes = initRoutes;
+	}
+
+	if (initAuth !== null) {
+		config.auth = initAuth;
+	}
 
 	if ((/^[^\d+]$/).test(config.port) && config.port < 1) {
 		console.error("Invalid configuration");

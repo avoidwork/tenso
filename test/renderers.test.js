@@ -1,6 +1,6 @@
 const tinyhttptest = require("tiny-httptest"),
 	csv = require("csv.js"),
-	tenso = require("../index"),
+	tenso = require("../dist/tenso.cjs"),
 	routes = require("./routes.js"),
 	timeout = 5000;
 
@@ -10,7 +10,7 @@ describe("Renderers", function () {
 	const port = 8011;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}});
+	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: false}});
 	this.tenso.renderer("custom", arg => arg);
 
 	const server = this.tenso.server;

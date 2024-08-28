@@ -1,5 +1,5 @@
 const tinyhttptest = require("tiny-httptest"),
-	tenso = require("../index"),
+	tenso = require("../dist/tenso.cjs"),
 	routes = require("./routes.js"),
 	timeout = 5000;
 
@@ -7,7 +7,7 @@ describe("Valid", function () {
 	const port = 8021;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, etags: {enabled: true}, logging: {enabled: false}, security: {csrf: false}, static: "/sample"});
+	this.tenso = tenso({port: port, initRoutes: routes, etags: {enabled: true}, logging: {enabled: false}, security: {csrf: false}, static: "/sample"});
 
 	const server = this.tenso.server;
 

@@ -1,6 +1,6 @@
-var uuid = require("tiny-uuid4");
+import uuid from "tiny-uuid4";
 
-module.exports.get = {
+export const get = {
 	"/": [
 		"empty",
 		"items",
@@ -79,8 +79,11 @@ module.exports.get = {
 	}
 };
 
-module.exports.post = {
+export const post = {
 	"/test": function (req, res) {
 		res.send("OK!");
 	}
 };
+
+export const routes = {get, post};
+export default routes;

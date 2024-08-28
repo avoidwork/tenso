@@ -1161,7 +1161,7 @@ class Tenso extends Woodland {
 
 		renderer = this.renderers.get(format);
 		res.header("content-type", format);
-		result = renderer(req, res, arg, this.template);
+		result = renderer(req, res, arg, this.webroot.template);
 
 		return result;
 	}

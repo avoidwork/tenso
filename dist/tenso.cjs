@@ -27,7 +27,7 @@ var redis = require('ioredis');
 var cookie = require('cookie-parser');
 var session = require('express-session');
 var passport = require('passport');
-var jwt = require('passport-jwt');
+var passportJWT = require('passport-jwt');
 var passportHttp = require('passport-http');
 var passportHttpBearer = require('passport-http-bearer');
 var passportLocal = require('passport-local');
@@ -105,7 +105,7 @@ const config = {
 	host: "0.0.0.0",
 	index: [],
 	initRoutes: {},
-	json: 0,
+	jsonIndent: 0,
 	logging: {
 		enabled: true,
 		format: "%h %l %u %t \"%r\" %>s %b",
@@ -262,7 +262,7 @@ function indent (arg = "", fallback = 0) {
 }
 
 function json (req, res, arg) {
-	return JSON.stringify(arg, null, indent(req.headers.accept, req.server.json));
+	return JSON.stringify(arg, null, indent(req.headers.accept, req.server.jsonIndent));
 }
 
 function yaml (req, res, arg) {
@@ -791,7 +791,7 @@ function isEmpty (arg = EMPTY) {
 // @todo audit redis
 // @todo audit the function - it's probably too complex
 
-const {JWTStrategy, ExtractJwt} = jwt.Strategy,
+const {Strategy: JWTStrategy, ExtractJwt} = passportJWT,
 	groups = [PROTECT, UNPROTECT];
 
 function auth (obj) {
@@ -1098,7 +1098,9 @@ class Tenso extends woodland.Woodland {
 		super(config$1);
 
 		for (const [key, value] of Object.entries(config$1)) {
-			this[key] = value;
+			if (key in this === false) {
+				this[key] = value;
+			}
 		}
 
 		this.parsers = parsers;

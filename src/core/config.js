@@ -66,7 +66,7 @@ export const config = {
 	host: "0.0.0.0",
 	index: [],
 	initRoutes: {},
-	json: 0,
+	jsonIndent: 0,
 	logging: {
 		enabled: true,
 		format: "%h %l %u %t \"%r\" %>s %b",

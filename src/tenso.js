@@ -40,7 +40,9 @@ class Tenso extends Woodland {
 		super(config);
 
 		for (const [key, value] of Object.entries(config)) {
-			this[key] = value;
+			if (key in this === false) {
+				this[key] = value;
+			}
 		}
 
 		this.parsers = parsers;

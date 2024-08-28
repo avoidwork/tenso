@@ -2,7 +2,7 @@ import redis from "ioredis";
 import cookie from "cookie-parser";
 import session from "express-session";
 import passport from "passport";
-import jwt from "passport-jwt";
+import passportJWT from "passport-jwt";
 import {BasicStrategy} from "passport-http";
 import {Strategy as BearerStrategy} from "passport-http-bearer";
 import {Strategy as LocalStrategy} from "passport-local";
@@ -25,7 +25,7 @@ import lusca from "lusca";
 // @todo audit redis
 // @todo audit the function - it's probably too complex
 
-const {JWTStrategy, ExtractJwt} = jwt.Strategy,
+const {Strategy: JWTStrategy, ExtractJwt} = passportJWT,
 	groups = [PROTECT, UNPROTECT];
 
 export function auth (obj) {

@@ -107,7 +107,7 @@ This is a sample configuration for Tenso, without authentication or SSL. This wo
 	"hostname": "localhost", /* Optional, default is 'localhost' */
 	"index": ["index.htm", "index.html"], /* Files served when accessing a static assets folder */
 	"initRoutes": require("./routes.js"), /* Required! */
-	"json": 0, /* Optional, default indent for 'pretty' JSON */
+	"jsonIndent": 0, /* Optional, default indent for 'pretty' JSON */
 	"logging": {
 		"level": "info", /* Optional */
 		"enabled": true, /* Optional */

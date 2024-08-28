@@ -5,7 +5,7 @@
  * @license BSD-3-Clause
  * @version 17.0.0
  */
-import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import {merge}from'tiny-merge';import {eventsource}from'tiny-eventsource';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {stringify as stringify$1}from'tiny-jsonl';import {keysort}from'keysort';import {URL}from'url';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import jwt from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-local';import {Strategy as Strategy$2}from'passport-oauth2';import lusca from'lusca';import {randomInt,randomUUID}from'node:crypto';import RedisStore from'connect-redis';const config = {
+import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import {merge}from'tiny-merge';import {eventsource}from'tiny-eventsource';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {stringify as stringify$1}from'tiny-jsonl';import {keysort}from'keysort';import {URL}from'url';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import passportJWT from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-local';import {Strategy as Strategy$2}from'passport-oauth2';import lusca from'lusca';import {randomInt,randomUUID}from'node:crypto';import RedisStore from'connect-redis';const config = {
 	auth: {
 		delay: 0,
 		protect: [],
@@ -73,7 +73,7 @@ import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';imp
 	host: "0.0.0.0",
 	index: [],
 	initRoutes: {},
-	json: 0,
+	jsonIndent: 0,
 	logging: {
 		enabled: true,
 		format: "%h %l %u %t \"%r\" %>s %b",
@@ -214,7 +214,7 @@ const trailingY = /y$/;function chunk (arg = [], size = 2) {
 function indent (arg = "", fallback = 0) {
 	return arg.includes(str_indent) ? parseInt(arg.match(/indent=(\d+)/)[1], 10) : fallback;
 }function json (req, res, arg) {
-	return JSON.stringify(arg, null, indent(req.headers.accept, req.server.json));
+	return JSON.stringify(arg, null, indent(req.headers.accept, req.server.jsonIndent));
 }function yaml (req, res, arg) {
 	return YAML.stringify(arg);
 }function xml (req, res, arg) {
@@ -675,7 +675,7 @@ function rate (req, res, next) {
 }// @todo audit redis
 // @todo audit the function - it's probably too complex
 
-const {JWTStrategy, ExtractJwt} = jwt.Strategy,
+const {Strategy: JWTStrategy, ExtractJwt} = passportJWT,
 	groups = [PROTECT, UNPROTECT];
 
 function auth (obj) {
@@ -980,7 +980,9 @@ class Tenso extends Woodland {
 		super(config$1);
 
 		for (const [key, value] of Object.entries(config$1)) {
-			this[key] = value;
+			if (key in this === false) {
+				this[key] = value;
+			}
 		}
 
 		this.parsers = parsers;

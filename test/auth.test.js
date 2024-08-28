@@ -9,12 +9,12 @@ const timeout = 5000;
 process.setMaxListeners(0);
 
 describe("Permissions (CSRF disabled)", function () {
-	const port = 8001;
+	const port = 8880;
 
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: false}});
 
-	const server = this.tenso.server;
+	const server = this.tenso.start();
 
 	it("GET / - returns an array of endpoints", function () {
 		return httptest({url: "http://localhost:" + port})

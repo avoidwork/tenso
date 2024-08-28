@@ -1,4 +1,4 @@
-import {EMPTY, HEADER_CONTENT_TYPE} from "../utils/constants.js";
+import {EMPTY, HEADER_CONTENT_TYPE} from "../core/constants.js";
 
 export function parse (req, res, next) {
 	let valid = true,

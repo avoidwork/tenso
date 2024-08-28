@@ -1,6 +1,6 @@
 import {coerce} from "tiny-coerce";
 import {bodySplit} from "../utils/regex.js";
-import {ENCODED_SPACE} from "../utils/constants.js";
+import {ENCODED_SPACE} from "../core/constants.js";
 import {chunk} from "../utils/chunk.js";
 
 export function xWwwFormURLEncoded (arg) {

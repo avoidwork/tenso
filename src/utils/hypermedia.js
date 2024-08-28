@@ -59,14 +59,14 @@ export function hypermedia (req, res, rep) {
 
 	query = req.parsed.searchParams;
 	page = Number(query.get("page")) || 1;
-	page_size = Number(query.get("page_size")) || server.config.pageSize || 5;
+	page_size = Number(query.get("page_size")) || server.pageSize || 5;
 
 	if (page < 1) {
 		page = 1;
 	}
 
 	if (page_size < 1) {
-		page_size = server.config.pageSize || 5;
+		page_size = server.pageSize || 5;
 	}
 
 	root = new URL(`http://127.0.0.1${req.parsed.pathname}${req.parsed.search}`);

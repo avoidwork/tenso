@@ -54,7 +54,9 @@ export default [
 			"ioredis",
 			"csv-stringify/sync",
 			"fast-xml-parser",
-			"tiny-jsonl"
+			"tiny-jsonl",
+			"lusca",
+			"connect-redis"
 		]
 	}
 ];

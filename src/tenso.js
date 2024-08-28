@@ -7,13 +7,13 @@ import {fileURLToPath, URL} from "node:url";
 import {Woodland} from "woodland";
 import defaults from "defaults";
 import {eventsource} from "tiny-eventsource";
-import {config as defaultConfig} from "./utils/config.js";
+import {config as defaultConfig} from "./core/config.js";
 import {parsers} from "./utils/parsers.js";
 import {renderers} from "./utils/renderers.js";
 import {serializers} from "./utils/serializers.js";
 import {mimetype} from "./utils/regex.js";
 import {hasBody} from "./utils/hasbody.js";
-import {CONNECT, EMPTY, FUNCTION, INT_200, INT_204, INT_304, SIGHUP, SIGINT, SIGTERM} from "./utils/constants.js";
+import {CONNECT, EMPTY, FUNCTION, INT_200, INT_204, INT_304, SIGHUP, SIGINT, SIGTERM} from "./core/constants.js";
 import {serialize} from "./utils/serialize.js";
 import {hypermedia} from "./utils/hypermedia.js";
 import {payload} from "./middleware/payload.js";
@@ -85,14 +85,14 @@ class Tenso extends Woodland {
 	}
 
 	init () {
-		const authorization = Object.keys(this.config.auth).filter(i => this.config.auth?.[i]?.enabled === true).length > 0 || this.config.rate.enabled || this.config.security.csrf;
+		const authorization = Object.keys(this.auth).filter(i => this.auth?.[i]?.enabled === true).length > 0 || this.rate.enabled || this.security.csrf;
 
 		this.decorate = this.decorate.bind(this);
 		this.route = this.route.bind(this);
+		this.render = this.render.bind(this);
 		this.signals();
-		this.version = this.config.version;
 		this.addListener(CONNECT, this.connect.bind(this));
-		this.onsend = (req, res, body = EMPTY, status = INT_200, headers) => {
+		this.onSend = (req, res, body = EMPTY, status = INT_200, headers) => {
 			this.headers(req, res);
 			res.statusCode = status;
 
@@ -110,25 +110,25 @@ class Tenso extends Woodland {
 		this.always(parse).ignore(parse);
 
 		// Setting 'always' routes before authorization runs
-		for (const [key, value] of Object.entries(this.config.routes.always ?? {})) {
+		for (const [key, value] of Object.entries(this.initRoutes.always ?? {})) {
 			if (typeof value === FUNCTION) {
 				this.always(key, value).ignore(value);
 			}
 		}
 
-		delete this.config.routes.always;
+		delete this.initRoutes.always;
 
 		if (authorization) {
-			auth(this, this.config);
+			auth(this);
 		}
 
 		// Static assets on disk for browsable interface
-		if (this.config.static !== EMPTY) {
-			this.staticFiles(join(__dirname, "..", "www", this.config.static));
+		if (this.static !== EMPTY) {
+			this.files("/assets", join(this.webroot.root), "assets");
 		}
 
 		// Setting routes
-		for (const [method, routes] of Object.entries(this.config.routes ?? {})) {
+		for (const [method, routes] of Object.entries(this.initRoutes ?? {})) {
 			for (const [route, target] of Object.entries(routes ?? {})) {
 				if (typeof target === FUNCTION) {
 					this[method](route, target);

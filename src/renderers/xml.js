@@ -1,5 +1,5 @@
 import {XMLBuilder} from "fast-xml-parser";
-import {XML_ARRAY_NODE_NAME, XML_PROLOG} from "../utils/constants";
+import {XML_ARRAY_NODE_NAME, XML_PROLOG} from "../core/constants.js";
 
 export function xml (req, res, arg) {
 	const builder = new XMLBuilder({

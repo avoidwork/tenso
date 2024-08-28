@@ -10,80 +10,64 @@ import {Strategy as OAuth2Strategy} from "passport-oauth2";
 import {STATUS_CODES} from "node:http";
 import {asyncFlag} from "../middleware/asyncFlag.js";
 import {bypass} from "../middleware/bypass.js";
+import {csrfWrapper} from "../middleware/csrf.js";
 import {guard} from "../middleware/guard.js";
+import {redirect} from "../middleware/redirect.js";
 import {zuul} from "../middleware/zuul.js";
 import {clone} from "./clone.js";
 import {delay} from "./delay.js";
 import {isEmpty} from "./isEmpty.js";
 import {randomUUID as uuid} from "node:crypto";
-import {PROTECT, UNPROTECT} from "./constants.js";
+import {PROTECT, UNPROTECT} from "../core/constants.js";
+import RedisStore from "connect-redis";
+import lusca from "lusca";
+
+// @todo audit redis
+// @todo audit the function - it's probably too complex
 
 const {JWTStrategy, ExtractJwt} = jwt.Strategy,
-	RedisStore = require("connect-redis")(session),
 	groups = [PROTECT, UNPROTECT];
 
-export function auth (obj, config) {
-	const ssl = config.ssl.cert && config.ssl.key,
-		realm = `http${ssl ? "s" : ""}://${config.host}${config.port !== 80 && config.port !== 443 ? ":" + config.port : ""}`,
-		async = config.auth.oauth2.enabled || config.auth.saml.enabled,
-		stateless = config.rate.enabled === false && config.security.csrf === false && config.auth.local.enabled === false,
-		authDelay = config.auth.delay,
+export function auth (obj) {
+	const ssl = obj.ssl.cert && obj.ssl.key,
+		realm = `http${ssl ? "s" : ""}://${obj.host}${obj.port !== 80 && obj.port !== 443 ? ":" + obj.port : ""}`,
+		async = obj.auth.oauth2.enabled || obj.auth.saml.enabled,
+		stateless = obj.rate.enabled === false && obj.security.csrf === false && obj.auth.local.enabled === false,
+		authDelay = obj.auth.delay,
 		authMap = {},
 		authUris = [];
 
-	let sesh, fnCookie, fnSession, luscaCsp, luscaCsrf, luscaXframe, luscaP3p, luscaHsts, luscaXssProtection,
-		luscaNoSniff,
-		passportInit, passportSession;
+	let sesh, fnCookie, fnSession, passportInit, passportSession;
 
-	function csrfWrapper (req, res, next) {
-		if (req.unprotect) {
-			next();
-		} else {
-			luscaCsrf(req, res, err => {
-				const key = req.server.config.security.key;
-
-				if (err === void 0 && req.csrf && key in res.locals) {
-					res.header(req.server.config.security.key, res.locals[key]);
-				}
-
-				next(err);
-			});
-		}
-	}
-
-	function redirect (req, res) {
-		res.redirect(config.auth.uri.redirect, false);
-	}
-
-	obj.router.ignore(asyncFlag);
+	obj.ignore(asyncFlag);
 
 	for (const k of groups) {
-		config.auth[k] = (config.auth[k] || []).map(i => new RegExp(`^${i !== config.auth.uri.login ? i.replace(/\.\*/g, "*").replace(/\*/g, ".*") : ""}(\/|$)`, "i"));
+		obj.auth[k] = (obj.auth[k] || []).map(i => new RegExp(`^${i !== obj.auth.uri.login ? i.replace(/\.\*/g, "*").replace(/\*/g, ".*") : ""}(\/|$)`, "i"));
 	}
 
-	for (const i of Object.keys(config.auth)) {
-		if (config.auth[i].enabled) {
+	for (const i of Object.keys(obj.auth)) {
+		if (obj.auth[i].enabled) {
 			authMap[`${i}_uri`] = `/auth/${i}`;
 			authUris.push(`/auth/${i}`);
-			config.auth.protect.push(new RegExp(`^/auth/${i}(/|$)`));
+			obj.auth.protect.push(new RegExp(`^/auth/${i}(/|$)`));
 		}
 	}
 
-	if (config.auth.local.enabled) {
-		authUris.push(config.auth.uri.redirect);
-		authUris.push(config.auth.uri.login);
+	if (obj.auth.local.enabled) {
+		authUris.push(obj.auth.uri.redirect);
+		authUris.push(obj.auth.uri.login);
 	}
 
 	if (stateless === false) {
-		const configSession = clone(config.session);
+		const objSession = clone(obj.session);
 
-		delete configSession.redis;
-		delete configSession.store;
+		delete objSession.redis;
+		delete objSession.store;
 
-		sesh = Object.assign({secret: uuid()}, configSession);
+		sesh = Object.assign({secret: uuid()}, objSession);
 
-		if (config.session.store === "redis") {
-			const client = redis.createClient(clone(config.session.redis));
+		if (obj.session.store === "redis") {
+			const client = redis.createClient(clone(obj.session.redis));
 
 			sesh.store = new RedisStore({client});
 		}
@@ -95,39 +79,44 @@ export function auth (obj, config) {
 		obj.always(fnSession).ignore(fnSession);
 		obj.always(bypass).ignore(bypass);
 
-		if (config.security.csrf) {
-			luscaCsrf = lusca.csrf({key: config.security.key, secret: config.security.secret});
+		if (obj.security.csrf) {
 			obj.always(csrfWrapper).ignore(csrfWrapper);
 		}
 	}
 
-	if (config.security.csp instanceof Object) {
-		luscaCsp = lusca.csp(config.security.csp);
+	if (obj.security.csp instanceof Object) {
+		const luscaCsp = lusca.csp(obj.security.csp);
+
 		obj.always(luscaCsp).ignore(luscaCsp);
 	}
 
-	if (isEmpty(config.security.xframe || "") === false) {
-		luscaXframe = lusca.xframe(config.security.xframe);
+	if (isEmpty(obj.security.xframe || "") === false) {
+		const luscaXframe = lusca.xframe(obj.security.xframe);
+
 		obj.always(luscaXframe).ignore(luscaXframe);
 	}
 
-	if (isEmpty(config.security.p3p || "") === false) {
-		luscaP3p = lusca.p3p(config.security.p3p);
+	if (isEmpty(obj.security.p3p || "") === false) {
+		const luscaP3p = lusca.p3p(obj.security.p3p);
+
 		obj.always(luscaP3p).ignore(luscaP3p);
 	}
 
-	if (config.security.hsts instanceof Object) {
-		luscaHsts = lusca.hsts(config.security.hsts);
+	if (obj.security.hsts instanceof Object) {
+		const luscaHsts = lusca.hsts(obj.security.hsts);
+
 		obj.always(luscaHsts).ignore(luscaHsts);
 	}
 
-	if (config.security.xssProtection) {
-		luscaXssProtection = lusca.xssProtection(config.security.xssProtection);
+	if (obj.security.xssProtection) {
+		const luscaXssProtection = lusca.xssProtection(obj.security.xssProtection);
+
 		obj.always(luscaXssProtection).ignore(luscaXssProtection);
 	}
 
-	if (config.security.nosniff) {
-		luscaNoSniff = lusca.nosniff();
+	if (obj.security.nosniff) {
+		const luscaNoSniff = lusca.nosniff();
+
 		obj.always(luscaNoSniff).ignore(luscaNoSniff);
 	}
 
@@ -145,7 +134,7 @@ export function auth (obj, config) {
 	passport.serializeUser((user, done) => done(null, user));
 	passport.deserializeUser((arg, done) => done(null, arg));
 
-	if (config.auth.basic.enabled) {
+	if (obj.auth.basic.enabled) {
 		let x = {};
 
 		const validate = (arg, cb) => {
@@ -156,7 +145,7 @@ export function auth (obj, config) {
 			}
 		};
 
-		for (const i of config.auth.basic.list || []) {
+		for (const i of obj.auth.basic.list || []) {
 			let args = i.split(":");
 
 			if (args.length > 0) {
@@ -182,15 +171,15 @@ export function auth (obj, config) {
 
 		const passportAuth = passport.authenticate("basic", {session: stateless === false});
 
-		if (async || config.auth.local.enabled) {
+		if (async || obj.auth.local.enabled) {
 			obj.get("/auth/basic", passportAuth).ignore(passportAuth);
 			obj.get("/auth/basic", redirect);
 		} else {
 			obj.always(passportAuth).ignore(passportAuth);
 		}
-	} else if (config.auth.bearer.enabled) {
+	} else if (obj.auth.bearer.enabled) {
 		const validate = (arg, cb) => {
-			if (obj.config.auth.bearer.tokens.includes(arg)) {
+			if (obj.obj.auth.bearer.tokens.includes(arg)) {
 				cb(null, arg);
 			} else {
 				cb(new Error(STATUS_CODES[401]), null);
@@ -213,28 +202,28 @@ export function auth (obj, config) {
 
 		const passportAuth = passport.authenticate("bearer", {session: stateless === false});
 
-		if (async || config.auth.local.enabled) {
+		if (async || obj.auth.local.enabled) {
 			obj.get("/auth/bearer", passportAuth).ignore(passportAuth);
 			obj.get("/auth/bearer", redirect);
 		} else {
 			obj.always(passportAuth).ignore(passportAuth);
 		}
-	} else if (config.auth.jwt.enabled) {
+	} else if (obj.auth.jwt.enabled) {
 		const opts = {
-			jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme(config.auth.jwt.scheme),
-			secretOrKey: config.auth.jwt.secretOrKey,
-			ignoreExpiration: config.auth.jwt.ignoreExpiration === true
+			jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme(obj.auth.jwt.scheme),
+			secretOrKey: obj.auth.jwt.secretOrKey,
+			ignoreExpiration: obj.auth.jwt.ignoreExpiration === true
 		};
 
 		for (const i of ["algorithms", "audience", "issuer"]) {
-			if (config.auth.jwt[i] !== void 0) {
-				opts[i] = config.auth.jwt[i];
+			if (obj.auth.jwt[i] !== void 0) {
+				opts[i] = obj.auth.jwt[i];
 			}
 		}
 
 		passport.use(new JWTStrategy(opts, (token, done) => {
 			delay(() => {
-				config.auth.jwt.auth(token, (err, user) => {
+				obj.auth.jwt.auth(token, (err, user) => {
 					if (err !== null) {
 						done(err);
 					} else {
@@ -246,10 +235,10 @@ export function auth (obj, config) {
 
 		const passportAuth = passport.authenticate("jwt", {session: false});
 		obj.always(passportAuth).ignore(passportAuth);
-	} else if (config.auth.local.enabled) {
+	} else if (obj.auth.local.enabled) {
 		passport.use(new LocalStrategy((username, password, done) => {
 			delay(() => {
-				config.auth.local.auth(username, password, (err, user) => {
+				obj.auth.local.auth(username, password, (err, user) => {
 					if (err !== null) {
 						done(err);
 					} else {
@@ -259,8 +248,7 @@ export function auth (obj, config) {
 			}, authDelay);
 		}));
 
-		config.routes.post = config.routes.post || {};
-		config.routes.post[config.auth.uri.login] = (req, res) => {
+		obj.post(obj.auth.uri.login, (req, res) => {
 			function final () {
 				passport.authenticate("local")(req, res, e => {
 					if (e !== void 0) {
@@ -278,17 +266,17 @@ export function auth (obj, config) {
 			}
 
 			passportInit(req, res, mid);
-		};
-	} else if (config.auth.oauth2.enabled) {
+		});
+	} else if (obj.auth.oauth2.enabled) {
 		passport.use(new OAuth2Strategy({
-			authorizationURL: config.auth.oauth2.auth_url,
-			tokenURL: config.auth.oauth2.token_url,
-			clientID: config.auth.oauth2.client_id,
-			clientSecret: config.auth.oauth2.client_secret,
+			authorizationURL: obj.auth.oauth2.auth_url,
+			tokenURL: obj.auth.oauth2.token_url,
+			clientID: obj.auth.oauth2.client_id,
+			clientSecret: obj.auth.oauth2.client_secret,
 			callbackURL: `${realm}/auth/oauth2/callback`
 		}, (accessToken, refreshToken, profile, done) => {
 			delay(() => {
-				config.auth.oauth2.auth(accessToken, refreshToken, profile, (err, user) => {
+				obj.auth.oauth2.auth(accessToken, refreshToken, profile, (err, user) => {
 					if (err !== null) {
 						done(err);
 					} else {
@@ -301,16 +289,16 @@ export function auth (obj, config) {
 		obj.get("/auth/oauth2", asyncFlag);
 		obj.get("/auth/oauth2", passport.authenticate("oauth2"));
 		obj.get("/auth/oauth2/callback", asyncFlag);
-		obj.get("/auth/oauth2/callback", passport.authenticate("oauth2", {failureRedirect: config.auth.uri.login}));
+		obj.get("/auth/oauth2/callback", passport.authenticate("oauth2", {failureRedirect: obj.auth.uri.login}));
 		obj.get("/auth/oauth2/callback", redirect);
 	}
 
 	if (authUris.length > 0) {
 		if (Object.keys(authMap).length > 0) {
-			config.routes.get[config.auth.uri.root] = authMap;
+			obj.get(obj.auth.uri.root, authMap);
 		}
 
-		let r = `(?!${config.auth.uri.root}/(`;
+		let r = `(?!${obj.auth.uri.root}/(`;
 
 		for (const i of authUris) {
 			r += i.replace("_uri", "") + "|";
@@ -319,22 +307,18 @@ export function auth (obj, config) {
 		r = r.replace(/\|$/, "") + ")).*$";
 		obj.always(r, guard).ignore(guard);
 
-		config.routes.get[config.auth.uri.login] = {
-			instruction: config.auth.msg.login
-		};
-	} else if (config.auth.local.enabled) {
-		config.routes.get[config.auth.uri.login] = {
-			instruction: config.auth.msg.login
-		};
+		obj.get(obj.auth.uri.login, (req, res) => res.json({instruction: obj.auth.msg.login}));
+	} else if (obj.auth.local.enabled) {
+		obj.get(obj.auth.uri.login, (req, res) => res.json({instruction: obj.auth.msg.login}));
 	}
 
-	config.routes.get[config.auth.uri.logout] = (req, res) => {
+	obj.get(obj.auth.uri.logout, (req, res) => {
 		if (req.session !== void 0) {
 			req.session.destroy();
 		}
 
 		redirect(req, res);
-	};
+	});
 
-	return config;
+	return obj;
 }

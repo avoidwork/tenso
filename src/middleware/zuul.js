@@ -6,7 +6,7 @@ export function zuul (req, res, next) {
 	let protect = false;
 
 	if (req.unprotect === false) {
-		for (const i of req.server.config.auth.protect) {
+		for (const i of req.server.auth.protect) {
 			if (i.test(uri)) {
 				protect = true;
 				break;

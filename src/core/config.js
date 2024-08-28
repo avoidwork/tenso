@@ -65,6 +65,7 @@ export const config = {
 	etags: true,
 	host: "0.0.0.0",
 	index: [],
+	initRoutes: {},
 	json: 0,
 	logging: {
 		enabled: true,

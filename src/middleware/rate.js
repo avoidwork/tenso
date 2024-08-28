@@ -1,4 +1,4 @@
-import {INT_429, RETRY_AFTER, X_RATELIMIT_LIMIT, X_RATELIMIT_REMAINING, X_RATELIMIT_RESET} from "../utils/constants.js";
+import {INT_429, RETRY_AFTER, X_RATELIMIT_LIMIT, X_RATELIMIT_REMAINING, X_RATELIMIT_RESET} from "../core/constants.js";
 
 const rateHeaders = [
 	X_RATELIMIT_LIMIT,
@@ -7,7 +7,7 @@ const rateHeaders = [
 ];
 
 export function rate (req, res, next) {
-	const config = req.server.config.rate;
+	const config = req.server.rate;
 
 	if (config.enabled === false || req.unprotect) {
 		next();

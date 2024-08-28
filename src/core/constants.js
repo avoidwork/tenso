@@ -36,3 +36,5 @@ export const PROTECT = "protect";
 export const UNPROTECT = "unprotect";
 export const FUNCTION = "function";
 export const CONNECT = "connect";
+export const ASSETS = "assets";
+export const SLASH = "/";

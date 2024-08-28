@@ -1,9 +1,9 @@
-import {DATA, EMPTY, END, HEADER_CONTENT_TYPE, INT_413, MULTIPART, UTF8} from "../utils/constants.js";
+import {DATA, EMPTY, END, HEADER_CONTENT_TYPE, INT_413, MULTIPART, UTF8} from "../core/constants.js";
 import {hasBody} from "../utils/hasbody.js";
 
 export function payload (req, res, next) {
 	if (hasBody(req.method) && req.headers?.[HEADER_CONTENT_TYPE]?.includes(MULTIPART) === false) {
-		const max = req.server.config.maxBytes;
+		const max = req.server.maxBytes;
 		let body = EMPTY,
 			invalid = false;
 

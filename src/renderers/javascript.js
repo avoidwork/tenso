@@ -1,4 +1,4 @@
-import {CALLBACK, HEADER_APPLICATION_JSON, HEADER_CONTENT_TYPE, INT_0} from "../utils/constants.js";
+import {CALLBACK, HEADER_APPLICATION_JSON, HEADER_CONTENT_TYPE, INT_0} from "../core/constants.js";
 
 export function javascript (req, res, arg) {
 	req.headers.accept = HEADER_APPLICATION_JSON;

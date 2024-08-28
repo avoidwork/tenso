@@ -1,5 +1,15 @@
 import {URL} from "url";
 import {keysort} from "keysort";
+import {
+	hypermedia as hypermediaPattern,
+	collection as collectionPattern,
+	trailingSlash,
+	trailing,
+	trailingS,
+	trailingY
+} from "./regex";
+import {id} from "./id";
+import {scheme} from "./scheme";
 
 export function hypermedia (req, res, rep) {
 	const server = req.server,
@@ -25,11 +35,11 @@ export function hypermedia (req, res, rep) {
 					let lcollection, uri;
 
 					// If ID like keys are found, and are not URIs, they are assumed to be root collections
-					if (lid || regex.hypermedia.test(i)) {
+					if (lid || hypermediaPattern.test(i)) {
 						const lkey = obj[i].toString();
 
 						if (lid === false) {
-							lcollection = i.replace(regex.trailing, "").replace(regex.trailingS, "").replace(regex.trailingY, "ie") + "s";
+							lcollection = i.replace(trailing, "").replace(trailingS, "").replace(trailingY, "ie") + "s";
 							lrel = "related";
 						} else {
 							lcollection = item_collection;
@@ -74,7 +84,7 @@ export function hypermedia (req, res, rep) {
 	root.searchParams.delete("page_size");
 
 	if (root.pathname !== "/") {
-		const proot = root.pathname.replace(regex.trailingSlash, "").replace(regex.collection, "$1") || "/";
+		const proot = root.pathname.replace(trailingSlash, "").replace(collectionPattern, "$1") || "/";
 
 		if (server.allowed("GET", proot)) {
 			links.push({uri: proot, rel: "collection"});
@@ -92,7 +102,10 @@ export function hypermedia (req, res, rep) {
 				nth = Math.ceil(rep.data.length / page_size);
 
 				if (nth > 1) {
-					rep.data = retsu.limit(rep.data, (page - 1) * page_size, page_size);
+					const start = (page - 1) * page_size,
+						end = start + page_size;
+
+					rep.data = rep.data.slice(start, end);
 					root.searchParams.set("page", 0);
 					root.searchParams.set("page_size", page_size);
 
@@ -121,7 +134,7 @@ export function hypermedia (req, res, rep) {
 			if (req.hypermedia) {
 				for (const i of rep.data) {
 					if (i instanceof Object) {
-						marshal(i, "item", req.parsed.pathname.replace(regex.trailingSlash, ""));
+						marshal(i, "item", req.parsed.pathname.replace(trailingSlash, ""));
 					} else {
 						const li = i.toString();
 
@@ -142,7 +155,7 @@ export function hypermedia (req, res, rep) {
 				parent.pop();
 			}
 
-			rep.data = marshal(rep.data, void 0, retsu.last(parent));
+			rep.data = marshal(rep.data, void 0, parent[parent.length - 1]);
 		}
 	}
 

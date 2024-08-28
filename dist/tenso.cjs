@@ -213,7 +213,13 @@ function json$1 (arg = EMPTY) {
 }
 
 const bodySplit = /&|=/;
+const collection = /(.*)(\/.*)$/;
+const hypermedia$1 = /(([a-z]+(_)?)?id|url|uri)$/i;
 const mimetype = /;.*/;
+const trailing = /_.*$/;
+const trailingS = /s$/;
+const trailingSlash = /\/$/;
+const trailingY = /y$/;
 
 function chunk (arg = [], size = 2) {
 	const result = [];
@@ -420,10 +426,26 @@ function serialize (req, res, arg) {
 	return result;
 }
 
+const str_id = "id";
+const str_id_2 = "_id";
+const str_id_3 = "ID";
+const str_id_4 = "_ID";
+
+function id (arg = "") {
+	return arg === str_id || arg === str_id_2 || arg === str_id_3 || arg === str_id_4;
+}
+
+const str_slash = "/";
+const str_scheme = "://";
+
+function scheme (arg = "") {
+	return arg.includes(str_slash) || arg[0] === str_scheme;
+}
+
 function hypermedia (req, res, rep) {
 	const server = req.server,
 		headers = res.getHeaders(),
-		collection = req.parsed.pathname,
+		collection$1 = req.parsed.pathname,
 		links = [],
 		seen = new Set(),
 		exists = rep !== null;
@@ -444,11 +466,11 @@ function hypermedia (req, res, rep) {
 					let lcollection, uri;
 
 					// If ID like keys are found, and are not URIs, they are assumed to be root collections
-					if (lid || regex.hypermedia.test(i)) {
+					if (lid || hypermedia$1.test(i)) {
 						const lkey = obj[i].toString();
 
 						if (lid === false) {
-							lcollection = i.replace(regex.trailing, "").replace(regex.trailingS, "").replace(regex.trailingY, "ie") + "s";
+							lcollection = i.replace(trailing, "").replace(trailingS, "").replace(trailingY, "ie") + "s";
 							lrel = "related";
 						} else {
 							lcollection = item_collection;
@@ -493,7 +515,7 @@ function hypermedia (req, res, rep) {
 	root.searchParams.delete("page_size");
 
 	if (root.pathname !== "/") {
-		const proot = root.pathname.replace(regex.trailingSlash, "").replace(regex.collection, "$1") || "/";
+		const proot = root.pathname.replace(trailingSlash, "").replace(collection, "$1") || "/";
 
 		if (server.allowed("GET", proot)) {
 			links.push({uri: proot, rel: "collection"});
@@ -511,7 +533,10 @@ function hypermedia (req, res, rep) {
 				nth = Math.ceil(rep.data.length / page_size);
 
 				if (nth > 1) {
-					rep.data = retsu.limit(rep.data, (page - 1) * page_size, page_size);
+					const start = (page - 1) * page_size,
+						end = start + page_size;
+
+					rep.data = rep.data.slice(start, end);
 					root.searchParams.set("page", 0);
 					root.searchParams.set("page_size", page_size);
 
@@ -540,12 +565,12 @@ function hypermedia (req, res, rep) {
 			if (req.hypermedia) {
 				for (const i of rep.data) {
 					if (i instanceof Object) {
-						marshal(i, "item", req.parsed.pathname.replace(regex.trailingSlash, ""));
+						marshal(i, "item", req.parsed.pathname.replace(trailingSlash, ""));
 					} else {
 						const li = i.toString();
 
-						if (li !== collection) {
-							const uri = li.indexOf("//") >= 0 ? li : `${collection.replace(/\s/g, "%20")}/${li.replace(/\s/g, "%20")}`.replace(/^\/\//, "/");
+						if (li !== collection$1) {
+							const uri = li.indexOf("//") >= 0 ? li : `${collection$1.replace(/\s/g, "%20")}/${li.replace(/\s/g, "%20")}`.replace(/^\/\//, "/");
 
 							if (server.allowed("GET", uri)) {
 								links.push({uri: uri, rel: "item"});
@@ -561,7 +586,7 @@ function hypermedia (req, res, rep) {
 				parent.pop();
 			}
 
-			rep.data = marshal(rep.data, void 0, retsu.last(parent));
+			rep.data = marshal(rep.data, void 0, parent[parent.length - 1]);
 		}
 	}
 

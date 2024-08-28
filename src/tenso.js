@@ -13,7 +13,17 @@ import {renderers} from "./utils/renderers.js";
 import {serializers} from "./utils/serializers.js";
 import {mimetype} from "./utils/regex.js";
 import {hasBody} from "./utils/hasbody.js";
-import {CONNECT, EMPTY, FUNCTION, INT_200, INT_204, INT_304, SIGHUP, SIGINT, SIGTERM} from "./core/constants.js";
+import {
+	CONNECT,
+	EMPTY,
+	FUNCTION,
+	INT_200,
+	INT_204,
+	INT_304,
+	SIGHUP,
+	SIGINT,
+	SIGTERM
+} from "./core/constants.js";
 import {serialize} from "./utils/serialize.js";
 import {hypermedia} from "./utils/hypermedia.js";
 import {payload} from "./middleware/payload.js";
@@ -123,8 +133,8 @@ class Tenso extends Woodland {
 		}
 
 		// Static assets on disk for browsable interface
-		if (this.static !== EMPTY) {
-			this.files("/assets", join(this.webroot.root), "assets");
+		if (this.webroot.static !== EMPTY) {
+			this.files(this.webroot.static, join(this.webroot.root, this.webroot.static));
 		}
 
 		// Setting routes
@@ -137,6 +147,8 @@ class Tenso extends Woodland {
 				}
 			}
 		}
+
+		delete this.initRoutes;
 
 		return this;
 	}

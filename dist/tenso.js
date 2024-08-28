@@ -573,12 +573,14 @@ function scheme (arg = "") {
 }function bypass (req, res, next) {
 	req.unprotect = req.cors && req.method === OPTIONS || req.server.auth.unprotect.some(i => i.test(req.url));
 	next();
-}let cachedFn, cachedKey;
+}let memoized = false,
+	cachedFn, cachedKey;
 
 function csrfWrapper (req, res, next) {
-	{
+	if (memoized === false) {
 		cachedKey = req.server.security.key;
 		cachedFn = lusca.csrf({key: cachedKey, secret: req.server.security.secret});
+		memoized = true;
 	}
 
 	if (req.unprotect) {
@@ -1071,8 +1073,8 @@ class Tenso extends Woodland {
 		}
 
 		// Static assets on disk for browsable interface
-		if (this.static !== EMPTY) {
-			this.files("/assets", join(this.webroot.root), "assets");
+		if (this.webroot.static !== EMPTY) {
+			this.files(this.webroot.static, join(this.webroot.root, this.webroot.static));
 		}
 
 		// Setting routes
@@ -1085,6 +1087,8 @@ class Tenso extends Woodland {
 				}
 			}
 		}
+
+		delete this.initRoutes;
 
 		return this;
 	}

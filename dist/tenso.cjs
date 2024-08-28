@@ -277,7 +277,7 @@ function xml (req, res, arg) {
 		arrayNodeName: Array.isArray(arg) ? XML_ARRAY_NODE_NAME : undefined
 	});
 
-	return `${XML_PROLOG}\n${builder.build(arg)}`;
+	return `${XML_PROLOG}\n${builder.build({output: arg})}`;
 }
 
 function plain$1 (req, res, arg) {

@@ -225,7 +225,7 @@ function indent (arg = "", fallback = 0) {
 		arrayNodeName: Array.isArray(arg) ? XML_ARRAY_NODE_NAME : undefined
 	});
 
-	return `${XML_PROLOG}\n${builder.build(arg)}`;
+	return `${XML_PROLOG}\n${builder.build({output: arg})}`;
 }function plain$1 (req, res, arg) {
 	return Array.isArray(arg) ? arg.map(i => text(req, res, i)).join(COMMA) : arg instanceof Object ? JSON.stringify(arg, null, indent(req.headers.accept, req.server.json)) : arg.toString()
 }function javascript (req, res, arg) {

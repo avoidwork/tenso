@@ -13,7 +13,7 @@
 		resBody = modal.querySelector(".body"),
 		toggle = document.querySelector("#viewModeToggle"),
 		body = document.querySelector("body"),
-		json = /^[\[\{"]/,
+		json = /^[[{"]/,
 		isJson = /application\/json/;
 
 	if (methods.childElementCount > 0) {
@@ -21,14 +21,14 @@
 	}
 
 	function escape (arg) {
-		return arg.replace(/[\-\[\]{}()*+?.,\\\/\^\$|#\s]/g, "\\$&");
+		return arg.replace(/[-[\]{}()*+?.,\\/^$|#\s]/g, "\\$&");
 	}
 
 	// Stage 1 of prettifying a <code>
 	function prepare (html) {
-		const keys = Array.from(html.match(/\".*":/g)),
-			matches = Array.from(keys.concat(html.match(/:\s(\".*\"|\d{3,3}|null)/g))),
-			replaces = matches.map(i => keys.includes(i) ? i.replace(/(\"(.*)\")/, "<span class='key $2'>$1</span>") : i.replace(/(\".*\"|\d{3,3}|null)/, "<span class='item'>$1</span>"));
+		const keys = Array.from(html.match(/".*":/g)),
+			matches = Array.from(keys.concat(html.match(/:\s(".*"|\d{3,3}|null)/g))),
+			replaces = matches.map(i => keys.includes(i) ? i.replace(/("(.*)")/, "<span class='key $2'>$1</span>") : i.replace(/(".*"|\d{3,3}|null)/, "<span class='item'>$1</span>"));
 
 		let output = html;
 
@@ -49,7 +49,7 @@
 		// Changing URIs into anchors
 		Array.from(document.querySelectorAll(".item")).forEach(i => {
 			let html = i.innerHTML,
-				val = html.replace(/(^\"|\"$)/g, "");
+				val = html.replace(/(^"|"$)/g, "");
 
 			if (val.indexOf("/") === 0 || val.indexOf("//") > -1) {
 				html = html.replace(val, `<a href="${val}" title="View ${val}">${val}</a>`);
@@ -77,7 +77,7 @@
 	function sanitize (arg = "") {
 		let tmp = typeof arg !== "string" ? JSON.stringify(arg, null, 2) : arg;
 
-		return tmp.replace(/\</g, "&lt;").replace(/\>/g, "&gt;");
+		return tmp.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 	}
 
 	// Intercepting the submission

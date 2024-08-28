@@ -1098,9 +1098,7 @@ class Tenso extends woodland.Woodland {
 		super(config$1);
 
 		for (const [key, value] of Object.entries(config$1)) {
-			if (key in this === false) {
-				this[key] = value;
-			}
+			this[key] = value;
 		}
 
 		this.parsers = parsers;
@@ -1339,7 +1337,7 @@ class Tenso extends woodland.Woodland {
 }
 
 function tenso (userConfig = {}) {
-	const config$1 = tinyMerge.merge(userConfig, clone(config));
+	const config$1 = tinyMerge.merge(clone(config), userConfig);
 
 	if ((/^[^\d+]$/).test(config$1.port) && config$1.port < 1) {
 		console.error("Invalid configuration");

@@ -40,9 +40,7 @@ class Tenso extends Woodland {
 		super(config);
 
 		for (const [key, value] of Object.entries(config)) {
-			if (key in this === false) {
-				this[key] = value;
-			}
+			this[key] = value;
 		}
 
 		this.parsers = parsers;
@@ -281,7 +279,7 @@ class Tenso extends Woodland {
 }
 
 export function tenso (userConfig = {}) {
-	const config = merge(userConfig, clone(defaultConfig));
+	const config = merge(clone(defaultConfig), userConfig);
 
 	if ((/^[^\d+]$/).test(config.port) && config.port < 1) {
 		console.error("Invalid configuration");

@@ -1074,7 +1074,7 @@ class Tenso extends Woodland {
 
 		// Static assets on disk for browsable interface
 		if (this.webroot.static !== EMPTY) {
-			this.files(this.webroot.static, join(this.webroot.root, this.webroot.static));
+			this.files(this.webroot.static, this.webroot.root);
 		}
 
 		// Setting routes

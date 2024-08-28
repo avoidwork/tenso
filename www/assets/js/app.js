@@ -11,6 +11,8 @@
 		loading = modal.querySelector(".loading"),
 		textarea = document.querySelector("textarea"),
 		resBody = modal.querySelector(".body"),
+		toggle = document.querySelector("#viewModeToggle"),
+		body = document.querySelector("body"),
 		json = /^[\[\{"]/,
 		isJson = /application\/json/;
 
@@ -124,7 +126,7 @@
 	router({css: {current: "is-active", hidden: "dr-hidden"}, callback: ev => {
 		window.requestAnimationFrame(() => {
 			Array.from(document.querySelectorAll("li.is-active")).forEach(i => i.classList.remove("is-active"));
-			ev.trigger.parentNode.classList.add("is-active");
+			ev.trigger?.[0]?.parentNode?.classList?.add("is-active");
 		});
 	}});
 
@@ -139,6 +141,16 @@
 	// Wiring up format selection
 	formats.onchange = ev => {
 		window.location = `${window.location.pathname}?format=${ev.target.options[ev.target.selectedIndex].value}${window.location.search.replace(/^\?/, "&")}`;
+	};
+
+	// Dark mode toggle
+	toggle.onclick = ev => {
+		ev.preventDefault();
+		ev.stopPropagation();
+		window.requestAnimationFrame(() => {
+			body.classList.toggle("dark");
+			toggle.innerText = body.classList.contains("dark") ? "Light" : "Dark";
+		});
 	};
 
 	// Setting up the UI

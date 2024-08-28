@@ -1,8 +1,9 @@
-const tinyhttptest = require("tiny-httptest"),
-	csv = require("csv.js"),
-	tenso = require("../dist/tenso.cjs"),
-	routes = require("./routes.js"),
-	timeout = 5000;
+import {httptest} from "tiny-httptest";
+import {tenso} from "../dist/tenso.js";
+import {routes} from "./routes.js";
+import {parse} from "csv-parse/sync";
+
+const timeout = 5000;
 
 process.setMaxListeners(0);
 
@@ -16,31 +17,31 @@ describe("Renderers", function () {
 	const server = this.tenso.server;
 
 	it("GET CSV (header)", function () {
-		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "text/csv"}})
+		return httptest({url: "http://localhost:" + port, headers: {accept: "text/csv"}})
 			.expectStatus(200)
 			.expectHeader("content-type", "text/csv")
 			.expectHeader("content-disposition", "attachment; filename=\"download.csv\"")
-			.expectBody(arg => csv.decode(arg) instanceof Object)
+			.expectBody(arg => parse(arg) instanceof Object)
 			.end();
 	});
 
 	it("GET CSV (query string)", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/?format=text/csv"})
+		return httptest({url: "http://localhost:" + port + "/?format=text/csv"})
 			.expectStatus(200)
 			.expectHeader("content-type", "text/csv")
 			.expectHeader("content-disposition", "attachment; filename=\"download.csv\"")
-			.expectBody(arg => csv.decode(arg) instanceof Object)
+			.expectBody(arg => parse(arg) instanceof Object)
 			.end();
 	});
 
 	it("GET CSV (invalid)", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/abc/?format=text/csv"})
+		return httptest({url: "http://localhost:" + port + "/abc/?format=text/csv"})
 			.expectStatus(404)
 			.end();
 	});
 
 	it("GET JSONP (header)", function () {
-		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "application/javascript"}})
+		return httptest({url: "http://localhost:" + port, headers: {accept: "application/javascript"}})
 			.expectStatus(200)
 			.expectHeader("content-type", "application/javascript")
 			.expectBody(/^callback\(/)
@@ -48,7 +49,7 @@ describe("Renderers", function () {
 	});
 
 	it("GET JSONP (query string)", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/?format=application/javascript"})
+		return httptest({url: "http://localhost:" + port + "/?format=application/javascript"})
 			.expectStatus(200)
 			.expectHeader("content-type", "application/javascript")
 			.expectBody(/^callback\(/)
@@ -56,13 +57,13 @@ describe("Renderers", function () {
 	});
 
 	it("GET JSONP (invalid)", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/abc/?format=application/javascript"})
+		return httptest({url: "http://localhost:" + port + "/abc/?format=application/javascript"})
 			.expectStatus(404)
 			.end();
 	});
 
 	it("GET JSONP (header - custom callback)", function () {
-		return tinyhttptest({
+		return httptest({
 			url: "http://localhost:" + port + "/?callback=custom",
 			headers: {accept: "application/javascript"}
 		})
@@ -73,7 +74,7 @@ describe("Renderers", function () {
 	});
 
 	it("GET JSONP (query string - custom callback)", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/?format=application/javascript&callback=custom"})
+		return httptest({url: "http://localhost:" + port + "/?format=application/javascript&callback=custom"})
 			.expectStatus(200)
 			.expectHeader("content-type", "application/javascript")
 			.expectBody(/^custom\(/)
@@ -81,13 +82,13 @@ describe("Renderers", function () {
 	});
 
 	it("GET JSONP (invalid)", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/abc/?format=application/javascript&callback=custom"})
+		return httptest({url: "http://localhost:" + port + "/abc/?format=application/javascript&callback=custom"})
 			.expectStatus(404)
 			.end();
 	});
 
 	it("GET HTML (header)", function () {
-		return tinyhttptest({
+		return httptest({
 			url: "http://localhost:" + port,
 			headers: {accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"}
 		})
@@ -98,7 +99,7 @@ describe("Renderers", function () {
 	});
 
 	it("GET HTML (query string)", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/things?format=text/html"})
+		return httptest({url: "http://localhost:" + port + "/things?format=text/html"})
 			.expectStatus(200)
 			.expectHeader("content-type", /text\/html/)
 			.expectBody(/&lt;h1&gt;blahblah&lt;\/h1&gt;/)
@@ -106,87 +107,87 @@ describe("Renderers", function () {
 	});
 
 	it("GET HTML (invalid)", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/abc/?format=text/html"})
+		return httptest({url: "http://localhost:" + port + "/abc/?format=text/html"})
 			.expectStatus(404)
 			.end();
 	});
 
 	it("GET YAML (header)", function () {
-		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "application/yaml"}})
+		return httptest({url: "http://localhost:" + port, headers: {accept: "application/yaml"}})
 			.expectStatus(200)
 			.expectHeader("content-type", "application/yaml")
 			.end();
 	});
 
 	it("GET YAML (query string)", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/?format=application/yaml"})
+		return httptest({url: "http://localhost:" + port + "/?format=application/yaml"})
 			.expectStatus(200)
 			.expectHeader("content-type", "application/yaml")
 			.end();
 	});
 
 	it("GET YAML (invalid)", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/abc/?format=application/yaml"})
+		return httptest({url: "http://localhost:" + port + "/abc/?format=application/yaml"})
 			.expectStatus(404)
 			.end();
 	});
 
 	it("GET XML (header)", function () {
-		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "application/xml"}})
+		return httptest({url: "http://localhost:" + port, headers: {accept: "application/xml"}})
 			.expectStatus(200)
 			.expectHeader("content-type", "application/xml")
 			.end();
 	});
 
 	it("GET XML (query string)", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/?format=application/xml"})
+		return httptest({url: "http://localhost:" + port + "/?format=application/xml"})
 			.expectStatus(200)
 			.expectHeader("content-type", "application/xml")
 			.end();
 	});
 
 	it("GET XML (invalid)", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/abc/?format=application/xml"})
+		return httptest({url: "http://localhost:" + port + "/abc/?format=application/xml"})
 			.expectStatus(404)
 			.end();
 	});
 
 	it("GET Custom (header)", function () {
-		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "application/custom"}})
+		return httptest({url: "http://localhost:" + port, headers: {accept: "application/custom"}})
 			.expectStatus(200)
 			.expectHeader("content-type", "application/json")
 			.end();
 	});
 
 	it("GET Custom (query string)", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/?format=application/custom"})
+		return httptest({url: "http://localhost:" + port + "/?format=application/custom"})
 			.expectStatus(200)
 			.expectHeader("content-type", "application/json")
 			.end();
 	});
 
 	it("GET Custom (invalid)", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/abc/?format=application/custom"})
+		return httptest({url: "http://localhost:" + port + "/abc/?format=application/custom"})
 			.expectStatus(404)
 			.end();
 	});
 
 	it("GET Plain Text (header)", function () {
-		return tinyhttptest({url: "http://localhost:" + port, headers: {accept: "text/plain"}})
+		return httptest({url: "http://localhost:" + port, headers: {accept: "text/plain"}})
 			.expectStatus(200)
 			.expectHeader("content-type", "text/plain")
 			.end();
 	});
 
 	it("GET Plain Text (query string)", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/?format=text/plain"})
+		return httptest({url: "http://localhost:" + port + "/?format=text/plain"})
 			.expectStatus(200)
 			.expectHeader("content-type", "text/plain")
 			.end();
 	});
 
 	it("GET Plain Text (invalid)", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/abc/?format=text/plain"})
+		return httptest({url: "http://localhost:" + port + "/abc/?format=text/plain"})
 			.expectStatus(404)
 			.end().then(() => server.close());
 	});

@@ -1,7 +1,7 @@
 import {httptest} from "tiny-httptest";
 import jwt from "jsonwebtoken";
 import {tenso} from "../dist/tenso.js";
-import { routes } from "./routes.js";
+import {routes} from "./routes.js";
 
 const csrf = "x-csrf-token";
 const timeout = 5000;
@@ -91,7 +91,7 @@ describe("Basic Auth", function () {
 	this.tenso = tenso({
 		port: port,
 		initRoutes: routes,
-		logging: {level: "error"},
+		logging: {enabled: false},
 		auth: {basic: {enabled: true, list: ["test:123"]}, protect: ["/uuid"]}
 	});
 
@@ -137,7 +137,7 @@ describe("OAuth2 Token Bearer", function () {
 	this.tenso = tenso({
 		port: port,
 		initRoutes: routes,
-		logging: {level: "error"},
+		logging: {enabled: false},
 		auth: {bearer: {enabled: true, tokens: ["abc-123"]}, protect: ["/"]}
 	});
 
@@ -173,7 +173,7 @@ describe("Local", function () {
 
 	this.timeout(timeout);
 	this.tenso = tenso({
-		port: port, initRoutes: routes, logging: {level: "error"}, auth: {
+		port: port, initRoutes: routes, logging: {enabled: false}, auth: {
 			local: {
 				enabled: true,
 				auth: function (username, password, callback) {
@@ -189,7 +189,7 @@ describe("Local", function () {
 	});
 
 	const server = this.tenso.server,
-		login = this.tenso.config.auth.uri.login;
+		login = this.tenso.auth.uri.login;
 
 	it("GET /uuid (invalid) - returns an 'unauthorized' error", function () {
 		return httptest({url: "http://localhost:" + port + "/uuid"})
@@ -279,7 +279,7 @@ describe("JWT", function () {
 
 	this.timeout(timeout);
 	this.tenso = tenso({
-		port: port, initRoutes: routes, logging: {level: "error"}, auth: {
+		port: port, initRoutes: routes, logging: {enabled: false}, auth: {
 			jwt: {
 				enabled: true,
 				auth: function (arg, cb) {

@@ -5,7 +5,7 @@ import {createRequire} from "node:module";
 import {join, resolve} from "node:path";
 import {fileURLToPath, URL} from "node:url";
 import {Woodland} from "woodland";
-import defaults from "defaults";
+import {merge} from "tiny-merge";
 import {eventsource} from "tiny-eventsource";
 import {config as defaultConfig} from "./core/config.js";
 import {parsers} from "./utils/parsers.js";
@@ -226,6 +226,18 @@ class Tenso extends Woodland {
 		return result;
 	}
 
+	renderer (mediatype, fn) {
+		this.renderers.set(mediatype, fn);
+
+		return this;
+	}
+
+	serializer (mediatype, fn) {
+		this.serializers.set(mediatype, fn);
+
+		return this;
+	}
+
 	signals () {
 		for (const signal of [SIGHUP, SIGINT, SIGTERM]) {
 			process.on(signal, () => {
@@ -269,19 +281,7 @@ class Tenso extends Woodland {
 }
 
 export function tenso (userConfig = {}) {
-	const initRoutes = userConfig?.initRoutes ?? null;
-	const initAuth = userConfig?.auth ?? null;
-	delete userConfig.initRoutes;
-	delete userConfig.auth;
-	const config = defaults(userConfig, clone(defaultConfig));
-
-	if (initRoutes !== null) {
-		config.initRoutes = initRoutes;
-	}
-
-	if (initAuth !== null) {
-		config.auth = initAuth;
-	}
+	const config = merge(userConfig, clone(defaultConfig));
 
 	if ((/^[^\d+]$/).test(config.port) && config.port < 1) {
 		console.error("Invalid configuration");

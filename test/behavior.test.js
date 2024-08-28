@@ -1,7 +1,8 @@
-const tinyhttptest = require("tiny-httptest"),
-	tenso = require("../dist/tenso.cjs"),
-	routes = require("./routes.js"),
-	timeout = 5000;
+import {httptest} from "tiny-httptest";
+import {tenso} from "../dist/tenso.js";
+import {routes} from "./routes.js";
+
+const timeout = 5000;
 
 describe("Pagination", function () {
 	const port = 8002;
@@ -12,7 +13,7 @@ describe("Pagination", function () {
 	const server = this.tenso.server;
 
 	it("GET /empty - returns an empty array", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/empty"})
+		return httptest({url: "http://localhost:" + port + "/empty"})
 			.expectStatus(200)
 			.expectValue("links", [{uri: "/", rel: "collection"}])
 			.expectValue("data", [])
@@ -22,7 +23,7 @@ describe("Pagination", function () {
 	});
 
 	it("GET /items/ - returns page 1/3 of an array of numbers", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/items/"})
+		return httptest({url: "http://localhost:" + port + "/items/"})
 			.expectStatus(200)
 			.expectValue("links", [{"uri": "/", "rel": "collection"}, {
 				"uri": "/items/?page=3&page_size=5",
@@ -35,7 +36,7 @@ describe("Pagination", function () {
 	});
 
 	it("GET /items - returns page 1/3 of an array of numbers", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/items"})
+		return httptest({url: "http://localhost:" + port + "/items"})
 			.expectStatus(200)
 			.expectValue("links", [{"uri": "/", "rel": "collection"}, {
 				"uri": "/items?page=3&page_size=5",
@@ -48,7 +49,7 @@ describe("Pagination", function () {
 	});
 
 	it("GET /items?page=a&page_size=b - returns page 1/3 of an array of numbers", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/items?page=a&page_size=b"})
+		return httptest({url: "http://localhost:" + port + "/items?page=a&page_size=b"})
 			.expectStatus(200)
 			.expectValue("links", [{"uri": "/", "rel": "collection"}, {
 				"uri": "/items?page=3&page_size=5",
@@ -61,7 +62,7 @@ describe("Pagination", function () {
 	});
 
 	it("GET /items?page=0&page_size=5 - returns page 1/3 of an array of numbers", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/items?page=0&page_size=5"})
+		return httptest({url: "http://localhost:" + port + "/items?page=0&page_size=5"})
 			.expectStatus(200)
 			.expectValue("links", [{"uri": "/", "rel": "collection"}, {
 				"uri": "/items?page=3&page_size=5",
@@ -74,7 +75,7 @@ describe("Pagination", function () {
 	});
 
 	it("GET /items?page=0&page_size=-1 - returns page 1/3 of an array of numbers", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/items?page=0&page_size=-1"})
+		return httptest({url: "http://localhost:" + port + "/items?page=0&page_size=-1"})
 			.expectStatus(200)
 			.expectValue("links", [{"uri": "/", "rel": "collection"}, {
 				"uri": "/items?page=3&page_size=5",
@@ -87,7 +88,7 @@ describe("Pagination", function () {
 	});
 
 	it("GET /items?page=2&page_size=5 - returns page 2/3 of an array of numbers", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/items?page=2&page_size=5"})
+		return httptest({url: "http://localhost:" + port + "/items?page=2&page_size=5"})
 			.expectStatus(200)
 			.expectValue("links", [{"uri": "/", "rel": "collection"}, {
 				"uri": "/items?page=1&page_size=5",
@@ -100,7 +101,7 @@ describe("Pagination", function () {
 	});
 
 	it("GET /items?page=3&page_size=5 - returns page 3/3 of an array of numbers", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/items?page=3&page_size=5"})
+		return httptest({url: "http://localhost:" + port + "/items?page=3&page_size=5"})
 			.expectStatus(200)
 			.expectValue("links", [{"uri": "/", "rel": "collection"}, {
 				"uri": "/items?page=1&page_size=5",
@@ -113,7 +114,7 @@ describe("Pagination", function () {
 	});
 
 	it("GET /items?page=4&page_size=5 - returns page 4/3 of an array of numbers (empty)", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/items?page=4&page_size=5"})
+		return httptest({url: "http://localhost:" + port + "/items?page=4&page_size=5"})
 			.expectStatus(200)
 			.expectValue("links", [{"uri": "/", "rel": "collection"}, {
 				"uri": "/items?page=1&page_size=5",
@@ -126,7 +127,7 @@ describe("Pagination", function () {
 	});
 
 	it("GET /items?email=user@domain.com - returns page 1/3 of an array of numbers, preserving the query string via encoding", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/items?email=user@domain.com"})
+		return httptest({url: "http://localhost:" + port + "/items?email=user@domain.com"})
 			.expectStatus(200)
 			.expectValue("links", [{
 				uri: "/",
@@ -149,12 +150,12 @@ describe("Hypermedia", function () {
 	const port = 8003;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}});
 
 	const server = this.tenso.server;
 
 	it("GET /things - returns a collection of representations that has hypermedia properties", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/things"})
+		return httptest({url: "http://localhost:" + port + "/things"})
 			.expectStatus(200)
 			.expectValue("links", [{
 				uri: "/",
@@ -171,7 +172,7 @@ describe("Hypermedia", function () {
 	});
 
 	it("GET /somethings/abc - returns an entity that has hypermedia properties, and data", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/somethings/abc"})
+		return httptest({url: "http://localhost:" + port + "/somethings/abc"})
 			.expectStatus(200)
 			.expectValue("links", [{"uri": "/somethings", "rel": "collection"}, {
 				"uri": "/somethings/abc",
@@ -190,7 +191,7 @@ describe("Hypermedia", function () {
 	});
 
 	it("GET /somethings/def - returns an entity that has hypermedia properties, and no data", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/somethings/def"})
+		return httptest({url: "http://localhost:" + port + "/somethings/def"})
 			.expectStatus(200)
 			.expectValue("links", [{"uri": "/somethings", "rel": "collection"}, {
 				"uri": "/somethings/def",
@@ -210,7 +211,7 @@ describe("Rate Limiting", function () {
 	this.tenso = tenso({
 		port: port,
 		routes: routes,
-		logging: {level: "error"},
+		logging: {enabled: false},
 		security: {csrf: false},
 		rate: {enabled: true, limit: 2, reset: 900}
 	});
@@ -218,7 +219,7 @@ describe("Rate Limiting", function () {
 	const server = this.tenso.server;
 
 	it("GET / - returns an array of endpoints (1/2)", function () {
-		return tinyhttptest({url: "http://localhost:" + port})
+		return httptest({url: "http://localhost:" + port})
 			.cookies()
 			.expectStatus(200)
 			.expectHeader("x-ratelimit-limit", "2")
@@ -236,7 +237,7 @@ describe("Rate Limiting", function () {
 	});
 
 	it("GET / - returns an array of endpoints (2/2)", function () {
-		return tinyhttptest({url: "http://localhost:" + port})
+		return httptest({url: "http://localhost:" + port})
 			.cookies()
 			.expectStatus(200)
 			.expectHeader("x-ratelimit-limit", "2")
@@ -254,7 +255,7 @@ describe("Rate Limiting", function () {
 	});
 
 	it("GET / - returns a 'too many requests' error", function () {
-		return tinyhttptest({url: "http://localhost:" + port})
+		return httptest({url: "http://localhost:" + port})
 			.cookies()
 			.expectStatus(429)
 			.expectValue("data", null)
@@ -270,7 +271,7 @@ describe("Rate Limiting (Override)", function () {
 
 	this.timeout(timeout);
 	this.tenso = tenso({
-		port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}, rate: {
+		port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}, rate: {
 			enabled: true,
 			limit: 2,
 			reset: 900,
@@ -288,7 +289,7 @@ describe("Rate Limiting (Override)", function () {
 	const server = this.tenso.server;
 
 	it("GET / - returns an array of endpoints (1/2)", function () {
-		return tinyhttptest({url: "http://localhost:" + port})
+		return httptest({url: "http://localhost:" + port})
 			.cookies()
 			.expectStatus(200)
 			.expectHeader("x-ratelimit-limit", "102")
@@ -306,7 +307,7 @@ describe("Rate Limiting (Override)", function () {
 	});
 
 	it("GET / - returns an array of endpoints (2/2)", function () {
-		return tinyhttptest({url: "http://localhost:" + port})
+		return httptest({url: "http://localhost:" + port})
 			.cookies()
 			.expectStatus(200)
 			.expectHeader("x-ratelimit-limit", "102")
@@ -328,12 +329,12 @@ describe("Request body max byte size", function () {
 	const port = 8008;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}, maxBytes: 10});
+	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}, maxBytes: 10});
 
 	const server = this.tenso.server;
 
 	it("POST /test - returns an a result", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/test", method: "post"})
+		return httptest({url: "http://localhost:" + port + "/test", method: "post"})
 			.json({"x": 1})
 			.expectStatus(200)
 			.expectValue("links", [{uri: "/", rel: "collection"}])
@@ -344,7 +345,7 @@ describe("Request body max byte size", function () {
 	});
 
 	it("POST /test (invalid) - returns a 'request entity too large' error", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/test", method: "post"})
+		return httptest({url: "http://localhost:" + port + "/test", method: "post"})
 			.json({"abc": true})
 			.expectStatus(413)
 			.expectValue("data", null)
@@ -358,10 +359,10 @@ describe("Route parameters", function () {
 	const port = 8010;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}});
 
 	it("GET /test/hidden - returns an a 'hidden' result", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/test/hidden"})
+		return httptest({url: "http://localhost:" + port + "/test/hidden"})
 			.expectStatus(200)
 			.expectValue("links", [{uri: "/test", rel: "collection"}])
 			.expectValue("data", "hidden")
@@ -375,17 +376,17 @@ describe("CORS", function () {
 	const port = 8013;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}});
 
 	it("OPTIONS /empty - returns an empty array", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/empty", method: "options"})
+		return httptest({url: "http://localhost:" + port + "/empty", method: "options"})
 			.cors("http://not.localhost")
 			.expectStatus(200)
 			.end();
 	});
 
 	it("GET /empty - returns an empty array", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/empty"})
+		return httptest({url: "http://localhost:" + port + "/empty"})
 			.cors("http://not.localhost")
 			.expectStatus(200)
 			.end();
@@ -396,12 +397,12 @@ describe("CORS Headers", function () {
 	const port = 8015;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: true}});
+	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: true}});
 
 	const server = this.tenso.server;
 
 	it("GET /test - exposes x-csrf-token header", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/test"})
+		return httptest({url: "http://localhost:" + port + "/test"})
 			.cors("http://not.localhost")
 			.expectHeader("access-control-expose-headers", /x-csrf-token/)
 			.expectHeader("x-csrf-token", /\w/)
@@ -414,12 +415,12 @@ describe("Sorting", function () {
 	const port = 8014;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {level: "error"}, security: {csrf: false}});
+	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}});
 
 	const server = this.tenso.server;
 
 	it("GET /things?order_by=user_id%20asc&order_by=name%20desc - returns a sorted array of objects", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/things?order_by=user_id%20asc&order_by=name%20desc"})
+		return httptest({url: "http://localhost:" + port + "/things?order_by=user_id%20asc&order_by=name%20desc"})
 			.expectStatus(200)
 			.expectValue("data", [
 				{
@@ -445,7 +446,7 @@ describe("Sorting", function () {
 	});
 
 	it("GET /items?order_by=asc - returns a sorted array of primitives", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/items?order_by=asc"})
+		return httptest({url: "http://localhost:" + port + "/items?order_by=asc"})
 			.expectStatus(200)
 			.expectValue("data", [
 				1,
@@ -460,7 +461,7 @@ describe("Sorting", function () {
 	});
 
 	it("GET /items?order_by=desc - returns a sorted array of primitives", function () {
-		return tinyhttptest({url: "http://localhost:" + port + "/items?order_by=desc"})
+		return httptest({url: "http://localhost:" + port + "/items?order_by=desc"})
 			.expectStatus(200)
 			.expectValue("data", [
 				15,

@@ -1,4 +1,4 @@
-import uuid from "tiny-uuid4";
+import {randomUUID as uuid} from "node:crypto";
 
 export const get = {
 	"/": [

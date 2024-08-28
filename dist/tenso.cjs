@@ -14,7 +14,7 @@ var node_module = require('node:module');
 var node_path = require('node:path');
 var node_url = require('node:url');
 var woodland = require('woodland');
-var defaults = require('defaults');
+var tinyMerge = require('tiny-merge');
 var tinyEventsource = require('tiny-eventsource');
 var tinyCoerce = require('tiny-coerce');
 var YAML = require('yamljs');
@@ -1284,6 +1284,18 @@ class Tenso extends woodland.Woodland {
 		return result;
 	}
 
+	renderer (mediatype, fn) {
+		this.renderers.set(mediatype, fn);
+
+		return this;
+	}
+
+	serializer (mediatype, fn) {
+		this.serializers.set(mediatype, fn);
+
+		return this;
+	}
+
 	signals () {
 		for (const signal of [SIGHUP, SIGINT, SIGTERM]) {
 			process.on(signal, () => {
@@ -1327,19 +1339,7 @@ class Tenso extends woodland.Woodland {
 }
 
 function tenso (userConfig = {}) {
-	const initRoutes = userConfig?.initRoutes ?? null;
-	const initAuth = userConfig?.auth ?? null;
-	delete userConfig.initRoutes;
-	delete userConfig.auth;
-	const config$1 = defaults(userConfig, clone(config));
-
-	if (initRoutes !== null) {
-		config$1.initRoutes = initRoutes;
-	}
-
-	if (initAuth !== null) {
-		config$1.auth = initAuth;
-	}
+	const config$1 = tinyMerge.merge(userConfig, clone(config));
 
 	if ((/^[^\d+]$/).test(config$1.port) && config$1.port < 1) {
 		console.error("Invalid configuration");

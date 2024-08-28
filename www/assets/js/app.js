@@ -172,4 +172,4 @@
 		"             \\   \\  /'---'        `--'---'",
 		"              `----'"
 	].join("\n"));
-}(document, window, location, fetch, router));
+}(document, window, location, fetch, domRouter.router));

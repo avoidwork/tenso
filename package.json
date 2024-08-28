@@ -26,7 +26,8 @@
     "mocha": "nyc mocha test/*.test.js",
     "rollup": "rollup --config",
     "test": "npm run lint && npm run mocha",
-    "prepare": "husky"
+    "prepare": "husky",
+    "types": "npx -p typescript tsc src/tenso.js --declaration --allowJs --emitDeclarationOnly --outDir types"
   },
   "source": "src/tenso.js",
   "main": "dist/tenso.cjs",
@@ -40,7 +41,7 @@
   "files": [
     "dist/tenso.cjs",
     "dist/tenso.js",
-    "types/tenso.d.ts",
+    "types",
     "www/template.html",
     "www/assets"
   ],

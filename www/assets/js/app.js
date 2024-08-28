@@ -1,6 +1,6 @@
 "use strict";
 
-(function (document, window, location, fetch, router) {
+(function (document, window, location, fetch, router, localStorage) {
 	// Wiring up the request tab
 	const button = document.querySelector("button"),
 		close = document.querySelector("#close"),
@@ -149,7 +149,9 @@
 		ev.stopPropagation();
 		window.requestAnimationFrame(() => {
 			body.classList.toggle("dark");
-			toggle.innerText = body.classList.contains("dark") ? "Light" : "Dark";
+			const isDark = body.classList.contains("dark");
+			toggle.innerText = isDark ? "Light" : "Dark";
+			localStorage.setItem("tensoDark", isDark);
 		});
 	};
 
@@ -165,6 +167,12 @@
 
 		// Prettifying the response
 		prettify(document.querySelector("#body"));
+
+		// Setting up dark mode
+		if (localStorage.getItem("tensoDark") === "true") {
+			toggle.click();
+			console.log("Starting in dark mode");
+		}
 	});
 
 	console.log([
@@ -184,4 +192,4 @@
 		"             \\   \\  /'---'        `--'---'",
 		"              `----'"
 	].join("\n"));
-}(document, window, location, fetch, domRouter.router));
+}(document, window, location, fetch, domRouter.router, localStorage));

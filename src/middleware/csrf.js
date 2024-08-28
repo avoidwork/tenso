@@ -7,6 +7,7 @@ export function csrfWrapper (req, res, next) {
 	if (memoized === false) {
 		cachedKey = req.server.security.key;
 		cachedFn = lusca.csrf({key: cachedKey, secret: req.server.security.secret});
+		memoized = true;
 	}
 
 	if (req.unprotect) {

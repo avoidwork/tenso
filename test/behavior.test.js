@@ -379,6 +379,8 @@ describe("CORS", function () {
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: false}});
 
+	const server = this.tenso.start();
+
 	it("OPTIONS /empty - returns an empty array", function () {
 		return httptest({url: "http://localhost:" + port + "/empty", method: "options"})
 			.cors("http://not.localhost")
@@ -390,7 +392,7 @@ describe("CORS", function () {
 		return httptest({url: "http://localhost:" + port + "/empty"})
 			.cors("http://not.localhost")
 			.expectStatus(200)
-			.end();
+			.end().then(() => server.stop());
 	});
 });
 

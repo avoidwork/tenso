@@ -99,7 +99,6 @@ export const JWT = "jwt";
 export const LAST = "last";
 export const LT = "&lt;";
 export const LINK = "link";
-export const LINKS = "links";
 export const LOG_FORMAT = "%h %l %u %t \"%r\" %>s %b";
 export const MEMORY = "memory";
 export const MSG_LOGIN = "POST 'username' & 'password' to authenticate";

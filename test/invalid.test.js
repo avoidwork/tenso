@@ -11,7 +11,7 @@ describe("Invalid", function () {
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: false}});
 
-	const server = this.tenso.server;
+	const server = this.tenso.start();
 
 	it("GET / (416 / 'Partial response - invalid')", function () {
 		return httptest({url: "http://localhost:" + port + "/", headers: {range: "a-b"}})

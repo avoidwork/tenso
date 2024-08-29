@@ -1307,11 +1307,7 @@ class Tenso extends woodland.Woodland {
 		// Setting routes
 		for (const [method, routes] of Object.entries(this.initRoutes ?? {})) {
 			for (const [route, target] of Object.entries(routes ?? {})) {
-				if (typeof target === FUNCTION) {
-					this[method](route, target);
-				} else {
-					this[method](route, (req, res) => res.send(target));
-				}
+				this[method](route, target);
 			}
 		}
 

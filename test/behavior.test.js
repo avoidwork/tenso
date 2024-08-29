@@ -10,7 +10,7 @@ describe("Pagination", function () {
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: false}});
 
-	const server = this.tenso.server;
+	const server = this.tenso.start();
 
 	it("GET /empty - returns an empty array", function () {
 		return httptest({url: "http://localhost:" + port + "/empty"})
@@ -152,7 +152,7 @@ describe("Hypermedia", function () {
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}});
 
-	const server = this.tenso.server;
+	const server = this.tenso.start();
 
 	it("GET /things - returns a collection of representations that has hypermedia properties", function () {
 		return httptest({url: "http://localhost:" + port + "/things"})
@@ -216,7 +216,7 @@ describe("Rate Limiting", function () {
 		rate: {enabled: true, limit: 2, reset: 900}
 	});
 
-	const server = this.tenso.server;
+	const server = this.tenso.start();
 
 	it("GET / - returns an array of endpoints (1/2)", function () {
 		return httptest({url: "http://localhost:" + port})
@@ -286,7 +286,7 @@ describe("Rate Limiting (Override)", function () {
 		}
 	});
 
-	const server = this.tenso.server;
+	const server = this.tenso.start();
 
 	it("GET / - returns an array of endpoints (1/2)", function () {
 		return httptest({url: "http://localhost:" + port})
@@ -331,7 +331,7 @@ describe("Request body max byte size", function () {
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}, maxBytes: 10});
 
-	const server = this.tenso.server;
+	const server = this.tenso.start();
 
 	it("POST /test - returns an a result", function () {
 		return httptest({url: "http://localhost:" + port + "/test", method: "post"})
@@ -399,7 +399,7 @@ describe("CORS Headers", function () {
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: true}});
 
-	const server = this.tenso.server;
+	const server = this.tenso.start();
 
 	it("GET /test - exposes x-csrf-token header", function () {
 		return httptest({url: "http://localhost:" + port + "/test"})
@@ -417,7 +417,7 @@ describe("Sorting", function () {
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}});
 
-	const server = this.tenso.server;
+	const server = this.tenso.start();
 
 	it("GET /things?order_by=user_id%20asc&order_by=name%20desc - returns a sorted array of objects", function () {
 		return httptest({url: "http://localhost:" + port + "/things?order_by=user_id%20asc&order_by=name%20desc"})

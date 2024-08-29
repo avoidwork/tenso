@@ -17,7 +17,7 @@ describe("Valid", function () {
 		static: "/sample"
 	});
 
-	const server = this.tenso.server;
+	const server = this.tenso.start();
 
 	it("GET / (200 / 'Array')", function () {
 		return httptest({url: "http://localhost:" + port + "/"})

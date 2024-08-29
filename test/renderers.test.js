@@ -14,7 +14,7 @@ describe("Renderers", function () {
 	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: false}});
 	this.tenso.renderer("custom", arg => arg);
 
-	const server = this.tenso.server;
+	const server = this.tenso.start();
 
 	it("GET CSV (header)", function () {
 		return httptest({url: "http://localhost:" + port, headers: {accept: "text/csv"}})

@@ -3,7 +3,7 @@
  *
  * @copyright 2024 Jason Mulligan <jason.mulligan@avoidwork.com>
  * @license BSD-3-Clause
- * @version 17.0.1
+ * @version 17.0.2
  */
 'use strict';
 
@@ -885,14 +885,6 @@ function rate (req, res, next) {
 	}
 }
 
-function keymaster (req, res) {
-	if (req.protect === false || req.protectAsync === false || req.session !== void 0 && req.isAuthenticated()) {
-		req.exit();
-	} else {
-		res.error(INT_401);
-	}
-}
-
 function zuul (req, res, next) {
 	const uri = req.parsed.pathname;
 	let protect = false;
@@ -916,7 +908,7 @@ function zuul (req, res, next) {
 		} else if (protect) {
 			next();
 		} else {
-			keymaster(req, res);
+			req.exit();
 		}
 	});
 }

@@ -12,12 +12,11 @@ describe("Renderers", function () {
 
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: false}});
-	this.tenso.renderer("custom", arg => arg);
 
 	const server = this.tenso.start();
 
 	it("GET CSV (header)", function () {
-		return httptest({url: "http://localhost:" + port, headers: {accept: "text/csv"}})
+		return httptest({url: "http://localhost:" + port + "/things", headers: {accept: "text/csv"}})
 			.expectStatus(200)
 			.expectHeader("content-type", "text/csv")
 			.expectHeader("content-disposition", "attachment; filename=\"download.csv\"")
@@ -26,7 +25,7 @@ describe("Renderers", function () {
 	});
 
 	it("GET CSV (query string)", function () {
-		return httptest({url: "http://localhost:" + port + "/?format=text/csv"})
+		return httptest({url: "http://localhost:" + port + "/things?format=text/csv"})
 			.expectStatus(200)
 			.expectHeader("content-type", "text/csv")
 			.expectHeader("content-disposition", "attachment; filename=\"download.csv\"")

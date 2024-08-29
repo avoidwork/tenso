@@ -83,6 +83,8 @@ const HEADER_APPLICATION_JSON_LINES = "application/json-lines";
 const HEADER_APPLICATION_XML = "application/xml";
 const HEADER_APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
 const HEADER_APPLICATION_YAML = "application/yaml";
+const HEADER_CONTENT_DISPOSITION = "content-disposition";
+const HEADER_CONTENT_DISPOSITION_VALUE = "attachment; filename=\"download.csv\"";
 const HEADER_CONTENT_TYPE = "content-type";
 const HEADER_SPLIT = "\" <";
 const HEADER_TEXT_CSV = "text/csv";
@@ -434,6 +436,8 @@ function javascript (req, res, arg) {
 }
 
 function csv (req, res, arg) {
+	res.header(HEADER_CONTENT_DISPOSITION, HEADER_CONTENT_DISPOSITION_VALUE);
+
 	return sync.stringify(Array.isArray(arg) ? arg : [arg], {
 		cast: {
 			boolean: value => value ? TRUE : FALSE,
@@ -507,7 +511,7 @@ const serializers = new Map([
 	[HEADER_APPLICATION_XML, custom],
 	[HEADER_TEXT_PLAIN, plain],
 	[HEADER_APPLICATION_JAVASCRIPT, custom],
-	[HEADER_TEXT_CSV, custom],
+	[HEADER_TEXT_CSV, plain],
 	[HEADER_TEXT_HTML, custom],
 	[HEADER_APPLICATION_JSON_LINES, plain],
 	[HEADER_APPLICATION_JSONL, plain],

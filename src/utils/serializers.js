@@ -19,7 +19,7 @@ export const serializers = new Map([
 	[HEADER_APPLICATION_XML, custom],
 	[HEADER_TEXT_PLAIN, plain],
 	[HEADER_APPLICATION_JAVASCRIPT, custom],
-	[HEADER_TEXT_CSV, custom],
+	[HEADER_TEXT_CSV, plain],
 	[HEADER_TEXT_HTML, custom],
 	[HEADER_APPLICATION_JSON_LINES, plain],
 	[HEADER_APPLICATION_JSONL, plain],

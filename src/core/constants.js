@@ -46,6 +46,8 @@ export const HEADER_APPLICATION_JSON_LINES = "application/json-lines";
 export const HEADER_APPLICATION_XML = "application/xml";
 export const HEADER_APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
 export const HEADER_APPLICATION_YAML = "application/yaml";
+export const HEADER_CONTENT_DISPOSITION = "content-disposition";
+export const HEADER_CONTENT_DISPOSITION_VALUE = "attachment; filename=\"download.csv\"";
 export const HEADER_CONTENT_TYPE = "content-type";
 export const HEADER_SPLIT = "\" <";
 export const HEADER_TEXT_CSV = "text/csv";

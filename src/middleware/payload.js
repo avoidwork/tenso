@@ -1,5 +1,5 @@
 import {DATA, EMPTY, END, HEADER_CONTENT_TYPE, INT_0, INT_413, MULTIPART, UTF8} from "../core/constants.js";
-import {hasBody} from "../utils/hasbody.js";
+import {hasBody} from "../utils/hasBody.js";
 
 export function payload (req, res, next) {
 	if (hasBody(req.method) && req.headers?.[HEADER_CONTENT_TYPE]?.includes(MULTIPART) === false) {

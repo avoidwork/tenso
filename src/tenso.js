@@ -12,7 +12,7 @@ import {parsers} from "./utils/parsers.js";
 import {renderers} from "./utils/renderers.js";
 import {serializers} from "./utils/serializers.js";
 import {mimetype} from "./utils/regex.js";
-import {hasBody} from "./utils/hasbody.js";
+import {hasBody} from "./utils/hasBody.js";
 import {
 	ACCESS_CONTROL,
 	ALLOW,

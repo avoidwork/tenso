@@ -3,9 +3,10 @@ import {tenso} from "../dist/tenso.js";
 import {routes} from "./routes.js";
 
 const timeout = 5000;
+const basePort = 3100;
 
 describe("Pagination", function () {
-	const port = 8002;
+	const port = basePort;
 
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: false}});
@@ -147,7 +148,7 @@ describe("Pagination", function () {
 });
 
 describe("Hypermedia", function () {
-	const port = 8003;
+	const port = basePort + 1;
 
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: false}});
@@ -205,7 +206,7 @@ describe("Hypermedia", function () {
 });
 
 describe("Rate Limiting", function () {
-	const port = 8007;
+	const port = basePort + 2;
 
 	this.timeout(timeout);
 	this.tenso = tenso({
@@ -213,7 +214,7 @@ describe("Rate Limiting", function () {
 		initRoutes: routes,
 		logging: {enabled: false},
 		security: {csrf: false},
-		rateLimit: {enabled: true, limit: 2, reset: 900}
+		rate: {enabled: true, limit: 2, reset: 900}
 	});
 
 	const server = this.tenso.start();
@@ -266,7 +267,7 @@ describe("Rate Limiting", function () {
 });
 
 describe("Rate Limiting (Override)", function () {
-	const port = 8009;
+	const port = basePort + 3;
 	let i = 1;
 
 	this.timeout(timeout);
@@ -326,7 +327,7 @@ describe("Rate Limiting (Override)", function () {
 });
 
 describe("Request body max byte size", function () {
-	const port = 8008;
+	const port = basePort + 4;
 
 	this.timeout(timeout);
 	this.tenso = tenso({
@@ -362,7 +363,7 @@ describe("Request body max byte size", function () {
 });
 
 describe("Route parameters", function () {
-	const port = 8010;
+	const port = basePort + 5;
 
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: false}});
@@ -379,7 +380,7 @@ describe("Route parameters", function () {
 });
 
 describe("CORS", function () {
-	const port = 8013;
+	const port = basePort + 6;
 
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: false}});
@@ -400,7 +401,7 @@ describe("CORS", function () {
 });
 
 describe("CORS Headers", function () {
-	const port = 8015;
+	const port = basePort + 7;
 
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: true}});
@@ -418,7 +419,7 @@ describe("CORS Headers", function () {
 });
 
 describe("Sorting", function () {
-	const port = 8014;
+	const port = basePort + 8;
 
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: false}});

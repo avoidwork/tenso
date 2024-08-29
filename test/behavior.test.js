@@ -146,12 +146,11 @@ describe("Pagination", function () {
 	});
 });
 
-/**
 describe("Hypermedia", function () {
 	const port = 8003;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}});
+	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: false}});
 
 	const server = this.tenso.start();
 
@@ -211,10 +210,10 @@ describe("Rate Limiting", function () {
 	this.timeout(timeout);
 	this.tenso = tenso({
 		port: port,
-		routes: routes,
+		initRoutes: routes,
 		logging: {enabled: false},
 		security: {csrf: false},
-		rate: {enabled: true, limit: 2, reset: 900}
+		rateLimit: {enabled: true, limit: 2, reset: 900}
 	});
 
 	const server = this.tenso.start();
@@ -272,7 +271,7 @@ describe("Rate Limiting (Override)", function () {
 
 	this.timeout(timeout);
 	this.tenso = tenso({
-		port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}, rate: {
+		port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: false}, rate: {
 			enabled: true,
 			limit: 2,
 			reset: 900,
@@ -330,7 +329,13 @@ describe("Request body max byte size", function () {
 	const port = 8008;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}, maxBytes: 10});
+	this.tenso = tenso({
+		port: port,
+		initRoutes: routes,
+		logging: {enabled: false},
+		security: {csrf: false},
+		maxBytes: 10
+	});
 
 	const server = this.tenso.start();
 
@@ -360,7 +365,7 @@ describe("Route parameters", function () {
 	const port = 8010;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}});
+	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: false}});
 
 	it("GET /test/hidden - returns an a 'hidden' result", function () {
 		return httptest({url: "http://localhost:" + port + "/test/hidden"})
@@ -377,7 +382,7 @@ describe("CORS", function () {
 	const port = 8013;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}});
+	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: false}});
 
 	it("OPTIONS /empty - returns an empty array", function () {
 		return httptest({url: "http://localhost:" + port + "/empty", method: "options"})
@@ -398,7 +403,7 @@ describe("CORS Headers", function () {
 	const port = 8015;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: true}});
+	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: true}});
 
 	const server = this.tenso.start();
 
@@ -416,7 +421,7 @@ describe("Sorting", function () {
 	const port = 8014;
 
 	this.timeout(timeout);
-	this.tenso = tenso({port: port, routes: routes, logging: {enabled: false}, security: {csrf: false}});
+	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: false}});
 
 	const server = this.tenso.start();
 
@@ -476,4 +481,3 @@ describe("Sorting", function () {
 			.end().then(() => server.stop());
 	});
 });
-*/

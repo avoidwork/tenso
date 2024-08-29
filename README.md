@@ -439,11 +439,11 @@ webroot: {
 }
 ```
 
-## Custom static routes
-Custom static routes can be defined like such:
+## Serving files
+Custom file routes can be created like this:
 
 ```
-   "/other": (req, res) => req.server.static(req, res);
+app.files("/folder", "/full/path/to/parent");
 ```
 
 ## EventSource streams

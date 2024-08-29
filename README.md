@@ -35,11 +35,13 @@ As of 10.3.0 you can specify `always` as a method to run middleware before autho
 ```javascript
 import {randomUUID as uuid} from "crypto";
 
-export const get = {
-	"/": ["reports", "uuid"],
-	"/reports": ["tps"],
-	"/reports/tps": (req, res) => res.error(785, Error("TPS Cover Sheet not attached")),
-	"/uuid": (req, res) => res.send(uuid(), 200, {"cache-control": "no-cache"})
+export const initRoutes = {
+	"get": {
+		"/": ["reports", "uuid"],
+		"/reports": ["tps"],
+		"/reports/tps": (req, res) => res.error(785, Error("TPS Cover Sheet not attached")),
+		"/uuid": (req, res) => res.send(uuid(), 200, {"cache-control": "no-cache"})
+	}
 };
 ```
 

@@ -940,9 +940,6 @@ function isEmpty (arg = EMPTY) {
 	return arg === EMPTY;
 }
 
-// @todo audit redis
-// @todo audit the function - it's probably too complex
-
 const {Strategy: JWTStrategy, ExtractJwt} = passportJWT,
 	groups = [PROTECT, UNPROTECT];
 

@@ -56,9 +56,6 @@ import {
 import RedisStore from "connect-redis";
 import lusca from "lusca";
 
-// @todo audit redis
-// @todo audit the function - it's probably too complex
-
 const {Strategy: JWTStrategy, ExtractJwt} = passportJWT,
 	groups = [PROTECT, UNPROTECT];
 

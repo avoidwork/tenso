@@ -362,6 +362,8 @@ describe("Route parameters", function () {
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: false}});
 
+	const server = this.tenso.start();
+
 	it("GET /test/hidden - returns an a 'hidden' result", function () {
 		return httptest({url: "http://localhost:" + port + "/test/hidden"})
 			.expectStatus(200)
@@ -369,7 +371,7 @@ describe("Route parameters", function () {
 			.expectValue("data", "hidden")
 			.expectValue("error", null)
 			.expectValue("status", 200)
-			.end();
+			.end().then(() => server.stop());
 	});
 });
 

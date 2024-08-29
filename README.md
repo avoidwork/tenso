@@ -15,7 +15,7 @@ Tenso is an HTTP REST API framework, that will handle the serialization & creati
 Creating an API with Tenso can be this simple:
 
 ```javascript
-import {tenso} from "./dist/tenso.js";
+import {tenso} from "tenso";
 
 export const app = tenso({port: 8000});
 

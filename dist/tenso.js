@@ -153,11 +153,17 @@ const HEADER_TEXT_CSV = "text/csv";
 const HEADER_TEXT_HTML = "text/html";
 const HTML = "html";
 const INT_0 = 0;
+const INT_1 = 1;
+const INT_5 = 5;
 const INT_200 = 200;
 const INT_204 = 204;
+const INT_206 = 206;
 const INT_304 = 304;
+const INT_400 = 400;
+const INT_401 = 401;
 const INT_413 = 413;
 const INT_429 = 429;
+const INT_500 = 500;
 const MULTIPART = "multipart";
 const RETRY_AFTER = "retry-after";
 const UTF8 = "utf8";
@@ -185,6 +191,8 @@ const SPACE = " ";
 const PATCH = "PATCH";
 const POST = "POST";
 const PUT = "PUT";
+const DELETE = "DELETE";
+const GET = "GET";
 const OPTIONS = "OPTIONS";
 const ID = "id";
 const ID_2 = "_id";
@@ -203,7 +211,37 @@ const BOOLEAN = "boolean";
 const NUMBER = "number";
 const UNDEFINED = "undefined";
 const DESC = "desc";
-const EQ = "=";function json$1 (arg = EMPTY) {
+const EQ = "=";
+const ALLOW = "allow";
+const EXPOSE = "expose";
+const HEADERS = "headers";
+const ACCESS_CONTROL = "access-control";
+const HYPHEN = "-";
+const CACHE_CONTROL = "cache-control";
+const PRIVATE = "private";
+const NULL = "null";
+const INVALID_CONFIGURATION = "Invalid configuration";
+const X_POWERED_BY = "x-powered-by";
+const TEMPLATE_FILE = "template.html";
+const WWW = "www";
+const PREV_DIR = "..";
+const DOUBLE_SLASH = "//";
+const RELATED = "related";
+const ITEM = "item";
+const PAGE = "page";
+const PAGE_SIZE = "page_size";
+const FIRST = "first";
+const PREV = "prev";
+const NEXT = "next";
+const LAST = "last";
+const COMMA_SPACE$1 = ", ";
+const LINK = "link";
+const REL_URI = "rel, uri";
+const HEADER_SPLIT = "\" <";
+const COLLECTION = "collection";
+const URL_127001 = "http://127.0.0.1";
+const S = "s";
+const IE = "ie";function json$1 (arg = EMPTY) {
 	return JSON.parse(arg);
 }const bodySplit = /&|=/;
 const collection = /(.*)(\/.*)$/;
@@ -366,7 +404,7 @@ function sort (arg, req) {
 	const status = res.statusCode;
 	let format = req.server.mimeType,
 		accepts = explode(req.parsed.searchParams.get(FORMAT) || req.headers.accept || res.getHeader(HEADER_CONTENT_TYPE) || format, COMMA),
-		errz = arg instanceof Error || status >= 400,
+		errz = arg instanceof Error || status >= INT_400,
 		result, serializer;
 
 	for (const i of accepts) {
@@ -383,7 +421,7 @@ function sort (arg, req) {
 	res.header(HEADER_CONTENT_TYPE, `${format}${CHARSET_UTF8}`);
 
 	if (errz) {
-		result = serializer(null, arg, status < 400 ? 500 : status, req.server.logging.stackWire);
+		result = serializer(null, arg, status < INT_400 ? INT_500 : status, req.server.logging.stackWire);
 	} else {
 		result = serializer(sort(arg, req), null, status);
 	}
@@ -408,7 +446,7 @@ function hypermedia (req, res, rep) {
 	// Parsing the object for hypermedia properties
 	function marshal (obj, rel, item_collection) {
 		let keys = Object.keys(obj),
-			lrel = rel || "related",
+			lrel = rel || RELATED,
 			result;
 
 		if (keys.length === 0) {
@@ -424,20 +462,20 @@ function hypermedia (req, res, rep) {
 						const lkey = obj[i].toString();
 
 						if (lid === false) {
-							lcollection = i.replace(trailing, "").replace(trailingS, "").replace(trailingY, "ie") + "s";
-							lrel = "related";
+							lcollection = i.replace(trailing, EMPTY).replace(trailingS, EMPTY).replace(trailingY, IE) + S;
+							lrel = RELATED;
 						} else {
 							lcollection = item_collection;
-							lrel = "item";
+							lrel = ITEM;
 						}
 
 						if (scheme(lkey) === false) {
-							uri = `${lcollection[0] === "/" ? "" : "/"}${lcollection.replace(/\s/g, "%20")}/${lkey.replace(/\s/g, "%20")}`;
+							uri = `${lcollection[0] === SLASH ? EMPTY : SLASH}${lcollection.replace(/\s/g, ENCODED_SPACE)}/${lkey.replace(/\s/g, ENCODED_SPACE)}`;
 
 							if (uri !== root && seen.has(uri) === false) {
 								seen.add(uri);
 
-								if (server.allowed("GET", uri)) {
+								if (server.allowed(GET, uri)) {
 									links.push({uri: uri, rel: lrel});
 								}
 							}
@@ -453,65 +491,65 @@ function hypermedia (req, res, rep) {
 	}
 
 	query = req.parsed.searchParams;
-	page = Number(query.get("page")) || 1;
-	page_size = Number(query.get("page_size")) || server.pageSize || 5;
+	page = Number(query.get(PAGE)) || INT_1;
+	page_size = Number(query.get(PAGE_SIZE)) || server.pageSize || INT_5;
 
-	if (page < 1) {
-		page = 1;
+	if (page < INT_1) {
+		page = INT_1;
 	}
 
-	if (page_size < 1) {
-		page_size = server.pageSize || 5;
+	if (page_size < INT_1) {
+		page_size = server.pageSize || INT_5;
 	}
 
-	root = new URL(`http://127.0.0.1${req.parsed.pathname}${req.parsed.search}`);
-	root.searchParams.delete("page");
-	root.searchParams.delete("page_size");
+	root = new URL(`${URL_127001}${req.parsed.pathname}${req.parsed.search}`);
+	root.searchParams.delete(PAGE);
+	root.searchParams.delete(PAGE_SIZE);
 
-	if (root.pathname !== "/") {
-		const proot = root.pathname.replace(trailingSlash, "").replace(collection, "$1") || "/";
+	if (root.pathname !== SLASH) {
+		const proot = root.pathname.replace(trailingSlash, EMPTY).replace(collection, "$1") || SLASH;
 
-		if (server.allowed("GET", proot)) {
-			links.push({uri: proot, rel: "collection"});
+		if (server.allowed(GET, proot)) {
+			links.push({uri: proot, rel: COLLECTION});
 			seen.add(proot);
 		}
 	}
 
 	if (exists) {
 		if (Array.isArray(rep.data)) {
-			if (req.method === "GET" && (rep.status >= 200 && rep.status <= 206)) {
-				if (isNaN(page) || page <= 0) {
-					page = 1;
+			if (req.method === GET && (rep.status >= INT_200 && rep.status <= INT_206)) {
+				if (isNaN(page) || page <= INT_0) {
+					page = INT_1;
 				}
 
 				nth = Math.ceil(rep.data.length / page_size);
 
-				if (nth > 1) {
-					const start = (page - 1) * page_size,
+				if (nth > INT_1) {
+					const start = (page - INT_1) * page_size,
 						end = start + page_size;
 
 					rep.data = rep.data.slice(start, end);
-					root.searchParams.set("page", 0);
-					root.searchParams.set("page_size", page_size);
+					root.searchParams.set(PAGE, INT_0);
+					root.searchParams.set(PAGE_SIZE, page_size);
 
-					if (page > 1) {
-						root.searchParams.set("page", 1);
-						links.push({uri: `${root.pathname}${root.search}`, rel: "first"});
+					if (page > INT_1) {
+						root.searchParams.set(PAGE, INT_1);
+						links.push({uri: `${root.pathname}${root.search}`, rel: FIRST});
 					}
 
-					if (page - 1 > 1 && page <= nth) {
-						root.searchParams.set("page", page - 1);
-						links.push({uri: `${root.pathname}${root.search}`, rel: "prev"});
+					if (page - INT_1 > INT_1 && page <= nth) {
+						root.searchParams.set(PAGE, page - INT_1);
+						links.push({uri: `${root.pathname}${root.search}`, rel: PREV});
 					}
 
-					if (page + 1 < nth) {
-						root.searchParams.set("page", page + 1);
-						links.push({uri: `${root.pathname}${root.search}`, rel: "next"});
+					if (page + INT_1 < nth) {
+						root.searchParams.set(PAGE, page + INT_1);
+						links.push({uri: `${root.pathname}${root.search}`, rel: NEXT});
 					}
 
-					if (nth > 0 && page !== nth) {
-						root.searchParams.set("page", nth);
-						links.push({uri: `${root.pathname}${root.search}`, rel: "last"});
+					if (nth > INT_0 && page !== nth) {
+						root.searchParams.set(PAGE, nth);
+						links.push({uri: `${root.pathname}${root.search}`, rel: LAST});
 					}
 				}
 			}
@@ -519,22 +557,22 @@ function hypermedia (req, res, rep) {
 			if (req.hypermedia) {
 				for (const i of rep.data) {
 					if (i instanceof Object) {
-						marshal(i, "item", req.parsed.pathname.replace(trailingSlash, ""));
+						marshal(i, ITEM, req.parsed.pathname.replace(trailingSlash, EMPTY));
 					} else {
 						const li = i.toString();
 
 						if (li !== collection$1) {
-							const uri = li.indexOf("//") >= 0 ? li : `${collection$1.replace(/\s/g, "%20")}/${li.replace(/\s/g, "%20")}`.replace(/^\/\//, "/");
+							const uri = li.indexOf(DOUBLE_SLASH) >= 0 ? li : `${collection$1.replace(/\s/g, ENCODED_SPACE)}/${li.replace(/\s/g, ENCODED_SPACE)}`.replace(/^\/\//, SLASH);
 
-							if (server.allowed("GET", uri)) {
-								links.push({uri: uri, rel: "item"});
+							if (server.allowed(GET, uri)) {
+								links.push({uri: uri, rel: ITEM});
 							}
 						}
 					}
 				}
 			}
 		} else if (rep.data instanceof Object && req.hypermedia) {
-			parent = req.parsed.pathname.split("/").filter(i => i !== "");
+			parent = req.parsed.pathname.split(SLASH).filter(i => i !== EMPTY);
 
 			if (parent.length > 1) {
 				parent.pop();
@@ -546,15 +584,15 @@ function hypermedia (req, res, rep) {
 
 	if (links.length > 0) {
 		if (headers.link !== void 0) {
-			for (const i of headers.link.split("\" <")) {
+			for (const i of headers.link.split(HEADER_SPLIT)) {
 				links.push({
-					uri: i.replace(/(^\<|\>.*$)/g, ""),
-					rel: i.replace(/(^.*rel\=\"|\"$)/g, "")
+					uri: i.replace(/(^<|>.*$)/g, EMPTY),
+					rel: i.replace(/(^.*rel="|"$)/g, EMPTY)
 				});
 			}
 		}
 
-		res.header("link", keysort(links, "rel, uri").map(i => `<${i.uri}>; rel="${i.rel}"`).join(", "));
+		res.header(LINK, keysort(links, REL_URI).map(i => `<${i.uri}>; rel="${i.rel}"`).join(COMMA_SPACE$1));
 
 		if (exists && rep.links !== void 0) {
 			rep.links = links;
@@ -642,7 +680,7 @@ function csrfWrapper (req, res, next) {
 	if (req.parsed.pathname === login || req.isAuthenticated()) {
 		next();
 	} else {
-		res.error(401);
+		res.error(INT_401);
 	}
 }function redirect (req, res) {
 	res.redirect(req.server.auth.uri.redirect, false);
@@ -676,7 +714,7 @@ function rate (req, res, next) {
 	if (req.protect === false || req.protectAsync === false || req.session !== void 0 && req.isAuthenticated()) {
 		req.exit();
 	} else {
-		res.error(401);
+		res.error(INT_401);
 	}
 }function zuul (req, res, next) {
 	const uri = req.parsed.pathname;
@@ -833,7 +871,7 @@ function auth (obj) {
 			if (x[arg] !== void 0) {
 				cb(null, x[arg]);
 			} else {
-				cb(new Error(STATUS_CODES[401]), null);
+				cb(new Error(STATUS_CODES[INT_401]), null);
 			}
 		};
 
@@ -874,7 +912,7 @@ function auth (obj) {
 			if (obj.obj.auth.bearer.tokens.includes(arg)) {
 				cb(null, arg);
 			} else {
-				cb(new Error(STATUS_CODES[401]), null);
+				cb(new Error(STATUS_CODES[INT_401]), null);
 			}
 		};
 
@@ -944,7 +982,7 @@ function auth (obj) {
 			function final () {
 				passport.authenticate("local")(req, res, e => {
 					if (e !== void 0) {
-						res.error(401, STATUS_CODES[401]);
+						res.error(INT_401, STATUS_CODES[INT_401]);
 					} else if (req.cors && req.headers["x-requested-with"] === "XMLHttpRequest") {
 						res.send("Success");
 					} else {
@@ -1036,7 +1074,7 @@ class Tenso extends Woodland {
 	}
 
 	canModify (arg) {
-		return arg.includes("DELETE") || hasBody(arg);
+		return arg.includes(DELETE) || hasBody(arg);
 	}
 
 	connect (req, res) {
@@ -1049,7 +1087,7 @@ class Tenso extends Woodland {
 		req.server = this;
 
 		if (req.cors) {
-			const header = `access-control-${req.method === "OPTIONS" ? "allow" : "expose"}-headers`;
+			const header = `${ACCESS_CONTROL}${HYPHEN}${req.method === OPTIONS ? ALLOW : EXPOSE}${HYPHEN}${HEADERS}`;
 
 			res.removeHeader(header);
 			res.header(header, `cache-control, content-language, content-type, expires, last-modified, pragma${req.csrf ? `, ${this.security.key}` : ""}${this.corsExpose.length > 0 ? `, ${this.corsExpose}` : ""}`);
@@ -1065,14 +1103,14 @@ class Tenso extends Woodland {
 	}
 
 	headers (req, res) {
-		const key = "cache-control",
-			cache = res.getHeader(key) || "";
+		const key = CACHE_CONTROL,
+			cache = res.getHeader(key) || EMPTY;
 
-		if ((req.protect || req.csrf || req.private) && cache.includes("private") === false) {
-			const lcache = cache.replace(/(private|public)(,\s)?/g, "");
+		if ((req.protect || req.csrf || req.private) && cache.includes(PRIVATE) === false) {
+			const lcache = cache.replace(/(private|public)(,\s)?/g, EMPTY);
 
 			res.removeHeader(key);
-			res.header(key, `private${lcache.length > 0 ? ", " : ""}${lcache || ""}`);
+			res.header(key, `${PRIVATE}${lcache.length > 0 ? `${COMMA}${EMPTY}` : EMPTY}${lcache || EMPTY}`);
 		}
 	}
 
@@ -1135,7 +1173,7 @@ class Tenso extends Woodland {
 		return this;
 	}
 
-	parser (mediatype = "", fn = arg => arg) {
+	parser (mediatype = EMPTY, fn = arg => arg) {
 		this.parsers.set(mediatype, fn);
 
 		return this;
@@ -1157,7 +1195,7 @@ class Tenso extends Woodland {
 			});
 		}
 
-		if (typeof fn === "function") {
+		if (typeof fn === FUNCTION) {
 			this.rates.set(id, fn(req, this.rates.get(id)));
 		}
 
@@ -1181,15 +1219,15 @@ class Tenso extends Woodland {
 
 	render (req, res, arg) {
 		if (arg === null) {
-			arg = "null";
+			arg = NULL;
 		}
 
-		const accepts = (req.parsed.searchParams.get("format") || req.headers.accept || res.getHeader("content-type")).split(",");
-		let format = "",
+		const accepts = (req.parsed.searchParams.get(FORMAT) || req.headers.accept || res.getHeader(HEADER_CONTENT_TYPE)).split(COMMA);
+		let format = EMPTY,
 			renderer, result;
 
 		for (const media of accepts) {
-			const lmimetype = media.replace(mimetype, "");
+			const lmimetype = media.replace(mimetype, EMPTY);
 
 			if (this.renderers.has(lmimetype)) {
 				format = lmimetype;
@@ -1202,7 +1240,7 @@ class Tenso extends Woodland {
 		}
 
 		renderer = this.renderers.get(format);
-		res.header("content-type", format);
+		res.header(HEADER_CONTENT_TYPE, format);
 		result = renderer(req, res, arg, this.webroot.template);
 
 		return result;
@@ -1266,18 +1304,18 @@ function tenso (userConfig = {}) {
 	const config$1 = merge(clone(config), userConfig);
 
 	if ((/^[^\d+]$/).test(config$1.port) && config$1.port < 1) {
-		console.error("Invalid configuration");
+		console.error(INVALID_CONFIGURATION);
 		process.exit(1);
 	}
 
 	config$1.title = name;
 	config$1.version = version;
-	config$1.webroot.root = resolve(config$1.webroot.root || join(__dirname, "..", "www"));
-	config$1.webroot.template = readFileSync(config$1.webroot.template || join(config$1.webroot.root, "template.html"), {encoding: "utf8"});
+	config$1.webroot.root = resolve(config$1.webroot.root || join(__dirname, PREV_DIR, WWW));
+	config$1.webroot.template = readFileSync(config$1.webroot.template || join(config$1.webroot.root, TEMPLATE_FILE), {encoding: UTF8});
 
 	if (config$1.silent !== true) {
 		config$1.defaultHeaders.server = `tenso/${config$1.version}`;
-		config$1.defaultHeaders["x-powered-by"] = `nodejs/${process.version}, ${process.platform}/${process.arch}`;
+		config$1.defaultHeaders[X_POWERED_BY] = `nodejs/${process.version}, ${process.platform}/${process.arch}`;
 	}
 
 	const app = new Tenso(config$1);

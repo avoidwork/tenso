@@ -13,7 +13,21 @@ import {renderers} from "./utils/renderers.js";
 import {serializers} from "./utils/serializers.js";
 import {mimetype} from "./utils/regex.js";
 import {hasBody} from "./utils/hasbody.js";
-import {CONNECT, EMPTY, FUNCTION, INT_200, INT_204, INT_304, SIGHUP, SIGINT, SIGTERM} from "./core/constants.js";
+import {
+	ACCESS_CONTROL,
+	ALLOW, CACHE_CONTROL, COMMA,
+	CONNECT,
+	DELETE,
+	EMPTY,
+	EXPOSE, FORMAT,
+	FUNCTION, HEADER_CONTENT_TYPE, HEADERS, HYPHEN,
+	INT_200,
+	INT_204,
+	INT_304, INVALID_CONFIGURATION, NULL, OPTIONS, PREV_DIR, PRIVATE,
+	SIGHUP,
+	SIGINT,
+	SIGTERM, TEMPLATE_FILE, UTF8, WWW, X_POWERED_BY
+} from "./core/constants.js";
 import {serialize} from "./utils/serialize.js";
 import {hypermedia} from "./utils/hypermedia.js";
 import {payload} from "./middleware/payload.js";
@@ -44,7 +58,7 @@ class Tenso extends Woodland {
 	}
 
 	canModify (arg) {
-		return arg.includes("DELETE") || hasBody(arg);
+		return arg.includes(DELETE) || hasBody(arg);
 	}
 
 	connect (req, res) {
@@ -57,7 +71,7 @@ class Tenso extends Woodland {
 		req.server = this;
 
 		if (req.cors) {
-			const header = `access-control-${req.method === "OPTIONS" ? "allow" : "expose"}-headers`;
+			const header = `${ACCESS_CONTROL}${HYPHEN}${req.method === OPTIONS ? ALLOW : EXPOSE}${HYPHEN}${HEADERS}`;
 
 			res.removeHeader(header);
 			res.header(header, `cache-control, content-language, content-type, expires, last-modified, pragma${req.csrf ? `, ${this.security.key}` : ""}${this.corsExpose.length > 0 ? `, ${this.corsExpose}` : ""}`);
@@ -73,14 +87,14 @@ class Tenso extends Woodland {
 	}
 
 	headers (req, res) {
-		const key = "cache-control",
-			cache = res.getHeader(key) || "";
+		const key = CACHE_CONTROL,
+			cache = res.getHeader(key) || EMPTY;
 
-		if ((req.protect || req.csrf || req.private) && cache.includes("private") === false) {
-			const lcache = cache.replace(/(private|public)(,\s)?/g, "");
+		if ((req.protect || req.csrf || req.private) && cache.includes(PRIVATE) === false) {
+			const lcache = cache.replace(/(private|public)(,\s)?/g, EMPTY);
 
 			res.removeHeader(key);
-			res.header(key, `private${lcache.length > 0 ? ", " : ""}${lcache || ""}`);
+			res.header(key, `${PRIVATE}${lcache.length > 0 ? `${COMMA}${EMPTY}` : EMPTY}${lcache || EMPTY}`);
 		}
 	}
 
@@ -143,7 +157,7 @@ class Tenso extends Woodland {
 		return this;
 	}
 
-	parser (mediatype = "", fn = arg => arg) {
+	parser (mediatype = EMPTY, fn = arg => arg) {
 		this.parsers.set(mediatype, fn);
 
 		return this;
@@ -165,7 +179,7 @@ class Tenso extends Woodland {
 			});
 		}
 
-		if (typeof fn === "function") {
+		if (typeof fn === FUNCTION) {
 			this.rates.set(id, fn(req, this.rates.get(id)));
 		}
 
@@ -189,15 +203,15 @@ class Tenso extends Woodland {
 
 	render (req, res, arg) {
 		if (arg === null) {
-			arg = "null";
+			arg = NULL;
 		}
 
-		const accepts = (req.parsed.searchParams.get("format") || req.headers.accept || res.getHeader("content-type")).split(",");
-		let format = "",
+		const accepts = (req.parsed.searchParams.get(FORMAT) || req.headers.accept || res.getHeader(HEADER_CONTENT_TYPE)).split(COMMA);
+		let format = EMPTY,
 			renderer, result;
 
 		for (const media of accepts) {
-			const lmimetype = media.replace(mimetype, "");
+			const lmimetype = media.replace(mimetype, EMPTY);
 
 			if (this.renderers.has(lmimetype)) {
 				format = lmimetype;
@@ -210,7 +224,7 @@ class Tenso extends Woodland {
 		}
 
 		renderer = this.renderers.get(format);
-		res.header("content-type", format);
+		res.header(HEADER_CONTENT_TYPE, format);
 		result = renderer(req, res, arg, this.webroot.template);
 
 		return result;
@@ -274,18 +288,18 @@ export function tenso (userConfig = {}) {
 	const config = merge(clone(defaultConfig), userConfig);
 
 	if ((/^[^\d+]$/).test(config.port) && config.port < 1) {
-		console.error("Invalid configuration");
+		console.error(INVALID_CONFIGURATION);
 		process.exit(1);
 	}
 
 	config.title = name;
 	config.version = version;
-	config.webroot.root = resolve(config.webroot.root || join(__dirname, "..", "www"));
-	config.webroot.template = readFileSync(config.webroot.template || join(config.webroot.root, "template.html"), {encoding: "utf8"});
+	config.webroot.root = resolve(config.webroot.root || join(__dirname, PREV_DIR, WWW));
+	config.webroot.template = readFileSync(config.webroot.template || join(config.webroot.root, TEMPLATE_FILE), {encoding: UTF8});
 
 	if (config.silent !== true) {
 		config.defaultHeaders.server = `tenso/${config.version}`;
-		config.defaultHeaders["x-powered-by"] = `nodejs/${process.version}, ${process.platform}/${process.arch}`;
+		config.defaultHeaders[X_POWERED_BY] = `nodejs/${process.version}, ${process.platform}/${process.arch}`;
 	}
 
 	const app = new Tenso(config);

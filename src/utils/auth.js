@@ -18,7 +18,7 @@ import {clone} from "./clone.js";
 import {delay} from "./delay.js";
 import {isEmpty} from "./isEmpty.js";
 import {randomUUID as uuid} from "node:crypto";
-import {PROTECT, UNPROTECT} from "../core/constants.js";
+import {INT_401, PROTECT, UNPROTECT} from "../core/constants.js";
 import RedisStore from "connect-redis";
 import lusca from "lusca";
 
@@ -141,7 +141,7 @@ export function auth (obj) {
 			if (x[arg] !== void 0) {
 				cb(null, x[arg]);
 			} else {
-				cb(new Error(STATUS_CODES[401]), null);
+				cb(new Error(STATUS_CODES[INT_401]), null);
 			}
 		};
 
@@ -182,7 +182,7 @@ export function auth (obj) {
 			if (obj.obj.auth.bearer.tokens.includes(arg)) {
 				cb(null, arg);
 			} else {
-				cb(new Error(STATUS_CODES[401]), null);
+				cb(new Error(STATUS_CODES[INT_401]), null);
 			}
 		};
 
@@ -252,7 +252,7 @@ export function auth (obj) {
 			function final () {
 				passport.authenticate("local")(req, res, e => {
 					if (e !== void 0) {
-						res.error(401, STATUS_CODES[401]);
+						res.error(INT_401, STATUS_CODES[INT_401]);
 					} else if (req.cors && req.headers["x-requested-with"] === "XMLHttpRequest") {
 						res.send("Success");
 					} else {

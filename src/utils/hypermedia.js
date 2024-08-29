@@ -11,32 +11,32 @@ import {
 import {id} from "./id";
 import {scheme} from "./scheme";
 import {
+	COLLECTION,
+	COMMA_SPACE,
+	DOUBLE_SLASH,
 	EMPTY,
 	ENCODED_SPACE,
+	FIRST,
 	GET,
+	HEADER_SPLIT,
+	IE,
 	INT_0,
 	INT_1,
 	INT_200,
 	INT_206,
 	INT_5,
-	DOUBLE_SLASH,
-	RELATED,
-	SLASH,
 	ITEM,
+	LAST,
+	LINK,
+	NEXT,
 	PAGE,
 	PAGE_SIZE,
-	FIRST,
 	PREV,
-	NEXT,
-	LAST,
-	COMMA_SPACE,
-	LINK,
 	REL_URI,
-	HEADER_SPLIT,
-	COLLECTION,
-	URL_127001,
+	RELATED,
 	S,
-	IE
+	SLASH,
+	URL_127001
 } from "../core/constants.js";
 
 // @todo audit this function

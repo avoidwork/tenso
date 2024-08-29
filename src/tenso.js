@@ -15,18 +15,35 @@ import {mimetype} from "./utils/regex.js";
 import {hasBody} from "./utils/hasbody.js";
 import {
 	ACCESS_CONTROL,
-	ALLOW, CACHE_CONTROL, COMMA,
+	ALLOW,
+	CACHE_CONTROL,
+	COMMA,
 	CONNECT,
 	DELETE,
 	EMPTY,
-	EXPOSE, FORMAT,
-	FUNCTION, HEADER_CONTENT_TYPE, HEADERS, HYPHEN, INT_1, INT_1000,
+	EXPOSE,
+	FORMAT,
+	FUNCTION,
+	HEADER_CONTENT_TYPE,
+	HEADERS,
+	HYPHEN,
+	INT_1,
+	INT_1000,
 	INT_200,
 	INT_204,
-	INT_304, INVALID_CONFIGURATION, NULL, OPTIONS, PREV_DIR, PRIVATE,
+	INT_304,
+	INVALID_CONFIGURATION,
+	NULL,
+	OPTIONS,
+	PREV_DIR,
+	PRIVATE,
 	SIGHUP,
 	SIGINT,
-	SIGTERM, TEMPLATE_FILE, UTF8, WWW, X_POWERED_BY
+	SIGTERM,
+	TEMPLATE_FILE,
+	UTF8,
+	WWW,
+	X_POWERED_BY
 } from "./core/constants.js";
 import {serialize} from "./utils/serialize.js";
 import {hypermedia} from "./utils/hypermedia.js";

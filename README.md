@@ -79,14 +79,22 @@ Tenso will bend the rules of REST when using authentication strategies provided 
 
 Hypermedia processing of the response body can be disabled as of `10.2.0`, by setting `req.hypermedia = false` and/or `req.hypermediaHeader` via middleware.
 
-## Browsable API / Renderers / Serializers
-Tenso 1.4.0 added a few common format renderers, such as CSV, HTML, YAML, & XML. The HTML interface is a browsable API! You can use it to verify requests & responses, or simply poke around your API to see how it behaves.
+## Extensibility
 
-Custom renderers can be registered with `server.renderer('mimetype', fn);` or directly on `server.renderers`. The parameters for a renderer are `(req, res, arg)`. Custom serializes can be registered with `server.serializer('mimetype', fn);` or directly on `server.serializers`. The parameters for a serializer are `(arg, err, status = 200, stack = false)`; if `arg` is `null` then `err` must be an `Error` & `stack` determines if the response body is the `Error.message` or `Error.stack` property.
- 
-## Parsers
+Tenso is extensible, and can be customized with custom parsers, renderers, & serializers.
 
-Custom renderers can be registered with `server.parser('mimetype', fn);` or directly on `server.parsers`. The parameters for a renderer are `(arg)`.
+### Parsers
+
+Custom parsers can be registered with `server.parser('mimetype', fn);` or directly on `server.parsers`. The parameters for a parser are `(arg)`.
+
+### Renderers
+
+Custom renderers can be registered with `server.renderer('mimetype', fn);`. The parameters for a renderer are `(req, res, arg)`.
+
+### Serializers
+
+Custom renderers can be registered with `server.serializer('mimetype', fn);`. The parameters for a serializer are `(arg, err, status = 200, stack = false)`.
+
 
 ## Configuration
 This is a sample configuration for Tenso, without authentication or SSL. This would be ideal for development, but not production! Enabling SSL is as easy as providing file paths for the two keys.

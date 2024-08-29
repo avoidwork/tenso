@@ -64,7 +64,7 @@ declare class Tenso extends Woodland {
         host: string;
         index: any[];
         initRoutes: {};
-        json: number;
+        jsonIndent: number;
         logging: {
             enabled: boolean;
             format: string;
@@ -142,6 +142,8 @@ declare class Tenso extends Woodland {
     render(req: any, res: any, arg: any): any;
     parser(mediatype?: string, fn?: (arg: any) => any): this;
     rateLimit(req: any, fn: any): any[];
+    renderer(mediatype: any, fn: any): this;
+    serializer(mediatype: any, fn: any): this;
     signals(): this;
     start(): this;
     stop(): this;

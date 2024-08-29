@@ -1,1 +1,1 @@
-export const clone: typeof structuredClone | ((arg: any) => any);
+export function clone(arg: any): any;

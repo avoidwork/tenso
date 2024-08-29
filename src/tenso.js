@@ -22,6 +22,7 @@ import {
 	DELETE,
 	EMPTY,
 	EXPOSE,
+	EXPOSE_HEADERS,
 	FORMAT,
 	FUNCTION,
 	HEADER_CONTENT_TYPE,
@@ -92,7 +93,7 @@ class Tenso extends Woodland {
 			const header = `${ACCESS_CONTROL}${HYPHEN}${req.method === OPTIONS ? ALLOW : EXPOSE}${HYPHEN}${HEADERS}`;
 
 			res.removeHeader(header);
-			res.header(header, `cache-control, content-language, content-type, expires, last-modified, pragma${req.csrf ? `, ${this.security.key}` : ""}${this.corsExpose.length > INT_0 ? `, ${this.corsExpose}` : ""}`);
+			res.header(header, `${EXPOSE_HEADERS}${req.csrf ? `, ${this.security.key}` : EMPTY}${this.corsExpose.length > INT_0 ? `, ${this.corsExpose}` : EMPTY}`);
 		}
 	}
 

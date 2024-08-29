@@ -21,8 +21,8 @@
     "build": "npm run lint && npm run rollup",
     "changelog": "auto-changelog -p",
     "sample": "node sample.js",
-    "lint": "eslint *.js src/*.js test/*.js",
-    "fix": "eslint --fix *.js src/*.js test/*.js",
+    "lint": "eslint *.js src/**/*.js test/*.js",
+    "fix": "eslint --fix *.js src/**/*.js test/*.js",
     "mocha": "nyc mocha test/*.test.js",
     "rollup": "rollup --config",
     "test": "npm run lint && npm run mocha",
@@ -37,7 +37,7 @@
     "require": "./dist/tenso.cjs"
   },
   "type": "module",
-  "types": "types/tenso.d.ts",
+  "types": "types/**/*.d.ts",
   "files": [
     "dist/tenso.cjs",
     "dist/tenso.js",

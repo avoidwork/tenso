@@ -10,6 +10,7 @@ const COMMA = ",";
 const COLON = ":";
 const DATA = "data";
 const EMPTY = "";
+const PIPE = "|";
 const ENCODED_SPACE = "%20";
 const END = "end";
 const HEADER_ALLOW_GET = "GET, HEAD, OPTIONS";
@@ -29,6 +30,8 @@ const INT_2 = 2;
 const INT_3 = 3;
 const INT_5 = 5;
 const INT_10 = 10;
+const INT_80 = 80;
+const INT_443 = 443;
 const INT_100 = 1e2;
 const INT_200 = 2e2;
 const INT_204 = 204;
@@ -143,7 +146,7 @@ const URL_AUTH_LOGIN = "/auth/login";
 const URL_AUTH_LOGOUT = "/auth/logout";
 const URL_AUTH_ROOT = "/auth";
 const UTF_8 = "utf-8";
-const EXPOSE_HEADERS = "cache-control, content-language, content-type, expires, last-modified, pragma, x-csrf-token";
+const EXPOSE_HEADERS = "cache-control, content-language, content-type, expires, last-modified, pragma";
 const HEADER_VARY = "vary";
 const DEFAULT_CONTENT_TYPE = "application/json; charset=utf-8";
 const DEFAULT_VARY = "accept, accept-encoding, accept-language, origin";
@@ -159,7 +162,24 @@ const COOKIE_NAME = "tenso.sid";
 const IP_127001 = "127.0.0.1";
 const SESSION_SECRET = "tensoABC";
 const MEMORY = "memory";
-const PATH_ASSETS = "/assets";const config = {
+const PATH_ASSETS = "/assets";
+const AUTH = "auth";
+const URI = "uri";
+const UNDERSCORE = "_";
+const REDIS = "redis";
+const BASIC = "basic";
+const READ = "read";
+const ALGORITHMS = "algorithms";
+const AUDIENCE = "audience";
+const ISSUER = "issuer";
+const JWT = "jwt";
+const LOCAL = "local";
+const SUCCESS = "Success";
+const X_REQUESTED_WITH = "x-requested-with";
+const XHR = "XMLHttpRequest";
+const OAUTH2 = "oauth2";
+const REGEX_REPLACE = ")).*$";
+const PERIOD = ".";const config = {
 	auth: {
 		delay: INT_0,
 		protect: [],
@@ -680,7 +700,7 @@ function hypermedia (req, res, rep) {
 	let valid = true,
 		exception;
 
-	if (req.body !== "") {
+	if (req.body !== EMPTY) {
 		const type = req.headers?.[HEADER_CONTENT_TYPE]?.replace(/\s.*$/, EMPTY) ?? EMPTY;
 		const parsers = req.server.parsers;
 
@@ -808,7 +828,7 @@ const {Strategy: JWTStrategy, ExtractJwt} = passportJWT,
 
 function auth (obj) {
 	const ssl = obj.ssl.cert && obj.ssl.key,
-		realm = `http${ssl ? "s" : ""}://${obj.host}${obj.port !== 80 && obj.port !== 443 ? ":" + obj.port : ""}`,
+		realm = `http${ssl ? S : EMPTY}://${obj.host}${obj.port !== INT_80 && obj.port !== INT_443 ? COLON + obj.port : EMPTY}`,
 		async = obj.auth.oauth2.enabled || obj.auth.saml.enabled,
 		stateless = obj.rate.enabled === false && obj.security.csrf === false && obj.auth.local.enabled === false,
 		authDelay = obj.auth.delay,
@@ -820,13 +840,15 @@ function auth (obj) {
 	obj.ignore(asyncFlag);
 
 	for (const k of groups) {
-		obj.auth[k] = (obj.auth[k] || []).map(i => new RegExp(`^${i !== obj.auth.uri.login ? i.replace(/\.\*/g, "*").replace(/\*/g, ".*") : ""}(\/|$)`, "i"));
+		obj.auth[k] = (obj.auth[k] || []).map(i => new RegExp(`^${i !== obj.auth.uri.login ? i.replace(/\.\*/g, WILDCARD).replace(/\*/g, `${PERIOD}${WILDCARD}`) : EMPTY}(/|$)`, I));
 	}
 
 	for (const i of Object.keys(obj.auth)) {
 		if (obj.auth[i].enabled) {
-			authMap[`${i}_uri`] = `/auth/${i}`;
-			authUris.push(`/auth/${i}`);
+			const uri = `${SLASH}${AUTH}${SLASH}${i}`;
+
+			authMap[`${i}${UNDERSCORE}${URI}`] = uri;
+			authUris.push(uri);
 			obj.auth.protect.push(new RegExp(`^/auth/${i}(/|$)`));
 		}
 	}
@@ -844,7 +866,7 @@ function auth (obj) {
 
 		sesh = Object.assign({secret: randomUUID()}, objSession);
 
-		if (obj.session.store === "redis") {
+		if (obj.session.store === REDIS) {
 			const client = redis.createClient(clone(obj.session.redis));
 
 			sesh.store = new RedisStore({client});
@@ -868,13 +890,13 @@ function auth (obj) {
 		obj.always(luscaCsp).ignore(luscaCsp);
 	}
 
-	if (isEmpty(obj.security.xframe || "") === false) {
+	if (isEmpty(obj.security.xframe || EMPTY) === false) {
 		const luscaXframe = lusca.xframe(obj.security.xframe);
 
 		obj.always(luscaXframe).ignore(luscaXframe);
 	}
 
-	if (isEmpty(obj.security.p3p || "") === false) {
+	if (isEmpty(obj.security.p3p || EMPTY) === false) {
 		const luscaP3p = lusca.p3p(obj.security.p3p);
 
 		obj.always(luscaP3p).ignore(luscaP3p);
@@ -900,7 +922,6 @@ function auth (obj) {
 
 	// Can fork to `middleware.keymaster()`
 	obj.always(zuul).ignore(zuul);
-
 	passportInit = passport.initialize();
 	obj.always(passportInit).ignore(passportInit);
 
@@ -947,11 +968,13 @@ function auth (obj) {
 			}, authDelay);
 		}));
 
-		const passportAuth = passport.authenticate("basic", {session: stateless === false});
+		const passportAuth = passport.authenticate(BASIC, {session: stateless === false});
 
 		if (async || obj.auth.local.enabled) {
-			obj.get("/auth/basic", passportAuth).ignore(passportAuth);
-			obj.get("/auth/basic", redirect);
+			const uri = `${SLASH}${AUTH}${SLASH}${BASIC}`;
+
+			obj.get(uri, passportAuth).ignore(passportAuth);
+			obj.get(uri, redirect);
 		} else {
 			obj.always(passportAuth).ignore(passportAuth);
 		}
@@ -972,17 +995,19 @@ function auth (obj) {
 					} else if (user === void 0) {
 						done(null, false);
 					} else {
-						done(null, user, {scope: "read"});
+						done(null, user, {scope: READ});
 					}
 				});
 			}, authDelay);
 		}));
 
-		const passportAuth = passport.authenticate("bearer", {session: stateless === false});
+		const passportAuth = passport.authenticate(BEARER.toLowerCase(), {session: stateless === false});
 
 		if (async || obj.auth.local.enabled) {
-			obj.get("/auth/bearer", passportAuth).ignore(passportAuth);
-			obj.get("/auth/bearer", redirect);
+			const uri = `${SLASH}${AUTH}${SLASH}${BEARER.toLowerCase()}`;
+
+			obj.get(uri, passportAuth).ignore(passportAuth);
+			obj.get(uri, redirect);
 		} else {
 			obj.always(passportAuth).ignore(passportAuth);
 		}
@@ -993,7 +1018,7 @@ function auth (obj) {
 			ignoreExpiration: obj.auth.jwt.ignoreExpiration === true
 		};
 
-		for (const i of ["algorithms", "audience", "issuer"]) {
+		for (const i of [ALGORITHMS, AUDIENCE, ISSUER]) {
 			if (obj.auth.jwt[i] !== void 0) {
 				opts[i] = obj.auth.jwt[i];
 			}
@@ -1011,7 +1036,7 @@ function auth (obj) {
 			}, authDelay);
 		}));
 
-		const passportAuth = passport.authenticate("jwt", {session: false});
+		const passportAuth = passport.authenticate(JWT, {session: false});
 		obj.always(passportAuth).ignore(passportAuth);
 	} else if (obj.auth.local.enabled) {
 		passport.use(new Strategy$1((username, password, done) => {
@@ -1028,11 +1053,11 @@ function auth (obj) {
 
 		obj.post(obj.auth.uri.login, (req, res) => {
 			function final () {
-				passport.authenticate("local")(req, res, e => {
+				passport.authenticate(LOCAL)(req, res, e => {
 					if (e !== void 0) {
 						res.error(INT_401, STATUS_CODES[INT_401]);
-					} else if (req.cors && req.headers["x-requested-with"] === "XMLHttpRequest") {
-						res.send("Success");
+					} else if (req.cors && req.headers[X_REQUESTED_WITH] === XHR) {
+						res.send(SUCCESS);
 					} else {
 						redirect(req, res);
 					}
@@ -1046,12 +1071,15 @@ function auth (obj) {
 			passportInit(req, res, mid);
 		});
 	} else if (obj.auth.oauth2.enabled) {
+		const uri = `${SLASH}${AUTH}${SLASH}${OAUTH2}`;
+		const uri_callback = `${uri}${SLASH}${CALLBACK}`;
+
 		passport.use(new Strategy$2({
 			authorizationURL: obj.auth.oauth2.auth_url,
 			tokenURL: obj.auth.oauth2.token_url,
 			clientID: obj.auth.oauth2.client_id,
 			clientSecret: obj.auth.oauth2.client_secret,
-			callbackURL: `${realm}/auth/oauth2/callback`
+			callbackURL: `${realm}${uri_callback}`
 		}, (accessToken, refreshToken, profile, done) => {
 			delay(() => {
 				obj.auth.oauth2.auth(accessToken, refreshToken, profile, (err, user) => {
@@ -1064,14 +1092,14 @@ function auth (obj) {
 			}, authDelay);
 		}));
 
-		obj.get("/auth/oauth2", asyncFlag);
-		obj.get("/auth/oauth2", passport.authenticate("oauth2"));
-		obj.get("/auth/oauth2/callback", asyncFlag);
-		obj.get("/auth/oauth2/callback", passport.authenticate("oauth2", {failureRedirect: obj.auth.uri.login}));
-		obj.get("/auth/oauth2/callback", redirect);
+		obj.get(uri, asyncFlag);
+		obj.get(uri, passport.authenticate(OAUTH2));
+		obj.get(uri_callback, asyncFlag);
+		obj.get(uri_callback, passport.authenticate(OAUTH2, {failureRedirect: obj.auth.uri.login}));
+		obj.get(uri_callback, redirect);
 	}
 
-	if (authUris.length > 0) {
+	if (authUris.length > INT_0) {
 		if (Object.keys(authMap).length > INT_0) {
 			obj.get(obj.auth.uri.root, authMap);
 		}
@@ -1079,10 +1107,10 @@ function auth (obj) {
 		let r = `(?!${obj.auth.uri.root}/(`;
 
 		for (const i of authUris) {
-			r += i.replace("_uri", "") + "|";
+			r += i.replace(`${UNDERSCORE}${URI}`, EMPTY) + PIPE;
 		}
 
-		r = r.replace(/\|$/, "") + ")).*$";
+		r = r.replace(/\|$/, EMPTY) + REGEX_REPLACE;
 		obj.always(r, guard).ignore(guard);
 
 		obj.get(obj.auth.uri.login, (req, res) => res.json({instruction: obj.auth.msg.login}));
@@ -1138,7 +1166,7 @@ class Tenso extends Woodland {
 			const header = `${ACCESS_CONTROL}${HYPHEN}${req.method === OPTIONS ? ALLOW : EXPOSE}${HYPHEN}${HEADERS}`;
 
 			res.removeHeader(header);
-			res.header(header, `cache-control, content-language, content-type, expires, last-modified, pragma${req.csrf ? `, ${this.security.key}` : ""}${this.corsExpose.length > INT_0 ? `, ${this.corsExpose}` : ""}`);
+			res.header(header, `${EXPOSE_HEADERS}${req.csrf ? `, ${this.security.key}` : EMPTY}${this.corsExpose.length > INT_0 ? `, ${this.corsExpose}` : EMPTY}`);
 		}
 	}
 

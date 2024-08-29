@@ -4,7 +4,7 @@ export function parse (req, res, next) {
 	let valid = true,
 		exception;
 
-	if (req.body !== "") {
+	if (req.body !== EMPTY) {
 		const type = req.headers?.[HEADER_CONTENT_TYPE]?.replace(/\s.*$/, EMPTY) ?? EMPTY;
 		const parsers = req.server.parsers;
 

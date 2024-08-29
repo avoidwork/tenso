@@ -23,10 +23,6 @@ declare class Tenso extends Woodland {
                 scheme: string;
                 secretOrKey: string;
             };
-            local: {
-                enabled: boolean;
-                auth: any;
-            };
             msg: {
                 login: string;
             };
@@ -74,6 +70,7 @@ declare class Tenso extends Woodland {
         maxBytes: number;
         mimeType: string;
         origins: string[];
+        pageSize: number;
         port: number;
         rate: {
             enabled: boolean;

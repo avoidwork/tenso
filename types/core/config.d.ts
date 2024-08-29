@@ -24,20 +24,14 @@ export namespace config {
             export { BEARER as scheme };
             export { EMPTY as secretOrKey };
         }
-        export namespace local {
-            let enabled_3: boolean;
-            export { enabled_3 as enabled };
-            let auth_2: any;
-            export { auth_2 as auth };
-        }
         export namespace msg {
             export { MSG_LOGIN as login };
         }
         export namespace oauth2 {
-            let enabled_4: boolean;
-            export { enabled_4 as enabled };
-            let auth_3: any;
-            export { auth_3 as auth };
+            let enabled_3: boolean;
+            export { enabled_3 as enabled };
+            let auth_2: any;
+            export { auth_2 as auth };
             export { EMPTY as auth_url };
             export { EMPTY as token_url };
             export { EMPTY as client_id };
@@ -50,10 +44,10 @@ export namespace config {
             export { URL_AUTH_ROOT as root };
         }
         export namespace saml {
-            let enabled_5: boolean;
-            export { enabled_5 as enabled };
-            let auth_4: any;
-            export { auth_4 as auth };
+            let enabled_4: boolean;
+            export { enabled_4 as enabled };
+            let auth_3: any;
+            export { auth_3 as auth };
         }
     }
     export let autoindex: boolean;
@@ -73,8 +67,8 @@ export namespace config {
     export let initRoutes: {};
     export { INT_0 as jsonIndent };
     export namespace logging {
-        let enabled_6: boolean;
-        export { enabled_6 as enabled };
+        let enabled_5: boolean;
+        export { enabled_5 as enabled };
         export { LOG_FORMAT as format };
         export { DEBUG as level };
         export let stack: boolean;
@@ -82,10 +76,11 @@ export namespace config {
     export { INT_0 as maxBytes };
     export { HEADER_APPLICATION_JSON as mimeType };
     export let origins: string[];
+    export { INT_5 as pageSize };
     export { INT_8000 as port };
     export namespace rate {
-        let enabled_7: boolean;
-        export { enabled_7 as enabled };
+        let enabled_6: boolean;
+        export { enabled_6 as enabled };
         export { INT_450 as limit };
         export { MSG_TOO_MANY_REQUESTS as message };
         export let override: any;
@@ -153,6 +148,7 @@ import { IP_0000 } from "./constants.js";
 import { LOG_FORMAT } from "./constants.js";
 import { DEBUG } from "./constants.js";
 import { HEADER_APPLICATION_JSON } from "./constants.js";
+import { INT_5 } from "./constants.js";
 import { INT_8000 } from "./constants.js";
 import { INT_450 } from "./constants.js";
 import { MSG_TOO_MANY_REQUESTS } from "./constants.js";

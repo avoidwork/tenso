@@ -2,31 +2,6 @@
 
 Tenso is an HTTP REST API framework, that will handle the serialization & creation of hypermedia links; all you have to do is give it `Arrays` or `Objects`.
 
-Tenso has parsers for:
-
-- `application/json`
-- `application/x-www-form-urlencoded`
-- `application/jsonl`
-- `application/json-lines`
-- `text/json-lines`
-
-Tenso has renderers for:
-
-- `application/javascript`
-- `application/json`
-- `application/jsonl`
-- `application/json-lines`
-- `text/json-lines`
-- `application/yaml`
-- `application/xml`
-- `text/csv`
-- `text/html`
-
-Tenso has two default serializers which can be overridden:
-
-- `plain` for plain text responses
-- `custom` for standard response shape
-
 ## Example
 Creating an API with Tenso can be this simple:
 
@@ -81,11 +56,36 @@ Tenso is extensible, and can be customized with custom parsers, renderers, & ser
 ### Parsers
 Custom parsers can be registered with `server.parser('mimetype', fn);` or directly on `server.parsers`. The parameters for a parser are `(arg)`.
 
+Tenso has parsers for:
+
+- `application/json`
+- `application/x-www-form-urlencoded`
+- `application/jsonl`
+- `application/json-lines`
+- `text/json-lines`
+
 ### Renderers
 Custom renderers can be registered with `server.renderer('mimetype', fn);`. The parameters for a renderer are `(req, res, arg)`.
 
+Tenso has renderers for:
+
+- `application/javascript`
+- `application/json`
+- `application/jsonl`
+- `application/json-lines`
+- `text/json-lines`
+- `application/yaml`
+- `application/xml`
+- `text/csv`
+- `text/html`
+
 ### Serializers
 Custom renderers can be registered with `server.serializer('mimetype', fn);`. The parameters for a serializer are `(arg, err, status = 200, stack = false)`.
+
+Tenso has two default serializers which can be overridden:
+
+- `plain` for plain text responses
+- `custom` for standard response shape
 
 ## Responses
 Responses will have a standard shape, and will be utf-8 by default. The result will be in `data`. Hypermedia (pagination & links) will be in `links:[ {"uri": "...", "rel": "..."}, ...]`, & also in the `Link` HTTP header.

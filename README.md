@@ -80,19 +80,15 @@ Tenso will bend the rules of REST when using authentication strategies provided 
 Hypermedia processing of the response body can be disabled as of `10.2.0`, by setting `req.hypermedia = false` and/or `req.hypermediaHeader` via middleware.
 
 ## Extensibility
-
 Tenso is extensible, and can be customized with custom parsers, renderers, & serializers.
 
 ### Parsers
-
 Custom parsers can be registered with `server.parser('mimetype', fn);` or directly on `server.parsers`. The parameters for a parser are `(arg)`.
 
 ### Renderers
-
 Custom renderers can be registered with `server.renderer('mimetype', fn);`. The parameters for a renderer are `(req, res, arg)`.
 
 ### Serializers
-
 Custom renderers can be registered with `server.serializer('mimetype', fn);`. The parameters for a serializer are `(arg, err, status = 200, stack = false)`.
 
 

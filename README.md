@@ -75,35 +75,6 @@ Tenso decorates `req` with "helpers" such as `req.allow`, `req.csrf`, `req.ip`, 
 
 Tenso decorates `res` with "helpers" such as `res.send()`, `res.status()`, & `res.json()`.
 
-## Responses
-Responses will have a standard shape, and will be utf-8 by default. The result will be in `data`. Hypermedia (pagination & links) will be in `links:[ {"uri": "...", "rel": "..."}, ...]`, & also in the `Link` HTTP header.
-
-Page size can be specified via the `page_size` parameter, e.g. `?page_size=25`.
-
-Sort order can be specified via then `order-by` which accepts `[field ]asc|desc` & can be combined like an SQL 'ORDER BY', e.g. `?order_by=desc` or `?order_by=lastName%20asc&order_by=firstName%20asc&order_by=age%20desc`
-
-```json
-{
-  "data": "`null` or ?",
-  "error": "`null` or an `Error` stack trace / message",
-  "links": [],
-  "status": 200
-}
-```
-
-Final modifications can be made to a response body after `hypermedia()` by overriding `tenso.final(req, res, body)`.
-
-## REST / Hypermedia
-Hypermedia is a prerequisite of REST, and is best described by the [Richardson Maturity Model](http://martinfowler.com/articles/richardsonMaturityModel.html). Tenso will automagically paginate Arrays of results, or parse Entity representations for keys that imply
-relationships, and create the appropriate Objects in the `link` Array, as well as the `Link` HTTP header. Object keys that match this pattern: `/_(guid|uuid|id|uri|url)$/` will be considered
-hypermedia links.
-
-For example, if the key `user_id` was found, it would be mapped to `/users/:id` with a link `rel` of `related`.
-
-Tenso will bend the rules of REST when using authentication strategies provided by passport.js, or CSRF if is enabled, because they rely on a session. Session storage is in memory, or Redis. You have the option of a stateless or stateful API.
-
-Hypermedia processing of the response body can be disabled as of `10.2.0`, by setting `req.hypermedia = false` and/or `req.hypermediaHeader` via middleware.
-
 ## Extensibility
 Tenso is extensible, and can be customized with custom parsers, renderers, & serializers.
 
@@ -116,6 +87,23 @@ Custom renderers can be registered with `server.renderer('mimetype', fn);`. The 
 ### Serializers
 Custom renderers can be registered with `server.serializer('mimetype', fn);`. The parameters for a serializer are `(arg, err, status = 200, stack = false)`.
 
+## Responses
+Responses will have a standard shape, and will be utf-8 by default. The result will be in `data`. Hypermedia (pagination & links) will be in `links:[ {"uri": "...", "rel": "..."}, ...]`, & also in the `Link` HTTP header.
+
+Page size can be specified via the `page_size` parameter, e.g. `?page_size=25`.
+
+Sort order can be specified via then `order-by` which accepts `[field ]asc|desc` & can be combined like an SQL 'ORDER BY', e.g. `?order_by=desc` or `?order_by=lastName%20asc&order_by=firstName%20asc&order_by=age%20desc`
+
+## REST / Hypermedia
+Hypermedia is a prerequisite of REST, and is best described by the [Richardson Maturity Model](http://martinfowler.com/articles/richardsonMaturityModel.html). Tenso will automagically paginate Arrays of results, or parse Entity representations for keys that imply
+relationships, and create the appropriate Objects in the `link` Array, as well as the `Link` HTTP header. Object keys that match this pattern: `/_(guid|uuid|id|uri|url)$/` will be considered
+hypermedia links.
+
+For example, if the key `user_id` was found, it would be mapped to `/users/:id` with a link `rel` of `related`.
+
+Tenso will bend the rules of REST when using authentication strategies provided by passport.js, or CSRF if is enabled, because they rely on a session. Session storage is in memory, or Redis. You have the option of a stateless or stateful API.
+
+Hypermedia processing of the response body can be disabled as of `10.2.0`, by setting `req.hypermedia = false` and/or `req.hypermediaHeader` via middleware.
 
 ## Configuration
 This is the default configuration for Tenso, without authentication or SSL. This would be ideal for development, but not production! Enabling SSL is as easy as providing file paths for the two keys.

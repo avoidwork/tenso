@@ -135,7 +135,9 @@ export function hypermedia (req, res, rep) {
 			}
 		}
 
-		res.header(LINK, keysort(links, REL_URI).map(i => `<${i.uri}>; rel="${i.rel}"`).join(COMMA_SPACE));
+		if (req.hypermediaHeader) {
+			res.header(LINK, keysort(links, REL_URI).map(i => `<${i.uri}>; rel="${i.rel}"`).join(COMMA_SPACE));
+		}
 
 		if (exists && Array.isArray(rep?.links ?? EMPTY)) {
 			rep.links = links;

@@ -746,7 +746,9 @@ function hypermedia (req, res, rep) {
 			}
 		}
 
-		res.header(LINK, keysort.keysort(links, REL_URI).map(i => `<${i.uri}>; rel="${i.rel}"`).join(COMMA_SPACE$1));
+		if (req.hypermediaHeader) {
+			res.header(LINK, keysort.keysort(links, REL_URI).map(i => `<${i.uri}>; rel="${i.rel}"`).join(COMMA_SPACE$1));
+		}
 
 		if (exists && Array.isArray(rep?.links ?? EMPTY)) {
 			rep.links = links;
@@ -1230,6 +1232,7 @@ class Tenso extends woodland.Woodland {
 	connect (req, res) {
 		req.csrf = this.canModify(req.method) === false && this.canModify(req.allow) && this.security.csrf === true;
 		req.hypermedia = true;
+		req.hypermediaHeader = true;
 		req.private = false;
 		req.protect = false;
 		req.protectAsync = false;

@@ -83,6 +83,7 @@ class Tenso extends Woodland {
 	connect (req, res) {
 		req.csrf = this.canModify(req.method) === false && this.canModify(req.allow) && this.security.csrf === true;
 		req.hypermedia = true;
+		req.hypermediaHeader = true;
 		req.private = false;
 		req.protect = false;
 		req.protectAsync = false;

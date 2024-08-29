@@ -189,6 +189,6 @@ describe("Renderers", function () {
 	it("GET Plain Text (invalid)", function () {
 		return httptest({url: "http://localhost:" + port + "/abc/?format=text/plain"})
 			.expectStatus(404)
-			.end().then(() => server.close());
+			.end().then(() => server.stop());
 	});
 });

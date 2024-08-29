@@ -84,6 +84,6 @@ describe("Valid", function () {
 		return httptest({url: "http://localhost:" + port + "/sample/"})
 			.expectStatus(200)
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.end().then(() => server.close());
+			.end().then(() => server.stop());
 	});
 });

@@ -128,6 +128,6 @@ describe("Invalid", function () {
 			.expectStatus(404)
 			.expectHeader("allow", "")
 			.expectValue("error", http.STATUS_CODES[404])
-			.end().then(() => server.close());
+			.end().then(() => server.stop());
 	});
 });

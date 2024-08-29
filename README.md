@@ -19,7 +19,7 @@ import {tenso} from "tenso";
 
 export const app = tenso({port: 8000});
 
-app.get("/", (req, res) => res.send("Hello, World!"));
+app.get("/", "Hello, World!");
 app.start();
 ```
 

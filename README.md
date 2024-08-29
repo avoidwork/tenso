@@ -95,7 +95,7 @@ Tenso has renderers for:
 - `text/html`
 
 ### Serializers
-Custom renderers can be registered with `server.serializer('mimetype', fn);`. The parameters for a serializer are `(arg, err, status = 200, stack = false)`.
+Custom serializers can be registered with `server.serializer('mimetype', fn);`. The parameters for a serializer are `(arg, err, status = 200, stack = false)`.
 
 Tenso has two default serializers which can be overridden:
 

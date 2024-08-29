@@ -765,7 +765,7 @@ function rate (req, res, next) {
 	if (config.enabled === false || req.unprotect) {
 		next();
 	} else {
-		const results = req.server.rate(req, config.override),
+		const results = req.server.rateLimit(req, config.override),
 			good = results.shift();
 
 		if (good) {
@@ -1211,32 +1211,31 @@ class Tenso extends Woodland {
 	}
 
 	rateLimit (req, fn) {
-		const config = this.rate,
-			id = req.sessionID || req.ip;
+		const reqId = req.sessionID || req.ip;
 		let valid = true,
 			seconds = Math.floor(new Date().getTime() / INT_1000),
 			limit, remaining, reset, state;
 
-		if (this.rates.has(id) === false) {
-			this.rates.set(id, {
-				limit: config.limit,
-				remaining: config.limit,
-				reset: seconds + config.reset,
-				time_reset: config.reset
+		if (this.rates.has(reqId) === false) {
+			this.rates.set(reqId, {
+				limit: this.rate.limit,
+				remaining: this.rate.limit,
+				reset: seconds + this.rate.reset,
+				time_reset: this.rate.reset
 			});
 		}
 
 		if (typeof fn === FUNCTION) {
-			this.rates.set(id, fn(req, this.rates.get(id)));
+			this.rates.set(reqId, fn(req, this.rates.get(reqId)));
 		}
 
-		state = this.rates.get(id);
+		state = this.rates.get(reqId);
 		limit = state.limit;
 		remaining = state.remaining;
 		reset = state.reset;
 
 		if (seconds >= reset) {
-			reset = state.reset = seconds + config.reset;
+			reset = state.reset = seconds + this.rate.reset;
 			remaining = state.remaining = limit - INT_1;
 		} else if (remaining > INT_0) {
 			state.remaining--;

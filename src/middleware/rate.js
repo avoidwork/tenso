@@ -12,7 +12,7 @@ export function rate (req, res, next) {
 	if (config.enabled === false || req.unprotect) {
 		next();
 	} else {
-		const results = req.server.rate(req, config.override),
+		const results = req.server.rateLimit(req, config.override),
 			good = results.shift();
 
 		if (good) {

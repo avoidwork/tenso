@@ -431,6 +431,8 @@ Standard log levels are supported, and are emitted to `stdout` & `stderr`. Stack
 ## HTML Renderer
 The HTML template can be overridden with a custom HTML document.
 
+Dark mode is supported! The `dark` class will be added to the `body` tag if the user's browser is in dark mode.
+
 ```
 webroot: {
     root: "full path",

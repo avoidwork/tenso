@@ -1,6 +1,6 @@
 import http from "node:http";
 import {httptest} from "tiny-httptest";
-import {tenso} from "../dist/tenso.js";
+import {tenso} from "../dist/tenso.cjs";
 import {routes} from "./routes.js";
 
 const timeout = 5000;

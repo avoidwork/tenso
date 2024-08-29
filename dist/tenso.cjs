@@ -429,8 +429,8 @@ function plain$1 (req, res, arg) {
 }
 
 function javascript (req, res, arg) {
-	req.headers.accept = HEADER_APPLICATION_JSON;
-	res.header(HEADER_CONTENT_TYPE, HEADER_APPLICATION_JSON);
+	req.headers.accept = HEADER_APPLICATION_JAVASCRIPT;
+	res.header(HEADER_CONTENT_TYPE, HEADER_APPLICATION_JAVASCRIPT);
 
 	return `${req.parsed.searchParams.get(CALLBACK) ?? CALLBACK}(${JSON.stringify(arg, null, INT_0)});`;
 }

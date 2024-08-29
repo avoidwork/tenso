@@ -1,6 +1,6 @@
 import {httptest} from "tiny-httptest";
 import jwt from "jsonwebtoken";
-import {tenso} from "../dist/tenso.js";
+import {tenso} from "../dist/tenso.cjs";
 import {routes} from "./routes.js";
 
 const timeout = 5000;

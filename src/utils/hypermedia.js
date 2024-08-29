@@ -1,16 +1,17 @@
 import {URL} from "url";
 import {keysort} from "keysort";
 import {
-	hypermedia as hypermediaPattern,
 	collection as collectionPattern,
-	trailingSlash,
+	hypermedia as hypermediaPattern,
 	trailing,
 	trailingS,
+	trailingSlash,
 	trailingY
 } from "./regex";
 import {id} from "./id";
 import {scheme} from "./scheme";
 
+// @todo audit this function
 export function hypermedia (req, res, rep) {
 	const server = req.server,
 		headers = res.getHeaders(),
@@ -161,7 +162,7 @@ export function hypermedia (req, res, rep) {
 
 	if (links.length > 0) {
 		if (headers.link !== void 0) {
-			for (const i of headers.link.split('" <')) {
+			for (const i of headers.link.split("\" <")) {
 				links.push({
 					uri: i.replace(/(^\<|\>.*$)/g, ""),
 					rel: i.replace(/(^.*rel\=\"|\"$)/g, "")

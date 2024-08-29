@@ -5,7 +5,7 @@
  * @license BSD-3-Clause
  * @version 17.0.0
  */
-import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import {merge}from'tiny-merge';import {eventsource}from'tiny-eventsource';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {stringify as stringify$1}from'tiny-jsonl';import {keysort}from'keysort';import {URL}from'url';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import passportJWT from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-local';import {Strategy as Strategy$2}from'passport-oauth2';import lusca from'lusca';import {randomInt,randomUUID}from'node:crypto';import RedisStore from'connect-redis';const config = {
+import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import {merge}from'tiny-merge';import {eventsource}from'tiny-eventsource';import {coerce}from'tiny-coerce';import {parse as parse$1,stringify as stringify$1}from'tiny-jsonl';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {keysort}from'keysort';import {URL}from'url';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import passportJWT from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-local';import {Strategy as Strategy$2}from'passport-oauth2';import lusca from'lusca';import {randomInt,randomUUID}from'node:crypto';import RedisStore from'connect-redis';const config = {
 	auth: {
 		delay: 0,
 		protect: [],
@@ -144,7 +144,13 @@ const ENCODED_SPACE = "%20";
 const END = "end";
 const HEADER_ALLOW_GET = "GET, HEAD, OPTIONS";
 const HEADER_APPLICATION_JSON = "application/json";
+const HEADER_APPLICATION_YAML = "application/yaml";
+const HEADER_APPLICATION_XML = "application/xml";
+const HEADER_TEXT_PLAIN = "text/plain";
 const HEADER_CONTENT_TYPE = "content-type";
+const HEADER_APPLICATION_JAVASCRIPT = "application/javascript";
+const HEADER_TEXT_CSV = "text/csv";
+const HEADER_TEXT_HTML = "text/html";
 const HTML = "html";
 const INT_0 = 0;
 const INT_200 = 200;
@@ -153,7 +159,6 @@ const INT_304 = 304;
 const INT_413 = 413;
 const INT_429 = 429;
 const MULTIPART = "multipart";
-const OPTIONS = "OPTIONS";
 const RETRY_AFTER = "retry-after";
 const UTF8 = "utf8";
 const X_CSRF_TOKEN = "x-csrf-token";
@@ -172,7 +177,33 @@ const XML_ARRAY_NODE_NAME = "item";
 const PROTECT = "protect";
 const UNPROTECT = "unprotect";
 const FUNCTION = "function";
-const CONNECT = "connect";function json$1 (arg = EMPTY) {
+const CONNECT = "connect";
+const TRUE = "true";
+const FALSE = "false";
+const NL = "\n";
+const SPACE = " ";
+const PATCH = "PATCH";
+const POST = "POST";
+const PUT = "PUT";
+const OPTIONS = "OPTIONS";
+const ID = "id";
+const ID_2 = "_id";
+const I = "i";
+const IDENT_VAR = "indent=";
+const HEADER_APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
+const HEADER_APPLICATION_JSON_LINES = "application/json-lines";
+const HEADER_APPLICATION_JSONL = "application/jsonl";
+const HEADER_TEXT_JSON_LINES = "text/json-lines";
+const SLASH = "/";
+const URI_SCHEME = "://";
+const FORMAT = "format";
+const CHARSET_UTF8 = "; charset=utf-8";
+const ORDER_BY = "order_by";
+const BOOLEAN = "boolean";
+const NUMBER = "number";
+const UNDEFINED = "undefined";
+const DESC = "desc";
+const EQ = "=";function json$1 (arg = EMPTY) {
 	return JSON.parse(arg);
 }const bodySplit = /&|=/;
 const collection = /(.*)(\/.*)$/;
@@ -202,17 +233,27 @@ const trailingY = /y$/;function chunk (arg = [], size = 2) {
 	return result;
 }const parsers = new Map([
 	[
-		"application/x-www-form-urlencoded",
+		HEADER_APPLICATION_X_WWW_FORM_URLENCODED,
 		xWwwFormURLEncoded
 	],
 	[
-		"application/json",
+		HEADER_APPLICATION_JSON,
 		json$1
+	],
+	[
+		HEADER_APPLICATION_JSON_LINES,
+		parse$1
+	],
+	[
+		HEADER_APPLICATION_JSONL,
+		parse$1
+	],
+	[
+		HEADER_TEXT_JSON_LINES,
+		parse$1
 	]
-]);const str_indent = "indent=";
-
-function indent (arg = "", fallback = 0) {
-	return arg.includes(str_indent) ? parseInt(arg.match(/indent=(\d+)/)[1], 10) : fallback;
+]);function indent (arg = EMPTY, fallback = 0) {
+	return arg.includes(IDENT_VAR) ? parseInt(arg.match(/indent=(\d+)/)[1], 10) : fallback;
 }function json (req, res, arg) {
 	return JSON.stringify(arg, null, indent(req.headers.accept, req.server.jsonIndent));
 }function yaml (req, res, arg) {
@@ -227,7 +268,7 @@ function indent (arg = "", fallback = 0) {
 
 	return `${XML_PROLOG}\n${builder.build({output: arg})}`;
 }function plain$1 (req, res, arg) {
-	return Array.isArray(arg) ? arg.map(i => text(req, res, i)).join(COMMA) : arg instanceof Object ? JSON.stringify(arg, null, indent(req.headers.accept, req.server.json)) : arg.toString()
+	return Array.isArray(arg) ? arg.map(i => plain$1(req, res, i)).join(COMMA) : arg instanceof Object ? JSON.stringify(arg, null, indent(req.headers.accept, req.server.json)) : arg.toString();
 }function javascript (req, res, arg) {
 	req.headers.accept = HEADER_APPLICATION_JSON;
 	res.header(HEADER_CONTENT_TYPE, HEADER_APPLICATION_JSON);
@@ -236,46 +277,46 @@ function indent (arg = "", fallback = 0) {
 }function csv (req, res, arg) {
 	return stringify(Array.isArray(arg) ? arg : [arg], {
 		cast: {
-			boolean: value => value ? "true" : "false",
+			boolean: value => value ? TRUE : FALSE,
 			date: value => value.toISOString(),
 			number: value => value.toString()
 		},
-		delimiter: ",",
+		delimiter: COMMA,
 		header: true,
 		quoted: false
 	});
-}function explode (arg = "", delimiter = ",") {
+}function explode (arg = EMPTY, delimiter = COMMA) {
 	return arg.trim().split(new RegExp(`\\s*${delimiter}\\s*`));
 }function sanitize (arg) {
 	return typeof arg === STRING ? arg.replace(/</g, LESS_THAN).replace(/>/g, GREATER_THAN) : arg;
-}function html (req, res, arg, tpl = "") {
+}function html (req, res, arg, tpl = EMPTY) {
 	const protocol = X_FORWARDED_PROTO in req.headers ? req.headers[X_FORWARDED_PROTO] + COLON : req.parsed.protocol,
 		headers = res.getHeaders();
 
-	return tpl.length > 0 ? tpl.replace(/\{\{title\}\}/g, req.server.title)
+	return tpl.length > 0 ? tpl.replace(/{{title}}/g, req.server.title)
 		.replace("{{url}}", req.parsed.href.replace(req.parsed.protocol, protocol))
-		.replace("{{headers}}", Object.keys(headers).sort().map(i => `<tr><td>${i}</td><td>${sanitize(headers[i])}</td></tr>`).join("\n"))
-		.replace("{{formats}}", `<option value=''></option>${Array.from(renderers.keys()).filter(i => i.indexOf(HTML) === -1).map(i => `<option value='${i.trim()}'>${i.replace(/^.*\//, "").toUpperCase()}</option>`).join("\n")}`)
+		.replace("{{headers}}", Object.keys(headers).sort().map(i => `<tr><td>${i}</td><td>${sanitize(headers[i])}</td></tr>`).join(NL))
+		.replace("{{formats}}", `<option value=''></option>${Array.from(renderers.keys()).filter(i => i.indexOf(HTML) === -1).map(i => `<option value='${i.trim()}'>${i.replace(/^.*\//, EMPTY).toUpperCase()}</option>`).join(NL)}`)
 		.replace("{{body}}", sanitize(JSON.stringify(arg, null, 2)))
 		.replace("{{year}}", new Date().getFullYear())
 		.replace("{{version}}", req.server.version)
 		.replace("{{allow}}", headers.allow)
-		.replace("{{methods}}", explode((headers?.allow ?? EMPTY).replace(HEADER_ALLOW_GET, EMPTY)).filter(i => i !== EMPTY).map(i => `<option value='${i.trim()}'>$i.trim()}</option>`).join("\n"))
+		.replace("{{methods}}", explode((headers?.allow ?? EMPTY).replace(HEADER_ALLOW_GET, EMPTY)).filter(i => i !== EMPTY).map(i => `<option value='${i.trim()}'>$i.trim()}</option>`).join(NL))
 		.replace("{{csrf}}", headers?.[X_CSRF_TOKEN] ?? EMPTY)
 		.replace("class=\"headers", req.server.renderHeaders === false ? "class=\"headers dr-hidden" : "class=\"headers") : EMPTY;
 }function jsonl (req, res, arg) {
 	return stringify$1(arg);
 }const renderers = new Map([
-	["application/json", json],
-	["application/yaml", yaml],
-	["application/xml", xml],
-	["text/plain", plain$1],
-	["application/javascript", javascript],
-	["text/csv", csv],
-	["text/html", html],
-	["application/json-lines", jsonl],
-	["application/jsonl", jsonl],
-	["text/jsonl", jsonl]
+	[HEADER_APPLICATION_JSON, json],
+	[HEADER_APPLICATION_YAML, yaml],
+	[HEADER_APPLICATION_XML, xml],
+	[HEADER_TEXT_PLAIN, plain$1],
+	[HEADER_APPLICATION_JAVASCRIPT, javascript],
+	[HEADER_TEXT_CSV, csv],
+	[HEADER_TEXT_HTML, html],
+	[HEADER_APPLICATION_JSON_LINES, jsonl],
+	[HEADER_APPLICATION_JSONL, jsonl],
+	[HEADER_TEXT_JSON_LINES, jsonl]
 ]);function custom (arg, err, status = INT_200, stack = false) {
 	return {
 		data: arg,
@@ -286,30 +327,36 @@ function indent (arg = "", fallback = 0) {
 }function plain (arg, err, status = INT_200, stack = false) {
 	return err !== null ? (stack ? err.stack : err.message) || err || STATUS_CODES[status] : arg;
 }const serializers = new Map([
-	["application/json", custom],
-	["application/yaml", custom],
-	["application/xml", custom],
-	["text/plain", plain],
-	["application/javascript", custom],
-	["text/csv", custom],
-	["text/html", custom]
+	[HEADER_APPLICATION_JSON, custom],
+	[HEADER_APPLICATION_YAML, custom],
+	[HEADER_APPLICATION_XML, custom],
+	[HEADER_TEXT_PLAIN, plain],
+	[HEADER_APPLICATION_JAVASCRIPT, custom],
+	[HEADER_TEXT_CSV, custom],
+	[HEADER_TEXT_HTML, custom],
+	[HEADER_APPLICATION_JSON_LINES, plain],
+	[HEADER_APPLICATION_JSONL, plain],
+	[HEADER_TEXT_JSON_LINES, plain]
 ]);function hasBody (arg) {
-	return arg.includes("PATCH") || arg.includes("POST") || arg.includes("PUT");
-}const clone = arg => JSON.parse(JSON.stringify(arg));function sort (arg, req) {
+	return arg.includes(PATCH) || arg.includes(POST) || arg.includes(PUT);
+}const clone = arg => JSON.parse(JSON.stringify(arg));const ORDER_BY_EQ_DESC = `${ORDER_BY}${EQ}${DESC}`;
+const COMMA_SPACE = `${COMMA}${SPACE}`;
+
+function sort (arg, req) {
 	let output = clone(arg);
 
-	if (typeof req.parsed.search === "string" && req.parsed.searchParams.has("order_by") && Array.isArray(arg)) {
+	if (typeof req.parsed.search === STRING && req.parsed.searchParams.has(ORDER_BY) && Array.isArray(arg)) {
 		const type = typeof arg[0];
 
-		if (type !== "boolean" && type !== "number" && type !== "string" && type !== "undefined" && arg[0] !== null) {
-			const args = req.parsed.searchParams.getAll("order_by").filter(i => i !== "desc").join(", ");
+		if (type !== BOOLEAN && type !== NUMBER && type !== STRING && type !== UNDEFINED && arg[0] !== null) {
+			const args = req.parsed.searchParams.getAll(ORDER_BY).filter(i => i !== DESC).join(COMMA_SPACE);
 
 			if (args.length > 0) {
 				output = keysort(output, args);
 			}
 		}
 
-		if (req.parsed.search.includes("order_by=desc")) {
+		if (req.parsed.search.includes(ORDER_BY_EQ_DESC)) {
 			output = output.reverse();
 		}
 	}
@@ -318,12 +365,12 @@ function indent (arg = "", fallback = 0) {
 }function serialize (req, res, arg) {
 	const status = res.statusCode;
 	let format = req.server.mimeType,
-		accepts = explode(req.parsed.searchParams.get("format") || req.headers.accept || res.getHeader("content-type") || format, ","),
+		accepts = explode(req.parsed.searchParams.get(FORMAT) || req.headers.accept || res.getHeader(HEADER_CONTENT_TYPE) || format, COMMA),
 		errz = arg instanceof Error || status >= 400,
 		result, serializer;
 
 	for (const i of accepts) {
-		let mimetype$1 = i.replace(mimetype, "");
+		let mimetype$1 = i.replace(mimetype, EMPTY);
 
 		if (serializers.has(mimetype$1)) {
 			format = mimetype$1;
@@ -332,8 +379,8 @@ function indent (arg = "", fallback = 0) {
 	}
 
 	serializer = serializers.get(format);
-	res.removeHeader("content-type");
-	res.header("content-type", `${format}; charset=utf-8`);
+	res.removeHeader(HEADER_CONTENT_TYPE);
+	res.header(HEADER_CONTENT_TYPE, `${format}${CHARSET_UTF8}`);
 
 	if (errz) {
 		result = serializer(null, arg, status < 400 ? 500 : status, req.server.logging.stackWire);
@@ -342,19 +389,14 @@ function indent (arg = "", fallback = 0) {
 	}
 
 	return result;
-}const str_id = "id";
-const str_id_2 = "_id";
-const str_id_3 = "ID";
-const str_id_4 = "_ID";
+}const pattern = new RegExp(`${ID}|${ID_2}$`, I);
 
-function id (arg = "") {
-	return arg === str_id || arg === str_id_2 || arg === str_id_3 || arg === str_id_4;
-}const str_slash = "/";
-const str_scheme = "://";
-
-function scheme (arg = "") {
-	return arg.includes(str_slash) || arg[0] === str_scheme;
-}function hypermedia (req, res, rep) {
+function id (arg = EMPTY) {
+	return pattern.test(arg);
+}function scheme (arg = EMPTY) {
+	return arg.includes(SLASH) || arg[0] === URI_SCHEME;
+}// @todo audit this function
+function hypermedia (req, res, rep) {
 	const server = req.server,
 		headers = res.getHeaders(),
 		collection$1 = req.parsed.pathname,
@@ -504,7 +546,7 @@ function scheme (arg = "") {
 
 	if (links.length > 0) {
 		if (headers.link !== void 0) {
-			for (const i of headers.link.split('" <')) {
+			for (const i of headers.link.split("\" <")) {
 				links.push({
 					uri: i.replace(/(^\<|\>.*$)/g, ""),
 					rel: i.replace(/(^.*rel\=\"|\"$)/g, "")
@@ -603,7 +645,7 @@ function csrfWrapper (req, res, next) {
 		res.error(401);
 	}
 }function redirect (req, res) {
-	res.redirect(req.config.auth.uri.redirect, false);
+	res.redirect(req.server.auth.uri.redirect, false);
 }const rateHeaders = [
 	X_RATELIMIT_LIMIT,
 	X_RATELIMIT_REMAINING,

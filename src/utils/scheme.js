@@ -1,6 +1,5 @@
-export const str_slash = "/";
-export const str_scheme = "://";
+import {EMPTY, SLASH, URI_SCHEME} from "../core/constants.js";
 
-export function scheme (arg = "") {
-	return arg.includes(str_slash) || arg[0] === str_scheme;
+export function scheme (arg = EMPTY) {
+	return arg.includes(SLASH) || arg[0] === URI_SCHEME;
 }

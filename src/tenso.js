@@ -13,17 +13,7 @@ import {renderers} from "./utils/renderers.js";
 import {serializers} from "./utils/serializers.js";
 import {mimetype} from "./utils/regex.js";
 import {hasBody} from "./utils/hasbody.js";
-import {
-	CONNECT,
-	EMPTY,
-	FUNCTION,
-	INT_200,
-	INT_204,
-	INT_304,
-	SIGHUP,
-	SIGINT,
-	SIGTERM
-} from "./core/constants.js";
+import {CONNECT, EMPTY, FUNCTION, INT_200, INT_204, INT_304, SIGHUP, SIGINT, SIGTERM} from "./core/constants.js";
 import {serialize} from "./utils/serialize.js";
 import {hypermedia} from "./utils/hypermedia.js";
 import {payload} from "./middleware/payload.js";

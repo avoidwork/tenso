@@ -1,8 +1,7 @@
-const str_id = "id";
-const str_id_2 = "_id";
-const str_id_3 = "ID";
-const str_id_4 = "_ID";
+import {EMPTY, I, ID, ID_2} from "../core/constants.js";
 
-export function id (arg = "") {
-	return arg === str_id || arg === str_id_2 || arg === str_id_3 || arg === str_id_4;
+const pattern = new RegExp(`${ID}|${ID_2}$`, I);
+
+export function id (arg = EMPTY) {
+	return pattern.test(arg);
 }

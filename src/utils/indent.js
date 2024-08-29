@@ -1,5 +1,5 @@
-const str_indent = "indent=";
+import {EMPTY, IDENT_VAR} from "../core/constants.js";
 
-export function indent (arg = "", fallback = 0) {
-	return arg.includes(str_indent) ? parseInt(arg.match(/indent=(\d+)/)[1], 10) : fallback;
+export function indent (arg = EMPTY, fallback = 0) {
+	return arg.includes(IDENT_VAR) ? parseInt(arg.match(/indent=(\d+)/)[1], 10) : fallback;
 }

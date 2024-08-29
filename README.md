@@ -102,6 +102,15 @@ Tenso has two default serializers which can be overridden:
 - `plain` for plain text responses
 - `custom` for standard response shape
 
+```json
+{
+  "data": "`null` or ?",
+  "error": "`null` or an `Error` stack trace / message",
+  "links": [],
+  "status": 200
+}
+```
+
 ## Responses
 Responses will have a standard shape, and will be utf-8 by default. The result will be in `data`. Hypermedia (pagination & links) will be in `links:[ {"uri": "...", "rel": "..."}, ...]`, & also in the `Link` HTTP header.
 

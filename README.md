@@ -15,10 +15,12 @@ Tenso is an HTTP REST API framework, that will handle the serialization & creati
 Creating an API with Tenso can be this simple:
 
 ```javascript
-const path = require('path'),
-    app = require("tenso")({initRoutes: require(path.join(__dirname, "routes.js"))});
+import {tenso} from "./dist/tenso.js";
 
-module.exports = app;
+export const app = tenso({port: 8000});
+
+app.get("/", (req, res) => res.send("Hello, World!"));
+app.start();
 ```
 
 ### Creating Routes
@@ -31,9 +33,9 @@ The following example will create GET routes that will return an `Array` at `/`,
 As of 10.3.0 you can specify `always` as a method to run middleware before authorization middleware, which will skip `always` middleware registered after it (via instance methods).
 
 ```javascript
-const uuid = require("tiny-uuid4");
+import {randomUUID as uuid} from "crypto";
 
-module.exports.get = {
+export const get = {
 	"/": ["reports", "uuid"],
 	"/reports": ["tps"],
 	"/reports/tps": (req, res) => res.error(785, Error("TPS Cover Sheet not attached")),

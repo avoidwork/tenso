@@ -19,6 +19,7 @@ import {
 	INT_300000,
 	INT_429,
 	INT_450,
+	INT_5,
 	INT_6379,
 	INT_8000,
 	INT_900,
@@ -115,6 +116,7 @@ export const config = {
 	maxBytes: INT_0,
 	mimeType: HEADER_APPLICATION_JSON,
 	origins: [WILDCARD],
+	pageSize: INT_5,
 	port: INT_8000,
 	rate: {
 		enabled: false,

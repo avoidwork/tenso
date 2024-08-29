@@ -200,6 +200,7 @@ Everything is optional! You can provide as much, or as little configuration as y
 	maxBytes: 0,
 	mimeType: "application/json",
 	origins: ["*"],
+	pageSize: 5,
 	port: 8000,
 	rate: {
 		enabled: false,

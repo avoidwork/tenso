@@ -284,6 +284,7 @@ const config = {
 	maxBytes: INT_0,
 	mimeType: HEADER_APPLICATION_JSON,
 	origins: [WILDCARD],
+	pageSize: INT_5,
 	port: INT_8000,
 	rate: {
 		enabled: false,

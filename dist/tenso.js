@@ -26,19 +26,24 @@ const INT_NEG_1 = -1;
 const INT_0 = 0;
 const INT_1 = 1;
 const INT_2 = 2;
+const INT_3 = 3;
 const INT_5 = 5;
 const INT_10 = 10;
 const INT_100 = 1e2;
-const INT_200 = 200;
+const INT_200 = 2e2;
 const INT_204 = 204;
 const INT_206 = 206;
 const INT_304 = 304;
-const INT_400 = 400;
+const INT_400 = 4e2;
 const INT_401 = 401;
 const INT_413 = 413;
 const INT_429 = 429;
-const INT_500 = 500;
+const INT_450 = 450;
+const INT_500 = 5e2;
+const INT_900 = 9e2;
 const INT_1000 = 1e3;
+const INT_6379 = 6379;
+const INT_8000 = 8e3;
 const INT_300000 = 3e5;
 const MULTIPART = "multipart";
 const RETRY_AFTER = "retry-after";
@@ -128,9 +133,35 @@ const TEMPLATE_YEAR = "{{year}}";
 const TEMPLATE_VERSION = "{{version}}";
 const TEMPLATE_ALLOW = "{{allow}}";
 const TEMPLATE_METHODS = "{{methods}}";
-const TEMPLATE_CSRF = "{{csrf}}";const config = {
+const TEMPLATE_CSRF = "{{csrf}}";
+const BEARER = "Bearer";
+const HS256 = "HS256";
+const HS384 = "HS384";
+const HS512 = "HS512";
+const MSG_LOGIN = "POST 'username' & 'password' to authenticate";
+const URL_AUTH_LOGIN = "/auth/login";
+const URL_AUTH_LOGOUT = "/auth/logout";
+const URL_AUTH_ROOT = "/auth";
+const UTF_8 = "utf-8";
+const EXPOSE_HEADERS = "cache-control, content-language, content-type, expires, last-modified, pragma, x-csrf-token";
+const HEADER_VARY = "vary";
+const DEFAULT_CONTENT_TYPE = "application/json; charset=utf-8";
+const DEFAULT_VARY = "accept, accept-encoding, accept-language, origin";
+const IP_0000 = "0.0.0.0";
+const LOG_FORMAT = "%h %l %u %t \"%r\" %>s %b";
+const DEBUG = "debug";
+const WILDCARD = "*";
+const MSG_TOO_MANY_REQUESTS = "Too many requests";
+const TENSO = "tenso";
+const SAMEORIGIN = "SAMEORIGIN";
+const AUTO = "auto";
+const COOKIE_NAME = "tenso.sid";
+const IP_127001 = "127.0.0.1";
+const SESSION_SECRET = "tensoABC";
+const MEMORY = "memory";
+const PATH_ASSETS = "/assets";const config = {
 	auth: {
-		delay: 0,
+		delay: INT_0,
 		protect: [],
 		unprotect: [],
 		basic: {
@@ -144,37 +175,37 @@ const TEMPLATE_CSRF = "{{csrf}}";const config = {
 		jwt: {
 			enabled: false,
 			auth: null,
-			audience: "",
+			audience: EMPTY,
 			algorithms: [
-				"HS256",
-				"HS384",
-				"HS512"
+				HS256,
+				HS384,
+				HS512
 			],
 			ignoreExpiration: false,
-			issuer: "",
-			scheme: "Bearer",
-			secretOrKey: ""
+			issuer: EMPTY,
+			scheme: BEARER,
+			secretOrKey: EMPTY
 		},
 		local: {
 			enabled: false,
 			auth: null
 		},
 		msg: {
-			login: "POST 'username' & 'password' to authenticate"
+			login: MSG_LOGIN
 		},
 		oauth2: {
 			enabled: false,
 			auth: null,
-			auth_url: "",
-			token_url: "",
-			client_id: "",
-			client_secret: ""
+			auth_url: EMPTY,
+			token_url: EMPTY,
+			client_id: EMPTY,
+			client_secret: EMPTY
 		},
 		uri: {
-			login: "/auth/login",
-			logout: "/auth/logout",
-			redirect: "/",
-			root: "/auth"
+			login: URL_AUTH_LOGIN,
+			logout: URL_AUTH_LOGOUT,
+			redirect: SLASH,
+			root: URL_AUTH_ROOT
 		},
 		saml: {
 			enabled: false,
@@ -185,45 +216,45 @@ const TEMPLATE_CSRF = "{{csrf}}";const config = {
 	cacheSize: INT_1000,
 	cacheTTL: INT_300000,
 	catchAll: true,
-	charset: "utf-8",
-	corsExpose: "cache-control, content-language, content-type, expires, last-modified, pragma, x-csrf-token",
+	charset: UTF_8,
+	corsExpose: EXPOSE_HEADERS,
 	defaultHeaders: {
-		"content-type": "application/json; charset=utf-8",
-		"vary": "accept, accept-encoding, accept-language, origin"
+		[HEADER_CONTENT_TYPE]: DEFAULT_CONTENT_TYPE,
+		[HEADER_VARY]: DEFAULT_VARY
 	},
-	digit: 3,
+	digit: INT_3,
 	etags: true,
-	host: "0.0.0.0",
+	host: IP_0000,
 	index: [],
 	initRoutes: {},
-	jsonIndent: 0,
+	jsonIndent: INT_0,
 	logging: {
 		enabled: true,
-		format: "%h %l %u %t \"%r\" %>s %b",
-		level: "debug",
+		format: LOG_FORMAT,
+		level: DEBUG,
 		stack: true
 	},
-	maxBytes: 0,
-	mimeType: "application/json",
-	origins: ["*"],
-	port: 8000,
+	maxBytes: INT_0,
+	mimeType: HEADER_APPLICATION_JSON,
+	origins: [WILDCARD],
+	port: INT_8000,
 	rate: {
 		enabled: false,
-		limit: 450,
-		message: "Too many requests",
+		limit: INT_450,
+		message: MSG_TOO_MANY_REQUESTS,
 		override: null,
-		reset: 900,
-		status: 429
+		reset: INT_900,
+		status: INT_429
 	},
 	renderHeaders: true,
 	time: true,
 	security: {
-		key: "x-csrf-token",
-		secret: "tenso",
+		key: X_CSRF_TOKEN,
+		secret: TENSO,
 		csrf: true,
 		csp: null,
-		xframe: "SAMEORIGIN",
-		p3p: "",
+		xframe: SAMEORIGIN,
+		p3p: EMPTY,
 		hsts: null,
 		xssProtection: true,
 		nosniff: true
@@ -231,21 +262,21 @@ const TEMPLATE_CSRF = "{{csrf}}";const config = {
 	session: {
 		cookie: {
 			httpOnly: true,
-			path: "/",
+			path: SLASH,
 			sameSite: true,
-			secure: "auto"
+			secure: AUTO
 		},
-		name: "tenso.sid",
+		name: COOKIE_NAME,
 		proxy: true,
 		redis: {
-			host: "127.0.0.1",
-			port: 6379
+			host: IP_127001,
+			port: INT_6379
 		},
 		rolling: true,
 		resave: true,
 		saveUninitialized: true,
-		secret: "tensoABC",
-		store: "memory"
+		secret: SESSION_SECRET,
+		store: MEMORY
 	},
 	silent: false,
 	ssl: {
@@ -254,9 +285,9 @@ const TEMPLATE_CSRF = "{{csrf}}";const config = {
 		pfx: null
 	},
 	webroot: {
-		root: "",
-		static: "/assets",
-		template: ""
+		root: EMPTY,
+		static: PATH_ASSETS,
+		template: EMPTY
 	}
 };function json$1 (arg = EMPTY) {
 	return JSON.parse(arg);
@@ -267,10 +298,10 @@ const mimetype = /;.*/;
 const trailing = /_.*$/;
 const trailingS = /s$/;
 const trailingSlash = /\/$/;
-const trailingY = /y$/;function chunk (arg = [], size = 2) {
+const trailingY = /y$/;function chunk (arg = [], size = INT_2) {
 	const result = [];
 	const nth = Math.ceil(arg.length / size);
-	let i = 0;
+	let i = INT_0;
 
 	while (i < nth) {
 		result.push(arg.slice(i * size, ++i * size));
@@ -348,11 +379,11 @@ const trailingY = /y$/;function chunk (arg = [], size = 2) {
 	const protocol = X_FORWARDED_PROTO in req.headers ? req.headers[X_FORWARDED_PROTO] + COLON : req.parsed.protocol,
 		headers = res.getHeaders();
 
-	return tpl.length > 0 ? tpl.replace(new RegExp(TEMPLATE_TITLE, G), req.server.title)
+	return tpl.length > INT_0 ? tpl.replace(new RegExp(TEMPLATE_TITLE, G), req.server.title)
 		.replace(TEMPLATE_URL, req.parsed.href.replace(req.parsed.protocol, protocol))
 		.replace(TEMPLATE_HEADERS, Object.keys(headers).sort().map(i => `<tr><td>${i}</td><td>${sanitize(headers[i])}</td></tr>`).join(NL))
 		.replace(TEMPLATE_FORMATS, `<option value=''></option>${Array.from(renderers.keys()).filter(i => i.indexOf(HTML) === INT_NEG_1).map(i => `<option value='${i.trim()}'>${i.replace(/^.*\//, EMPTY).toUpperCase()}</option>`).join(NL)}`)
-		.replace(TEMPLATE_BODY, sanitize(JSON.stringify(arg, null, 2)))
+		.replace(TEMPLATE_BODY, sanitize(JSON.stringify(arg, null, INT_2)))
 		.replace(TEMPLATE_YEAR, new Date().getFullYear())
 		.replace(TEMPLATE_VERSION, req.server.version)
 		.replace(TEMPLATE_ALLOW, headers.allow)
@@ -401,12 +432,12 @@ function sort (arg, req) {
 	let output = clone(arg);
 
 	if (typeof req.parsed.search === STRING && req.parsed.searchParams.has(ORDER_BY) && Array.isArray(arg)) {
-		const type = typeof arg[0];
+		const type = typeof arg[INT_0];
 
-		if (type !== BOOLEAN && type !== NUMBER && type !== STRING && type !== UNDEFINED && arg[0] !== null) {
+		if (type !== BOOLEAN && type !== NUMBER && type !== STRING && type !== UNDEFINED && arg[INT_0] !== null) {
 			const args = req.parsed.searchParams.getAll(ORDER_BY).filter(i => i !== DESC).join(COMMA_SPACE);
 
-			if (args.length > 0) {
+			if (args.length > INT_0) {
 				output = keysort(output, args);
 			}
 		}
@@ -466,7 +497,7 @@ function hypermedia (req, res, rep) {
 			lrel = rel || RELATED,
 			result;
 
-		if (keys.length === 0) {
+		if (keys.length === INT_0) {
 			result = null;
 		} else {
 			for (const i of keys) {
@@ -579,7 +610,7 @@ function hypermedia (req, res, rep) {
 						const li = i.toString();
 
 						if (li !== collection$1) {
-							const uri = li.indexOf(DOUBLE_SLASH) >= 0 ? li : `${collection$1.replace(/\s/g, ENCODED_SPACE)}/${li.replace(/\s/g, ENCODED_SPACE)}`.replace(/^\/\//, SLASH);
+							const uri = li.indexOf(DOUBLE_SLASH) >= INT_0 ? li : `${collection$1.replace(/\s/g, ENCODED_SPACE)}/${li.replace(/\s/g, ENCODED_SPACE)}`.replace(/^\/\//, SLASH);
 
 							if (server.allowed(GET, uri)) {
 								links.push({uri: uri, rel: ITEM});
@@ -629,7 +660,7 @@ function hypermedia (req, res, rep) {
 			if (invalid === false) {
 				body += data;
 
-				if (max > 0 && Buffer.byteLength(body) > max) {
+				if (max > INT_0 && Buffer.byteLength(body) > max) {
 					invalid = true;
 					res.error(INT_413);
 				}
@@ -653,7 +684,7 @@ function hypermedia (req, res, rep) {
 		const type = req.headers?.[HEADER_CONTENT_TYPE]?.replace(/\s.*$/, EMPTY) ?? EMPTY;
 		const parsers = req.server.parsers;
 
-		if (type.length > 0 && parsers.has(type)) {
+		if (type.length > INT_0 && parsers.has(type)) {
 			try {
 				req.body = parsers.get(type)(req.body);
 			} catch (err) {
@@ -761,8 +792,8 @@ function rate (req, res, next) {
 	});
 }function random (n = INT_100) {
 	return randomInt(INT_1, n);
-}function delay (fn = () => void 0, n = 0) {
-	if (n === 0) {
+}function delay (fn = () => void 0, n = INT_0) {
+	if (n === INT_0) {
 		fn();
 	} else {
 		setTimeout(fn, random(n));
@@ -1041,7 +1072,7 @@ function auth (obj) {
 	}
 
 	if (authUris.length > 0) {
-		if (Object.keys(authMap).length > 0) {
+		if (Object.keys(authMap).length > INT_0) {
 			obj.get(obj.auth.uri.root, authMap);
 		}
 
@@ -1107,7 +1138,7 @@ class Tenso extends Woodland {
 			const header = `${ACCESS_CONTROL}${HYPHEN}${req.method === OPTIONS ? ALLOW : EXPOSE}${HYPHEN}${HEADERS}`;
 
 			res.removeHeader(header);
-			res.header(header, `cache-control, content-language, content-type, expires, last-modified, pragma${req.csrf ? `, ${this.security.key}` : ""}${this.corsExpose.length > 0 ? `, ${this.corsExpose}` : ""}`);
+			res.header(header, `cache-control, content-language, content-type, expires, last-modified, pragma${req.csrf ? `, ${this.security.key}` : ""}${this.corsExpose.length > INT_0 ? `, ${this.corsExpose}` : ""}`);
 		}
 	}
 
@@ -1127,12 +1158,12 @@ class Tenso extends Woodland {
 			const lcache = cache.replace(/(private|public)(,\s)?/g, EMPTY);
 
 			res.removeHeader(key);
-			res.header(key, `${PRIVATE}${lcache.length > 0 ? `${COMMA}${EMPTY}` : EMPTY}${lcache || EMPTY}`);
+			res.header(key, `${PRIVATE}${lcache.length > INT_0 ? `${COMMA}${EMPTY}` : EMPTY}${lcache || EMPTY}`);
 		}
 	}
 
 	init () {
-		const authorization = Object.keys(this.auth).filter(i => this.auth?.[i]?.enabled === true).length > 0 || this.rate.enabled || this.security.csrf;
+		const authorization = Object.keys(this.auth).filter(i => this.auth?.[i]?.enabled === true).length > INT_0 || this.rate.enabled || this.security.csrf;
 
 		this.decorate = this.decorate.bind(this);
 		this.route = this.route.bind(this);
@@ -1224,7 +1255,7 @@ class Tenso extends Woodland {
 		if (seconds >= reset) {
 			reset = state.reset = seconds + config.reset;
 			remaining = state.remaining = limit - INT_1;
-		} else if (remaining > 0) {
+		} else if (remaining > INT_0) {
 			state.remaining--;
 			remaining = state.remaining;
 		} else {
@@ -1252,7 +1283,7 @@ class Tenso extends Woodland {
 			}
 		}
 
-		if (format.length === 0) {
+		if (format.length === INT_0) {
 			format = this.mimeType;
 		}
 
@@ -1292,9 +1323,9 @@ class Tenso extends Woodland {
 				this.server = http.createServer(this.route).listen(this.port, this.host);
 			} else {
 				this.server = https.createServer({
-					cert: this.ssl.cert ? readFileSync(this.ssl.cert) : void 0,
-					pfx: this.ssl.pfx ? readFileSync(this.ssl.pfx) : void 0,
-					key: this.ssl.key ? readFileSync(this.ssl.key) : void 0,
+					cert: this.ssl.cert ? readFileSync(this.ssl.cert) : void INT_0,
+					pfx: this.ssl.pfx ? readFileSync(this.ssl.pfx) : void INT_0,
+					key: this.ssl.key ? readFileSync(this.ssl.key) : void INT_0,
 					port: this.port,
 					host: this.host
 				}, this.route).listen(this.port, this.host);

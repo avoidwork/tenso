@@ -1,4 +1,4 @@
-import {DATA, EMPTY, END, HEADER_CONTENT_TYPE, INT_413, MULTIPART, UTF8} from "../core/constants.js";
+import {DATA, EMPTY, END, HEADER_CONTENT_TYPE, INT_0, INT_413, MULTIPART, UTF8} from "../core/constants.js";
 import {hasBody} from "../utils/hasbody.js";
 
 export function payload (req, res, next) {
@@ -13,7 +13,7 @@ export function payload (req, res, next) {
 			if (invalid === false) {
 				body += data;
 
-				if (max > 0 && Buffer.byteLength(body) > max) {
+				if (max > INT_0 && Buffer.byteLength(body) > max) {
 					invalid = true;
 					res.error(INT_413);
 				}

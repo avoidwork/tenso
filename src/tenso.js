@@ -27,6 +27,7 @@ import {
 	HEADER_CONTENT_TYPE,
 	HEADERS,
 	HYPHEN,
+	INT_0,
 	INT_1,
 	INT_1000,
 	INT_200,
@@ -91,7 +92,7 @@ class Tenso extends Woodland {
 			const header = `${ACCESS_CONTROL}${HYPHEN}${req.method === OPTIONS ? ALLOW : EXPOSE}${HYPHEN}${HEADERS}`;
 
 			res.removeHeader(header);
-			res.header(header, `cache-control, content-language, content-type, expires, last-modified, pragma${req.csrf ? `, ${this.security.key}` : ""}${this.corsExpose.length > 0 ? `, ${this.corsExpose}` : ""}`);
+			res.header(header, `cache-control, content-language, content-type, expires, last-modified, pragma${req.csrf ? `, ${this.security.key}` : ""}${this.corsExpose.length > INT_0 ? `, ${this.corsExpose}` : ""}`);
 		}
 	}
 
@@ -111,12 +112,12 @@ class Tenso extends Woodland {
 			const lcache = cache.replace(/(private|public)(,\s)?/g, EMPTY);
 
 			res.removeHeader(key);
-			res.header(key, `${PRIVATE}${lcache.length > 0 ? `${COMMA}${EMPTY}` : EMPTY}${lcache || EMPTY}`);
+			res.header(key, `${PRIVATE}${lcache.length > INT_0 ? `${COMMA}${EMPTY}` : EMPTY}${lcache || EMPTY}`);
 		}
 	}
 
 	init () {
-		const authorization = Object.keys(this.auth).filter(i => this.auth?.[i]?.enabled === true).length > 0 || this.rate.enabled || this.security.csrf;
+		const authorization = Object.keys(this.auth).filter(i => this.auth?.[i]?.enabled === true).length > INT_0 || this.rate.enabled || this.security.csrf;
 
 		this.decorate = this.decorate.bind(this);
 		this.route = this.route.bind(this);
@@ -208,7 +209,7 @@ class Tenso extends Woodland {
 		if (seconds >= reset) {
 			reset = state.reset = seconds + config.reset;
 			remaining = state.remaining = limit - INT_1;
-		} else if (remaining > 0) {
+		} else if (remaining > INT_0) {
 			state.remaining--;
 			remaining = state.remaining;
 		} else {
@@ -236,7 +237,7 @@ class Tenso extends Woodland {
 			}
 		}
 
-		if (format.length === 0) {
+		if (format.length === INT_0) {
 			format = this.mimeType;
 		}
 
@@ -276,9 +277,9 @@ class Tenso extends Woodland {
 				this.server = http.createServer(this.route).listen(this.port, this.host);
 			} else {
 				this.server = https.createServer({
-					cert: this.ssl.cert ? readFileSync(this.ssl.cert) : void 0,
-					pfx: this.ssl.pfx ? readFileSync(this.ssl.pfx) : void 0,
-					key: this.ssl.key ? readFileSync(this.ssl.key) : void 0,
+					cert: this.ssl.cert ? readFileSync(this.ssl.cert) : void INT_0,
+					pfx: this.ssl.pfx ? readFileSync(this.ssl.pfx) : void INT_0,
+					key: this.ssl.key ? readFileSync(this.ssl.key) : void INT_0,
 					port: this.port,
 					host: this.host
 				}, this.route).listen(this.port, this.host);

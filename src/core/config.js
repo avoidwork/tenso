@@ -1,8 +1,49 @@
-import {INT_1000, INT_300000} from "./constants.js";
+import {
+	AUTO,
+	BEARER,
+	COOKIE_NAME,
+	DEBUG,
+	DEFAULT_CONTENT_TYPE,
+	DEFAULT_VARY,
+	EMPTY,
+	EXPOSE_HEADERS,
+	HEADER_APPLICATION_JSON,
+	HEADER_CONTENT_TYPE,
+	HEADER_VARY,
+	HS256,
+	HS384,
+	HS512,
+	INT_0,
+	INT_1000,
+	INT_3,
+	INT_300000,
+	INT_429,
+	INT_450,
+	INT_6379,
+	INT_8000,
+	INT_900,
+	IP_0000,
+	IP_127001,
+	LOG_FORMAT,
+	MEMORY,
+	MSG_LOGIN,
+	MSG_TOO_MANY_REQUESTS,
+	PATH_ASSETS,
+	SAMEORIGIN,
+	SESSION_SECRET,
+	SLASH,
+	TENSO,
+	URL_AUTH_LOGIN,
+	URL_AUTH_LOGOUT,
+	URL_AUTH_ROOT,
+	UTF_8,
+	WILDCARD,
+	X_CSRF_TOKEN
+} from "./constants.js";
 
 export const config = {
 	auth: {
-		delay: 0,
+		delay: INT_0,
 		protect: [],
 		unprotect: [],
 		basic: {
@@ -16,37 +57,37 @@ export const config = {
 		jwt: {
 			enabled: false,
 			auth: null,
-			audience: "",
+			audience: EMPTY,
 			algorithms: [
-				"HS256",
-				"HS384",
-				"HS512"
+				HS256,
+				HS384,
+				HS512
 			],
 			ignoreExpiration: false,
-			issuer: "",
-			scheme: "Bearer",
-			secretOrKey: ""
+			issuer: EMPTY,
+			scheme: BEARER,
+			secretOrKey: EMPTY
 		},
 		local: {
 			enabled: false,
 			auth: null
 		},
 		msg: {
-			login: "POST 'username' & 'password' to authenticate"
+			login: MSG_LOGIN
 		},
 		oauth2: {
 			enabled: false,
 			auth: null,
-			auth_url: "",
-			token_url: "",
-			client_id: "",
-			client_secret: ""
+			auth_url: EMPTY,
+			token_url: EMPTY,
+			client_id: EMPTY,
+			client_secret: EMPTY
 		},
 		uri: {
-			login: "/auth/login",
-			logout: "/auth/logout",
-			redirect: "/",
-			root: "/auth"
+			login: URL_AUTH_LOGIN,
+			logout: URL_AUTH_LOGOUT,
+			redirect: SLASH,
+			root: URL_AUTH_ROOT
 		},
 		saml: {
 			enabled: false,
@@ -57,45 +98,45 @@ export const config = {
 	cacheSize: INT_1000,
 	cacheTTL: INT_300000,
 	catchAll: true,
-	charset: "utf-8",
-	corsExpose: "cache-control, content-language, content-type, expires, last-modified, pragma, x-csrf-token",
+	charset: UTF_8,
+	corsExpose: EXPOSE_HEADERS,
 	defaultHeaders: {
-		"content-type": "application/json; charset=utf-8",
-		"vary": "accept, accept-encoding, accept-language, origin"
+		[HEADER_CONTENT_TYPE]: DEFAULT_CONTENT_TYPE,
+		[HEADER_VARY]: DEFAULT_VARY
 	},
-	digit: 3,
+	digit: INT_3,
 	etags: true,
-	host: "0.0.0.0",
+	host: IP_0000,
 	index: [],
 	initRoutes: {},
-	jsonIndent: 0,
+	jsonIndent: INT_0,
 	logging: {
 		enabled: true,
-		format: "%h %l %u %t \"%r\" %>s %b",
-		level: "debug",
+		format: LOG_FORMAT,
+		level: DEBUG,
 		stack: true
 	},
-	maxBytes: 0,
-	mimeType: "application/json",
-	origins: ["*"],
-	port: 8000,
+	maxBytes: INT_0,
+	mimeType: HEADER_APPLICATION_JSON,
+	origins: [WILDCARD],
+	port: INT_8000,
 	rate: {
 		enabled: false,
-		limit: 450,
-		message: "Too many requests",
+		limit: INT_450,
+		message: MSG_TOO_MANY_REQUESTS,
 		override: null,
-		reset: 900,
-		status: 429
+		reset: INT_900,
+		status: INT_429
 	},
 	renderHeaders: true,
 	time: true,
 	security: {
-		key: "x-csrf-token",
-		secret: "tenso",
+		key: X_CSRF_TOKEN,
+		secret: TENSO,
 		csrf: true,
 		csp: null,
-		xframe: "SAMEORIGIN",
-		p3p: "",
+		xframe: SAMEORIGIN,
+		p3p: EMPTY,
 		hsts: null,
 		xssProtection: true,
 		nosniff: true
@@ -103,21 +144,21 @@ export const config = {
 	session: {
 		cookie: {
 			httpOnly: true,
-			path: "/",
+			path: SLASH,
 			sameSite: true,
-			secure: "auto"
+			secure: AUTO
 		},
-		name: "tenso.sid",
+		name: COOKIE_NAME,
 		proxy: true,
 		redis: {
-			host: "127.0.0.1",
-			port: 6379
+			host: IP_127001,
+			port: INT_6379
 		},
 		rolling: true,
 		resave: true,
 		saveUninitialized: true,
-		secret: "tensoABC",
-		store: "memory"
+		secret: SESSION_SECRET,
+		store: MEMORY
 	},
 	silent: false,
 	ssl: {
@@ -126,8 +167,8 @@ export const config = {
 		pfx: null
 	},
 	webroot: {
-		root: "",
-		static: "/assets",
-		template: ""
+		root: EMPTY,
+		static: PATH_ASSETS,
+		template: EMPTY
 	}
 };

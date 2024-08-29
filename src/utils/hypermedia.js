@@ -55,7 +55,7 @@ export function hypermedia (req, res, rep) {
 			lrel = rel || RELATED,
 			result;
 
-		if (keys.length === 0) {
+		if (keys.length === INT_0) {
 			result = null;
 		} else {
 			for (const i of keys) {
@@ -168,7 +168,7 @@ export function hypermedia (req, res, rep) {
 						const li = i.toString();
 
 						if (li !== collection) {
-							const uri = li.indexOf(DOUBLE_SLASH) >= 0 ? li : `${collection.replace(/\s/g, ENCODED_SPACE)}/${li.replace(/\s/g, ENCODED_SPACE)}`.replace(/^\/\//, SLASH);
+							const uri = li.indexOf(DOUBLE_SLASH) >= INT_0 ? li : `${collection.replace(/\s/g, ENCODED_SPACE)}/${li.replace(/\s/g, ENCODED_SPACE)}`.replace(/^\/\//, SLASH);
 
 							if (server.allowed(GET, uri)) {
 								links.push({uri: uri, rel: ITEM});

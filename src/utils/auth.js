@@ -294,7 +294,7 @@ export function auth (obj) {
 	}
 
 	if (authUris.length > 0) {
-		if (Object.keys(authMap).length > 0) {
+		if (Object.keys(authMap).length > INT_0) {
 			obj.get(obj.auth.uri.root, authMap);
 		}
 

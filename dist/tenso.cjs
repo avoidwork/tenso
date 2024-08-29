@@ -74,7 +74,7 @@ const FORMAT = "format";
 const FUNCTION = "function";
 const G = "g";
 const GET = "GET";
-const GREATER_THAN = "&gt;";
+const GT = "&gt;";
 const HEADERS = "headers";
 const HEADER_ALLOW_GET = "GET, HEAD, OPTIONS";
 const HEADER_APPLICATION_JAVASCRIPT = "application/javascript";
@@ -133,7 +133,7 @@ const ISSUER = "issuer";
 const ITEM = "item";
 const JWT = "jwt";
 const LAST = "last";
-const LESS_THAN = "&lt;";
+const LT = "&lt;";
 const LINK = "link";
 const LOCAL = "local";
 const LOG_FORMAT = "%h %l %u %t \"%r\" %>s %b";
@@ -456,7 +456,7 @@ function explode (arg = EMPTY, delimiter = COMMA) {
 }
 
 function sanitize (arg) {
-	return typeof arg === STRING ? arg.replace(/</g, LESS_THAN).replace(/>/g, GREATER_THAN) : arg;
+	return typeof arg === STRING ? arg.replace(/</g, LT).replace(/>/g, GT) : arg;
 }
 
 function html (req, res, arg, tpl = EMPTY) {

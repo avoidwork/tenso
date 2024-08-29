@@ -36,7 +36,7 @@ function shell (arg = "") {
 
 	for (const file of files) {
 		try {
-			const stdout = await shell(`node ${cpath} -k --success first \"node benchmarks${sep}${file}\" \"node ${apath} -c 100 -d 40 -p 10 localhost:8000\"`);
+			const stdout = await shell(`node ${cpath} -k --success first "node benchmarks${sep}${file}" "node ${apath} -c 100 -d 40 -p 10 localhost:8000"`);
 
 			result.push({file: file.replace(".js", ""), stdout});
 		} catch (err) {

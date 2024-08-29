@@ -1,6 +1,6 @@
 "use strict";
 
-(function (document, window, location, fetch, router) {
+(function (document, window, location, fetch, router, localStorage) {
 	// Wiring up the request tab
 	const button = document.querySelector("button"),
 		close = document.querySelector("#close"),
@@ -11,7 +11,9 @@
 		loading = modal.querySelector(".loading"),
 		textarea = document.querySelector("textarea"),
 		resBody = modal.querySelector(".body"),
-		json = /^[\[\{"]/,
+		toggle = document.querySelector("#viewModeToggle"),
+		body = document.querySelector("body"),
+		json = /^[[{"]/,
 		isJson = /application\/json/;
 
 	if (methods.childElementCount > 0) {
@@ -19,14 +21,14 @@
 	}
 
 	function escape (arg) {
-		return arg.replace(/[\-\[\]{}()*+?.,\\\/\^\$|#\s]/g, "\\$&");
+		return arg.replace(/[-[\]{}()*+?.,\\/^$|#\s]/g, "\\$&");
 	}
 
 	// Stage 1 of prettifying a <code>
 	function prepare (html) {
-		const keys = Array.from(html.match(/\".*":/g)),
-			matches = Array.from(keys.concat(html.match(/:\s(\".*\"|\d{3,3}|null)/g))),
-			replaces = matches.map(i => keys.includes(i) ? i.replace(/(\"(.*)\")/, "<span class='key $2'>$1</span>") : i.replace(/(\".*\"|\d{3,3}|null)/, "<span class='item'>$1</span>"));
+		const keys = Array.from(html.match(/".*":/g)),
+			matches = Array.from(keys.concat(html.match(/:\s(".*"|\d{3,3}|null)/g))),
+			replaces = matches.map(i => keys.includes(i) ? i.replace(/("(.*)")/, "<span class='key $2'>$1</span>") : i.replace(/(".*"|\d{3,3}|null)/, "<span class='item'>$1</span>"));
 
 		let output = html;
 
@@ -47,7 +49,7 @@
 		// Changing URIs into anchors
 		Array.from(document.querySelectorAll(".item")).forEach(i => {
 			let html = i.innerHTML,
-				val = html.replace(/(^\"|\"$)/g, "");
+				val = html.replace(/(^"|"$)/g, "");
 
 			if (val.indexOf("/") === 0 || val.indexOf("//") > -1) {
 				html = html.replace(val, `<a href="${val}" title="View ${val}">${val}</a>`);
@@ -75,7 +77,7 @@
 	function sanitize (arg = "") {
 		let tmp = typeof arg !== "string" ? JSON.stringify(arg, null, 2) : arg;
 
-		return tmp.replace(/\</g, "&lt;").replace(/\>/g, "&gt;");
+		return tmp.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 	}
 
 	// Intercepting the submission
@@ -124,7 +126,7 @@
 	router({css: {current: "is-active", hidden: "dr-hidden"}, callback: ev => {
 		window.requestAnimationFrame(() => {
 			Array.from(document.querySelectorAll("li.is-active")).forEach(i => i.classList.remove("is-active"));
-			ev.trigger.parentNode.classList.add("is-active");
+			ev.trigger?.[0]?.parentNode?.classList?.add("is-active");
 		});
 	}});
 
@@ -141,6 +143,18 @@
 		window.location = `${window.location.pathname}?format=${ev.target.options[ev.target.selectedIndex].value}${window.location.search.replace(/^\?/, "&")}`;
 	};
 
+	// Dark mode toggle
+	toggle.onclick = ev => {
+		ev.preventDefault();
+		ev.stopPropagation();
+		window.requestAnimationFrame(() => {
+			body.classList.toggle("dark");
+			const isDark = body.classList.contains("dark");
+			toggle.innerText = isDark ? "Light" : "Dark";
+			localStorage.setItem("tensoDark", isDark);
+		});
+	};
+
 	// Setting up the UI
 	window.requestAnimationFrame(() => {
 		// Hiding the request tab if read-only
@@ -153,6 +167,12 @@
 
 		// Prettifying the response
 		prettify(document.querySelector("#body"));
+
+		// Setting up dark mode
+		if (localStorage.getItem("tensoDark") === "true") {
+			toggle.click();
+			console.log("Starting in dark mode");
+		}
 	});
 
 	console.log([
@@ -172,4 +192,4 @@
 		"             \\   \\  /'---'        `--'---'",
 		"              `----'"
 	].join("\n"));
-}(document, window, location, fetch, router));
+}(document, window, location, fetch, domRouter.router, localStorage));

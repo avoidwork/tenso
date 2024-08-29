@@ -1,6 +1,6 @@
-var uuid = require("tiny-uuid4");
+import {randomUUID as uuid} from "node:crypto";
 
-module.exports.get = {
+export const get = {
 	"/": [
 		"empty",
 		"items",
@@ -12,7 +12,7 @@ module.exports.get = {
 	],
 	"/null": null,
 	"/empty": [],
-	"/items(\/?)": [
+	"/items(/?)": [
 		1,
 		2,
 		3,
@@ -79,8 +79,11 @@ module.exports.get = {
 	}
 };
 
-module.exports.post = {
+export const post = {
 	"/test": function (req, res) {
 		res.send("OK!");
 	}
 };
+
+export const routes = {get, post};
+export default routes;

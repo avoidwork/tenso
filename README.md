@@ -1,24 +1,17 @@
-Tenso
-=====
-
-[![build status](https://secure.travis-ci.org/avoidwork/tenso.svg)](http://travis-ci.org/avoidwork/tenso)
+# Tenso
 
 Tenso is an HTTP REST API framework, that will handle the serialization & creation of hypermedia links; all you have to do is give it `Arrays` or `Objects`.
-
-## Benchmark
-
-1. Clone repository from [GitHub](https://github.com/avoidwork/tenso).
-1. Install dependencies with `npm` or `yarn`.
-1. Execute `benchmark` script with `npm` or `yarn`.
 
 ## Example
 Creating an API with Tenso can be this simple:
 
 ```javascript
-const path = require('path'),
-    app = require("tenso")({routes: require(path.join(__dirname, "routes.js"))});
+import {tenso} from "tenso";
 
-module.exports = app;
+export const app = tenso();
+
+app.get("/", "Hello, World!");
+app.start();
 ```
 
 ### Creating Routes
@@ -30,15 +23,32 @@ The following example will create GET routes that will return an `Array` at `/`,
 
 As of 10.3.0 you can specify `always` as a method to run middleware before authorization middleware, which will skip `always` middleware registered after it (via instance methods).
 
-```javascript
-const uuid = require("tiny-uuid4");
+#### Example
 
-module.exports.get = {
-	"/": ["reports", "uuid"],
-	"/reports": ["tps"],
-	"/reports/tps": (req, res) => res.error(785, Error("TPS Cover Sheet not attached")),
-	"/uuid": (req, res) => res.send(uuid(), 200, {"cache-control": "no-cache"})
+##### Routes
+
+```javascript
+import {randomUUID as uuid} from "crypto";
+
+export const initRoutes = {
+	"get": {
+		"/": ["reports", "uuid"],
+		"/reports": ["tps"],
+		"/reports/tps": (req, res) => res.error(785, Error("TPS Cover Sheet not attached")),
+		"/uuid": (req, res) => res.send(uuid(), 200, {"cache-control": "no-cache"})
+	}
 };
+```
+
+##### Server
+
+```javascript
+import {tenso} from "tenso";
+import {initRoutes} from "./routes";
+
+export const app = tenso({initRoutes});
+
+app.start();
 ```
 
 #### Protected Routes
@@ -55,23 +65,49 @@ Tenso decorates `req` with "helpers" such as `req.allow`, `req.csrf`, `req.ip`, 
 
 Tenso decorates `res` with "helpers" such as `res.send()`, `res.status()`, & `res.json()`.
 
+## Extensibility
+Tenso is extensible, and can be customized with custom parsers, renderers, & serializers.
+
+### Parsers
+Custom parsers can be registered with `server.parser('mimetype', fn);` or directly on `server.parsers`. The parameters for a parser are `(arg)`.
+
+Tenso has parsers for:
+
+- `application/json`
+- `application/x-www-form-urlencoded`
+- `application/jsonl`
+- `application/json-lines`
+- `text/json-lines`
+
+### Renderers
+Custom renderers can be registered with `server.renderer('mimetype', fn);`. The parameters for a renderer are `(req, res, arg)`.
+
+Tenso has renderers for:
+
+- `application/javascript`
+- `application/json`
+- `application/jsonl`
+- `application/json-lines`
+- `text/json-lines`
+- `application/yaml`
+- `application/xml`
+- `text/csv`
+- `text/html`
+
+### Serializers
+Custom renderers can be registered with `server.serializer('mimetype', fn);`. The parameters for a serializer are `(arg, err, status = 200, stack = false)`.
+
+Tenso has two default serializers which can be overridden:
+
+- `plain` for plain text responses
+- `custom` for standard response shape
+
 ## Responses
 Responses will have a standard shape, and will be utf-8 by default. The result will be in `data`. Hypermedia (pagination & links) will be in `links:[ {"uri": "...", "rel": "..."}, ...]`, & also in the `Link` HTTP header.
 
 Page size can be specified via the `page_size` parameter, e.g. `?page_size=25`.
 
 Sort order can be specified via then `order-by` which accepts `[field ]asc|desc` & can be combined like an SQL 'ORDER BY', e.g. `?order_by=desc` or `?order_by=lastName%20asc&order_by=firstName%20asc&order_by=age%20desc`
-
-```json
-{
-  "data": "`null` or ?",
-  "error": "`null` or an `Error` stack trace / message",
-  "links": [],
-  "status": 200
-}
-```
-
-Final modifications can be made to a response body after `hypermedia()` by overriding `tenso.final(req, res, body)`.
 
 ## REST / Hypermedia
 Hypermedia is a prerequisite of REST, and is best described by the [Richardson Maturity Model](http://martinfowler.com/articles/richardsonMaturityModel.html). Tenso will automagically paginate Arrays of results, or parse Entity representations for keys that imply
@@ -82,57 +118,141 @@ For example, if the key `user_id` was found, it would be mapped to `/users/:id` 
 
 Tenso will bend the rules of REST when using authentication strategies provided by passport.js, or CSRF if is enabled, because they rely on a session. Session storage is in memory, or Redis. You have the option of a stateless or stateful API.
 
-Hypermedia processing of the response body can be disabled as of `10.2.0`, by setting `req.hypermedia = false` via middleware.
-
-## Browsable API / Renderers / Serializers
-Tenso 1.4.0 added a few common format renderers, such as CSV, HTML, YAML, & XML. The HTML interface is a browsable API! You can use it to verify requests & responses, or simply poke around your API to see how it behaves.
-
-Custom renderers can be registered with `server.renderer('mimetype', fn);` or directly on `server.renderers`. The parameters for a renderer are `(req, res, arg)`. Custom serializes can be registered with `server.serializer('mimetype', fn);` or directly on `server.serializers`. The parameters for a serializer are `(arg, err, status = 200, stack = false)`; if `arg` is `null` then `err` must be an `Error` & `stack` determines if the response body is the `Error.message` or `Error.stack` property.
- 
-## Parsers
-
-Custom renderers can be registered with `server.parser('mimetype', fn);` or directly on `server.parsers`. The parameters for a renderer are `(arg)`.
+Hypermedia processing of the response body can be disabled as of `10.2.0`, by setting `req.hypermedia = false` and/or `req.hypermediaHeader` via middleware.
 
 ## Configuration
-This is a sample configuration for Tenso, without authentication or SSL. This would be ideal for development, but not production! Enabling SSL is as easy as providing file paths for the two keys.
+This is the default configuration for Tenso, without authentication or SSL. This would be ideal for development, but not production! Enabling SSL is as easy as providing file paths for the two keys.
+
+Everything is optional! You can provide as much, or as little configuration as you like.
 
 ```
 {
-	"auth": { /* Optional, see Authentication section */
-		"delay": 0 /* Random delay on authorization validation */
+	auth: {
+		delay: 0,
+		protect: [],
+		unprotect: [],
+		basic: {
+			enabled: false,
+			list: []
+		},
+		bearer: {
+			enabled: false,
+			tokens: []
+		},
+		jwt: {
+			enabled: false,
+			auth: null,
+			audience: EMPTY,
+			algorithms: [
+				"HS256",
+				"HS384",
+				"HS512"
+			],
+			ignoreExpiration: false,
+			issuer: "",
+			scheme: "bearer",
+			secretOrKey: ""
+		},
+		msg: {
+			login: "POST 'username' & 'password' to authenticate"
+		},
+		oauth2: {
+			enabled: false,
+			auth: null,
+			auth_url: "",
+			token_url: "",
+			client_id: "",
+			client_secret: ""
+		},
+		uri: {
+			login: "/auth/login",
+			logout: "/auth/logout",
+			redirect: "/",
+			root: "/auth"
+		},
+		saml: {
+			enabled: false,
+			auth: null
+		}
 	},
-	"cacheSize": 1000, /* Optional, size of Etag & route LRU caches */
-	"cacheTTL": 0, /* Optional, TTL of items in Etag & route LRU caches */
-	"headers": {}, /* Optional, custom headers */
-	"hostname": "localhost", /* Optional, default is 'localhost' */
-	"index": ["index.htm", "index.html"], /* Files served when accessing a static assets folder */
-	"json": 0, /* Optional, default indent for 'pretty' JSON */
-	"logging": {
-		"level": "info", /* Optional */
-		"enabled": true, /* Optional */
-		"stack": false, /* Optional */
-		"stackWire": false /* Optional */
+	autoindex: false,
+	cacheSize: 1000,
+	cacheTTL: 300000,
+	catchAll: true,
+	charset: "utf-8",
+	corsExpose: "cache-control, content-language, content-type, expires, last-modified, pragma",
+	defaultHeaders: {
+		"content-type": "application/json; charset=utf-8",
+		"vary": "accept, accept-encoding, accept-language, origin"
 	},
-	"corsExpose": "x-custom-header, x-custom-header-abc",
-	"origins": ["*"], /* Optional, allowed origins of CORS requests */
-	"port": 8000, /* Optional */
-	"routes": require("./routes.js"), /* Required! */
-	"regex": {
-		"hypermedia": "[a-zA-Z]+_(guid|uuid|id|url|uri)$", /* Optional, changes hypermedia detection / generation */
-		"id": "^(_id|id)$" /* Optional, changes hypermedia detection / generation */
+	digit: 3,
+	etags: true,
+	host: "0.0.0.0",
+	index: [],
+	initRoutes: {},
+	jsonIndent: 0,
+	logging: {
+		enabled: true,
+		format: "%h %l %u %t \"%r\" %>s %b",
+		level: "debug",
+		stack: true
 	},
-	"session": { /* Optional */
-		"secret": null,
-		"store": "memory", /* "memory" or "redis" */
-		"redis": {} /* See connect-redis for options */
+	maxBytes: 0,
+	mimeType: "application/json",
+	origins: ["*"],
+	pageSize: 5,
+	port: 8000,
+	rate: {
+		enabled: false,
+		limit: 450,
+		message: "Too many requests",
+		override: null,
+		reset: 900,
+		status: 429
 	},
-	"ssl": { /* Optional */
-		"cert": null,
-		"key": null
+	renderHeaders: true,
+	time: true,
+	security: {
+		key: "x-csrf-token",
+		secret: "",
+		csrf: true,
+		csp: null,
+		xframe: "",
+		p3p: "",
+		hsts: null,
+		xssProtection: true,
+		nosniff: true
 	},
-	"renderHeaders": true, /* false will disable headers in HTML interface */
-	"title": "My API", /* Page title for browsable API */
-	"uid": 33 /* Optional, system account uid to drop to after starting with elevated privileges to run on a low port */
+	session: {
+		cookie: {
+			httpOnly: true,
+			path: "/",
+			sameSite: true,
+			secure: "auto"
+		},
+		name: "tenso.sid",
+		proxy: true,
+		redis: {
+			host: "127.0.0.1",
+			port: 6379
+		},
+		rolling: true,
+		resave: true,
+		saveUninitialized: true,
+		secret: "tensoABC",
+		store: "memory"
+	},
+	silent: false,
+	ssl: {
+		cert: null,
+		key: null,
+		pfx: null
+	},
+	webroot: {
+		root: "process.cwd()/www",
+		static: "/assets",
+		template: "template.html"
+	}
 }
 ```
 
@@ -158,8 +278,8 @@ Authentication attempts have a random delay to deal with "timing attacks"; alway
 }
 ```
 
-### JWT
-JWT (JSON Web Token) authentication is stateless and does not have an entry point. The `auth(token, callback)` function must verify `token.sub`, and must execute `callback(err, user)`.
+### JSON Web Token
+JSON Web Token (JWT) authentication is stateless and does not have an entry point. The `auth(token, callback)` function must verify `token.sub`, and must execute `callback(err, user)`.
 
 This authentication strategy relies on out-of-band information for the `secret`, and other optional token attributes.
 
@@ -175,21 +295,6 @@ This authentication strategy relies on out-of-band information for the `secret`,
 			"ignoreExpiration": false, /* Optional, set to `true` to ignore expired tokens */
 			"scheme": "Bearer", /* Optional, set to specify the `Authorization` scheme */
 			"secretOrKey": ""
-		}
-		"protect": ["/private"]
-	}
-}
-```
-
-### Local
-Local authentication will create `/login`. `auth(username, password)` must execute `callback(err, user)`.
-
-```
-{
-	"auth": {
-		"local": {
-			"enabled": true,
-			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
 		}
 		"protect": ["/private"]
 	}
@@ -324,38 +429,24 @@ Standard log levels are supported, and are emitted to `stdout` & `stderr`. Stack
 }
 ```
 
-## Template
-The browsable template can be overridden with a custom HTML document.
+## HTML Renderer
+The HTML template can be overridden with a custom HTML document.
+
+Dark mode is supported! The `dark` class will be added to the `body` tag if the user's browser is in dark mode.
 
 ```
-{
-    "template": ""
+webroot: {
+    root: "full path",
+    static: "folder to serve static assets",
+    template: "html template"
 }
 ```
 
-## Static assets folder
-The browsable template can load assets from this folder.
+## Serving files
+Custom file routes can be created like this:
 
 ```
-{
-    "static": "/assets"
-}
-```
-
-## Static assets cache
-The browsable template assets have a default `public` cache of `300` seconds (5 minutes). These assets will always be considered `public`, but you can customize how long they are cacheable.
-
-```
-{
-    "staticCache": 300
-}
-```
-
-## Custom static routes
-Custom static routes can be defined like such:
-
-```
-   "/other": (req, res) => req.server.static(req, res);
+app.files("/folder", "/full/path/to/parent");
 ```
 
 ## EventSource streams
@@ -382,30 +473,26 @@ const streams = new Map();
 streams.get(id).send({...});
 ```
 
-## Testing Code Coverage
-Run the `coverage` script with `npm` or `yarn`.
+## Testing
+
+Tenso has ~80% code coverage with its tests. Test coverage will be added in the future.
 
 ```console
------------------|---------|----------|---------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------
-File             | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
------------------|---------|----------|---------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------
-All files        |   79.05 |     69.1 |   66.18 |   78.81 |                                                                                                                                                       
- tenso           |      80 |    63.16 |      50 |      80 |                                                                                                                                                       
-  index.js       |      80 |    63.16 |      50 |      80 | 21-24,33-34,53-54                                                                                                                                     
- tenso/lib       |      79 |    69.35 |   66.42 |   78.75 |                                                                                                                                                       
-  base.js        |    22.5 |      100 |   17.86 |    22.5 | 6-30,44-58,68-76,86-94                                                                                                                                
-  middleware.js  |   89.86 |    77.36 |   83.33 |   91.18 | 13-14,43-44,87,132                                                                                                                                    
-  parsers.js     |   58.33 |        0 |      50 |   58.33 | 12-19                                                                                                                                                 
-  regex.js       |     100 |      100 |     100 |     100 |                                                                                                                                                       
-  renderers.js   |    97.3 |    68.75 |   93.33 |     100 | 10-19,35,41-48,58                                                                                                                                     
-  serializers.js |     100 |    55.56 |     100 |     100 | 6-16                                                                                                                                                  
-  shared.js      |      40 |    33.33 |      50 |      40 | 8-11                                                                                                                                                  
-  tenso.js       |   73.39 |    53.62 |      65 |    72.9 | 167-168,181-191,199-206,248-249,262,296-298,306-312,322-341                                                                                           
-  utility.js     |   83.33 |    74.37 |   81.13 |   82.97 | 34,46-49,53,72,118-120,137-138,147-148,152-153,187,203,207,218-219,228,236,238,249-250,271,301,315-337,339-361,382,388-392,438-439,498,543,567,629-630
------------------|---------|----------|---------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------|---------|----------|---------|---------|-------------------------------------------------------------------------------------------------------------------------------
+File       | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-----------|---------|----------|---------|---------|-------------------------------------------------------------------------------------------------------------------------------
+All files  |   78.15 |    54.93 |   68.75 |   78.58 |                                                                                                                               
+ tenso.cjs |   78.15 |    54.93 |   68.75 |   78.58 | ...85,1094,1102,1104,1115-1118,1139,1149-1175,1196-1200,1243-1251,1297-1298,1325-1365,1370,1398-1406,1412-1413,1425,1455-1456 
+-----------|---------|----------|---------|---------|-------------------------------------------------------------------------------------------------------------------------------
 ```
 
+## Benchmark
+
+1. Clone repository from [GitHub](https://github.com/avoidwork/tenso).
+1. Install dependencies with `npm` or `yarn`.
+1. Execute `benchmark` script with `npm` or `yarn`.
+
 ## License
-Copyright (c) 2021 Jason Mulligan
+Copyright (c) 2024 Jason Mulligan
 
 Licensed under the BSD-3-Clause license.

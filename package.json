@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tenso is an HTTP REST API framework",
-  "version": "16.2.4",
+  "version": "17.0.0",
   "homepage": "https://github.com/avoidwork/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -12,55 +12,77 @@
     "url": "https://github.com/avoidwork/tenso/issues"
   },
   "license": "BSD-3-Clause",
-  "main": "index",
   "engineStrict": true,
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=17.0.0"
   },
   "scripts": {
     "benchmark": "node benchmark.js",
+    "build": "npm run lint && npm run rollup",
     "changelog": "auto-changelog -p",
-    "coverage": "nyc npm run test",
     "sample": "node sample.js",
-    "test": "eslint *.js lib/*.js test/*.js && mocha test/*.js --exit"
+    "lint": "eslint *.js src/**/*.js test/*.js",
+    "fix": "eslint --fix *.js src/**/*.js test/*.js",
+    "mocha": "nyc mocha test/*.test.js",
+    "rollup": "rollup --config",
+    "test": "npm run lint && npm run mocha",
+    "prepare": "husky",
+    "types": "npx -p typescript tsc src/tenso.js --declaration --allowJs --emitDeclarationOnly --outDir types"
   },
+  "source": "src/tenso.js",
+  "main": "dist/tenso.cjs",
+  "exports": {
+    "types": "./types/tenso.d.ts",
+    "import": "./dist/tenso.js",
+    "require": "./dist/tenso.cjs"
+  },
+  "type": "module",
+  "types": "types/**/*.d.ts",
+  "files": [
+    "dist/tenso.cjs",
+    "dist/tenso.js",
+    "types/tenso.d.ts",
+    "www/template.html",
+    "www/assets"
+  ],
   "dependencies": {
-    "connect-redis": "^6.0.0",
-    "cookie-parser": "^1.4.5",
-    "csv.js": "^2.0.1",
-    "express-session": "^1.17.2",
-    "keysort": "^1.0.2",
+    "connect-redis": "^7.1.1",
+    "cookie-parser": "^1.4.6",
+    "csv-stringify": "^6.5.1",
+    "express-session": "^1.18.0",
+    "fast-xml-parser": "^4.4.1",
+    "ioredis": "^5.4.1",
+    "jsonwebtoken": "^9.0.2",
+    "keysort": "^3.0.1",
     "lusca": "^1.7.0",
-    "mime-db": "^1.50.0",
-    "passport": "^0.5.0",
+    "mime-db": "^1.53.0",
+    "passport": "^0.7.0",
     "passport-http": "^0.3.0",
     "passport-http-bearer": "^1.0.1",
-    "passport-jwt": "^4.0.0",
-    "passport-local": "^1.0.0",
-    "passport-oauth2": "^1.6.1",
-    "passport-saml": "^3.2.0",
-    "precise": "^1.1.0",
-    "redis": "^3.1.2",
-    "retsu": "^3.0.2",
-    "tiny-coerce": "^1.1.1",
-    "tiny-etag": "^2.1.0",
-    "tiny-eventsource": "^1.2.1",
-    "tiny-merge": "^1.0.0",
-    "tiny-uuid4": "^1.0.1",
-    "tiny-xml": "^2.0.1",
-    "woodland": "^16.1.3",
+    "passport-jwt": "^4.0.1",
+    "passport-oauth2": "^1.8.0",
+    "precise": "^4.0.3",
+    "tiny-coerce": "^3.0.2",
+    "tiny-etag": "^4.0.5",
+    "tiny-eventsource": "^3.0.8",
+    "tiny-jsonl": "^2.0.1",
+    "tiny-merge": "^2.0.0",
+    "woodland": "^20.0.4",
     "yamljs": "^0.3.0",
-    "yargs": "^17.2.1"
+    "yargs-parser": "^21.1.1"
   },
   "devDependencies": {
-    "auto-changelog": "^2.3.0",
-    "autocannon": "^7.4.0",
-    "concurrently": "^6.3.0",
-    "eslint": "^7.32.0",
-    "jsonwebtoken": "^8.5.1",
-    "mocha": "^9.1.2",
-    "nyc": "^15.1.0",
-    "tiny-httptest": "^2.0.0"
+    "auto-changelog": "^2.4.0",
+    "autocannon": "^7.15.0",
+    "concurrently": "^8.2.2",
+    "csv-parse": "^5.5.6",
+    "eslint": "^9.9.1",
+    "husky": "^9.1.5",
+    "mocha": "^10.7.3",
+    "nyc": "^17.0.0",
+    "rollup": "^4.21.1",
+    "tiny-httptest": "^4.0.11",
+    "typescript": "^5.5.4"
   },
   "keywords": [
     "rest",
@@ -69,6 +91,8 @@
     "gateway",
     "server",
     "hypermedia",
-    "framework"
+    "framework",
+    "http",
+    "https"
   ]
 }

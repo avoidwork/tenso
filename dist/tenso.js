@@ -377,9 +377,12 @@ const trailingY = /y$/;function chunk (arg = [], size = INT_2) {
 
 	return `${req.parsed.searchParams.get(CALLBACK) ?? CALLBACK}(${JSON.stringify(arg, null, INT_0)});`;
 }function csv (req, res, arg) {
-	res.header(HEADER_CONTENT_DISPOSITION, HEADER_CONTENT_DISPOSITION_VALUE);
+	const filename = req.parsed.pathname.split("/").pop().split(".")[0];
+	const input = res.statusCode < 400 ? Array.isArray(arg) ? arg : [arg] : [{Error: arg}];
 
-	return stringify(Array.isArray(arg) ? arg : [arg], {
+	res.header(HEADER_CONTENT_DISPOSITION, HEADER_CONTENT_DISPOSITION_VALUE.replace("download", filename));
+
+	return stringify(input, {
 		cast: {
 			boolean: value => value ? TRUE : FALSE,
 			date: value => value.toISOString(),

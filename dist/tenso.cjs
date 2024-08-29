@@ -436,9 +436,12 @@ function javascript (req, res, arg) {
 }
 
 function csv (req, res, arg) {
-	res.header(HEADER_CONTENT_DISPOSITION, HEADER_CONTENT_DISPOSITION_VALUE);
+	const filename = req.parsed.pathname.split("/").pop().split(".")[0];
+	const input = res.statusCode < 400 ? Array.isArray(arg) ? arg : [arg] : [{Error: arg}];
 
-	return sync.stringify(Array.isArray(arg) ? arg : [arg], {
+	res.header(HEADER_CONTENT_DISPOSITION, HEADER_CONTENT_DISPOSITION_VALUE.replace("download", filename));
+
+	return sync.stringify(input, {
 		cast: {
 			boolean: value => value ? TRUE : FALSE,
 			date: value => value.toISOString(),

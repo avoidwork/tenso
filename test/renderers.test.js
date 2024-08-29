@@ -19,7 +19,7 @@ describe("Renderers", function () {
 		return httptest({url: "http://localhost:" + port + "/things", headers: {accept: "text/csv"}})
 			.expectStatus(200)
 			.expectHeader("content-type", "text/csv")
-			.expectHeader("content-disposition", "attachment; filename=\"download.csv\"")
+			.expectHeader("content-disposition", "attachment; filename=\"things.csv\"")
 			.expectBody(arg => parse(arg) instanceof Object)
 			.end();
 	});
@@ -28,7 +28,7 @@ describe("Renderers", function () {
 		return httptest({url: "http://localhost:" + port + "/things?format=text/csv"})
 			.expectStatus(200)
 			.expectHeader("content-type", "text/csv")
-			.expectHeader("content-disposition", "attachment; filename=\"download.csv\"")
+			.expectHeader("content-disposition", "attachment; filename=\"things.csv\"")
 			.expectBody(arg => parse(arg) instanceof Object)
 			.end();
 	});

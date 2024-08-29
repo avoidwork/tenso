@@ -23,6 +23,10 @@ The following example will create GET routes that will return an `Array` at `/`,
 
 As of 10.3.0 you can specify `always` as a method to run middleware before authorization middleware, which will skip `always` middleware registered after it (via instance methods).
 
+#### Example
+
+##### Routes
+
 ```javascript
 import {randomUUID as uuid} from "crypto";
 
@@ -34,6 +38,17 @@ export const initRoutes = {
 		"/uuid": (req, res) => res.send(uuid(), 200, {"cache-control": "no-cache"})
 	}
 };
+```
+
+##### Server
+
+```javascript
+import {tenso} from "tenso";
+import {initRoutes} from "./routes";
+
+export const app = tenso({initRoutes});
+
+app.start();
 ```
 
 #### Protected Routes

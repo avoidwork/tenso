@@ -2,6 +2,31 @@
 
 Tenso is an HTTP REST API framework, that will handle the serialization & creation of hypermedia links; all you have to do is give it `Arrays` or `Objects`.
 
+Tenso has parsers for:
+
+- `application/json`
+- `application/x-www-form-urlencoded`
+- `application/jsonl`
+- `application/json-lines`
+- `text/json-lines`
+
+Tenso has renderers for:
+
+- `application/javascript`
+- `application/json`
+- `application/jsonl`
+- `application/json-lines`
+- `text/json-lines`
+- `application/yaml`
+- `application/xml`
+- `text/csv`
+- `text/html`
+
+Tenso has two default serializers which can be overridden:
+
+- `plain` for plain text responses
+- `custom` for standard response shape
+
 ## Example
 Creating an API with Tenso can be this simple:
 

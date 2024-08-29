@@ -1097,7 +1097,7 @@ function auth (obj) {
 		}
 	} else if (obj.auth.bearer.enabled) {
 		const validate = (arg, cb) => {
-			if (obj.obj.auth.bearer.tokens.includes(arg)) {
+			if (obj.auth.bearer.tokens.includes(arg)) {
 				cb(null, arg);
 			} else {
 				cb(new Error(http.STATUS_CODES[INT_401]), null);

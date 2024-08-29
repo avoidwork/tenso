@@ -68,7 +68,7 @@
     "tiny-eventsource": "^3.0.8",
     "tiny-jsonl": "^2.0.1",
     "tiny-merge": "^2.0.0",
-    "woodland": "^20.0.2",
+    "woodland": "^20.0.4",
     "yamljs": "^0.3.0",
     "yargs-parser": "^21.1.1"
   },

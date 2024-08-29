@@ -80,12 +80,12 @@ describe("Permissions (CSRF disabled)", function () {
 			.expectValue("data", null)
 			.expectValue("error", "Method Not Allowed")
 			.expectValue("status", 405)
-			.end().then(() => server.close());
+			.end().then(() => server.stop());
 	});
 });
 
 describe("Basic Auth", function () {
-	const port = 8004;
+	const port = 8881;
 
 	this.timeout(timeout);
 	this.tenso = tenso({
@@ -95,7 +95,7 @@ describe("Basic Auth", function () {
 		auth: {basic: {enabled: true, list: ["test:123"]}, protect: ["/uuid"]}
 	});
 
-	const server = this.tenso.server;
+	const server = this.tenso.start();
 
 	it("GET / - returns links", function () {
 		return httptest({url: "http://localhost:" + port})
@@ -126,12 +126,12 @@ describe("Basic Auth", function () {
 	it("GET /uuid - returns an 'unauthorized' error", function () {
 		return httptest({url: "http://localhost:" + port + "/uuid"})
 			.expectStatus(401)
-			.end().then(() => server.close());
+			.end().then(() => server.stop());
 	});
 });
 
 describe("OAuth2 Token Bearer", function () {
-	const port = 8005;
+	const port = 8882;
 
 	this.timeout(timeout);
 	this.tenso = tenso({
@@ -141,7 +141,7 @@ describe("OAuth2 Token Bearer", function () {
 		auth: {bearer: {enabled: true, tokens: ["abc-123"]}, protect: ["/"]}
 	});
 
-	const server = this.tenso.server;
+	const server = this.tenso.start();
 
 	it("GET / - returns an array of endpoints (authorized)", function () {
 		return httptest({url: "http://localhost:" + port, headers: {authorization: "Bearer abc-123"}})
@@ -162,12 +162,12 @@ describe("OAuth2 Token Bearer", function () {
 	it("GET / - returns an 'unauthorized' error", function () {
 		return httptest({url: "http://localhost:" + port})
 			.expectStatus(401)
-			.end().then(() => server.close());
+			.end().then(() => server.stop());
 	});
 });
 
 describe("Local", function () {
-	const port = 8006,
+	const port = 8883,
 		valid = 123,
 		invalid = 1234;
 
@@ -268,12 +268,12 @@ describe("Local", function () {
 			.expectValue("links", [{uri: "/", rel: "collection"}])
 			.expectValue("error", null)
 			.expectValue("status", 200)
-			.end().then(() => server.close());
+			.end().then(() => server.stop());
 	});
 });
 
 describe("JWT", function () {
-	const port = 8012,
+	const port = 8884,
 		secret = "jennifer",
 		token = jwt.sign({username: "jason@attack.io"}, secret);
 
@@ -298,7 +298,7 @@ describe("JWT", function () {
 		}
 	});
 
-	const server = this.tenso.server;
+	const server = this.tenso.start();
 
 	it("GET /uuid - returns a uuid (authorized)", function () {
 		return httptest({url: "http://localhost:" + port + "/uuid", headers: {authorization: "Bearer " + token}})
@@ -313,6 +313,6 @@ describe("JWT", function () {
 	it("GET /uuid - returns an 'unauthorized' error", function () {
 		return httptest({url: "http://localhost:" + port + "/uuid"})
 			.expectStatus(401)
-			.end().then(() => server.close());
+			.end().then(() => server.stop());
 	});
 });

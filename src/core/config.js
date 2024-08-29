@@ -1,3 +1,5 @@
+import {INT_1000, INT_300000} from "./constants.js";
+
 export const config = {
 	auth: {
 		delay: 0,
@@ -52,8 +54,8 @@ export const config = {
 		}
 	},
 	autoindex: false,
-	cacheSize: 1e3,
-	cacheTTL: 3e5,
+	cacheSize: INT_1000,
+	cacheTTL: INT_300000,
 	catchAll: true,
 	charset: "utf-8",
 	corsExpose: "cache-control, content-language, content-type, expires, last-modified, pragma, x-csrf-token",

@@ -18,7 +18,7 @@ import {clone} from "./clone.js";
 import {delay} from "./delay.js";
 import {isEmpty} from "./isEmpty.js";
 import {randomUUID as uuid} from "node:crypto";
-import {INT_401, PROTECT, UNPROTECT} from "../core/constants.js";
+import {COLON, INT_0, INT_1, INT_401, PROTECT, UNPROTECT} from "../core/constants.js";
 import RedisStore from "connect-redis";
 import lusca from "lusca";
 
@@ -146,10 +146,10 @@ export function auth (obj) {
 		};
 
 		for (const i of obj.auth.basic.list || []) {
-			let args = i.split(":");
+			let args = i.split(COLON);
 
-			if (args.length > 0) {
-				x[args[0]] = {password: args[1]};
+			if (args.length > INT_0) {
+				x[args[INT_0]] = {password: args[INT_1]};
 			}
 		}
 

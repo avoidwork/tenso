@@ -180,15 +180,15 @@ export function hypermedia (req, res, rep) {
 		} else if (rep.data instanceof Object && req.hypermedia) {
 			parent = req.parsed.pathname.split(SLASH).filter(i => i !== EMPTY);
 
-			if (parent.length > 1) {
+			if (parent.length > INT_1) {
 				parent.pop();
 			}
 
-			rep.data = marshal(rep.data, void 0, parent[parent.length - 1]);
+			rep.data = marshal(rep.data, void 0, parent[parent.length - INT_1]);
 		}
 	}
 
-	if (links.length > 0) {
+	if (links.length > INT_0) {
 		if (headers.link !== void 0) {
 			for (const i of headers.link.split(HEADER_SPLIT)) {
 				links.push({

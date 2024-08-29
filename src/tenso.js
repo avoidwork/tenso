@@ -20,7 +20,7 @@ import {
 	DELETE,
 	EMPTY,
 	EXPOSE, FORMAT,
-	FUNCTION, HEADER_CONTENT_TYPE, HEADERS, HYPHEN,
+	FUNCTION, HEADER_CONTENT_TYPE, HEADERS, HYPHEN, INT_1, INT_1000,
 	INT_200,
 	INT_204,
 	INT_304, INVALID_CONFIGURATION, NULL, OPTIONS, PREV_DIR, PRIVATE,
@@ -167,7 +167,7 @@ class Tenso extends Woodland {
 		const config = this.rate,
 			id = req.sessionID || req.ip;
 		let valid = true,
-			seconds = Math.floor(new Date().getTime() / 1000),
+			seconds = Math.floor(new Date().getTime() / INT_1000),
 			limit, remaining, reset, state;
 
 		if (this.rates.has(id) === false) {
@@ -190,7 +190,7 @@ class Tenso extends Woodland {
 
 		if (seconds >= reset) {
 			reset = state.reset = seconds + config.reset;
-			remaining = state.remaining = limit - 1;
+			remaining = state.remaining = limit - INT_1;
 		} else if (remaining > 0) {
 			state.remaining--;
 			remaining = state.remaining;
@@ -287,9 +287,9 @@ class Tenso extends Woodland {
 export function tenso (userConfig = {}) {
 	const config = merge(clone(defaultConfig), userConfig);
 
-	if ((/^[^\d+]$/).test(config.port) && config.port < 1) {
+	if ((/^[^\d+]$/).test(config.port) && config.port < INT_1) {
 		console.error(INVALID_CONFIGURATION);
-		process.exit(1);
+		process.exit(INT_1);
 	}
 
 	config.title = name;

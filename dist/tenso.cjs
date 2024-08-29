@@ -37,138 +37,6 @@ var node_crypto = require('node:crypto');
 var RedisStore = require('connect-redis');
 
 var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
-const config = {
-	auth: {
-		delay: 0,
-		protect: [],
-		unprotect: [],
-		basic: {
-			enabled: false,
-			list: []
-		},
-		bearer: {
-			enabled: false,
-			tokens: []
-		},
-		jwt: {
-			enabled: false,
-			auth: null,
-			audience: "",
-			algorithms: [
-				"HS256",
-				"HS384",
-				"HS512"
-			],
-			ignoreExpiration: false,
-			issuer: "",
-			scheme: "Bearer",
-			secretOrKey: ""
-		},
-		local: {
-			enabled: false,
-			auth: null
-		},
-		msg: {
-			login: "POST 'username' & 'password' to authenticate"
-		},
-		oauth2: {
-			enabled: false,
-			auth: null,
-			auth_url: "",
-			token_url: "",
-			client_id: "",
-			client_secret: ""
-		},
-		uri: {
-			login: "/auth/login",
-			logout: "/auth/logout",
-			redirect: "/",
-			root: "/auth"
-		},
-		saml: {
-			enabled: false,
-			auth: null
-		}
-	},
-	autoindex: false,
-	cacheSize: 1e3,
-	cacheTTL: 3e5,
-	catchAll: true,
-	charset: "utf-8",
-	corsExpose: "cache-control, content-language, content-type, expires, last-modified, pragma, x-csrf-token",
-	defaultHeaders: {
-		"content-type": "application/json; charset=utf-8",
-		"vary": "accept, accept-encoding, accept-language, origin"
-	},
-	digit: 3,
-	etags: true,
-	host: "0.0.0.0",
-	index: [],
-	initRoutes: {},
-	jsonIndent: 0,
-	logging: {
-		enabled: true,
-		format: "%h %l %u %t \"%r\" %>s %b",
-		level: "debug",
-		stack: true
-	},
-	maxBytes: 0,
-	mimeType: "application/json",
-	origins: ["*"],
-	port: 8000,
-	rate: {
-		enabled: false,
-		limit: 450,
-		message: "Too many requests",
-		override: null,
-		reset: 900,
-		status: 429
-	},
-	renderHeaders: true,
-	time: true,
-	security: {
-		key: "x-csrf-token",
-		secret: "tenso",
-		csrf: true,
-		csp: null,
-		xframe: "SAMEORIGIN",
-		p3p: "",
-		hsts: null,
-		xssProtection: true,
-		nosniff: true
-	},
-	session: {
-		cookie: {
-			httpOnly: true,
-			path: "/",
-			sameSite: true,
-			secure: "auto"
-		},
-		name: "tenso.sid",
-		proxy: true,
-		redis: {
-			host: "127.0.0.1",
-			port: 6379
-		},
-		rolling: true,
-		resave: true,
-		saveUninitialized: true,
-		secret: "tensoABC",
-		store: "memory"
-	},
-	silent: false,
-	ssl: {
-		cert: null,
-		key: null,
-		pfx: null
-	},
-	webroot: {
-		root: "",
-		static: "/assets",
-		template: ""
-	}
-};
-
 const CALLBACK = "callback";
 const COMMA = ",";
 const COLON = ":";
@@ -189,7 +57,10 @@ const HTML = "html";
 const INT_NEG_1 = -1;
 const INT_0 = 0;
 const INT_1 = 1;
+const INT_2 = 2;
 const INT_5 = 5;
+const INT_10 = 10;
+const INT_100 = 1e2;
 const INT_200 = 200;
 const INT_204 = 204;
 const INT_206 = 206;
@@ -199,6 +70,8 @@ const INT_401 = 401;
 const INT_413 = 413;
 const INT_429 = 429;
 const INT_500 = 500;
+const INT_1000 = 1e3;
+const INT_300000 = 3e5;
 const MULTIPART = "multipart";
 const RETRY_AFTER = "retry-after";
 const UTF8 = "utf8";
@@ -289,6 +162,138 @@ const TEMPLATE_ALLOW = "{{allow}}";
 const TEMPLATE_METHODS = "{{methods}}";
 const TEMPLATE_CSRF = "{{csrf}}";
 
+const config = {
+	auth: {
+		delay: 0,
+		protect: [],
+		unprotect: [],
+		basic: {
+			enabled: false,
+			list: []
+		},
+		bearer: {
+			enabled: false,
+			tokens: []
+		},
+		jwt: {
+			enabled: false,
+			auth: null,
+			audience: "",
+			algorithms: [
+				"HS256",
+				"HS384",
+				"HS512"
+			],
+			ignoreExpiration: false,
+			issuer: "",
+			scheme: "Bearer",
+			secretOrKey: ""
+		},
+		local: {
+			enabled: false,
+			auth: null
+		},
+		msg: {
+			login: "POST 'username' & 'password' to authenticate"
+		},
+		oauth2: {
+			enabled: false,
+			auth: null,
+			auth_url: "",
+			token_url: "",
+			client_id: "",
+			client_secret: ""
+		},
+		uri: {
+			login: "/auth/login",
+			logout: "/auth/logout",
+			redirect: "/",
+			root: "/auth"
+		},
+		saml: {
+			enabled: false,
+			auth: null
+		}
+	},
+	autoindex: false,
+	cacheSize: INT_1000,
+	cacheTTL: INT_300000,
+	catchAll: true,
+	charset: "utf-8",
+	corsExpose: "cache-control, content-language, content-type, expires, last-modified, pragma, x-csrf-token",
+	defaultHeaders: {
+		"content-type": "application/json; charset=utf-8",
+		"vary": "accept, accept-encoding, accept-language, origin"
+	},
+	digit: 3,
+	etags: true,
+	host: "0.0.0.0",
+	index: [],
+	initRoutes: {},
+	jsonIndent: 0,
+	logging: {
+		enabled: true,
+		format: "%h %l %u %t \"%r\" %>s %b",
+		level: "debug",
+		stack: true
+	},
+	maxBytes: 0,
+	mimeType: "application/json",
+	origins: ["*"],
+	port: 8000,
+	rate: {
+		enabled: false,
+		limit: 450,
+		message: "Too many requests",
+		override: null,
+		reset: 900,
+		status: 429
+	},
+	renderHeaders: true,
+	time: true,
+	security: {
+		key: "x-csrf-token",
+		secret: "tenso",
+		csrf: true,
+		csp: null,
+		xframe: "SAMEORIGIN",
+		p3p: "",
+		hsts: null,
+		xssProtection: true,
+		nosniff: true
+	},
+	session: {
+		cookie: {
+			httpOnly: true,
+			path: "/",
+			sameSite: true,
+			secure: "auto"
+		},
+		name: "tenso.sid",
+		proxy: true,
+		redis: {
+			host: "127.0.0.1",
+			port: 6379
+		},
+		rolling: true,
+		resave: true,
+		saveUninitialized: true,
+		secret: "tensoABC",
+		store: "memory"
+	},
+	silent: false,
+	ssl: {
+		cert: null,
+		key: null,
+		pfx: null
+	},
+	webroot: {
+		root: "",
+		static: "/assets",
+		template: ""
+	}
+};
+
 function json$1 (arg = EMPTY) {
 	return JSON.parse(arg);
 }
@@ -315,11 +320,11 @@ function chunk (arg = [], size = 2) {
 }
 
 function xWwwFormURLEncoded (arg) {
-	const args = arg ? chunk(arg.split(bodySplit), 2) : [],
+	const args = arg ? chunk(arg.split(bodySplit), INT_2) : [],
 		result = {};
 
 	for (const i of args) {
-		result[decodeURIComponent(i[0].replace(/\+/g, ENCODED_SPACE))] = tinyCoerce.coerce(decodeURIComponent(i[1].replace(/\+/g, ENCODED_SPACE)));
+		result[decodeURIComponent(i[INT_0].replace(/\+/g, ENCODED_SPACE))] = tinyCoerce.coerce(decodeURIComponent(i[INT_1].replace(/\+/g, ENCODED_SPACE)));
 	}
 
 	return result;
@@ -348,8 +353,8 @@ const parsers = new Map([
 	]
 ]);
 
-function indent (arg = EMPTY, fallback = 0) {
-	return arg.includes(IDENT_VAR) ? parseInt(arg.match(/indent=(\d+)/)[1], 10) : fallback;
+function indent (arg = EMPTY, fallback = INT_0) {
+	return arg.includes(IDENT_VAR) ? parseInt(arg.match(/indent=(\d+)/)[INT_1], INT_10) : fallback;
 }
 
 function json (req, res, arg) {
@@ -674,15 +679,15 @@ function hypermedia (req, res, rep) {
 		} else if (rep.data instanceof Object && req.hypermedia) {
 			parent = req.parsed.pathname.split(SLASH).filter(i => i !== EMPTY);
 
-			if (parent.length > 1) {
+			if (parent.length > INT_1) {
 				parent.pop();
 			}
 
-			rep.data = marshal(rep.data, void 0, parent[parent.length - 1]);
+			rep.data = marshal(rep.data, void 0, parent[parent.length - INT_1]);
 		}
 	}
 
-	if (links.length > 0) {
+	if (links.length > INT_0) {
 		if (headers.link !== void 0) {
 			for (const i of headers.link.split(HEADER_SPLIT)) {
 				links.push({
@@ -864,8 +869,8 @@ function zuul (req, res, next) {
 	});
 }
 
-function random (n = 1e2) {
-	return node_crypto.randomInt(1, n);
+function random (n = INT_100) {
+	return node_crypto.randomInt(INT_1, n);
 }
 
 function delay (fn = () => void 0, n = 0) {
@@ -1004,10 +1009,10 @@ function auth (obj) {
 		};
 
 		for (const i of obj.auth.basic.list || []) {
-			let args = i.split(":");
+			let args = i.split(COLON);
 
-			if (args.length > 0) {
-				x[args[0]] = {password: args[1]};
+			if (args.length > INT_0) {
+				x[args[INT_0]] = {password: args[INT_1]};
 			}
 		}
 
@@ -1313,7 +1318,7 @@ class Tenso extends woodland.Woodland {
 		const config = this.rate,
 			id = req.sessionID || req.ip;
 		let valid = true,
-			seconds = Math.floor(new Date().getTime() / 1000),
+			seconds = Math.floor(new Date().getTime() / INT_1000),
 			limit, remaining, reset, state;
 
 		if (this.rates.has(id) === false) {
@@ -1336,7 +1341,7 @@ class Tenso extends woodland.Woodland {
 
 		if (seconds >= reset) {
 			reset = state.reset = seconds + config.reset;
-			remaining = state.remaining = limit - 1;
+			remaining = state.remaining = limit - INT_1;
 		} else if (remaining > 0) {
 			state.remaining--;
 			remaining = state.remaining;
@@ -1433,9 +1438,9 @@ class Tenso extends woodland.Woodland {
 function tenso (userConfig = {}) {
 	const config$1 = tinyMerge.merge(clone(config), userConfig);
 
-	if ((/^[^\d+]$/).test(config$1.port) && config$1.port < 1) {
+	if ((/^[^\d+]$/).test(config$1.port) && config$1.port < INT_1) {
 		console.error(INVALID_CONFIGURATION);
-		process.exit(1);
+		process.exit(INT_1);
 	}
 
 	config$1.title = name;

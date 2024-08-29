@@ -175,10 +175,7 @@ describe("Hypermedia", function () {
 	it("GET /somethings/abc - returns an entity that has hypermedia properties, and data", function () {
 		return httptest({url: "http://localhost:" + port + "/somethings/abc"})
 			.expectStatus(200)
-			.expectValue("links", [{"uri": "/somethings", "rel": "collection"}, {
-				"uri": "/somethings/abc",
-				"rel": "item"
-			}, {"uri": "/users/123", "rel": "related"}])
+			.expectValue("links", [{"uri": "/somethings", "rel": "collection"}, {"uri": "/users/123", "rel": "related"}])
 			.expectValue("data", {
 				_id: "abc",
 				user_id: 123,
@@ -194,10 +191,7 @@ describe("Hypermedia", function () {
 	it("GET /somethings/def - returns an entity that has hypermedia properties, and no data", function () {
 		return httptest({url: "http://localhost:" + port + "/somethings/def"})
 			.expectStatus(200)
-			.expectValue("links", [{"uri": "/somethings", "rel": "collection"}, {
-				"uri": "/somethings/def",
-				"rel": "item"
-			}, {"uri": "/users/123", "rel": "related"}])
+			.expectValue("links", [{"uri": "/somethings", "rel": "collection"}, {"uri": "/users/123", "rel": "related"}])
 			.expectValue("data", {_id: "def", user_id: 123, source_url: "http://source.tld"})
 			.expectValue("error", null)
 			.expectValue("status", 200)

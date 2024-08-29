@@ -1,6 +1,7 @@
 import {json} from "../parsers/json.js";
+import {jsonl} from "../parsers/jsonl.js";
 import {xWwwFormURLEncoded} from "../parsers/xWwwFormURLEncoded.js";
-import {parse as jsonl} from "tiny-jsonl";
+
 import {
 	HEADER_APPLICATION_JSON,
 	HEADER_APPLICATION_JSON_LINES,

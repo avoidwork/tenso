@@ -5,7 +5,7 @@
  * @license BSD-3-Clause
  * @version 17.0.0
  */
-import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import {merge}from'tiny-merge';import {eventsource}from'tiny-eventsource';import {coerce}from'tiny-coerce';import {parse as parse$1,stringify as stringify$1}from'tiny-jsonl';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {keysort}from'keysort';import {URL}from'url';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import passportJWT from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-local';import {Strategy as Strategy$2}from'passport-oauth2';import lusca from'lusca';import {randomInt,randomUUID}from'node:crypto';import RedisStore from'connect-redis';const ACCESS_CONTROL = "access-control";
+import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import {merge}from'tiny-merge';import {eventsource}from'tiny-eventsource';import {parse as parse$1,stringify as stringify$1}from'tiny-jsonl';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {keysort}from'keysort';import {URL}from'url';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import passportJWT from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-local';import {Strategy as Strategy$2}from'passport-oauth2';import lusca from'lusca';import {randomInt,randomUUID}from'node:crypto';import RedisStore from'connect-redis';const ACCESS_CONTROL = "access-control";
 const ALGORITHMS = "algorithms";
 const ALLOW = "allow";
 const AUDIENCE = "audience";
@@ -311,6 +311,8 @@ const X_REQUESTED_WITH = "x-requested-with";const config = {
 	}
 };function json$1 (arg = EMPTY) {
 	return JSON.parse(arg);
+}function jsonl$1 (arg = EMPTY) {
+	return parse$1(arg);
 }const bodySplit = /&|=/;
 const collection = /(.*)(\/.*)$/;
 const hypermedia$1 = /(([a-z]+(_)?)?id|url|uri)$/i;
@@ -348,15 +350,15 @@ const trailingY = /y$/;function chunk (arg = [], size = INT_2) {
 	],
 	[
 		HEADER_APPLICATION_JSON_LINES,
-		parse$1
+		jsonl$1
 	],
 	[
 		HEADER_APPLICATION_JSONL,
-		parse$1
+		jsonl$1
 	],
 	[
 		HEADER_TEXT_JSON_LINES,
-		parse$1
+		jsonl$1
 	]
 ]);function indent (arg = EMPTY, fallback = INT_0) {
 	return arg.includes(IDENT_VAR) ? parseInt(arg.match(/indent=(\d+)/)[INT_1], INT_10) : fallback;

@@ -16,8 +16,8 @@ var node_url = require('node:url');
 var woodland = require('woodland');
 var tinyMerge = require('tiny-merge');
 var tinyEventsource = require('tiny-eventsource');
-var tinyCoerce = require('tiny-coerce');
 var tinyJsonl = require('tiny-jsonl');
+var tinyCoerce = require('tiny-coerce');
 var YAML = require('yamljs');
 var fastXmlParser = require('fast-xml-parser');
 var sync = require('csv-stringify/sync');
@@ -349,6 +349,10 @@ function json$1 (arg = EMPTY) {
 	return JSON.parse(arg);
 }
 
+function jsonl$1 (arg = EMPTY) {
+	return tinyJsonl.parse(arg);
+}
+
 const bodySplit = /&|=/;
 const collection = /(.*)(\/.*)$/;
 const hypermedia$1 = /(([a-z]+(_)?)?id|url|uri)$/i;
@@ -392,15 +396,15 @@ const parsers = new Map([
 	],
 	[
 		HEADER_APPLICATION_JSON_LINES,
-		tinyJsonl.parse
+		jsonl$1
 	],
 	[
 		HEADER_APPLICATION_JSONL,
-		tinyJsonl.parse
+		jsonl$1
 	],
 	[
 		HEADER_TEXT_JSON_LINES,
-		tinyJsonl.parse
+		jsonl$1
 	]
 ]);
 

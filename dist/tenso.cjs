@@ -186,6 +186,7 @@ const HEADER_APPLICATION_JAVASCRIPT = "application/javascript";
 const HEADER_TEXT_CSV = "text/csv";
 const HEADER_TEXT_HTML = "text/html";
 const HTML = "html";
+const INT_NEG_1 = -1;
 const INT_0 = 0;
 const INT_1 = 1;
 const INT_5 = 5;
@@ -275,7 +276,18 @@ const HEADER_SPLIT = "\" <";
 const COLLECTION = "collection";
 const URL_127001 = "http://127.0.0.1";
 const S = "s";
+const G = "g";
 const IE = "ie";
+const TEMPLATE_TITLE = "{{title}}";
+const TEMPLATE_URL = "{{url}}";
+const TEMPLATE_HEADERS = "{{headers}}";
+const TEMPLATE_BODY = "{{body}}";
+const TEMPLATE_FORMATS = "{{formats}}";
+const TEMPLATE_YEAR = "{{year}}";
+const TEMPLATE_VERSION = "{{version}}";
+const TEMPLATE_ALLOW = "{{allow}}";
+const TEMPLATE_METHODS = "{{methods}}";
+const TEMPLATE_CSRF = "{{csrf}}";
 
 function json$1 (arg = EMPTY) {
 	return JSON.parse(arg);
@@ -395,16 +407,16 @@ function html (req, res, arg, tpl = EMPTY) {
 	const protocol = X_FORWARDED_PROTO in req.headers ? req.headers[X_FORWARDED_PROTO] + COLON : req.parsed.protocol,
 		headers = res.getHeaders();
 
-	return tpl.length > 0 ? tpl.replace(/{{title}}/g, req.server.title)
-		.replace("{{url}}", req.parsed.href.replace(req.parsed.protocol, protocol))
-		.replace("{{headers}}", Object.keys(headers).sort().map(i => `<tr><td>${i}</td><td>${sanitize(headers[i])}</td></tr>`).join(NL))
-		.replace("{{formats}}", `<option value=''></option>${Array.from(renderers.keys()).filter(i => i.indexOf(HTML) === -1).map(i => `<option value='${i.trim()}'>${i.replace(/^.*\//, EMPTY).toUpperCase()}</option>`).join(NL)}`)
-		.replace("{{body}}", sanitize(JSON.stringify(arg, null, 2)))
-		.replace("{{year}}", new Date().getFullYear())
-		.replace("{{version}}", req.server.version)
-		.replace("{{allow}}", headers.allow)
-		.replace("{{methods}}", explode((headers?.allow ?? EMPTY).replace(HEADER_ALLOW_GET, EMPTY)).filter(i => i !== EMPTY).map(i => `<option value='${i.trim()}'>$i.trim()}</option>`).join(NL))
-		.replace("{{csrf}}", headers?.[X_CSRF_TOKEN] ?? EMPTY)
+	return tpl.length > 0 ? tpl.replace(new RegExp(TEMPLATE_TITLE, G), req.server.title)
+		.replace(TEMPLATE_URL, req.parsed.href.replace(req.parsed.protocol, protocol))
+		.replace(TEMPLATE_HEADERS, Object.keys(headers).sort().map(i => `<tr><td>${i}</td><td>${sanitize(headers[i])}</td></tr>`).join(NL))
+		.replace(TEMPLATE_FORMATS, `<option value=''></option>${Array.from(renderers.keys()).filter(i => i.indexOf(HTML) === INT_NEG_1).map(i => `<option value='${i.trim()}'>${i.replace(/^.*\//, EMPTY).toUpperCase()}</option>`).join(NL)}`)
+		.replace(TEMPLATE_BODY, sanitize(JSON.stringify(arg, null, 2)))
+		.replace(TEMPLATE_YEAR, new Date().getFullYear())
+		.replace(TEMPLATE_VERSION, req.server.version)
+		.replace(TEMPLATE_ALLOW, headers.allow)
+		.replace(TEMPLATE_METHODS, explode((headers?.allow ?? EMPTY).replace(HEADER_ALLOW_GET, EMPTY)).filter(i => i !== EMPTY).map(i => `<option value='${i.trim()}'>$i.trim()}</option>`).join(NL))
+		.replace(TEMPLATE_CSRF, headers?.[X_CSRF_TOKEN] ?? EMPTY)
 		.replace("class=\"headers", req.server.renderHeaders === false ? "class=\"headers dr-hidden" : "class=\"headers") : EMPTY;
 }
 

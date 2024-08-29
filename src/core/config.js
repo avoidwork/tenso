@@ -68,10 +68,6 @@ export const config = {
 			scheme: BEARER,
 			secretOrKey: EMPTY
 		},
-		local: {
-			enabled: false,
-			auth: null
-		},
 		msg: {
 			login: MSG_LOGIN
 		},

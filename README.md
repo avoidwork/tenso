@@ -185,21 +185,6 @@ This authentication strategy relies on out-of-band information for the `secret`,
 }
 ```
 
-### Local
-Local authentication will create `/login`. `auth(username, password)` must execute `callback(err, user)`.
-
-```
-{
-	"auth": {
-		"local": {
-			"enabled": true,
-			"auth": function ( ... ) { ... }, /* Authentication handler, to 'find' or 'create' a User */
-		}
-		"protect": ["/private"]
-	}
-}
-```
-
 ### OAuth2
 OAuth2 authentication will create `/auth`, `/auth/oauth2`, & `/auth/oauth2/callback` routes. `auth(accessToken, refreshToken, profile, callback)` must execute `callback(err, user)`.
  

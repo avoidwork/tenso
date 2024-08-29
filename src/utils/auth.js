@@ -5,7 +5,6 @@ import passport from "passport";
 import passportJWT from "passport-jwt";
 import {BasicStrategy} from "passport-http";
 import {Strategy as BearerStrategy} from "passport-http-bearer";
-import {Strategy as LocalStrategy} from "passport-local";
 import {Strategy as OAuth2Strategy} from "passport-oauth2";
 import {STATUS_CODES} from "node:http";
 import {asyncFlag} from "../middleware/asyncFlag.js";
@@ -35,7 +34,6 @@ import {
 	INT_80,
 	ISSUER,
 	JWT,
-	LOCAL,
 	OAUTH2,
 	PERIOD,
 	PIPE,
@@ -45,13 +43,10 @@ import {
 	REGEX_REPLACE,
 	S,
 	SLASH,
-	SUCCESS,
 	UNDERSCORE,
 	UNPROTECT,
 	URI,
-	WILDCARD,
-	X_REQUESTED_WITH,
-	XHR
+	WILDCARD
 } from "../core/constants.js";
 import RedisStore from "connect-redis";
 import lusca from "lusca";
@@ -63,7 +58,7 @@ export function auth (obj) {
 	const ssl = obj.ssl.cert && obj.ssl.key,
 		realm = `http${ssl ? S : EMPTY}://${obj.host}${obj.port !== INT_80 && obj.port !== INT_443 ? COLON + obj.port : EMPTY}`,
 		async = obj.auth.oauth2.enabled || obj.auth.saml.enabled,
-		stateless = obj.rate.enabled === false && obj.security.csrf === false && obj.auth.local.enabled === false,
+		stateless = obj.rate.enabled === false && obj.security.csrf === false,
 		authDelay = obj.auth.delay,
 		authMap = {},
 		authUris = [];
@@ -84,11 +79,6 @@ export function auth (obj) {
 			authUris.push(uri);
 			obj.auth.protect.push(new RegExp(`^/auth/${i}(/|$)`));
 		}
-	}
-
-	if (obj.auth.local.enabled) {
-		authUris.push(obj.auth.uri.redirect);
-		authUris.push(obj.auth.uri.login);
 	}
 
 	if (stateless === false) {
@@ -203,7 +193,7 @@ export function auth (obj) {
 
 		const passportAuth = passport.authenticate(BASIC, {session: stateless === false});
 
-		if (async || obj.auth.local.enabled) {
+		if (async) {
 			const uri = `${SLASH}${AUTH}${SLASH}${BASIC}`;
 
 			obj.get(uri, passportAuth).ignore(passportAuth);
@@ -236,7 +226,7 @@ export function auth (obj) {
 
 		const passportAuth = passport.authenticate(BEARER.toLowerCase(), {session: stateless === false});
 
-		if (async || obj.auth.local.enabled) {
+		if (async) {
 			const uri = `${SLASH}${AUTH}${SLASH}${BEARER.toLowerCase()}`;
 
 			obj.get(uri, passportAuth).ignore(passportAuth);
@@ -271,38 +261,6 @@ export function auth (obj) {
 
 		const passportAuth = passport.authenticate(JWT, {session: false});
 		obj.always(passportAuth).ignore(passportAuth);
-	} else if (obj.auth.local.enabled) {
-		passport.use(new LocalStrategy((username, password, done) => {
-			delay(() => {
-				obj.auth.local.auth(username, password, (err, user) => {
-					if (err !== null) {
-						done(err);
-					} else {
-						done(null, user);
-					}
-				});
-			}, authDelay);
-		}));
-
-		obj.post(obj.auth.uri.login, (req, res) => {
-			function final () {
-				passport.authenticate(LOCAL)(req, res, e => {
-					if (e !== void 0) {
-						res.error(INT_401, STATUS_CODES[INT_401]);
-					} else if (req.cors && req.headers[X_REQUESTED_WITH] === XHR) {
-						res.send(SUCCESS);
-					} else {
-						redirect(req, res);
-					}
-				});
-			}
-
-			function mid () {
-				passportSession(req, res, final);
-			}
-
-			passportInit(req, res, mid);
-		});
 	} else if (obj.auth.oauth2.enabled) {
 		const uri = `${SLASH}${AUTH}${SLASH}${OAUTH2}`;
 		const uri_callback = `${uri}${SLASH}${CALLBACK}`;
@@ -346,8 +304,6 @@ export function auth (obj) {
 		r = r.replace(/\|$/, EMPTY) + REGEX_REPLACE;
 		obj.always(r, guard).ignore(guard);
 
-		obj.get(obj.auth.uri.login, (req, res) => res.json({instruction: obj.auth.msg.login}));
-	} else if (obj.auth.local.enabled) {
 		obj.get(obj.auth.uri.login, (req, res) => res.json({instruction: obj.auth.msg.login}));
 	}
 

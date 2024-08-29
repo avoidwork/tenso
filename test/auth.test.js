@@ -3,13 +3,13 @@ import jwt from "jsonwebtoken";
 import {tenso} from "../dist/tenso.js";
 import {routes} from "./routes.js";
 
-const csrf = "x-csrf-token";
 const timeout = 5000;
+const basePort = 3000;
 
 process.setMaxListeners(0);
 
 describe("Permissions (CSRF disabled)", function () {
-	const port = 8880;
+	const port = basePort + 1;
 
 	this.timeout(timeout);
 	this.tenso = tenso({port: port, initRoutes: routes, logging: {enabled: false}, security: {csrf: false}});
@@ -85,7 +85,7 @@ describe("Permissions (CSRF disabled)", function () {
 });
 
 describe("Basic Auth", function () {
-	const port = 8881;
+	const port = basePort + 2;
 
 	this.timeout(timeout);
 	this.tenso = tenso({
@@ -131,7 +131,7 @@ describe("Basic Auth", function () {
 });
 
 describe("OAuth2 Token Bearer", function () {
-	const port = 8882;
+	const port = basePort + 3;
 
 	this.timeout(timeout);
 	this.tenso = tenso({
@@ -166,114 +166,8 @@ describe("OAuth2 Token Bearer", function () {
 	});
 });
 
-describe("Local", function () {
-	const port = 8883,
-		valid = 123,
-		invalid = 1234;
-
-	this.timeout(timeout);
-	this.tenso = tenso({
-		port: port, initRoutes: routes, logging: {enabled: false}, auth: {
-			local: {
-				enabled: true,
-				auth: function (username, password, callback) {
-					if (username === "test" && password === valid) {
-						callback(null, {username: username, password: password});
-					} else {
-						callback(true, null);
-					}
-				}
-			},
-			protect: ["/uuid"]
-		}
-	});
-
-	const server = this.tenso.server,
-		login = this.tenso.auth.uri.login;
-
-	it("GET /uuid (invalid) - returns an 'unauthorized' error", function () {
-		return httptest({url: "http://localhost:" + port + "/uuid"})
-			.cookies()
-			.expectStatus(401)
-			.end();
-	});
-
-	it("GET /auth/login - returns an authentication message", function () {
-		return httptest({url: "http://localhost:" + port + login})
-			.cookies()
-			.captureHeader(csrf)
-			.expectJson()
-			.expectStatus(200)
-			.expectValue("links", [{
-				"uri": "/auth",
-				"rel": "collection"
-			}])
-			.expectValue("data", {instruction: "POST 'username' & 'password' to authenticate"})
-			.expectValue("error", null)
-			.expectValue("status", 200)
-			.end();
-	});
-
-	it("POST /auth/login (invalid / no CSRF token) - returns an 'unauthorized' error", function () {
-		return httptest({url: "http://localhost:" + port + login, method: "post"})
-			.cookies()
-			.json({username: "test", password: invalid})
-			.expectStatus(403)
-			.expectValue("data", null)
-			.expectValue("error", "CSRF token missing")
-			.expectValue("status", 403)
-			.end();
-	});
-
-	it("POST /auth/login (invalid) - returns an 'unauthorized' error", function () {
-		return httptest({url: "http://localhost:" + port + login, method: "post"})
-			.cookies()
-			.reuseHeader(csrf)
-			.json({username: "test", password: invalid})
-			.expectStatus(401)
-			.expectValue("data", null)
-			.expectValue("error", "Unauthorized")
-			.expectValue("status", 401)
-			.end();
-	});
-
-	it("POST /auth/login - redirects to a predetermined URI", function () {
-		return httptest({url: "http://localhost:" + port + login, method: "post"})
-			.cookies()
-			.reuseHeader(csrf)
-			.json({username: "test", password: valid})
-			.expectStatus(302)
-			.expectHeader("content-type", undefined)
-			.expectHeader("location", "/")
-			.end();
-	});
-
-	it("POST /auth/login - redirects to a predetermined URI (CORS)", function () {
-		return httptest({url: "http://localhost:" + port + login, method: "post"})
-			.cors("http://not.localhost")
-			.cookies()
-			.reuseHeader(csrf)
-			.json({username: "test", password: valid})
-			.expectStatus(302)
-			.expectHeader("content-type", undefined)
-			.expectHeader("location", "/")
-			.end();
-	});
-
-	it("GET /uuid (session) - returns a version 4 uuid", function () {
-		return httptest({url: "http://localhost:" + port + "/uuid"})
-			.cookies()
-			.expectStatus(200)
-			.expectJson()
-			.expectValue("links", [{uri: "/", rel: "collection"}])
-			.expectValue("error", null)
-			.expectValue("status", 200)
-			.end().then(() => server.stop());
-	});
-});
-
 describe("JWT", function () {
-	const port = 8884,
+	const port = basePort + 5,
 		secret = "jennifer",
 		token = jwt.sign({username: "jason@attack.io"}, secret);
 

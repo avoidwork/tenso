@@ -30,7 +30,6 @@ var passport = require('passport');
 var passportJWT = require('passport-jwt');
 var passportHttp = require('passport-http');
 var passportHttpBearer = require('passport-http-bearer');
-var passportLocal = require('passport-local');
 var passportOauth2 = require('passport-oauth2');
 var lusca = require('lusca');
 var node_crypto = require('node:crypto');
@@ -135,7 +134,6 @@ const JWT = "jwt";
 const LAST = "last";
 const LT = "&lt;";
 const LINK = "link";
-const LOCAL = "local";
 const LOG_FORMAT = "%h %l %u %t \"%r\" %>s %b";
 const MEMORY = "memory";
 const MSG_LOGIN = "POST 'username' & 'password' to authenticate";
@@ -175,7 +173,6 @@ const SIGTERM = "SIGTERM";
 const SLASH = "/";
 const SPACE = " ";
 const STRING = "string";
-const SUCCESS = "Success";
 const TEMPLATE_ALLOW = "{{allow}}";
 const TEMPLATE_BODY = "{{body}}";
 const TEMPLATE_CSRF = "{{csrf}}";
@@ -202,7 +199,6 @@ const UTF8 = "utf8";
 const UTF_8 = "utf-8";
 const WILDCARD = "*";
 const WWW = "www";
-const XHR = "XMLHttpRequest";
 const XML_ARRAY_NODE_NAME = "item";
 const XML_PROLOG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 const X_CSRF_TOKEN = "x-csrf-token";
@@ -211,7 +207,6 @@ const X_POWERED_BY = "x-powered-by";
 const X_RATELIMIT_LIMIT = "x-ratelimit-limit";
 const X_RATELIMIT_REMAINING = "x-ratelimit-remaining";
 const X_RATELIMIT_RESET = "x-ratelimit-reset";
-const X_REQUESTED_WITH = "x-requested-with";
 
 const config = {
 	auth: {
@@ -239,10 +234,6 @@ const config = {
 			issuer: EMPTY,
 			scheme: BEARER,
 			secretOrKey: EMPTY
-		},
-		local: {
-			enabled: false,
-			auth: null
 		},
 		msg: {
 			login: MSG_LOGIN
@@ -947,7 +938,7 @@ function auth (obj) {
 	const ssl = obj.ssl.cert && obj.ssl.key,
 		realm = `http${ssl ? S : EMPTY}://${obj.host}${obj.port !== INT_80 && obj.port !== INT_443 ? COLON + obj.port : EMPTY}`,
 		async = obj.auth.oauth2.enabled || obj.auth.saml.enabled,
-		stateless = obj.rate.enabled === false && obj.security.csrf === false && obj.auth.local.enabled === false,
+		stateless = obj.rate.enabled === false && obj.security.csrf === false,
 		authDelay = obj.auth.delay,
 		authMap = {},
 		authUris = [];
@@ -968,11 +959,6 @@ function auth (obj) {
 			authUris.push(uri);
 			obj.auth.protect.push(new RegExp(`^/auth/${i}(/|$)`));
 		}
-	}
-
-	if (obj.auth.local.enabled) {
-		authUris.push(obj.auth.uri.redirect);
-		authUris.push(obj.auth.uri.login);
 	}
 
 	if (stateless === false) {
@@ -1087,7 +1073,7 @@ function auth (obj) {
 
 		const passportAuth = passport.authenticate(BASIC, {session: stateless === false});
 
-		if (async || obj.auth.local.enabled) {
+		if (async) {
 			const uri = `${SLASH}${AUTH}${SLASH}${BASIC}`;
 
 			obj.get(uri, passportAuth).ignore(passportAuth);
@@ -1120,7 +1106,7 @@ function auth (obj) {
 
 		const passportAuth = passport.authenticate(BEARER.toLowerCase(), {session: stateless === false});
 
-		if (async || obj.auth.local.enabled) {
+		if (async) {
 			const uri = `${SLASH}${AUTH}${SLASH}${BEARER.toLowerCase()}`;
 
 			obj.get(uri, passportAuth).ignore(passportAuth);
@@ -1155,38 +1141,6 @@ function auth (obj) {
 
 		const passportAuth = passport.authenticate(JWT, {session: false});
 		obj.always(passportAuth).ignore(passportAuth);
-	} else if (obj.auth.local.enabled) {
-		passport.use(new passportLocal.Strategy((username, password, done) => {
-			delay(() => {
-				obj.auth.local.auth(username, password, (err, user) => {
-					if (err !== null) {
-						done(err);
-					} else {
-						done(null, user);
-					}
-				});
-			}, authDelay);
-		}));
-
-		obj.post(obj.auth.uri.login, (req, res) => {
-			function final () {
-				passport.authenticate(LOCAL)(req, res, e => {
-					if (e !== void 0) {
-						res.error(INT_401, http.STATUS_CODES[INT_401]);
-					} else if (req.cors && req.headers[X_REQUESTED_WITH] === XHR) {
-						res.send(SUCCESS);
-					} else {
-						redirect(req, res);
-					}
-				});
-			}
-
-			function mid () {
-				passportSession(req, res, final);
-			}
-
-			passportInit(req, res, mid);
-		});
 	} else if (obj.auth.oauth2.enabled) {
 		const uri = `${SLASH}${AUTH}${SLASH}${OAUTH2}`;
 		const uri_callback = `${uri}${SLASH}${CALLBACK}`;
@@ -1230,8 +1184,6 @@ function auth (obj) {
 		r = r.replace(/\|$/, EMPTY) + REGEX_REPLACE;
 		obj.always(r, guard).ignore(guard);
 
-		obj.get(obj.auth.uri.login, (req, res) => res.json({instruction: obj.auth.msg.login}));
-	} else if (obj.auth.local.enabled) {
 		obj.get(obj.auth.uri.login, (req, res) => res.json({instruction: obj.auth.msg.login}));
 	}
 

@@ -97,7 +97,9 @@ Custom renderers can be registered with `server.serializer('mimetype', fn);`. Th
 
 
 ## Configuration
-This is a sample configuration for Tenso, without authentication or SSL. This would be ideal for development, but not production! Enabling SSL is as easy as providing file paths for the two keys.
+This is the default configuration for Tenso, without authentication or SSL. This would be ideal for development, but not production! Enabling SSL is as easy as providing file paths for the two keys.
+
+Everything is optional! You can provide as much, or as little configuration as you like.
 
 ```
 {

@@ -211,6 +211,15 @@ Everything is optional! You can provide as much, or as little configuration as y
 	origins: ["*"],
 	pageSize: 5,
 	port: 8000,
+	prometheus: {
+		enabled: false,
+		metrics: {
+			includeMethod: true,
+			includePath: true,
+			includeStatusCode: true,
+			includeUp: true
+		}
+	},
 	rate: {
 		enabled: false,
 		limit: 450,

@@ -118,6 +118,15 @@ export const config = {
 	origins: [WILDCARD],
 	pageSize: INT_5,
 	port: INT_8000,
+	prometheus: {
+		enabled: false,
+		metrics: {
+			includeMethod: true,
+			includePath: true,
+			includeStatusCode: true,
+			includeUp: true
+		}
+	},
 	rate: {
 		enabled: false,
 		limit: INT_450,

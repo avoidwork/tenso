@@ -5,7 +5,7 @@
  * @license BSD-3-Clause
  * @version 17.0.4
  */
-import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import {merge}from'tiny-merge';import {eventsource}from'tiny-eventsource';import {parse as parse$1,stringify as stringify$1}from'tiny-jsonl';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {keysort}from'keysort';import {URL}from'url';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import passportJWT from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-oauth2';import lusca from'lusca';import {randomInt,randomUUID}from'node:crypto';import RedisStore from'connect-redis';const ACCESS_CONTROL = "access-control";
+import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import {merge}from'tiny-merge';import {eventsource}from'tiny-eventsource';import {parse as parse$1,stringify as stringify$1}from'tiny-jsonl';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {keysort}from'keysort';import {URL}from'url';import promBundle from'express-prom-bundle';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import passportJWT from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-oauth2';import lusca from'lusca';import {randomInt,randomUUID}from'node:crypto';import RedisStore from'connect-redis';const ACCESS_CONTROL = "access-control";
 const ALGORITHMS = "algorithms";
 const ALLOW = "allow";
 const AUDIENCE = "audience";
@@ -253,6 +253,15 @@ const X_RATELIMIT_RESET = "x-ratelimit-reset";const config = {
 	origins: [WILDCARD],
 	pageSize: INT_5,
 	port: INT_8000,
+	prometheus: {
+		enabled: false,
+		metrics: {
+			includeMethod: true,
+			includePath: true,
+			includeStatusCode: true,
+			includeUp: true
+		}
+	},
 	rate: {
 		enabled: false,
 		limit: INT_450,
@@ -713,7 +722,8 @@ function marshal (obj, rel, item_collection, root, seen, links, server) {
 	}
 
 	next(valid === false ? exception : void 0);
-}function asyncFlag (req, res, next) {
+}// Prometheus metrics
+const prometheus = config => promBundle(config);function asyncFlag (req, res, next) {
 	req.protectAsync = true;
 	next();
 }function bypass (req, res, next) {
@@ -1161,6 +1171,14 @@ class Tenso extends Woodland {
 
 			return [body, status, headers];
 		};
+
+		// Prometheus metrics
+		if (this.prometheus.enabled) {
+			const middleware = prometheus(this.prometheus.metrics);
+
+			this.log("type=init, message\"Prometheus metrics enabled\"");
+			this.always(middleware).ignore(middleware);
+		}
 
 		// Payload handling
 		this.always(payload).ignore(payload);

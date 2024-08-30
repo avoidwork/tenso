@@ -78,9 +78,19 @@ export namespace config {
     export let origins: string[];
     export { INT_5 as pageSize };
     export { INT_8000 as port };
-    export namespace rate {
+    export namespace prometheus {
         let enabled_6: boolean;
         export { enabled_6 as enabled };
+        export namespace metrics {
+            let includeMethod: boolean;
+            let includePath: boolean;
+            let includeStatusCode: boolean;
+            let includeUp: boolean;
+        }
+    }
+    export namespace rate {
+        let enabled_7: boolean;
+        export { enabled_7 as enabled };
         export { INT_450 as limit };
         export { MSG_TOO_MANY_REQUESTS as message };
         export let override: any;

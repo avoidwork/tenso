@@ -51,6 +51,7 @@ import {serialize} from "./utils/serialize.js";
 import {hypermedia} from "./utils/hypermedia.js";
 import {payload} from "./middleware/payload.js";
 import {parse} from "./middleware/parse.js";
+import {prometheus} from "./middleware/prometheus.js";
 import {auth} from "./utils/auth.js";
 import {clone} from "./utils/clone.js";
 
@@ -138,6 +139,14 @@ class Tenso extends Woodland {
 
 			return [body, status, headers];
 		};
+
+		// Prometheus metrics
+		if (this.prometheus.enabled) {
+			const middleware = prometheus(this.prometheus.metrics);
+
+			this.log("type=init, message\"Prometheus metrics enabled\"");
+			this.always(middleware).ignore(middleware);
+		}
 
 		// Payload handling
 		this.always(payload).ignore(payload);

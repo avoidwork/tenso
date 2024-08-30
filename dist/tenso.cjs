@@ -23,6 +23,7 @@ var fastXmlParser = require('fast-xml-parser');
 var sync = require('csv-stringify/sync');
 var keysort = require('keysort');
 var url = require('url');
+var promBundle = require('express-prom-bundle');
 var redis = require('ioredis');
 var cookie = require('cookie-parser');
 var session = require('express-session');
@@ -286,6 +287,15 @@ const config = {
 	origins: [WILDCARD],
 	pageSize: INT_5,
 	port: INT_8000,
+	prometheus: {
+		enabled: false,
+		metrics: {
+			includeMethod: true,
+			includePath: true,
+			includeStatusCode: true,
+			includeUp: true
+		}
+	},
 	rate: {
 		enabled: false,
 		limit: INT_450,
@@ -810,6 +820,9 @@ function parse (req, res, next) {
 	next(valid === false ? exception : void 0);
 }
 
+// Prometheus metrics
+const prometheus = config => promBundle(config);
+
 function asyncFlag (req, res, next) {
 	req.protectAsync = true;
 	next();
@@ -1280,6 +1293,14 @@ class Tenso extends woodland.Woodland {
 
 			return [body, status, headers];
 		};
+
+		// Prometheus metrics
+		if (this.prometheus.enabled) {
+			const middleware = prometheus(this.prometheus.metrics);
+
+			this.log("type=init, message\"Prometheus metrics enabled\"");
+			this.always(middleware).ignore(middleware);
+		}
 
 		// Payload handling
 		this.always(payload).ignore(payload);

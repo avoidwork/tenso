@@ -72,6 +72,15 @@ declare class Tenso extends Woodland {
         origins: string[];
         pageSize: number;
         port: number;
+        prometheus: {
+            enabled: boolean;
+            metrics: {
+                includeMethod: boolean;
+                includePath: boolean;
+                includeStatusCode: boolean;
+                includeUp: boolean;
+            };
+        };
         rate: {
             enabled: boolean;
             limit: number;
@@ -124,10 +133,10 @@ declare class Tenso extends Woodland {
             template: string;
         };
     });
-    parsers: any;
-    rates: any;
-    renderers: any;
-    serializers: any;
+    parsers: Map<string, typeof import("./parsers/json.js").json>;
+    rates: Map<any, any>;
+    renderers: Map<string, typeof import("./renderers/html.js").html>;
+    serializers: Map<string, typeof import("./serializers/plain.js").plain>;
     server: any;
     version: any;
     canModify(arg: any): any;
@@ -136,7 +145,7 @@ declare class Tenso extends Woodland {
     final(req: any, res: any, arg: any): any;
     headers(req: any, res: any): void;
     init(): this;
-    render(req: any, res: any, arg: any): any;
+    render(req: any, res: any, arg: any): string;
     parser(mediatype?: string, fn?: (arg: any) => any): this;
     rateLimit(req: any, fn: any): any[];
     renderer(mediatype: any, fn: any): this;

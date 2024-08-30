@@ -1,1 +1,1 @@
-export function scheme(arg?: string): any;
+export function scheme(arg?: string): boolean;

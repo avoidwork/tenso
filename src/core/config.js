@@ -119,12 +119,14 @@ export const config = {
 	pageSize: INT_5,
 	port: INT_8000,
 	prometheus: {
-		enabled: false,
+		enabled: true,
 		metrics: {
 			includeMethod: true,
 			includePath: true,
 			includeStatusCode: true,
-			includeUp: true
+			includeUp: true,
+			buckets: [0.001, 0.01, 0.1, 1, 2, 3, 5, 7, 10, 15, 20, 25, 30, 35, 40, 50, 70, 100, 200],
+			customLabels: { model: "No" }
 		}
 	},
 	rate: {

@@ -34,7 +34,7 @@ import {
 	INT_200,
 	INT_204,
 	INT_304,
-	INVALID_CONFIGURATION,
+	INVALID_CONFIGURATION, METRICS_PATH, MSG_PROMETHEUS_ENABLED,
 	NULL,
 	OPTIONS,
 	PREV_DIR,
@@ -89,6 +89,7 @@ class Tenso extends Woodland {
 		req.protect = false;
 		req.protectAsync = false;
 		req.unprotect = false;
+		req.url = req.parsed.pathname;
 		req.server = this;
 
 		if (req.cors) {
@@ -144,8 +145,14 @@ class Tenso extends Woodland {
 		if (this.prometheus.enabled) {
 			const middleware = prometheus(this.prometheus.metrics);
 
-			this.log("type=init, message\"Prometheus metrics enabled\"");
+			this.log(`type=init, message"${MSG_PROMETHEUS_ENABLED}"`);
 			this.always(middleware).ignore(middleware);
+
+			this.get(METRICS_PATH, (req, res) => {
+				res.set(HEADER_CONTENT_TYPE, middleware.promRegistry.contentType);
+				res.set("cache-control", "private, must-revalidate, no-cache, no-store");
+				middleware.promRegistry.metrics().then(metrics => res.end(metrics));
+			});
 		}
 
 		// Payload handling

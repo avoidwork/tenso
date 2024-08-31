@@ -1,1 +1,1 @@
-export function random(n?: number): any;
+export function random(n?: number): number;

@@ -49,6 +49,7 @@
     "connect-redis": "^7.1.1",
     "cookie-parser": "^1.4.6",
     "csv-stringify": "^6.5.1",
+    "express-prom-bundle": "^7.0.0",
     "express-session": "^1.18.0",
     "fast-xml-parser": "^4.4.1",
     "ioredis": "^5.4.1",
@@ -67,7 +68,7 @@
     "tiny-eventsource": "^3.0.8",
     "tiny-jsonl": "^2.0.1",
     "tiny-merge": "^2.0.0",
-    "woodland": "^20.0.4",
+    "woodland": "^20.1.1",
     "yamljs": "^0.3.0",
     "yargs-parser": "^21.1.1"
   },

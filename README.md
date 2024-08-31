@@ -197,6 +197,10 @@ Everything is optional! You can provide as much, or as little configuration as y
 	digit: 3,
 	etags: true,
 	host: "0.0.0.0",
+	hypermedia: {
+		enabled: true,
+		header: true
+	},
 	index: [],
 	initRoutes: {},
 	jsonIndent: 0,
@@ -211,6 +215,17 @@ Everything is optional! You can provide as much, or as little configuration as y
 	origins: ["*"],
 	pageSize: 5,
 	port: 8000,
+	prometheus: {
+		enabled: false,
+		metrics: {
+			includeMethod: true,
+			includePath: true,
+			includeStatusCode: true,
+			includeUp: true,
+			buckets: [0.001, 0.01, 0.1, 1, 2, 3, 5, 7, 10, 15, 20, 25, 30, 35, 40, 50, 70, 100, 200],
+			customLabels: {}
+		}
+	},
 	rate: {
 		enabled: false,
 		limit: 450,
@@ -481,6 +496,10 @@ const streams = new Map();
 // Send data to Clients
 streams.get(id).send({...});
 ```
+
+## Prometheus
+
+Prometheus metrics can be enabled by setting `{prometheus: {enabled: true}}`. The metrics will be available at `/metrics`.
 
 ## Testing
 

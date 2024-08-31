@@ -104,6 +104,10 @@ export const config = {
 	digit: INT_3,
 	etags: true,
 	host: IP_0000,
+	hypermedia: {
+		enabled: true,
+		header: true
+	},
 	index: [],
 	initRoutes: {},
 	jsonIndent: INT_0,
@@ -118,6 +122,17 @@ export const config = {
 	origins: [WILDCARD],
 	pageSize: INT_5,
 	port: INT_8000,
+	prometheus: {
+		enabled: false,
+		metrics: {
+			includeMethod: true,
+			includePath: true,
+			includeStatusCode: true,
+			includeUp: true,
+			buckets: [0.001, 0.01, 0.1, 1, 2, 3, 5, 7, 10, 15, 20, 25, 30, 35, 40, 50, 70, 100, 200],
+			customLabels: {}
+		}
+	},
 	rate: {
 		enabled: false,
 		limit: INT_450,

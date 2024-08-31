@@ -23,6 +23,7 @@ var fastXmlParser = require('fast-xml-parser');
 var sync = require('csv-stringify/sync');
 var keysort = require('keysort');
 var url = require('url');
+var promBundle = require('express-prom-bundle');
 var redis = require('ioredis');
 var cookie = require('cookie-parser');
 var session = require('express-session');
@@ -65,6 +66,7 @@ const EMPTY = "";
 const ENCODED_SPACE = "%20";
 const END = "end";
 const EQ = "=";
+const ERROR = "error";
 const EXPOSE = "expose";
 const EXPOSE_HEADERS = "cache-control, content-language, content-type, expires, last-modified, pragma";
 const FALSE = "false";
@@ -138,7 +140,9 @@ const LT = "&lt;";
 const LINK = "link";
 const LOG_FORMAT = "%h %l %u %t \"%r\" %>s %b";
 const MEMORY = "memory";
+const METRICS_PATH = "/metrics";
 const MSG_LOGIN = "POST 'username' & 'password' to authenticate";
+const MSG_PROMETHEUS_ENABLED = "Prometheus metrics enabled";
 const MSG_TOO_MANY_REQUESTS = "Too many requests";
 const MULTIPART = "multipart";
 const NEXT = "next";
@@ -272,6 +276,10 @@ const config = {
 	digit: INT_3,
 	etags: true,
 	host: IP_0000,
+	hypermedia: {
+		enabled: true,
+		header: true
+	},
 	index: [],
 	initRoutes: {},
 	jsonIndent: INT_0,
@@ -286,6 +294,17 @@ const config = {
 	origins: [WILDCARD],
 	pageSize: INT_5,
 	port: INT_8000,
+	prometheus: {
+		enabled: false,
+		metrics: {
+			includeMethod: true,
+			includePath: true,
+			includeStatusCode: true,
+			includeUp: true,
+			buckets: [0.001, 0.01, 0.1, 1, 2, 3, 5, 7, 10, 15, 20, 25, 30, 35, 40, 50, 70, 100, 200],
+			customLabels: {}
+		}
+	},
 	rate: {
 		enabled: false,
 		limit: INT_450,
@@ -810,6 +829,9 @@ function parse (req, res, next) {
 	next(valid === false ? exception : void 0);
 }
 
+// Prometheus metrics
+const prometheus = config => promBundle(config);
+
 function asyncFlag (req, res, next) {
 	req.protectAsync = true;
 	next();
@@ -1224,12 +1246,13 @@ class Tenso extends woodland.Woodland {
 
 	connect (req, res) {
 		req.csrf = this.canModify(req.method) === false && this.canModify(req.allow) && this.security.csrf === true;
-		req.hypermedia = true;
-		req.hypermediaHeader = true;
+		req.hypermedia = this.hypermedia.enabled;
+		req.hypermediaHeader = this.hypermedia.header;
 		req.private = false;
 		req.protect = false;
 		req.protectAsync = false;
 		req.unprotect = false;
+		req.url = req.parsed.pathname;
 		req.server = this;
 
 		if (req.cors) {
@@ -1280,6 +1303,24 @@ class Tenso extends woodland.Woodland {
 
 			return [body, status, headers];
 		};
+
+		// Prometheus metrics
+		if (this.prometheus.enabled) {
+			const middleware = prometheus(this.prometheus.metrics);
+
+			this.log(`type=init, message"${MSG_PROMETHEUS_ENABLED}"`);
+			this.always(middleware).ignore(middleware);
+
+			// Registering a route for middleware response to be served
+			this.get(METRICS_PATH, EMPTY);
+
+			// Hooking events that might bypass middleware
+			this.on(ERROR, (req, res) => {
+				if (req.valid === false) {
+					middleware(req, res, () => void 0);
+				}
+			});
+		}
 
 		// Payload handling
 		this.always(payload).ignore(payload);

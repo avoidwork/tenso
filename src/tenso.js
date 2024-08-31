@@ -21,6 +21,7 @@ import {
 	CONNECT,
 	DELETE,
 	EMPTY,
+	ERROR,
 	EXPOSE,
 	EXPOSE_HEADERS,
 	FORMAT,
@@ -35,6 +36,8 @@ import {
 	INT_204,
 	INT_304,
 	INVALID_CONFIGURATION,
+	METRICS_PATH,
+	MSG_PROMETHEUS_ENABLED,
 	NULL,
 	OPTIONS,
 	PREV_DIR,
@@ -51,6 +54,7 @@ import {serialize} from "./utils/serialize.js";
 import {hypermedia} from "./utils/hypermedia.js";
 import {payload} from "./middleware/payload.js";
 import {parse} from "./middleware/parse.js";
+import {prometheus} from "./middleware/prometheus.js";
 import {auth} from "./utils/auth.js";
 import {clone} from "./utils/clone.js";
 
@@ -82,12 +86,13 @@ class Tenso extends Woodland {
 
 	connect (req, res) {
 		req.csrf = this.canModify(req.method) === false && this.canModify(req.allow) && this.security.csrf === true;
-		req.hypermedia = true;
-		req.hypermediaHeader = true;
+		req.hypermedia = this.hypermedia.enabled;
+		req.hypermediaHeader = this.hypermedia.header;
 		req.private = false;
 		req.protect = false;
 		req.protectAsync = false;
 		req.unprotect = false;
+		req.url = req.parsed.pathname;
 		req.server = this;
 
 		if (req.cors) {
@@ -138,6 +143,24 @@ class Tenso extends Woodland {
 
 			return [body, status, headers];
 		};
+
+		// Prometheus metrics
+		if (this.prometheus.enabled) {
+			const middleware = prometheus(this.prometheus.metrics);
+
+			this.log(`type=init, message"${MSG_PROMETHEUS_ENABLED}"`);
+			this.always(middleware).ignore(middleware);
+
+			// Registering a route for middleware response to be served
+			this.get(METRICS_PATH, EMPTY);
+
+			// Hooking events that might bypass middleware
+			this.on(ERROR, (req, res) => {
+				if (req.valid === false) {
+					middleware(req, res, () => void 0);
+				}
+			});
+		}
 
 		// Payload handling
 		this.always(payload).ignore(payload);

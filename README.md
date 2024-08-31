@@ -497,6 +497,10 @@ const streams = new Map();
 streams.get(id).send({...});
 ```
 
+## Prometheus
+
+Prometheus metrics can be enabled by setting `{prometheus: {enabled: true}}`. The metrics will be available at `/metrics`.
+
 ## Testing
 
 Tenso has ~80% code coverage with its tests. Test coverage will be added in the future.

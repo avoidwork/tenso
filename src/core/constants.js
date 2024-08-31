@@ -109,7 +109,6 @@ export const MSG_TOO_MANY_REQUESTS = "Too many requests";
 export const MULTIPART = "multipart";
 export const NEXT = "next";
 export const NL = "\n";
-export const NO_STORE = "no-store";
 export const NULL = "null";
 export const NUMBER = "number";
 export const OAUTH2 = "oauth2";

@@ -115,7 +115,6 @@ const MSG_TOO_MANY_REQUESTS = "Too many requests";
 const MULTIPART = "multipart";
 const NEXT = "next";
 const NL = "\n";
-const NO_STORE = "no-store";
 const NULL = "null";
 const NUMBER = "number";
 const OAUTH2 = "oauth2";
@@ -1190,11 +1189,8 @@ class Tenso extends Woodland {
 			this.log(`type=init, message"${MSG_PROMETHEUS_ENABLED}"`);
 			this.always(middleware).ignore(middleware);
 
-			this.get(METRICS_PATH, (req, res) => {
-				res.set(HEADER_CONTENT_TYPE, middleware.promRegistry.contentType);
-				res.set(CACHE_CONTROL, NO_STORE);
-				middleware.promRegistry.metrics().then(metrics => res.end(metrics));
-			});
+			// Registering a route for middleware response to be served
+			this.get(METRICS_PATH, EMPTY);
 
 			// Hooking events that might bypass middleware
 			this.on(ERROR, (req, res) => {

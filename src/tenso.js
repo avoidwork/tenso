@@ -38,7 +38,6 @@ import {
 	INVALID_CONFIGURATION,
 	METRICS_PATH,
 	MSG_PROMETHEUS_ENABLED,
-	NO_STORE,
 	NULL,
 	OPTIONS,
 	PREV_DIR,
@@ -152,11 +151,8 @@ class Tenso extends Woodland {
 			this.log(`type=init, message"${MSG_PROMETHEUS_ENABLED}"`);
 			this.always(middleware).ignore(middleware);
 
-			this.get(METRICS_PATH, (req, res) => {
-				res.set(HEADER_CONTENT_TYPE, middleware.promRegistry.contentType);
-				res.set(CACHE_CONTROL, NO_STORE);
-				middleware.promRegistry.metrics().then(metrics => res.end(metrics));
-			});
+			// Registering a route for middleware response to be served
+			this.get(METRICS_PATH, EMPTY);
 
 			// Hooking events that might bypass middleware
 			this.on(ERROR, (req, res) => {

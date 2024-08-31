@@ -34,7 +34,6 @@ export default [
 			"node:path",
 			"node:url",
 			"woodland",
-			"defaults",
 			"tiny-eventsource",
 			"node:http",
 			"node:https",
@@ -56,7 +55,9 @@ export default [
 			"fast-xml-parser",
 			"tiny-jsonl",
 			"lusca",
-			"connect-redis"
+			"connect-redis",
+			"tiny-merge",
+			"express-prom-bundle"
 		]
 	}
 ];

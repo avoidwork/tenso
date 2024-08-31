@@ -58,6 +58,10 @@ declare class Tenso extends Woodland {
         digit: number;
         etags: boolean;
         host: string;
+        hypermedia: {
+            enabled: boolean;
+            header: boolean;
+        };
         index: any[];
         initRoutes: {};
         jsonIndent: number;
@@ -79,6 +83,8 @@ declare class Tenso extends Woodland {
                 includePath: boolean;
                 includeStatusCode: boolean;
                 includeUp: boolean;
+                buckets: number[];
+                customLabels: {};
             };
         };
         rate: {

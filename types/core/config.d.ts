@@ -63,12 +63,17 @@ export namespace config {
     export { INT_3 as digit };
     export let etags: boolean;
     export { IP_0000 as host };
+    export namespace hypermedia {
+        let enabled_5: boolean;
+        export { enabled_5 as enabled };
+        export let header: boolean;
+    }
     export let index: any[];
     export let initRoutes: {};
     export { INT_0 as jsonIndent };
     export namespace logging {
-        let enabled_5: boolean;
-        export { enabled_5 as enabled };
+        let enabled_6: boolean;
+        export { enabled_6 as enabled };
         export { LOG_FORMAT as format };
         export { DEBUG as level };
         export let stack: boolean;
@@ -79,18 +84,20 @@ export namespace config {
     export { INT_5 as pageSize };
     export { INT_8000 as port };
     export namespace prometheus {
-        let enabled_6: boolean;
-        export { enabled_6 as enabled };
+        let enabled_7: boolean;
+        export { enabled_7 as enabled };
         export namespace metrics {
             let includeMethod: boolean;
             let includePath: boolean;
             let includeStatusCode: boolean;
             let includeUp: boolean;
+            let buckets: number[];
+            let customLabels: {};
         }
     }
     export namespace rate {
-        let enabled_7: boolean;
-        export { enabled_7 as enabled };
+        let enabled_8: boolean;
+        export { enabled_8 as enabled };
         export { INT_450 as limit };
         export { MSG_TOO_MANY_REQUESTS as message };
         export let override: any;

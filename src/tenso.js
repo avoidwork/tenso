@@ -21,6 +21,7 @@ import {
 	CONNECT,
 	DELETE,
 	EMPTY,
+	ERROR,
 	EXPOSE,
 	EXPOSE_HEADERS,
 	FORMAT,
@@ -34,7 +35,10 @@ import {
 	INT_200,
 	INT_204,
 	INT_304,
-	INVALID_CONFIGURATION, METRICS_PATH, MSG_PROMETHEUS_ENABLED,
+	INVALID_CONFIGURATION,
+	METRICS_PATH,
+	MSG_PROMETHEUS_ENABLED,
+	NO_STORE,
 	NULL,
 	OPTIONS,
 	PREV_DIR,
@@ -83,8 +87,8 @@ class Tenso extends Woodland {
 
 	connect (req, res) {
 		req.csrf = this.canModify(req.method) === false && this.canModify(req.allow) && this.security.csrf === true;
-		req.hypermedia = true;
-		req.hypermediaHeader = true;
+		req.hypermedia = this.hypermedia.enabled;
+		req.hypermediaHeader = this.hypermedia.header;
 		req.private = false;
 		req.protect = false;
 		req.protectAsync = false;
@@ -150,8 +154,15 @@ class Tenso extends Woodland {
 
 			this.get(METRICS_PATH, (req, res) => {
 				res.set(HEADER_CONTENT_TYPE, middleware.promRegistry.contentType);
-				res.set("cache-control", "private, must-revalidate, no-cache, no-store");
+				res.set(CACHE_CONTROL, NO_STORE);
 				middleware.promRegistry.metrics().then(metrics => res.end(metrics));
+			});
+
+			// Hooking events that might bypass middleware
+			this.on(ERROR, (req, res) => {
+				if (req.valid === false) {
+					middleware(req, res, () => void 0);
+				}
 			});
 		}
 

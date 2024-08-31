@@ -66,6 +66,7 @@ const EMPTY = "";
 const ENCODED_SPACE = "%20";
 const END = "end";
 const EQ = "=";
+const ERROR = "error";
 const EXPOSE = "expose";
 const EXPOSE_HEADERS = "cache-control, content-language, content-type, expires, last-modified, pragma";
 const FALSE = "false";
@@ -146,6 +147,7 @@ const MSG_TOO_MANY_REQUESTS = "Too many requests";
 const MULTIPART = "multipart";
 const NEXT = "next";
 const NL = "\n";
+const NO_STORE = "no-store";
 const NULL = "null";
 const NUMBER = "number";
 const OAUTH2 = "oauth2";
@@ -275,6 +277,10 @@ const config = {
 	digit: INT_3,
 	etags: true,
 	host: IP_0000,
+	hypermedia: {
+		enabled: true,
+		header: true
+	},
 	index: [],
 	initRoutes: {},
 	jsonIndent: INT_0,
@@ -290,14 +296,14 @@ const config = {
 	pageSize: INT_5,
 	port: INT_8000,
 	prometheus: {
-		enabled: true,
+		enabled: false,
 		metrics: {
 			includeMethod: true,
 			includePath: true,
 			includeStatusCode: true,
 			includeUp: true,
 			buckets: [0.001, 0.01, 0.1, 1, 2, 3, 5, 7, 10, 15, 20, 25, 30, 35, 40, 50, 70, 100, 200],
-			customLabels: { model: "No" }
+			customLabels: {}
 		}
 	},
 	rate: {
@@ -1241,8 +1247,8 @@ class Tenso extends woodland.Woodland {
 
 	connect (req, res) {
 		req.csrf = this.canModify(req.method) === false && this.canModify(req.allow) && this.security.csrf === true;
-		req.hypermedia = true;
-		req.hypermediaHeader = true;
+		req.hypermedia = this.hypermedia.enabled;
+		req.hypermediaHeader = this.hypermedia.header;
 		req.private = false;
 		req.protect = false;
 		req.protectAsync = false;
@@ -1308,8 +1314,15 @@ class Tenso extends woodland.Woodland {
 
 			this.get(METRICS_PATH, (req, res) => {
 				res.set(HEADER_CONTENT_TYPE, middleware.promRegistry.contentType);
-				res.set("cache-control", "private, must-revalidate, no-cache, no-store");
+				res.set(CACHE_CONTROL, NO_STORE);
 				middleware.promRegistry.metrics().then(metrics => res.end(metrics));
+			});
+
+			// Hooking events that might bypass middleware
+			this.on(ERROR, (req, res) => {
+				if (req.valid === false) {
+					middleware(req, res, () => void 0);
+				}
 			});
 		}
 

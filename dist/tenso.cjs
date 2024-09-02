@@ -1490,7 +1490,7 @@ function tenso (userConfig = {}) {
 		process.exit(INT_1);
 	}
 
-	config$1.title = name;
+	config$1.title = config$1.title ?? name;
 	config$1.version = version;
 	config$1.webroot.root = node_path.resolve(config$1.webroot.root || node_path.join(__dirname$1, PREV_DIR, WWW));
 	config$1.webroot.template = node_fs.readFileSync(config$1.webroot.template || node_path.join(config$1.webroot.root, TEMPLATE_FILE), {encoding: UTF8});

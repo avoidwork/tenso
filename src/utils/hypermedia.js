@@ -105,7 +105,7 @@ export function hypermedia (req, res, rep) {
 						const li = i.toString();
 
 						if (li !== collection) {
-							const uri = li.indexOf(DOUBLE_SLASH) >= INT_0 ? li : `${collection.replace(/\s/g, ENCODED_SPACE)}/${li.replace(/\s/g, ENCODED_SPACE)}`.replace(/^\/\//, SLASH);
+							const uri = li.startsWith(SLASH) || li.indexOf(DOUBLE_SLASH) >= INT_0 ? li : `${collection.replace(/\s/g, ENCODED_SPACE)}/${li.replace(/\s/g, ENCODED_SPACE)}`.replace(/^\/\//, SLASH);
 
 							if (uri !== collection && server.allowed(GET, uri)) {
 								links.push({uri: uri, rel: ITEM});

@@ -3,7 +3,7 @@
  *
  * @copyright 2024 Jason Mulligan <jason.mulligan@avoidwork.com>
  * @license BSD-3-Clause
- * @version 17.1.1
+ * @version 17.1.2
  */
 'use strict';
 
@@ -736,7 +736,7 @@ function hypermedia (req, res, rep) {
 						const li = i.toString();
 
 						if (li !== collection$1) {
-							const uri = li.indexOf(DOUBLE_SLASH) >= INT_0 ? li : `${collection$1.replace(/\s/g, ENCODED_SPACE)}/${li.replace(/\s/g, ENCODED_SPACE)}`.replace(/^\/\//, SLASH);
+							const uri = li.startsWith(SLASH) || li.indexOf(DOUBLE_SLASH) >= INT_0 ? li : `${collection$1.replace(/\s/g, ENCODED_SPACE)}/${li.replace(/\s/g, ENCODED_SPACE)}`.replace(/^\/\//, SLASH);
 
 							if (uri !== collection$1 && server.allowed(GET, uri)) {
 								links.push({uri: uri, rel: ITEM});

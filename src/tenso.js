@@ -52,6 +52,7 @@ import {
 } from "./core/constants.js";
 import {serialize} from "./utils/serialize.js";
 import {hypermedia} from "./utils/hypermedia.js";
+import {exit} from "./middleware/exit.js";
 import {payload} from "./middleware/payload.js";
 import {parse} from "./middleware/parse.js";
 import {prometheus} from "./middleware/prometheus.js";
@@ -161,6 +162,9 @@ class Tenso extends Woodland {
 				}
 			});
 		}
+
+		// Early exit after prometheus metrics (for GETs only)
+		this.always(exit).ignore(exit);
 
 		// Payload handling
 		this.always(payload).ignore(payload);

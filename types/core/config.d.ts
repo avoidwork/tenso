@@ -62,6 +62,7 @@ export namespace config {
     };
     export { INT_3 as digit };
     export let etags: boolean;
+    export let exit: any[];
     export { IP_0000 as host };
     export namespace hypermedia {
         let enabled_5: boolean;

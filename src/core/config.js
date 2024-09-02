@@ -103,6 +103,7 @@ export const config = {
 	},
 	digit: INT_3,
 	etags: true,
+	exit: [],
 	host: IP_0000,
 	hypermedia: {
 		enabled: true,

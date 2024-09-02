@@ -57,6 +57,7 @@ declare class Tenso extends Woodland {
         };
         digit: number;
         etags: boolean;
+        exit: any[];
         host: string;
         hypermedia: {
             enabled: boolean;

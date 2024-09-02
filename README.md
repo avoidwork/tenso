@@ -23,6 +23,8 @@ The following example will create GET routes that will return an `Array` at `/`,
 
 As of 10.3.0 you can specify `always` as a method to run middleware before authorization middleware, which will skip `always` middleware registered after it (via instance methods).
 
+As of 17.2.0 you can have routes exit the middleware pipeline immediately by setting them in the `exit` Array. This differs from `unprotect` as there is no request body handling.
+
 #### Example
 
 ##### Routes
@@ -196,6 +198,7 @@ Everything is optional! You can provide as much, or as little configuration as y
 	},
 	digit: 3,
 	etags: true,
+	exit: [],
 	host: "0.0.0.0",
 	hypermedia: {
 		enabled: true,

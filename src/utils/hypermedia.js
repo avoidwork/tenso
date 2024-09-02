@@ -31,7 +31,7 @@ import {marshal} from "./marshal.js";
 export function hypermedia (req, res, rep) {
 	const server = req.server,
 		headers = res.getHeaders(),
-		collection = req.parsed.pathname,
+		collection = req.url,
 		links = [],
 		seen = new Set(),
 		exists = rep !== null;
@@ -49,7 +49,7 @@ export function hypermedia (req, res, rep) {
 		page_size = server.pageSize || INT_5;
 	}
 
-	root = new URL(`${URL_127001}${req.parsed.pathname}${req.parsed.search}`);
+	root = new URL(`${URL_127001}${req.url}${req.parsed.search}`);
 	root.searchParams.delete(PAGE);
 	root.searchParams.delete(PAGE_SIZE);
 
@@ -100,7 +100,7 @@ export function hypermedia (req, res, rep) {
 			if (req.hypermedia) {
 				for (const i of rep.data) {
 					if (i instanceof Object) {
-						marshal(i, ITEM, req.parsed.pathname.replace(trailingSlash, EMPTY), root, seen, links, server);
+						marshal(i, ITEM, req.url.replace(trailingSlash, EMPTY), root, seen, links, server);
 					} else {
 						const li = i.toString();
 
@@ -115,7 +115,7 @@ export function hypermedia (req, res, rep) {
 				}
 			}
 		} else if (rep.data instanceof Object && req.hypermedia) {
-			parent = req.parsed.pathname.split(SLASH).filter(i => i !== EMPTY);
+			parent = req.url.split(SLASH).filter(i => i !== EMPTY);
 
 			if (parent.length > INT_1) {
 				parent.pop();

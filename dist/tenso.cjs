@@ -275,6 +275,7 @@ const config = {
 	},
 	digit: INT_3,
 	etags: true,
+	exit: [],
 	host: IP_0000,
 	hypermedia: {
 		enabled: true,
@@ -456,7 +457,7 @@ function javascript (req, res, arg) {
 }
 
 function csv (req, res, arg) {
-	const filename = req.parsed.pathname.split("/").pop().split(".")[0];
+	const filename = req.url.split("/").pop().split(".")[0];
 	const input = res.statusCode < 400 ? Array.isArray(arg) ? arg : [arg] : [{Error: arg}];
 
 	res.header(HEADER_CONTENT_DISPOSITION, HEADER_CONTENT_DISPOSITION_VALUE.replace("download", filename));
@@ -662,7 +663,7 @@ function marshal (obj, rel, item_collection, root, seen, links, server) {
 function hypermedia (req, res, rep) {
 	const server = req.server,
 		headers = res.getHeaders(),
-		collection$1 = req.parsed.pathname,
+		collection$1 = req.url,
 		links = [],
 		seen = new Set(),
 		exists = rep !== null;
@@ -680,7 +681,7 @@ function hypermedia (req, res, rep) {
 		page_size = server.pageSize || INT_5;
 	}
 
-	root = new url.URL(`${URL_127001}${req.parsed.pathname}${req.parsed.search}`);
+	root = new url.URL(`${URL_127001}${req.url}${req.parsed.search}`);
 	root.searchParams.delete(PAGE);
 	root.searchParams.delete(PAGE_SIZE);
 
@@ -731,7 +732,7 @@ function hypermedia (req, res, rep) {
 			if (req.hypermedia) {
 				for (const i of rep.data) {
 					if (i instanceof Object) {
-						marshal(i, ITEM, req.parsed.pathname.replace(trailingSlash, EMPTY), root, seen, links, server);
+						marshal(i, ITEM, req.url.replace(trailingSlash, EMPTY), root, seen, links, server);
 					} else {
 						const li = i.toString();
 
@@ -746,7 +747,7 @@ function hypermedia (req, res, rep) {
 				}
 			}
 		} else if (rep.data instanceof Object && req.hypermedia) {
-			parent = req.parsed.pathname.split(SLASH).filter(i => i !== EMPTY);
+			parent = req.url.split(SLASH).filter(i => i !== EMPTY);
 
 			if (parent.length > INT_1) {
 				parent.pop();
@@ -776,6 +777,14 @@ function hypermedia (req, res, rep) {
 	}
 
 	return rep;
+}
+
+function exit (req, res, next) {
+	if (req.server.exit.includes(req.url)) {
+		req.exit();
+	} else {
+		next();
+	}
 }
 
 function payload (req, res, next) {
@@ -868,7 +877,7 @@ function csrfWrapper (req, res, next) {
 function guard (req, res, next) {
 	const login = req.server.auth.uri.login;
 
-	if (req.parsed.pathname === login || req.isAuthenticated()) {
+	if (req.url === login || req.isAuthenticated()) {
 		next();
 	} else {
 		res.error(INT_401);
@@ -908,7 +917,7 @@ function rate (req, res, next) {
 }
 
 function zuul (req, res, next) {
-	const uri = req.parsed.pathname;
+	const uri = req.url;
 	let protect = false;
 
 	if (req.unprotect === false) {
@@ -1321,6 +1330,9 @@ class Tenso extends woodland.Woodland {
 				}
 			});
 		}
+
+		// Early exit after prometheus metrics (for GETs only)
+		this.always(exit).ignore(exit);
 
 		// Payload handling
 		this.always(payload).ignore(payload);

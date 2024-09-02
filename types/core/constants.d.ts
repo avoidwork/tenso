@@ -27,6 +27,7 @@ export const EMPTY: "";
 export const ENCODED_SPACE: "%20";
 export const END: "end";
 export const EQ: "=";
+export const ERROR: "error";
 export const EXPOSE: "expose";
 export const EXPOSE_HEADERS: "cache-control, content-language, content-type, expires, last-modified, pragma";
 export const FALSE: "false";

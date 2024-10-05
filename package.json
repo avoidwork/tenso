@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tenso is an HTTP REST API framework",
-  "version": "17.2.3",
+  "version": "17.2.4",
   "homepage": "https://github.com/avoidwork/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -51,7 +51,7 @@
     "csv-stringify": "^6.5.1",
     "express-prom-bundle": "^7.0.0",
     "express-session": "^1.18.0",
-    "fast-xml-parser": "^4.4.1",
+    "fast-xml-parser": "^4.5.0",
     "ioredis": "^5.4.1",
     "jsonwebtoken": "^9.0.2",
     "keysort": "^3.0.1",
@@ -66,24 +66,24 @@
     "tiny-coerce": "^3.0.2",
     "tiny-etag": "^4.0.5",
     "tiny-eventsource": "^3.0.8",
-    "tiny-jsonl": "^2.0.3",
+    "tiny-jsonl": "^3.0.2",
     "tiny-merge": "^2.0.0",
     "woodland": "^20.1.2",
     "yamljs": "^0.3.0",
     "yargs-parser": "^21.1.1"
   },
   "devDependencies": {
-    "auto-changelog": "^2.4.0",
+    "auto-changelog": "^2.5.0",
     "autocannon": "^7.15.0",
-    "concurrently": "^9.0.0",
+    "concurrently": "^9.0.1",
     "csv-parse": "^5.5.6",
-    "eslint": "^9.9.1",
-    "husky": "^9.1.5",
+    "eslint": "^9.12.0",
+    "husky": "^9.1.6",
     "mocha": "^10.7.3",
-    "nyc": "^17.0.0",
-    "rollup": "^4.21.1",
-    "tiny-httptest": "^4.0.11",
-    "typescript": "^5.5.4"
+    "nyc": "^17.1.0",
+    "rollup": "^4.24.0",
+    "tiny-httptest": "^4.0.13",
+    "typescript": "^5.6.2"
   },
   "keywords": [
     "rest",

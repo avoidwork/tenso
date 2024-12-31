@@ -46,7 +46,7 @@
     "www/assets"
   ],
   "dependencies": {
-    "connect-redis": "^7.1.1",
+    "connect-redis": "^8.0.1",
     "cookie-parser": "^1.4.6",
     "csv-stringify": "^6.5.1",
     "express-prom-bundle": "^8.0.0",

@@ -70,7 +70,7 @@
     "tiny-merge": "^2.0.0",
     "woodland": "^20.1.2",
     "yamljs": "^0.3.0",
-    "yargs-parser": "^21.1.1"
+    "yargs-parser": "^22.0.0"
   },
   "devDependencies": {
     "auto-changelog": "^2.5.0",

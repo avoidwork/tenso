@@ -9,5 +9,15 @@ import {EMPTY} from "../core/constants.js";
  * @throws {Error} When any line contains invalid JSON
  */
 export function jsonl (arg = EMPTY) {
-	return parse(arg);
+	// Handle empty or undefined input by returning empty array
+	if (!arg || arg === EMPTY) {
+		return [];
+	}
+
+	const result = parse(arg);
+
+	// Ensure result is always an array
+	// tiny-jsonl returns single objects directly for single lines,
+	// but arrays for multiple lines. We need consistent array output.
+	return Array.isArray(result) ? result : [result];
 }

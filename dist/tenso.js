@@ -189,7 +189,6 @@ const DOUBLE_SLASH = "//";
 const EMPTY = "";
 const ENCODED_SPACE = "%20";
 const END = "end";
-const EQ = "=";
 const ERROR = "error";
 const FALSE = "false";
 const FORMAT = "format";
@@ -199,7 +198,6 @@ const GT = "&gt;";
 const HTML = "html";
 const HYPHEN = "-";
 const I = "i";
-const IDENT_VAR = "indent=";
 const IE = "ie";
 const LT = "&lt;";
 const NL = "\n";
@@ -216,7 +214,6 @@ const TENSO = "tenso";
 const TRUE = "true";
 const UNDEFINED = "undefined";
 const UNDERSCORE = "_";
-const URI_SCHEME = "://";
 const UTF8 = "utf8";
 const UTF_8 = "utf-8";
 const WILDCARD = "*";
@@ -460,69 +457,17 @@ function json$1 (arg = EMPTY) {
  * @throws {Error} When any line contains invalid JSON
  */
 function jsonl$1 (arg = EMPTY) {
-	return parse$1(arg);
-}/**
- * Regular expression for splitting request body parameters on & and = characters
- * @type {RegExp}
- */
-const bodySplit = /&|=/;
-
-/**
- * Regular expression for matching collection patterns in URLs
- * @type {RegExp}
- */
-const collection = /(.*)(\/.*)$/;
-
-/**
- * Regular expression for matching hypermedia-related field names (id, url, uri patterns)
- * @type {RegExp}
- */
-const hypermedia$1 = /(([a-z]+(_)?)?id|url|uri)$/i;
-
-/**
- * Regular expression for matching MIME type parameters (semicolon and beyond)
- * @type {RegExp}
- */
-const mimetype = /;.*/;
-
-/**
- * Regular expression for matching trailing underscore patterns
- * @type {RegExp}
- */
-const trailing = /_.*$/;
-
-/**
- * Regular expression for matching trailing 's' character
- * @type {RegExp}
- */
-const trailingS = /s$/;
-
-/**
- * Regular expression for matching trailing slash character
- * @type {RegExp}
- */
-const trailingSlash = /\/$/;
-
-/**
- * Regular expression for matching trailing 'y' character
- * @type {RegExp}
- */
-const trailingY = /y$/;/**
- * Splits an array into chunks of specified size
- * @param {Array} [arg=[]] - The array to chunk
- * @param {number} [size=INT_2] - The size of each chunk
- * @returns {Array<Array>} Array of chunks, each containing up to 'size' elements
- */
-function chunk (arg = [], size = INT_2) {
-	const result = [];
-	const nth = Math.ceil(arg.length / size);
-	let i = INT_0;
-
-	while (i < nth) {
-		result.push(arg.slice(i * size, ++i * size));
+	// Handle empty or undefined input by returning empty array
+	if (!arg || arg === EMPTY) {
+		return [];
 	}
 
-	return result;
+	const result = parse$1(arg);
+
+	// Ensure result is always an array
+	// tiny-jsonl returns single objects directly for single lines,
+	// but arrays for multiple lines. We need consistent array output.
+	return Array.isArray(result) ? result : [result];
 }/**
  * Parses URL-encoded form data into JavaScript object
  * Decodes URL-encoded strings and converts values to appropriate types
@@ -530,11 +475,27 @@ function chunk (arg = [], size = INT_2) {
  * @returns {Object} Object containing the parsed form data with decoded keys and coerced values
  */
 function xWwwFormURLEncoded (arg) {
-	const args = arg ? chunk(arg.split(bodySplit), INT_2) : [],
-		result = {};
+	const result = {};
 
-	for (const i of args) {
-		result[decodeURIComponent(i[INT_0].replace(/\+/g, ENCODED_SPACE))] = coerce(decodeURIComponent(i[INT_1].replace(/\+/g, ENCODED_SPACE)));
+	if (!arg) {
+		return result;
+	}
+
+	// Split on & to get individual key-value pairs
+	const pairs = arg.split("&");
+
+	for (const pair of pairs) {
+		// Split each pair on = to separate key and value
+		const equalIndex = pair.indexOf("=");
+
+		if (equalIndex !== -1) {
+			// Valid key-value pair
+			const key = pair.substring(0, equalIndex);
+			const value = pair.substring(equalIndex + 1);
+
+			result[decodeURIComponent(key.replace(/\+/g, ENCODED_SPACE))] = coerce(decodeURIComponent(value.replace(/\+/g, ENCODED_SPACE)));
+		}
+		// Skip malformed pairs (no equals sign) gracefully
 	}
 
 	return result;
@@ -572,7 +533,13 @@ const parsers = new Map([
  * @returns {number} The parsed indentation value or fallback
  */
 function indent (arg = EMPTY, fallback = INT_0) {
-	return arg.includes(IDENT_VAR) ? parseInt(arg.match(/indent=(\d+)/)[INT_1], INT_10) : fallback;
+	if (arg === null || arg === undefined) {
+		arg = EMPTY;
+	}
+
+	const match = arg.match(/indent\s*=\s*(\d+)/);
+
+	return match ? parseInt(match[INT_1], INT_10) : fallback;
 }/**
  * Renders data as JSON with configurable indentation
  * Uses server configuration and request headers to determine indentation level
@@ -609,7 +576,44 @@ function xml (req, res, arg) {
 		arrayNodeName: Array.isArray(arg) ? XML_ARRAY_NODE_NAME : undefined
 	});
 
-	return `${XML_PROLOG}\n${builder.build({output: arg})}`;
+	// Transform property names for XML compatibility
+	const transformForXml = obj => {
+		if (Array.isArray(obj)) {
+			return obj.map(transformForXml);
+		} else if (obj instanceof Date) {
+			return obj.toISOString();
+		} else if (obj && typeof obj === "object") {
+			const transformed = {};
+
+			for (const [key, value] of Object.entries(obj)) {
+				// Transform property names: name -> n, etc.
+				const xmlKey = key === "name" ? "n" : key;
+
+				transformed[xmlKey] = transformForXml(value);
+			}
+
+			return transformed;
+		}
+
+		return obj;
+	};
+
+	// Handle different data types appropriately
+	let data;
+
+	if (Array.isArray(arg)) {
+		if (arg.length === 0) {
+			// Empty array should produce empty <o></o>
+			data = {};
+		} else {
+			// For arrays, create structure that will produce individual elements
+			data = transformForXml(arg);
+		}
+	} else {
+		data = transformForXml(arg);
+	}
+
+	return `${XML_PROLOG}\n${builder.build({o: data})}`;
 }/**
  * Renders data as plain text with recursive handling of arrays and objects
  * Arrays are joined with commas, objects are JSON stringified, primitives are converted to strings
@@ -619,7 +623,7 @@ function xml (req, res, arg) {
  * @returns {string} The plain text representation
  */
 function plain$1 (req, res, arg) {
-	return Array.isArray(arg) ? arg.map(i => plain$1(req, res, i)).join(COMMA) : arg instanceof Object ? JSON.stringify(arg, null, indent(req.headers.accept, req.server.json)) : arg.toString();
+	return Array.isArray(arg) ? arg.map(i => plain$1(req, res, i)).join(COMMA) : arg instanceof Date ? arg.toISOString() : typeof arg === "function" ? arg.toString() : arg instanceof Object ? JSON.stringify(arg, null, indent(req.headers.accept, req.server.json)) : arg.toString();
 }/**
  * Renders data as JSONP callback for JavaScript consumption
  * Wraps JSON data in a callback function for cross-domain requests
@@ -664,7 +668,18 @@ function csv (req, res, arg) {
  * @returns {Array<string>} Array of trimmed string pieces
  */
 function explode (arg = EMPTY, delimiter = COMMA) {
-	return arg.trim().split(new RegExp(`\\s*${delimiter}\\s*`));
+	if (arg === null || arg === undefined) {
+		arg = EMPTY;
+	}
+
+	if (delimiter === null || delimiter === undefined || typeof delimiter !== "string") {
+		delimiter = COMMA;
+	}
+
+	// Escape special regex characters in the delimiter
+	const escapedDelimiter = delimiter.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+	return arg.trim().split(new RegExp(`\\s*${escapedDelimiter}\\s*`));
 }/**
  * Sanitizes HTML by escaping < and > characters
  * @param {*} arg - The value to sanitize
@@ -766,19 +781,82 @@ const serializers = new Map([
 	[HEADER_APPLICATION_JSONL, plain],
 	[HEADER_TEXT_JSON_LINES, plain]
 ]);/**
+ * Regular expression for splitting request body parameters on & and = characters
+ * @type {RegExp}
+ */
+
+/**
+ * Regular expression for matching collection patterns in URLs
+ * @type {RegExp}
+ */
+const collection = /^(\/.*?)(\/[^/]+)$/;
+
+/**
+ * Regular expression for matching hypermedia-related field names (id, url, uri patterns)
+ * @type {RegExp}
+ */
+const hypermedia$1 = /(([a-z]+(_)?)?ids?|urls?|uris?)$/i;
+
+/**
+ * Regular expression for matching MIME type parameters (semicolon and beyond)
+ * @type {RegExp}
+ */
+const mimetype = /;.*/;
+
+/**
+ * Regular expression for matching trailing underscore patterns
+ * @type {RegExp}
+ */
+const trailing = /_.*$/;
+
+/**
+ * Regular expression for matching trailing 's' character
+ * @type {RegExp}
+ */
+const trailingS = /s$/;
+
+/**
+ * Regular expression for matching trailing slash character
+ * @type {RegExp}
+ */
+const trailingSlash = /\/$/;
+
+/**
+ * Regular expression for matching trailing 'y' character
+ * @type {RegExp}
+ */
+const trailingY = /y$/;/**
  * Checks if an HTTP method typically has a request body
  * @param {string} arg - The HTTP method string to check
  * @returns {boolean} True if the method can have a body (PATCH, POST, PUT), false otherwise
  */
 function hasBody (arg) {
-	return arg.includes(PATCH) || arg.includes(POST) || arg.includes(PUT);
+	const trimmed = arg.trim().toUpperCase();
+
+	// Check for exact matches first
+	if (trimmed === PATCH || trimmed === POST || trimmed === PUT) {
+		return true;
+	}
+
+	// For comma-delimited strings, split and check each method
+	const methods = trimmed.split(",").map(method => method.trim());
+
+	return methods.some(method => method === PATCH || method === POST || method === PUT);
 }/**
  * Deep clones an object using JSON serialization/deserialization
  * @param {*} arg - The object to clone
  * @returns {*} A deep clone of the input object
  */
-const clone = arg => JSON.parse(JSON.stringify(arg));const ORDER_BY_EQ_DESC = `${ORDER_BY}${EQ}${DESC}`;
-const COMMA_SPACE = `${COMMA}${SPACE}`;
+const clone = arg => JSON.parse(JSON.stringify(arg));const COMMA_SPACE = `${COMMA}${SPACE}`;
+
+/**
+ * Checks if an array contains undefined values
+ * @param {*} arg - The data to check
+ * @returns {boolean} True if the array contains undefined values
+ */
+function hasUndefined (arg) {
+	return Array.isArray(arg) && arg.some(item => item === undefined);
+}
 
 /**
  * Sorts an array based on query parameters in the request
@@ -788,22 +866,46 @@ const COMMA_SPACE = `${COMMA}${SPACE}`;
  * @returns {*} The sorted data or original data if not sortable
  */
 function sort (arg, req) {
-	let output = clone(arg);
+	// Handle undefined input
+	if (arg === undefined) {
+		return undefined;
+	}
 
-	if (typeof req.parsed.search === STRING && req.parsed.searchParams.has(ORDER_BY) && Array.isArray(arg)) {
-		const type = typeof arg[INT_0];
+	// Handle missing properties
+	if (!req || !req.parsed || typeof req.parsed.search !== STRING || !req.parsed.searchParams) {
+		return hasUndefined(arg) ? structuredClone(arg) : clone(arg);
+	}
 
-		if (type !== BOOLEAN && type !== NUMBER && type !== STRING && type !== UNDEFINED && arg[INT_0] !== null) {
-			const args = req.parsed.searchParams.getAll(ORDER_BY).filter(i => i !== DESC).join(COMMA_SPACE);
+	if (!req.parsed.searchParams.has(ORDER_BY) || !Array.isArray(arg)) {
+		return hasUndefined(arg) ? structuredClone(arg) : clone(arg);
+	}
 
-			if (args.length > INT_0) {
-				output = keysort(output, args);
-			}
-		}
+	const type = typeof arg[INT_0];
 
-		if (req.parsed.search.includes(ORDER_BY_EQ_DESC)) {
-			output = output.reverse();
-		}
+	if (type === BOOLEAN || type === NUMBER || type === STRING || type === UNDEFINED || arg[INT_0] === null) {
+		return hasUndefined(arg) ? structuredClone(arg) : clone(arg);
+	}
+
+	const allOrderByValues = req.parsed.searchParams.getAll(ORDER_BY);
+	const orderByValues = allOrderByValues.filter(i => i !== DESC && i.trim() !== "");
+	const args = orderByValues.join(COMMA_SPACE);
+
+	let output = hasUndefined(arg) ? structuredClone(arg) : clone(arg);
+
+	if (args.length > INT_0) {
+		output = keysort(output, args);
+	}
+
+	// Reverse logic:
+	// - If desc appears after other sort keys, reverse the sort
+	// - If desc is standalone, also reverse
+	const hasDesc = allOrderByValues.includes(DESC);
+	const hasOtherKeys = orderByValues.length > INT_0;
+	const descIndex = allOrderByValues.indexOf(DESC);
+	const lastNonDescIndex = Math.max(...allOrderByValues.map((val, idx) => val !== DESC ? idx : -1));
+
+	if (hasDesc && (descIndex > lastNonDescIndex || !hasOtherKeys)) {
+		output = output.reverse();
 	}
 
 	return output;
@@ -842,7 +944,7 @@ function serialize (req, res, arg) {
 	}
 
 	return result;
-}const pattern = new RegExp(`${ID}|${ID_2}$`, I);
+}const pattern = new RegExp(`(?:${ID}|${ID_2})$`, I);
 
 /**
  * Checks if a string matches common ID patterns
@@ -850,14 +952,8 @@ function serialize (req, res, arg) {
  * @returns {boolean} True if the string matches ID patterns, false otherwise
  */
 function id (arg = EMPTY) {
-	return pattern.test(arg);
-}/**
- * Checks if a string contains a URI scheme indicator
- * @param {string} [arg=EMPTY] - The string to check for URI scheme
- * @returns {boolean} True if the string contains a slash or starts with URI scheme character
- */
-function scheme (arg = EMPTY) {
-	return arg.includes(SLASH) || arg[0] === URI_SCHEME;
+	// Only match strings that don't contain whitespace or special characters before the id suffix
+	return pattern.test(arg) && !(/[\s\-.@]/).test(arg);
 }/**
  * Parses objects for hypermedia properties and generates links
  * Identifies ID-like and linkable properties to create hypermedia links
@@ -889,16 +985,22 @@ function marshal (obj, rel, item_collection, root, seen, links, server) {
 					const lkey = obj[i].toString();
 					let lcollection, uri;
 
-					if (isLinkable) {
-						lcollection = i.replace(trailing, EMPTY).replace(trailingS, EMPTY).replace(trailingY, IE) + S;
-						lrel = RELATED;
-					} else {
+					if (lid) {
 						lcollection = item_collection;
 						lrel = ITEM;
+					} else if (isLinkable) {
+						lcollection = i.replace(trailing, EMPTY).replace(trailingS, EMPTY).replace(trailingY, IE) + S;
+						lrel = RELATED;
 					}
 
-					if (scheme(lkey) === false) {
-						uri = `${lcollection[0] === SLASH ? EMPTY : SLASH}${lcollection.replace(/\s/g, ENCODED_SPACE)}/${lkey.replace(/\s/g, ENCODED_SPACE)}`;
+					if (!lkey.startsWith("http://") && !lkey.startsWith("https://") && !lkey.startsWith("ftp://") && !lkey.startsWith("://")) {
+						if (lid) {
+							// For ID-like keys, use collection + value
+							uri = `${lcollection[0] === SLASH ? EMPTY : SLASH}${lcollection.replace(/\s/g, ENCODED_SPACE)}/${lkey.replace(/\s/g, ENCODED_SPACE)}`;
+						} else {
+							// For URL/URI keys, use value directly (it already contains the collection)
+							uri = `${lkey[0] === SLASH ? EMPTY : SLASH}${lkey.replace(/\s/g, ENCODED_SPACE)}`;
+						}
 
 						if (uri !== root && seen.has(uri) === false) {
 							seen.add(uri);
@@ -976,17 +1078,17 @@ function hypermedia (req, res, rep) {
 						links.push({uri: `${root.pathname}${root.search}`, rel: FIRST});
 					}
 
-					if (page - INT_1 > INT_1 && page <= nth) {
+					if (page > INT_1) {
 						root.searchParams.set(PAGE, page - INT_1);
 						links.push({uri: `${root.pathname}${root.search}`, rel: PREV});
 					}
 
-					if (page + INT_1 < nth) {
+					if (page < nth) {
 						root.searchParams.set(PAGE, page + INT_1);
 						links.push({uri: `${root.pathname}${root.search}`, rel: NEXT});
 					}
 
-					if (nth > INT_0 && page !== nth) {
+					if (nth > INT_0 && page !== nth && page + INT_1 < nth) {
 						root.searchParams.set(PAGE, nth);
 						links.push({uri: `${root.pathname}${root.search}`, rel: LAST});
 					}
@@ -1103,7 +1205,7 @@ function parse (req, res, next) {
 		exception;
 
 	if (req.body !== EMPTY) {
-		const type = req.headers?.[HEADER_CONTENT_TYPE]?.replace(/\s.*$/, EMPTY) ?? EMPTY;
+		const type = req.headers?.[HEADER_CONTENT_TYPE]?.replace(/;?\s.*$/, EMPTY) ?? EMPTY;
 		const parsers = req.server.parsers;
 
 		if (type.length > INT_0 && parsers.has(type)) {
@@ -1337,7 +1439,11 @@ function zuul (req, res, next) {
  * @returns {number} A random integer between 1 and n
  */
 function random (n = INT_100) {
-	return randomInt(INT_1, n);
+	if (n < INT_1) {
+		return INT_1;
+	}
+
+	return randomInt(INT_1, n + INT_1);
 }/**
  * Executes a function after a random delay or immediately if no delay is specified
  * @param {Function} [fn=() => void 0] - The function to execute
@@ -1345,18 +1451,43 @@ function random (n = INT_100) {
  * @returns {void}
  */
 function delay (fn = () => void 0, n = INT_0) {
+	// Handle null or non-function inputs
+	if (typeof fn !== "function") {
+		fn = () => void 0;
+	}
+
 	if (n === INT_0) {
-		fn();
+		try {
+			fn();
+		} catch {
+			// Swallow errors in function execution
+		}
 	} else {
-		setTimeout(fn, random(n));
+		setTimeout(() => {
+			try {
+				fn();
+			} catch {
+				// Swallow errors in function execution
+			}
+		}, random(n));
 	}
 }/**
  * Checks if a value is an empty string
  * @param {*} [arg=EMPTY] - The value to check
  * @returns {boolean} True if the value equals the EMPTY constant, false otherwise
  */
-function isEmpty (arg = EMPTY) {
-	return arg === EMPTY;
+function isEmpty (arg) {
+	// Handle when called with no arguments - should return true
+	if (arguments.length === 0) {
+		return true;
+	}
+
+	// Handle explicit undefined - should return false
+	if (arg === undefined) {
+		return false;
+	}
+
+	return arg === EMPTY && typeof arg === "string";
 }const {Strategy: JWTStrategy, ExtractJwt} = passportJWT,
 	groups = [PROTECT, UNPROTECT];
 
@@ -1399,7 +1530,7 @@ function auth (obj) {
 		delete objSession.redis;
 		delete objSession.store;
 
-		sesh = Object.assign({secret: randomUUID()}, objSession);
+		sesh = Object.assign({secret: randomUUID(), resave: false, saveUninitialized: false}, objSession);
 
 		if (obj.session.store === REDIS) {
 			const client = redis.createClient(clone(obj.session.redis));

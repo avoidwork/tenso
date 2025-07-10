@@ -120,8 +120,7 @@ const api = new MyAPI();
 - [Serving Files](#serving-files)
 - [EventSource Streams](#eventsource-streams)
 - [Prometheus](#prometheus)
-- [Testing](#testing)
-- [Benchmark](#benchmark)
+  - [Testing](#testing)
 - [TypeScript](#typescript)
 - [Examples](#examples)
 - [Troubleshooting](#troubleshooting)
@@ -707,47 +706,6 @@ describe("My API", () => {
     assert.equal(res.body, "Hello");
   });
 });
-```
-
-## ⚡ Benchmark
-
-1. Clone repository from [GitHub](https://github.com/avoidwork/tenso)
-2. Install dependencies with `npm` or `yarn`
-3. Execute `benchmark` script with `npm` or `yarn`
-
-## 📘 TypeScript
-
-Tenso includes full TypeScript definitions for all functionality:
-
-```typescript
-import {Tenso, tenso} from "tenso";
-import {IncomingMessage, ServerResponse} from "node:http";
-
-// Using factory function
-const app = tenso({
-  defaultHeaders: {"content-type": "application/json"}
-});
-
-// Using class
-class MyAPI extends Tenso {
-  constructor() {
-    super({time: true});
-  }
-}
-
-// Custom middleware with types
-interface CustomRequest extends IncomingMessage {
-  user?: {id: string, name: string};
-}
-
-const authenticate = (
-  req: CustomRequest,
-  res: ServerResponse,
-  next: () => void
-): void => {
-  req.user = {id: "123", name: "John"};
-  next();
-};
 ```
 
 ## 🔍 Examples

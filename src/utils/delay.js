@@ -8,9 +8,24 @@ import {INT_0} from "../core/constants.js";
  * @returns {void}
  */
 export function delay (fn = () => void 0, n = INT_0) {
+	// Handle null or non-function inputs
+	if (typeof fn !== "function") {
+		fn = () => void 0;
+	}
+
 	if (n === INT_0) {
-		fn();
+		try {
+			fn();
+		} catch {
+			// Swallow errors in function execution
+		}
 	} else {
-		setTimeout(fn, random(n));
+		setTimeout(() => {
+			try {
+				fn();
+			} catch {
+				// Swallow errors in function execution
+			}
+		}, random(n));
 	}
 }

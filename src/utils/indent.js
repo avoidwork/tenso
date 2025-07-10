@@ -1,4 +1,4 @@
-import {EMPTY, IDENT_VAR, INT_0, INT_1, INT_10} from "../core/constants.js";
+import {EMPTY, INT_0, INT_1, INT_10} from "../core/constants.js";
 
 /**
  * Extracts indentation value from a string or returns fallback
@@ -12,5 +12,7 @@ export function indent (arg = EMPTY, fallback = INT_0) {
 		arg = EMPTY;
 	}
 
-	return arg.includes(IDENT_VAR) ? parseInt(arg.match(/indent=(\d+)/)[INT_1], INT_10) : fallback;
+	const match = arg.match(/indent\s*=\s*(\d+)/);
+
+	return match ? parseInt(match[INT_1], INT_10) : fallback;
 }

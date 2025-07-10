@@ -8,13 +8,13 @@ export const bodySplit = /&|=/;
  * Regular expression for matching collection patterns in URLs
  * @type {RegExp}
  */
-export const collection = /(.*)(\/.*)$/;
+export const collection = /^(\/.*?)(\/[^/]+)$/;
 
 /**
  * Regular expression for matching hypermedia-related field names (id, url, uri patterns)
  * @type {RegExp}
  */
-export const hypermedia = /(([a-z]+(_)?)?id|url|uri)$/i;
+export const hypermedia = /(([a-z]+(_)?)?ids?|urls?|uris?)$/i;
 
 /**
  * Regular expression for matching MIME type parameters (semicolon and beyond)

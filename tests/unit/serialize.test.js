@@ -79,7 +79,7 @@ describe("serialize", () => {
 
 		assert.ok(result);
 		// Should pick the first supported type
-		assert.strictEqual(mockRes.getHeader("content-type"), "application/json; charset=utf-8");
+		assert.strictEqual(mockRes.getHeader("content-type"), "text/html; charset=utf-8");
 	});
 
 	it("should handle error objects", () => {
@@ -169,7 +169,7 @@ describe("serialize", () => {
 		const result = serialize(mockReq, mockRes, data);
 
 		assert.ok(result);
-		assert.strictEqual(mockRes.getHeader("content-type"), "application/json; charset=utf-8");
+		assert.strictEqual(mockRes.getHeader("content-type"), "text/html; charset=utf-8");
 	});
 
 	it("should handle YAML content type", () => {

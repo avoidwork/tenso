@@ -10,5 +10,5 @@ export function scheme (arg = EMPTY) {
 		arg = EMPTY;
 	}
 
-	return arg.includes(SLASH) || arg[0] === URI_SCHEME;
+	return arg.includes(SLASH) || arg.startsWith(URI_SCHEME) || arg.startsWith(":");
 }

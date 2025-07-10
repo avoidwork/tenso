@@ -11,5 +11,12 @@ export function explode (arg = EMPTY, delimiter = COMMA) {
 		arg = EMPTY;
 	}
 
-	return arg.trim().split(new RegExp(`\\s*${delimiter}\\s*`));
+	if (delimiter === null || delimiter === undefined || typeof delimiter !== "string") {
+		delimiter = COMMA;
+	}
+
+	// Escape special regex characters in the delimiter
+	const escapedDelimiter = delimiter.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+	return arg.trim().split(new RegExp(`\\s*${escapedDelimiter}\\s*`));
 }

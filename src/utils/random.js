@@ -7,5 +7,9 @@ import {INT_1, INT_100} from "../core/constants.js";
  * @returns {number} A random integer between 1 and n
  */
 export function random (n = INT_100) {
-	return randomInt(INT_1, n);
+	if (n < INT_1) {
+		return INT_1;
+	}
+
+	return randomInt(INT_1, n + INT_1);
 }

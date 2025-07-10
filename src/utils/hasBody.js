@@ -6,5 +6,15 @@ import {PATCH, POST, PUT} from "../core/constants.js";
  * @returns {boolean} True if the method can have a body (PATCH, POST, PUT), false otherwise
  */
 export function hasBody (arg) {
-	return arg.includes(PATCH) || arg.includes(POST) || arg.includes(PUT);
+	const trimmed = arg.trim().toUpperCase();
+
+	// Check for exact matches first
+	if (trimmed === PATCH || trimmed === POST || trimmed === PUT) {
+		return true;
+	}
+
+	// For comma-delimited strings, split and check each method
+	const methods = trimmed.split(",").map(method => method.trim());
+
+	return methods.some(method => method === PATCH || method === POST || method === PUT);
 }

@@ -1,7 +1,6 @@
 import {EMPTY, ENCODED_SPACE, GET, IE, INT_0, ITEM, RELATED, S, SLASH} from "../core/constants.js";
 import {id} from "./id.js";
 import {hypermedia as hypermediaPattern, trailing, trailingS, trailingY} from "./regex.js";
-import {scheme} from "./scheme.js";
 
 /**
  * Parses objects for hypermedia properties and generates links
@@ -34,16 +33,22 @@ export function marshal (obj, rel, item_collection, root, seen, links, server) {
 					const lkey = obj[i].toString();
 					let lcollection, uri;
 
-					if (isLinkable) {
-						lcollection = i.replace(trailing, EMPTY).replace(trailingS, EMPTY).replace(trailingY, IE) + S;
-						lrel = RELATED;
-					} else {
+					if (lid) {
 						lcollection = item_collection;
 						lrel = ITEM;
+					} else if (isLinkable) {
+						lcollection = i.replace(trailing, EMPTY).replace(trailingS, EMPTY).replace(trailingY, IE) + S;
+						lrel = RELATED;
 					}
 
-					if (scheme(lkey) === false) {
-						uri = `${lcollection[0] === SLASH ? EMPTY : SLASH}${lcollection.replace(/\s/g, ENCODED_SPACE)}/${lkey.replace(/\s/g, ENCODED_SPACE)}`;
+					if (!lkey.startsWith("http://") && !lkey.startsWith("https://") && !lkey.startsWith("ftp://") && !lkey.startsWith("://")) {
+						if (lid) {
+							// For ID-like keys, use collection + value
+							uri = `${lcollection[0] === SLASH ? EMPTY : SLASH}${lcollection.replace(/\s/g, ENCODED_SPACE)}/${lkey.replace(/\s/g, ENCODED_SPACE)}`;
+						} else {
+							// For URL/URI keys, use value directly (it already contains the collection)
+							uri = `${lkey[0] === SLASH ? EMPTY : SLASH}${lkey.replace(/\s/g, ENCODED_SPACE)}`;
+						}
 
 						if (uri !== root && seen.has(uri) === false) {
 							seen.add(uri);

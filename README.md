@@ -548,7 +548,7 @@ If the session `secret` is not provided, a version 4 UUID will be used.
 
 ## 🔒 Security
 
-Tenso uses [lusca](https://github.com/krakenjs/lusca#api) for security as middleware. Please see its documentation for how to configure it; each method & argument is a key:value pair for `security`.
+Tenso uses [helmet](https://helmetjs.github.io/) for security headers as middleware. Please see its documentation for how to configure it; each method & argument is a key:value pair for `security`.
 
 ```javascript
 {
@@ -882,7 +882,7 @@ const app = tenso({
 
 ## 📄 License
 
-Copyright (c) 2024 Jason Mulligan
+Copyright (c) 2025 Jason Mulligan
 
 Licensed under the **BSD-3-Clause** license.
 

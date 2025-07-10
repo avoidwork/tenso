@@ -54,7 +54,7 @@ export default [
 			"csv-stringify/sync",
 			"fast-xml-parser",
 			"tiny-jsonl",
-			"lusca",
+			"helmet",
 			"connect-redis",
 			"tiny-merge",
 			"express-prom-bundle"

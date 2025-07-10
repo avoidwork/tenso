@@ -42,6 +42,56 @@ import {
 	X_CSRF_TOKEN
 } from "./constants.js";
 
+/**
+ * Default configuration object for Tenso framework
+ * 
+ * This configuration object contains all the default settings for a Tenso server instance.
+ * It includes settings for authentication, security, logging, caching, middleware, and more.
+ * 
+ * @typedef {Object} TensoConfig
+ * @property {Object} auth - Authentication configuration
+ * @property {number} auth.delay - Authentication delay in milliseconds
+ * @property {Array<string>} auth.protect - Routes to protect with authentication
+ * @property {Array<string>} auth.unprotect - Routes to exclude from authentication
+ * @property {Object} auth.basic - Basic authentication settings
+ * @property {Object} auth.bearer - Bearer token authentication settings
+ * @property {Object} auth.jwt - JWT authentication settings
+ * @property {Object} auth.oauth2 - OAuth2 authentication settings
+ * @property {Object} auth.saml - SAML authentication settings
+ * @property {Object} auth.uri - Authentication URI endpoints
+ * @property {boolean} autoindex - Enable automatic directory indexing
+ * @property {number} cacheSize - Maximum number of items in cache
+ * @property {number} cacheTTL - Cache time-to-live in milliseconds
+ * @property {boolean} catchAll - Enable catch-all route handling
+ * @property {string} charset - Default character encoding
+ * @property {string} corsExpose - CORS exposed headers
+ * @property {Object} defaultHeaders - Default HTTP headers to include in responses
+ * @property {number} digit - Number of decimal places for numeric formatting
+ * @property {boolean} etags - Enable ETag generation
+ * @property {Array} exit - Exit handlers
+ * @property {string} host - Server host address
+ * @property {Object} hypermedia - Hypermedia/HATEOAS configuration
+ * @property {Array} index - Index route configuration
+ * @property {Object} initRoutes - Initial route definitions
+ * @property {number} jsonIndent - JSON response indentation level
+ * @property {Object} logging - Logging configuration
+ * @property {number} maxBytes - Maximum request body size in bytes
+ * @property {string} mimeType - Default MIME type for responses
+ * @property {Array<string>} origins - Allowed CORS origins
+ * @property {number} pageSize - Default pagination page size
+ * @property {number} port - Server port number
+ * @property {Object} prometheus - Prometheus metrics configuration
+ * @property {Object} rate - Rate limiting configuration
+ * @property {boolean} renderHeaders - Include headers in rendered output
+ * @property {boolean} time - Include timing information in responses
+ * @property {Object} security - Security-related settings (CSRF, CSP, etc.)
+ * @property {Object} session - Session management configuration
+ * @property {boolean} silent - Suppress console output
+ * @property {Object} ssl - SSL/TLS configuration
+ * @property {Object} webroot - Web root and static file serving configuration
+ * 
+ * @type {TensoConfig}
+ */
 export const config = {
 	auth: {
 		delay: INT_0,

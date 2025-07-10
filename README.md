@@ -4,8 +4,8 @@ _Lightweight HTTP REST API framework with built-in hypermedia support_
 
 [![npm version](https://badge.fury.io/js/tenso.svg)](https://badge.fury.io/js/tenso)
 [![Node.js Version](https://img.shields.io/node/v/tenso.svg)](https://nodejs.org/)
-[![License](https://img.shields.io/npm/l/tenso.svg)](https://github.com/avoidwork/tenso/blob/master/LICENSE)
-[![Build Status](https://travis-ci.org/avoidwork/tenso.svg?branch=master)](https://travis-ci.org/avoidwork/tenso)
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+[![Build Status](https://github.com/avoidwork/tenso/actions/workflows/ci.yml/badge.svg)](https://github.com/avoidwork/tenso/actions)
 
 ## 🚀 Features
 

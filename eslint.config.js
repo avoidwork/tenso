@@ -7,7 +7,8 @@ export default [
 			globals: {
 				...globals.node,
 				it: true,
-				describe: true
+				describe: true,
+				beforeEach: true
 			},
 			parserOptions: {
 				ecmaVersion: 2020

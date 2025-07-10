@@ -25,6 +25,15 @@ import {explode} from "../utils/explode.js";
 import {sanitize} from "../utils/sanitize.js";
 import {renderers} from "../utils/renderers.js";
 
+/**
+ * Renders data as HTML using template replacement
+ * Replaces template placeholders with actual values including headers, body, and metadata
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {*} arg - The data to render in the HTML template
+ * @param {string} [tpl=EMPTY] - The HTML template string with placeholders
+ * @returns {string} The rendered HTML string
+ */
 export function html (req, res, arg, tpl = EMPTY) {
 	const protocol = X_FORWARDED_PROTO in req.headers ? req.headers[X_FORWARDED_PROTO] + COLON : req.parsed.protocol,
 		headers = res.getHeaders();

@@ -6,6 +6,14 @@ const rateHeaders = [
 	X_RATELIMIT_RESET
 ];
 
+/**
+ * Rate limiting middleware that enforces request rate limits
+ * Tracks request rates and returns 429 status when limits are exceeded
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {Function} next - The next middleware function
+ * @returns {void}
+ */
 export function rate (req, res, next) {
 	const config = req.server.rate;
 

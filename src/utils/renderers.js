@@ -19,6 +19,11 @@ import {
 	HEADER_TEXT_PLAIN
 } from "../core/constants.js";
 
+/**
+ * Map of content types to their corresponding renderer functions
+ * Maps MIME types to functions that can render data in that format
+ * @type {Map<string, Function>}
+ */
 export const renderers = new Map([
 	[HEADER_APPLICATION_JSON, json],
 	[HEADER_APPLICATION_YAML, yaml],

@@ -1,6 +1,6 @@
 import {URL} from "url";
 import {keysort} from "keysort";
-import {collection as collectionPattern, trailingSlash} from "./regex";
+import {collection as collectionPattern, trailingSlash} from "./regex.js";
 import {
 	COLLECTION,
 	COMMA_SPACE,
@@ -28,6 +28,14 @@ import {
 } from "../core/constants.js";
 import {marshal} from "./marshal.js";
 
+/**
+ * Processes hypermedia links for responses including pagination and resource links
+ * Handles collection pagination, resource linking, and hypermedia header generation
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {Object} rep - The response representation object
+ * @returns {Object} The processed response with hypermedia links
+ */
 export function hypermedia (req, res, rep) {
 	const server = req.server,
 		headers = res.getHeaders(),
@@ -80,17 +88,17 @@ export function hypermedia (req, res, rep) {
 						links.push({uri: `${root.pathname}${root.search}`, rel: FIRST});
 					}
 
-					if (page - INT_1 > INT_1 && page <= nth) {
+					if (page > INT_1) {
 						root.searchParams.set(PAGE, page - INT_1);
 						links.push({uri: `${root.pathname}${root.search}`, rel: PREV});
 					}
 
-					if (page + INT_1 < nth) {
+					if (page < nth) {
 						root.searchParams.set(PAGE, page + INT_1);
 						links.push({uri: `${root.pathname}${root.search}`, rel: NEXT});
 					}
 
-					if (nth > INT_0 && page !== nth) {
+					if (nth > INT_0 && page !== nth && page + INT_1 < nth) {
 						root.searchParams.set(PAGE, nth);
 						links.push({uri: `${root.pathname}${root.search}`, rel: LAST});
 					}

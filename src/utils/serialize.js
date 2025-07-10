@@ -4,6 +4,14 @@ import {mimetype as regex} from "./regex.js";
 import {sort} from "./sort.js";
 import {CHARSET_UTF8, COMMA, EMPTY, FORMAT, HEADER_CONTENT_TYPE, INT_400, INT_500} from "../core/constants.js";
 
+/**
+ * Serializes response data based on content type negotiation
+ * Handles format selection, sorting, and error serialization
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {*} arg - The data to serialize
+ * @returns {*} The serialized data
+ */
 export function serialize (req, res, arg) {
 	const status = res.statusCode;
 	let format = req.server.mimeType,

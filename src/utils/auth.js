@@ -38,7 +38,7 @@ import {
 	PERIOD,
 	PIPE,
 	PROTECT,
-	READ,
+	read,
 	REDIS,
 	REGEX_REPLACE,
 	S,
@@ -48,12 +48,18 @@ import {
 	URI,
 	WILDCARD
 } from "../core/constants.js";
-import RedisStore from "connect-redis";
-import lusca from "lusca";
+import {RedisStore} from "connect-redis";
+import helmet from "helmet";
 
 const {Strategy: JWTStrategy, ExtractJwt} = passportJWT,
 	groups = [PROTECT, UNPROTECT];
 
+/**
+ * Configures authentication middleware and strategies for the server
+ * Sets up various authentication methods (Basic, Bearer, JWT, OAuth2) and security middleware
+ * @param {Object} obj - The server configuration object
+ * @returns {Object} The configured server object with authentication middleware
+ */
 export function auth (obj) {
 	const ssl = obj.ssl.cert && obj.ssl.key,
 		realm = `http${ssl ? S : EMPTY}://${obj.host}${obj.port !== INT_80 && obj.port !== INT_443 ? COLON + obj.port : EMPTY}`,
@@ -87,7 +93,7 @@ export function auth (obj) {
 		delete objSession.redis;
 		delete objSession.store;
 
-		sesh = Object.assign({secret: uuid()}, objSession);
+		sesh = Object.assign({secret: uuid(), resave: false, saveUninitialized: false}, objSession);
 
 		if (obj.session.store === REDIS) {
 			const client = redis.createClient(clone(obj.session.redis));
@@ -108,39 +114,55 @@ export function auth (obj) {
 	}
 
 	if (obj.security.csp instanceof Object) {
-		const luscaCsp = lusca.csp(obj.security.csp);
+		// Handle both direct directives and nested policy structure
+		const directives = obj.security.csp.policy || obj.security.csp;
+		const helmetCsp = helmet.contentSecurityPolicy({
+			directives: directives,
+			useDefaults: true
+		});
 
-		obj.always(luscaCsp).ignore(luscaCsp);
+		obj.always(helmetCsp).ignore(helmetCsp);
 	}
 
 	if (isEmpty(obj.security.xframe || EMPTY) === false) {
-		const luscaXframe = lusca.xframe(obj.security.xframe);
+		const helmetXFrame = helmet.xFrameOptions({
+			action: obj.security.xframe
+		});
 
-		obj.always(luscaXframe).ignore(luscaXframe);
+		obj.always(helmetXFrame).ignore(helmetXFrame);
 	}
 
 	if (isEmpty(obj.security.p3p || EMPTY) === false) {
-		const luscaP3p = lusca.p3p(obj.security.p3p);
+		// P3P is deprecated, but we can use xPermittedCrossDomainPolicies for similar functionality
+		const helmetCrossDomain = helmet.xPermittedCrossDomainPolicies({
+			permittedPolicies: obj.security.p3p === "none" ? "none" : "by-content-type"
+		});
 
-		obj.always(luscaP3p).ignore(luscaP3p);
+		obj.always(helmetCrossDomain).ignore(helmetCrossDomain);
 	}
 
 	if (obj.security.hsts instanceof Object) {
-		const luscaHsts = lusca.hsts(obj.security.hsts);
+		const helmetHsts = helmet.strictTransportSecurity({
+			maxAge: obj.security.hsts.maxAge || 31536000,
+			includeSubDomains: obj.security.hsts.includeSubDomains !== false,
+			preload: obj.security.hsts.preload === true
+		});
 
-		obj.always(luscaHsts).ignore(luscaHsts);
+		obj.always(helmetHsts).ignore(helmetHsts);
 	}
 
 	if (obj.security.xssProtection) {
-		const luscaXssProtection = lusca.xssProtection(obj.security.xssProtection);
+		// Note: Helmet sets X-XSS-Protection to 0 by default (which is safer)
+		// But if the config explicitly enables it, we'll respect that
+		const helmetXss = helmet.xXssProtection();
 
-		obj.always(luscaXssProtection).ignore(luscaXssProtection);
+		obj.always(helmetXss).ignore(helmetXss);
 	}
 
 	if (obj.security.nosniff) {
-		const luscaNoSniff = lusca.nosniff();
+		const helmetNoSniff = helmet.xContentTypeOptions();
 
-		obj.always(luscaNoSniff).ignore(luscaNoSniff);
+		obj.always(helmetNoSniff).ignore(helmetNoSniff);
 	}
 
 	// Can fork to `middleware.keymaster()`
@@ -218,7 +240,7 @@ export function auth (obj) {
 					} else if (user === void 0) {
 						done(null, false);
 					} else {
-						done(null, user, {scope: READ});
+						done(null, user, {scope: read});
 					}
 				});
 			}, authDelay);

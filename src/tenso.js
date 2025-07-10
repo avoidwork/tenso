@@ -63,7 +63,16 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const require = createRequire(import.meta.url);
 const {name, version} = require(join(__dirname, "..", "package.json"));
 
+/**
+ * Tenso web framework class that extends Woodland
+ * @class Tenso
+ * @extends {Woodland}
+ */
 class Tenso extends Woodland {
+	/**
+	 * Creates an instance of Tenso
+	 * @param {Object} [config=defaultConfig] - Configuration object for the Tenso instance
+	 */
 	constructor (config = defaultConfig) {
 		super(config);
 
@@ -81,10 +90,21 @@ class Tenso extends Woodland {
 		this.version = config.version;
 	}
 
+	/**
+	 * Checks if a given HTTP method can modify data
+	 * @param {string} arg - HTTP method to check
+	 * @returns {boolean} True if the method can modify data, false otherwise
+	 */
 	canModify (arg) {
 		return arg.includes(DELETE) || hasBody(arg);
 	}
 
+	/**
+	 * Handles connection setup for incoming requests
+	 * @param {Object} req - Request object
+	 * @param {Object} res - Response object
+	 * @returns {void}
+	 */
 	connect (req, res) {
 		req.csrf = this.canModify(req.method) === false && this.canModify(req.allow) && this.security.csrf === true;
 		req.hypermedia = this.hypermedia.enabled;
@@ -104,14 +124,32 @@ class Tenso extends Woodland {
 		}
 	}
 
+	/**
+	 * Creates an EventSource instance
+	 * @param {...any} args - Arguments to pass to the eventsource function
+	 * @returns {*} Result of the eventsource function
+	 */
 	eventsource (...args) {
 		return eventsource(...args);
 	}
 
+	/**
+	 * Final processing step in the request pipeline
+	 * @param {Object} req - Request object
+	 * @param {Object} res - Response object
+	 * @param {*} arg - Data to be processed
+	 * @returns {*} The processed data
+	 */
 	final (req, res, arg) {
 		return arg;
 	}
 
+	/**
+	 * Handles response headers, particularly caching headers
+	 * @param {Object} req - Request object
+	 * @param {Object} res - Response object
+	 * @returns {void}
+	 */
 	headers (req, res) {
 		const key = CACHE_CONTROL,
 			cache = res.getHeader(key) || EMPTY;
@@ -124,6 +162,10 @@ class Tenso extends Woodland {
 		}
 	}
 
+	/**
+	 * Initializes the Tenso server with middleware, routes, and configuration
+	 * @returns {Tenso} The Tenso instance for method chaining
+	 */
 	init () {
 		const authorization = Object.keys(this.auth).filter(i => this.auth?.[i]?.enabled === true).length > INT_0 || this.rate.enabled || this.security.csrf;
 
@@ -147,13 +189,22 @@ class Tenso extends Woodland {
 
 		// Prometheus metrics
 		if (this.prometheus.enabled) {
-			const middleware = prometheus(this.prometheus.metrics);
+			const metricsHandler = prometheus(this.prometheus.metrics);
+			const middleware = metricsHandler;
 
 			this.log(`type=init, message"${MSG_PROMETHEUS_ENABLED}"`);
 			this.always(middleware).ignore(middleware);
 
-			// Registering a route for middleware response to be served
-			this.get(METRICS_PATH, EMPTY);
+			// Registering a route for metrics endpoint
+			this.get(METRICS_PATH, (req, res) => {
+				res.setHeader('Content-Type', metricsHandler.register.contentType);
+				metricsHandler.register.metrics().then(metrics => {
+					res.end(metrics);
+				}).catch(err => {
+					res.statusCode = 500;
+					res.end(`Error collecting metrics: ${err.message}`);
+				});
+			});
 
 			// Hooking events that might bypass middleware
 			this.on(ERROR, (req, res) => {
@@ -200,12 +251,24 @@ class Tenso extends Woodland {
 		return this;
 	}
 
+	/**
+	 * Registers a parser for a specific media type
+	 * @param {string} [mediatype=EMPTY] - The media type to register the parser for
+	 * @param {Function} [fn=arg => arg] - The parser function
+	 * @returns {Tenso} The Tenso instance for method chaining
+	 */
 	parser (mediatype = EMPTY, fn = arg => arg) {
 		this.parsers.set(mediatype, fn);
 
 		return this;
 	}
 
+	/**
+	 * Handles rate limiting for incoming requests
+	 * @param {Object} req - Request object
+	 * @param {Function} fn - Optional function to modify rate limit state
+	 * @returns {Array} Array containing [valid, limit, remaining, reset]
+	 */
 	rateLimit (req, fn) {
 		const reqId = req.sessionID || req.ip;
 		let valid = true,
@@ -243,6 +306,13 @@ class Tenso extends Woodland {
 		return [valid, limit, remaining, reset];
 	}
 
+	/**
+	 * Renders the response based on the accepted content type
+	 * @param {Object} req - Request object
+	 * @param {Object} res - Response object
+	 * @param {*} arg - Data to be rendered
+	 * @returns {*} The rendered response
+	 */
 	render (req, res, arg) {
 		if (arg === null) {
 			arg = NULL;
@@ -272,18 +342,34 @@ class Tenso extends Woodland {
 		return result;
 	}
 
+	/**
+	 * Registers a renderer for a specific media type
+	 * @param {string} mediatype - The media type to register the renderer for
+	 * @param {Function} fn - The renderer function
+	 * @returns {Tenso} The Tenso instance for method chaining
+	 */
 	renderer (mediatype, fn) {
 		this.renderers.set(mediatype, fn);
 
 		return this;
 	}
 
+	/**
+	 * Registers a serializer for a specific media type
+	 * @param {string} mediatype - The media type to register the serializer for
+	 * @param {Function} fn - The serializer function
+	 * @returns {Tenso} The Tenso instance for method chaining
+	 */
 	serializer (mediatype, fn) {
 		this.serializers.set(mediatype, fn);
 
 		return this;
 	}
 
+	/**
+	 * Sets up signal handlers for graceful server shutdown
+	 * @returns {Tenso} The Tenso instance for method chaining
+	 */
 	signals () {
 		for (const signal of [SIGHUP, SIGINT, SIGTERM]) {
 			process.on(signal, () => {
@@ -295,6 +381,10 @@ class Tenso extends Woodland {
 		return this;
 	}
 
+	/**
+	 * Starts the HTTP or HTTPS server
+	 * @returns {Tenso} The Tenso instance for method chaining
+	 */
 	start () {
 		if (this.server === null) {
 			if (this.ssl.cert === null && this.ssl.pfx === null && this.ssl.key === null) {
@@ -315,6 +405,10 @@ class Tenso extends Woodland {
 		return this;
 	}
 
+	/**
+	 * Stops the server
+	 * @returns {Tenso} The Tenso instance for method chaining
+	 */
 	stop () {
 		if (this.server !== null) {
 			this.server.close();
@@ -326,6 +420,11 @@ class Tenso extends Woodland {
 	}
 }
 
+/**
+ * Factory function that creates and initializes a Tenso server instance
+ * @param {Object} [userConfig={}] - User configuration object to override defaults
+ * @returns {Tenso} An initialized Tenso server instance
+ */
 export function tenso (userConfig = {}) {
 	const config = merge(clone(defaultConfig), userConfig);
 

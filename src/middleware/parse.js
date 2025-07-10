@@ -13,7 +13,7 @@ export function parse (req, res, next) {
 		exception;
 
 	if (req.body !== EMPTY) {
-		const type = req.headers?.[HEADER_CONTENT_TYPE]?.replace(/\s.*$/, EMPTY) ?? EMPTY;
+		const type = req.headers?.[HEADER_CONTENT_TYPE]?.replace(/;?\s.*$/, EMPTY) ?? EMPTY;
 		const parsers = req.server.parsers;
 
 		if (type.length > INT_0 && parsers.has(type)) {

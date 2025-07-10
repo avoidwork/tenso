@@ -1,80 +1,119 @@
-import { TensoRequest, TensoResponse, MiddlewareFunction } from './tenso';
+import { TensoRequest, TensoResponse, MiddlewareFunction } from './core.js';
 
 /**
- * Middleware that sets the async protection flag on the request object
+ * Prometheus metrics configuration for middleware
  */
-export declare function asyncFlag(req: TensoRequest, res: TensoResponse, next: (error?: any) => void): void;
-
-/**
- * Middleware that determines if request should bypass protection based on CORS/OPTIONS or auth patterns
- */
-export declare function bypass(req: TensoRequest, res: TensoResponse, next: (error?: any) => void): void;
-
-/**
- * CSRF protection middleware wrapper using csrf-csrf
- * Memoizes the CSRF function for performance and handles unprotected requests
- */
-export declare function csrfWrapper(req: TensoRequest, res: TensoResponse, next: (error?: any) => void): void;
-
-/**
- * Middleware that terminates the request if the URL matches configured exit patterns
- */
-export declare function exit(req: TensoRequest, res: TensoResponse, next: (error?: any) => void): void;
-
-/**
- * Authentication guard middleware that protects routes requiring authentication
- * Allows access to login URL or for authenticated users, otherwise returns 401
- */
-export declare function guard(req: TensoRequest, res: TensoResponse, next: (error?: any) => void): void;
-
-/**
- * Request body parsing middleware that uses registered parsers based on content type
- * Attempts to parse the request body and handles parsing errors
- */
-export declare function parse(req: TensoRequest, res: TensoResponse, next: (error?: any) => void): void;
-
-/**
- * Request payload collection middleware that handles request body data
- * Collects request body data for non-multipart requests and enforces size limits
- */
-export declare function payload(req: TensoRequest, res: TensoResponse, next: (error?: any) => void): void;
-
-/**
- * Prometheus metrics configuration interface
- */
-export interface PrometheusMetricsConfig {
-  includeMethod: boolean;
-  includePath: boolean;
-  includeStatusCode: boolean;
-  includeUp: boolean;
-  buckets: number[];
-  customLabels: Record<string, any>;
+export interface PrometheusMiddlewareConfig {
+  /** Include HTTP method in metrics */
+  includeMethod?: boolean;
+  /** Include request path in metrics */
+  includePath?: boolean;
+  /** Include status code in metrics */
+  includeStatusCode?: boolean;
+  /** Include default metrics */
+  includeUp?: boolean;
+  /** Histogram buckets for request duration */
+  buckets?: number[];
+  /** Custom labels to add to metrics */
+  customLabels?: Record<string, string>;
 }
 
 /**
- * Prometheus metrics middleware
- * Creates histogram and counter metrics for HTTP requests
+ * Prometheus middleware function with register property
  */
-export declare function prometheus(config: PrometheusMetricsConfig): MiddlewareFunction & {
+export interface PrometheusMiddleware extends MiddlewareFunction {
+  /** Prometheus metrics registry */
   register: {
+    /** Content type for metrics endpoint */
     contentType: string;
+    /** Get metrics as a promise */
     metrics(): Promise<string>;
   };
-};
+}
 
 /**
- * Rate limiting middleware that enforces request rate limits
- * Tracks request rates and returns 429 status when limits are exceeded
+ * Middleware that sets async protection flag
+ * @param req - The HTTP request object
+ * @param res - The HTTP response object
+ * @param next - The next middleware function
  */
-export declare function rate(req: TensoRequest, res: TensoResponse, next: (error?: any) => void): void;
+export declare function asyncFlag(req: TensoRequest, res: TensoResponse, next: (err?: any) => void): void;
 
 /**
- * Authentication redirect middleware that redirects to the configured auth redirect URI
+ * Middleware that allows bypassing certain request processing
+ * @param req - The HTTP request object
+ * @param res - The HTTP response object
+ * @param next - The next middleware function
  */
-export declare function redirect(req: TensoRequest, res: TensoResponse): void;
+export declare function bypass(req: TensoRequest, res: TensoResponse, next: (err?: any) => void): void;
 
 /**
- * Main protection middleware that coordinates authentication and rate limiting
- * Determines if a request should be protected based on auth patterns and handles rate limiting
+ * Middleware for CSRF protection
+ * @param req - The HTTP request object
+ * @param res - The HTTP response object
+ * @param next - The next middleware function
  */
-export declare function zuul(req: TensoRequest, res: TensoResponse, next: (error?: any) => void): void; 
+export declare function csrf(req: TensoRequest, res: TensoResponse, next: (err?: any) => void): void;
+
+/**
+ * Middleware that terminates the request if the URL matches configured exit patterns
+ * @param req - The HTTP request object
+ * @param res - The HTTP response object
+ * @param next - The next middleware function
+ */
+export declare function exit(req: TensoRequest, res: TensoResponse, next: (err?: any) => void): void;
+
+/**
+ * Middleware for request guarding and validation
+ * @param req - The HTTP request object
+ * @param res - The HTTP response object
+ * @param next - The next middleware function
+ */
+export declare function guard(req: TensoRequest, res: TensoResponse, next: (err?: any) => void): void;
+
+/**
+ * Middleware for parsing request bodies
+ * @param req - The HTTP request object
+ * @param res - The HTTP response object
+ * @param next - The next middleware function
+ */
+export declare function parse(req: TensoRequest, res: TensoResponse, next: (err?: any) => void): void;
+
+/**
+ * Middleware for handling request payload
+ * @param req - The HTTP request object
+ * @param res - The HTTP response object
+ * @param next - The next middleware function
+ */
+export declare function payload(req: TensoRequest, res: TensoResponse, next: (err?: any) => void): void;
+
+/**
+ * Creates Prometheus metrics middleware
+ * @param config - Prometheus configuration
+ * @returns Prometheus middleware function with metrics registry
+ */
+export declare function prometheus(config: PrometheusMiddlewareConfig): PrometheusMiddleware;
+
+/**
+ * Middleware for rate limiting
+ * @param req - The HTTP request object
+ * @param res - The HTTP response object
+ * @param next - The next middleware function
+ */
+export declare function rate(req: TensoRequest, res: TensoResponse, next: (err?: any) => void): void;
+
+/**
+ * Middleware for handling redirects
+ * @param req - The HTTP request object
+ * @param res - The HTTP response object
+ * @param next - The next middleware function
+ */
+export declare function redirect(req: TensoRequest, res: TensoResponse, next: (err?: any) => void): void;
+
+/**
+ * Middleware for API gateway functionality (Zuul)
+ * @param req - The HTTP request object
+ * @param res - The HTTP response object
+ * @param next - The next middleware function
+ */
+export declare function zuul(req: TensoRequest, res: TensoResponse, next: (err?: any) => void): void; 

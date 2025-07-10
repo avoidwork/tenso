@@ -1,36 +1,27 @@
-/**
- * Custom serializer that creates a structured response object with metadata
- * Returns an object containing data, error, links, and status fields
- * @param arg - The data to serialize
- * @param err - The error object or message, null if no error
- * @param status - HTTP status code
- * @param stack - Whether to include error stack trace
- * @returns Structured response object with data, error, links, and status
- */
-export declare function custom(
-  arg: any,
-  err: Error | string | null,
-  status?: number,
-  stack?: boolean
-): {
-  data: any;
-  error: string | null;
-  links: any[];
-  status: number;
-};
+import { TensoRequest, TensoResponse, SerializerFunction } from './core.js';
 
 /**
- * Plain serializer that returns data directly or error information
- * Returns the original data if no error, otherwise returns error message or stack trace
- * @param arg - The data to serialize
- * @param err - The error object or message, null if no error
- * @param status - HTTP status code (used for fallback error message)
- * @param stack - Whether to return error stack trace instead of message
- * @returns The original data or error information
+ * Custom serializer that handles complex data types and transformations
+ * Provides advanced serialization logic for various data formats
+ * @param req - The HTTP request object
+ * @param res - The HTTP response object
+ * @param data - The data to serialize
+ * @returns The serialized data
  */
-export declare function plain(
-  arg: any,
-  err: Error | string | null,
-  status?: number,
-  stack?: boolean
-): any; 
+export declare function custom(req: TensoRequest, res: TensoResponse, data: any): any;
+
+/**
+ * Plain serializer that performs minimal transformation
+ * Passes data through with basic string conversion if needed
+ * @param req - The HTTP request object
+ * @param res - The HTTP response object
+ * @param data - The data to serialize
+ * @returns The serialized data (typically unchanged)
+ */
+export declare function plain(req: TensoRequest, res: TensoResponse, data: any): any;
+
+/**
+ * Map of content types to their corresponding serializer functions
+ * Maps MIME types to functions that can serialize data for that format
+ */
+export declare const serializers: Map<string, SerializerFunction>; 

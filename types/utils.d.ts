@@ -1,147 +1,171 @@
-import { TensoRequest, TensoResponse, Tenso } from './tenso';
+import { TensoRequest, TensoResponse, ParserFunction, RendererFunction, SerializerFunction } from './core.js';
 
 /**
- * Authentication setup function that configures auth middleware for a Tenso instance
+ * Handles authentication logic for the Tenso server
+ * Sets up authentication middleware and routes
+ * @param server - The Tenso server instance
  */
-export declare function auth(obj: Tenso): Tenso;
+export declare function auth(server: any): void;
 
 /**
- * Capitalizes the first letter of a string or each word in a delimited string
+ * Capitalizes the first letter of a string
+ * @param input - The string to capitalize
+ * @returns The capitalized string
  */
-export declare function capitalize(obj: string, e?: boolean, delimiter?: string): string;
+export declare function capitalize(input: string): string;
 
 /**
- * Splits an array into chunks of specified size
+ * Splits data into chunks of specified size
+ * @param data - The data to chunk
+ * @param size - The chunk size
+ * @returns Array of chunks
  */
-export declare function chunk<T>(arg?: T[], size?: number): T[][];
+export declare function chunk<T>(data: T[], size: number): T[][];
 
 /**
- * Deep clones an object using JSON serialization/deserialization
+ * Creates a deep clone of an object
+ * @param obj - The object to clone
+ * @returns Deep copy of the object
  */
-export declare const clone: <T>(arg: T) => T;
+export declare function clone<T>(obj: T): T;
 
 /**
- * Executes a function after a random delay or immediately if no delay is specified
+ * Creates a delay/timeout
+ * @param ms - Milliseconds to delay
+ * @returns Promise that resolves after the specified delay
  */
-export declare function delay(fn?: () => void, n?: number): void;
+export declare function delay(ms: number): Promise<void>;
 
 /**
- * Checks if an object with a length or size property is empty
+ * Checks if a value is empty (null, undefined, empty string, empty array, etc.)
+ * @param value - The value to check
+ * @returns True if the value is considered empty
  */
-export declare function empty(obj: { length?: number; size?: number }): boolean;
+export declare function empty(value: any): boolean;
 
 /**
- * Splits a string by delimiter and trims whitespace around each piece
+ * Splits a string into an array based on delimiters
+ * @param input - The string to explode
+ * @param delimiter - The delimiter to split on
+ * @returns Array of string parts
  */
-export declare function explode(arg?: string, delimiter?: string): string[];
+export declare function explode(input: string, delimiter?: string): string[];
 
 /**
  * Checks if an HTTP method typically has a request body
+ * @param method - The HTTP method to check
+ * @returns True if the method typically has a body
  */
-export declare function hasBody(arg: string): boolean;
+export declare function hasBody(method: string): boolean;
 
 /**
- * Checks if an HTTP method is a read-only operation
+ * Checks if a request has been read/processed
+ * @param req - The request object to check
+ * @returns True if the request has been read
  */
-export declare function hasRead(arg: string): boolean;
+export declare function hasRead(req: TensoRequest): boolean;
 
 /**
- * Hypermedia link interface
+ * Adds hypermedia/HATEOAS links to response data
+ * @param req - The HTTP request object
+ * @param res - The HTTP response object
+ * @param data - The response data to enhance with hypermedia
+ * @returns Enhanced data with hypermedia links
  */
-export interface HypermediaLink {
-  uri: string;
-  rel: string;
-}
+export declare function hypermedia(req: TensoRequest, res: TensoResponse, data: any): any;
 
 /**
- * Processes hypermedia links for responses including pagination and resource links
- * Handles collection pagination, resource linking, and hypermedia header generation
+ * Generates a unique identifier
+ * @param prefix - Optional prefix for the ID
+ * @returns Unique identifier string
  */
-export declare function hypermedia(req: TensoRequest, res: TensoResponse, rep: any): any;
+export declare function id(prefix?: string): string;
 
 /**
- * Checks if a string matches common ID patterns
+ * Determines the appropriate indentation level for formatted output
+ * @param accept - Accept header value
+ * @param defaultIndent - Default indentation level
+ * @returns Indentation level
  */
-export declare function id(arg?: string): boolean;
+export declare function indent(accept: string, defaultIndent: number): number;
 
 /**
- * Extracts indentation value from a string or returns fallback
- * Looks for "indent=number" pattern in the input string
+ * Checks if a value is empty using strict criteria
+ * @param value - The value to check
+ * @returns True if the value is empty
  */
-export declare function indent(arg?: string, fallback?: number): number;
+export declare function isEmpty(value: any): boolean;
 
 /**
- * Checks if a value is an empty string
+ * Marshals data for transmission
+ * @param req - The HTTP request object
+ * @param res - The HTTP response object
+ * @param data - The data to marshal
+ * @returns Marshaled data
  */
-export declare function isEmpty(arg?: any): boolean;
-
-/**
- * Parses objects for hypermedia properties and generates links
- * Identifies ID-like and linkable properties to create hypermedia links
- */
-export declare function marshal(
-  obj: any,
-  rel: string,
-  item_collection: string,
-  root: string,
-  seen: Set<string>,
-  links: HypermediaLink[],
-  server: Tenso
-): any | null;
+export declare function marshal(req: TensoRequest, res: TensoResponse, data: any): any;
 
 /**
  * Map of content types to their corresponding parser functions
- * Maps MIME types to functions that can parse request bodies of that type
  */
-export declare const parsers: Map<string, (body: string) => any>;
+export declare const parsers: Map<string, ParserFunction>;
 
 /**
- * Generates a random integer between 1 and n (inclusive)
+ * Generates a random value
+ * @param max - Maximum value (exclusive)
+ * @param min - Minimum value (inclusive)
+ * @returns Random number
  */
-export declare function random(n?: number): number;
+export declare function random(max?: number, min?: number): number;
 
 /**
- * Regular expression patterns used throughout the framework
+ * Regular expressions used throughout the framework
  */
-export declare const bodySplit: RegExp;
-export declare const collection: RegExp;
-export declare const hypermedia: RegExp;
-export declare const mimetype: RegExp;
-export declare const trailing: RegExp;
-export declare const trailingS: RegExp;
-export declare const trailingSlash: RegExp;
-export declare const trailingY: RegExp;
+export declare const regex: {
+  /** MIME type regex */
+  mimetype: RegExp;
+  /** Other common patterns */
+  [key: string]: RegExp;
+};
 
 /**
  * Map of content types to their corresponding renderer functions
- * Maps MIME types to functions that can render data in that format
  */
-export declare const renderers: Map<string, (req: TensoRequest, res: TensoResponse, data: any, template?: string) => string>;
+export declare const renderers: Map<string, RendererFunction>;
 
 /**
- * Sanitizes HTML by escaping < and > characters
+ * Sanitizes input data for safe processing
+ * @param input - The input to sanitize
+ * @returns Sanitized input
  */
-export declare function sanitize(arg: any): any;
+export declare function sanitize(input: string): string;
 
 /**
- * Checks if a string contains a URI scheme indicator
+ * Determines the URL scheme (http/https) based on request
+ * @param req - The HTTP request object
+ * @returns URL scheme string
  */
-export declare function scheme(arg?: string): boolean;
+export declare function scheme(req: TensoRequest): string;
 
 /**
- * Serializes response data based on content type negotiation
- * Handles format selection, sorting, and error serialization
+ * Serializes data for response
+ * @param req - The HTTP request object
+ * @param res - The HTTP response object
+ * @param data - The data to serialize
+ * @returns Serialized data
  */
-export declare function serialize(req: TensoRequest, res: TensoResponse, arg: any): any;
+export declare function serialize(req: TensoRequest, res: TensoResponse, data: any): any;
 
 /**
  * Map of content types to their corresponding serializer functions
- * Maps MIME types to functions that can serialize data for that format
  */
-export declare const serializers: Map<string, (data: any, error: Error | string | null, status?: number, stack?: boolean) => any>;
+export declare const serializers: Map<string, SerializerFunction>;
 
 /**
- * Sorts an array based on query parameters in the request
- * Supports ordering by object keys and reverse ordering
+ * Sorts an array or object based on specified criteria
+ * @param data - The data to sort
+ * @param sortBy - The field or criteria to sort by
+ * @param direction - Sort direction ('asc' or 'desc')
+ * @returns Sorted data
  */
-export declare function sort<T>(arg: T, req: TensoRequest): T; 
+export declare function sort<T>(data: T[], sortBy?: string | ((item: T) => any), direction?: 'asc' | 'desc'): T[]; 

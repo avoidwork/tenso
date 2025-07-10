@@ -38,7 +38,7 @@ import {
 	PERIOD,
 	PIPE,
 	PROTECT,
-	READ,
+	read,
 	REDIS,
 	REGEX_REPLACE,
 	S,
@@ -48,7 +48,7 @@ import {
 	URI,
 	WILDCARD
 } from "../core/constants.js";
-import RedisStore from "connect-redis";
+import {RedisStore} from "connect-redis";
 import lusca from "lusca";
 
 const {Strategy: JWTStrategy, ExtractJwt} = passportJWT,
@@ -224,7 +224,7 @@ export function auth (obj) {
 					} else if (user === void 0) {
 						done(null, false);
 					} else {
-						done(null, user, {scope: READ});
+						done(null, user, {scope: read});
 					}
 				});
 			}, authDelay);

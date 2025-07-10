@@ -1,51 +1,45 @@
 /**
  * tenso
  *
- * @copyright 2024 Jason Mulligan <jason.mulligan@avoidwork.com>
+ * @copyright 2025 Jason Mulligan <jason.mulligan@avoidwork.com>
  * @license BSD-3-Clause
- * @version 17.2.4
+ * @version 17.2.5
  */
-import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import {merge}from'tiny-merge';import {eventsource}from'tiny-eventsource';import {parse as parse$1,stringify as stringify$1}from'tiny-jsonl';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {keysort}from'keysort';import {URL}from'url';import promBundle from'express-prom-bundle';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import passportJWT from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-oauth2';import lusca from'lusca';import {randomInt,randomUUID}from'node:crypto';import RedisStore from'connect-redis';const ACCESS_CONTROL = "access-control";
-const ALGORITHMS = "algorithms";
-const ALLOW = "allow";
-const AUDIENCE = "audience";
-const AUTH = "auth";
-const AUTO = "auto";
-const BASIC = "basic";
-const BEARER = "Bearer";
-const BOOLEAN = "boolean";
-const CACHE_CONTROL = "cache-control";
-const CALLBACK = "callback";
-const CHARSET_UTF8 = "; charset=utf-8";
-const COLLECTION = "collection";
-const COLON = ":";
-const COMMA = ",";
-const COMMA_SPACE$1 = ", ";
+import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import {merge}from'tiny-merge';import {eventsource}from'tiny-eventsource';import {parse as parse$1,stringify as stringify$1}from'tiny-jsonl';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {keysort}from'keysort';import {URL}from'url';import promClient from'prom-client';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import passportJWT from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-oauth2';import lusca from'lusca';import {randomInt,randomUUID}from'node:crypto';import {RedisStore}from'connect-redis';// =============================================================================
+// HTTP METHODS
+// =============================================================================
+
 const CONNECT = "connect";
-const COOKIE_NAME = "tenso.sid";
-const DATA = "data";
-const DEBUG = "debug";
+const DELETE = "DELETE";
+const GET = "GET";
+const OPTIONS = "OPTIONS";
+const PATCH = "PATCH";
+const POST = "POST";
+const PUT = "PUT";
+
+// =============================================================================
+// HTTP STATUS CODES
+// =============================================================================
+
+const INT_200 = 2e2;
+const INT_204 = 204;
+const INT_206 = 206;
+const INT_300000 = 3e5;
+const INT_304 = 304;
+const INT_400 = 4e2;
+const INT_401 = 401;
+const INT_413 = 413;
+const INT_429 = 429;
+const INT_450 = 450;
+const INT_500 = 5e2;
+
+// =============================================================================
+// CONTENT TYPES & HEADERS
+// =============================================================================
+
 const DEFAULT_CONTENT_TYPE = "application/json; charset=utf-8";
 const DEFAULT_VARY = "accept, accept-encoding, accept-language, origin";
-const DELETE = "DELETE";
-const DESC = "desc";
-const DOUBLE_SLASH = "//";
-const EMPTY = "";
-const ENCODED_SPACE = "%20";
-const END = "end";
-const EQ = "=";
-const ERROR = "error";
-const EXPOSE = "expose";
-const EXPOSE_HEADERS = "cache-control, content-language, content-type, expires, last-modified, pragma";
-const FALSE = "false";
-const FIRST = "first";
-const FORMAT = "format";
-const FUNCTION = "function";
-const G = "g";
-const GET = "GET";
-const GT = "&gt;";
-const HEADERS = "headers";
-const HEADER_ALLOW_GET = "GET, HEAD, OPTIONS";
+
 const HEADER_APPLICATION_JAVASCRIPT = "application/javascript";
 const HEADER_APPLICATION_JSON = "application/json";
 const HEADER_APPLICATION_JSONL = "application/jsonl";
@@ -53,100 +47,74 @@ const HEADER_APPLICATION_JSON_LINES = "application/json-lines";
 const HEADER_APPLICATION_XML = "application/xml";
 const HEADER_APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
 const HEADER_APPLICATION_YAML = "application/yaml";
-const HEADER_CONTENT_DISPOSITION = "content-disposition";
-const HEADER_CONTENT_DISPOSITION_VALUE = "attachment; filename=\"download.csv\"";
-const HEADER_CONTENT_TYPE = "content-type";
-const HEADER_SPLIT = "\" <";
 const HEADER_TEXT_CSV = "text/csv";
 const HEADER_TEXT_HTML = "text/html";
 const HEADER_TEXT_JSON_LINES = "text/json-lines";
 const HEADER_TEXT_PLAIN = "text/plain";
+
+const HEADER_ALLOW_GET = "GET, HEAD, OPTIONS";
+const HEADER_CONTENT_DISPOSITION = "content-disposition";
+const HEADER_CONTENT_DISPOSITION_VALUE = "attachment; filename=\"download.csv\"";
+const HEADER_CONTENT_TYPE = "content-type";
+const HEADER_SPLIT = "\" <";
 const HEADER_VARY = "vary";
+
+const CACHE_CONTROL = "cache-control";
+const CHARSET_UTF8 = "; charset=utf-8";
+const EXPOSE_HEADERS = "cache-control, content-language, content-type, expires, last-modified, pragma";
+const RETRY_AFTER = "retry-after";
+const X_CSRF_TOKEN = "x-csrf-token";
+const X_FORWARDED_PROTO = "x-forwarded-proto";
+const X_POWERED_BY = "x-powered-by";
+const X_RATELIMIT_LIMIT = "x-ratelimit-limit";
+const X_RATELIMIT_REMAINING = "x-ratelimit-remaining";
+const X_RATELIMIT_RESET = "x-ratelimit-reset";
+
+// =============================================================================
+// AUTHENTICATION & AUTHORIZATION
+// =============================================================================
+
+const ACCESS_CONTROL = "access-control";
+const ALGORITHMS = "algorithms";
+const ALLOW = "allow";
+const AUDIENCE = "audience";
+const AUTH = "auth";
+const BASIC = "basic";
+const BEARER = "Bearer";
+const COOKIE_NAME = "tenso.sid";
+const EXPOSE = "expose";
+const ISSUER = "issuer";
+const JWT = "jwt";
+const OAUTH2 = "oauth2";
+const PRIVATE = "private";
+const PROTECT = "protect";
+const read = "read";
+const SAMEORIGIN = "SAMEORIGIN";
+const SESSION_SECRET = "tensoABC";
+const UNPROTECT = "unprotect";
+
+// JWT Algorithms
 const HS256 = "HS256";
 const HS384 = "HS384";
 const HS512 = "HS512";
-const HTML = "html";
-const HYPHEN = "-";
-const I = "i";
-const ID = "id";
-const IDENT_VAR = "indent=";
-const ID_2 = "_id";
-const IE = "ie";
-const INT_0 = 0;
-const INT_1 = 1;
-const INT_10 = 10;
-const INT_100 = 1e2;
-const INT_1000 = 1e3;
-const INT_2 = 2;
-const INT_200 = 2e2;
-const INT_204 = 204;
-const INT_206 = 206;
-const INT_3 = 3;
-const INT_300000 = 3e5;
-const INT_304 = 304;
-const INT_400 = 4e2;
-const INT_401 = 401;
-const INT_413 = 413;
-const INT_429 = 429;
-const INT_443 = 443;
-const INT_450 = 450;
-const INT_5 = 5;
-const INT_500 = 5e2;
-const INT_6379 = 6379;
-const INT_80 = 80;
-const INT_8000 = 8e3;
-const INT_900 = 9e2;
-const INT_NEG_1 = -1;
-const INVALID_CONFIGURATION = "Invalid configuration";
+
+// =============================================================================
+// URLS & PATHS
+// =============================================================================
+
 const IP_0000 = "0.0.0.0";
 const IP_127001 = "127.0.0.1";
-const ISSUER = "issuer";
-const ITEM = "item";
-const JWT = "jwt";
-const LAST = "last";
-const LT = "&lt;";
-const LINK = "link";
-const LOG_FORMAT = "%h %l %u %t \"%r\" %>s %b";
-const MEMORY = "memory";
-const METRICS_PATH = "/metrics";
-const MSG_LOGIN = "POST 'username' & 'password' to authenticate";
-const MSG_PROMETHEUS_ENABLED = "Prometheus metrics enabled";
-const MSG_TOO_MANY_REQUESTS = "Too many requests";
-const MULTIPART = "multipart";
-const NEXT = "next";
-const NL = "\n";
-const NULL = "null";
-const NUMBER = "number";
-const OAUTH2 = "oauth2";
-const OPTIONS = "OPTIONS";
-const ORDER_BY = "order_by";
-const PAGE = "page";
-const PAGE_SIZE = "page_size";
-const PATCH = "PATCH";
+const URL_127001 = "http://127.0.0.1";
+const URL_AUTH_LOGIN = "/auth/login";
+const URL_AUTH_LOGOUT = "/auth/logout";
+const URL_AUTH_ROOT = "/auth";
 const PATH_ASSETS = "/assets";
-const PERIOD = ".";
-const PIPE = "|";
-const POST = "POST";
-const PREV = "prev";
-const PREV_DIR = "..";
-const PRIVATE = "private";
-const PROTECT = "protect";
-const PUT = "PUT";
-const READ = "read";
-const REDIS = "redis";
-const REGEX_REPLACE = ")).*$";
-const RELATED = "related";
-const REL_URI = "rel, uri";
-const RETRY_AFTER = "retry-after";
-const S = "s";
-const SAMEORIGIN = "SAMEORIGIN";
-const SESSION_SECRET = "tensoABC";
-const SIGHUP = "SIGHUP";
-const SIGINT = "SIGINT";
-const SIGTERM = "SIGTERM";
-const SLASH = "/";
-const SPACE = " ";
-const STRING = "string";
+const METRICS_PATH = "/metrics";
+
+// =============================================================================
+// TEMPLATE CONSTANTS
+// =============================================================================
+
 const TEMPLATE_ALLOW = "{{allow}}";
 const TEMPLATE_BODY = "{{body}}";
 const TEMPLATE_CSRF = "{{csrf}}";
@@ -158,29 +126,182 @@ const TEMPLATE_TITLE = "{{title}}";
 const TEMPLATE_URL = "{{url}}";
 const TEMPLATE_VERSION = "{{version}}";
 const TEMPLATE_YEAR = "{{year}}";
+
+// =============================================================================
+// PAGINATION & QUERY PARAMETERS
+// =============================================================================
+
+const ORDER_BY = "order_by";
+const PAGE = "page";
+const PAGE_SIZE = "page_size";
+const FIRST = "first";
+const LAST = "last";
+const NEXT = "next";
+const PREV = "prev";
+const DESC = "desc";
+
+// =============================================================================
+// DATA STRUCTURE KEYS
+// =============================================================================
+
+const COLLECTION = "collection";
+const DATA = "data";
+const HEADERS = "headers";
+const ID = "id";
+const ID_2 = "_id";
+const ITEM = "item";
+const LINK = "link";
+const RELATED = "related";
+const REL_URI = "rel, uri";
+const URI = "uri";
+
+// =============================================================================
+// NUMERIC CONSTANTS
+// =============================================================================
+
+const INT_NEG_1 = -1;
+const INT_0 = 0;
+const INT_1 = 1;
+const INT_2 = 2;
+const INT_3 = 3;
+const INT_5 = 5;
+const INT_10 = 10;
+const INT_80 = 80;
+const INT_100 = 1e2;
+const INT_443 = 443;
+const INT_900 = 9e2;
+const INT_1000 = 1e3;
+const INT_6379 = 6379;
+const INT_8000 = 8e3;
+
+// =============================================================================
+// STRING LITERALS & SYMBOLS
+// =============================================================================
+
+const AUTO = "auto";
+const BOOLEAN = "boolean";
+const CALLBACK = "callback";
+const COLON = ":";
+const COMMA = ",";
+const COMMA_SPACE$1 = ", ";
+const DEBUG = "debug";
+const DOUBLE_SLASH = "//";
+const EMPTY = "";
+const ENCODED_SPACE = "%20";
+const END = "end";
+const EQ = "=";
+const ERROR = "error";
+const FALSE = "false";
+const FORMAT = "format";
+const FUNCTION = "function";
+const G = "g";
+const GT = "&gt;";
+const HTML = "html";
+const HYPHEN = "-";
+const I = "i";
+const IDENT_VAR = "indent=";
+const IE = "ie";
+const LT = "&lt;";
+const NL = "\n";
+const NULL = "null";
+const NUMBER = "number";
+const PERIOD = ".";
+const PIPE = "|";
+const PREV_DIR = "..";
+const S = "s";
+const SLASH = "/";
+const SPACE = " ";
+const STRING = "string";
 const TENSO = "tenso";
 const TRUE = "true";
 const UNDEFINED = "undefined";
 const UNDERSCORE = "_";
-const UNPROTECT = "unprotect";
-const URI = "uri";
 const URI_SCHEME = "://";
-const URL_127001 = "http://127.0.0.1";
-const URL_AUTH_LOGIN = "/auth/login";
-const URL_AUTH_LOGOUT = "/auth/logout";
-const URL_AUTH_ROOT = "/auth";
 const UTF8 = "utf8";
 const UTF_8 = "utf-8";
 const WILDCARD = "*";
 const WWW = "www";
+
+// =============================================================================
+// XML CONSTANTS
+// =============================================================================
+
 const XML_ARRAY_NODE_NAME = "item";
 const XML_PROLOG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-const X_CSRF_TOKEN = "x-csrf-token";
-const X_FORWARDED_PROTO = "x-forwarded-proto";
-const X_POWERED_BY = "x-powered-by";
-const X_RATELIMIT_LIMIT = "x-ratelimit-limit";
-const X_RATELIMIT_REMAINING = "x-ratelimit-remaining";
-const X_RATELIMIT_RESET = "x-ratelimit-reset";const config = {
+
+// =============================================================================
+// CONFIGURATION & SYSTEM
+// =============================================================================
+
+const INVALID_CONFIGURATION = "Invalid configuration";
+const LOG_FORMAT = "%h %l %u %t \"%r\" %>s %b";
+const MEMORY = "memory";
+const MULTIPART = "multipart";
+const REDIS = "redis";
+const REGEX_REPLACE = ")).*$";
+
+// System signals
+const SIGHUP = "SIGHUP";
+const SIGINT = "SIGINT";
+const SIGTERM = "SIGTERM";
+
+// =============================================================================
+// MESSAGES
+// =============================================================================
+
+const MSG_LOGIN = "POST 'username' & 'password' to authenticate";
+const MSG_PROMETHEUS_ENABLED = "Prometheus metrics enabled";
+const MSG_TOO_MANY_REQUESTS = "Too many requests";/**
+ * Default configuration object for Tenso framework
+ * 
+ * This configuration object contains all the default settings for a Tenso server instance.
+ * It includes settings for authentication, security, logging, caching, middleware, and more.
+ * 
+ * @typedef {Object} TensoConfig
+ * @property {Object} auth - Authentication configuration
+ * @property {number} auth.delay - Authentication delay in milliseconds
+ * @property {Array<string>} auth.protect - Routes to protect with authentication
+ * @property {Array<string>} auth.unprotect - Routes to exclude from authentication
+ * @property {Object} auth.basic - Basic authentication settings
+ * @property {Object} auth.bearer - Bearer token authentication settings
+ * @property {Object} auth.jwt - JWT authentication settings
+ * @property {Object} auth.oauth2 - OAuth2 authentication settings
+ * @property {Object} auth.saml - SAML authentication settings
+ * @property {Object} auth.uri - Authentication URI endpoints
+ * @property {boolean} autoindex - Enable automatic directory indexing
+ * @property {number} cacheSize - Maximum number of items in cache
+ * @property {number} cacheTTL - Cache time-to-live in milliseconds
+ * @property {boolean} catchAll - Enable catch-all route handling
+ * @property {string} charset - Default character encoding
+ * @property {string} corsExpose - CORS exposed headers
+ * @property {Object} defaultHeaders - Default HTTP headers to include in responses
+ * @property {number} digit - Number of decimal places for numeric formatting
+ * @property {boolean} etags - Enable ETag generation
+ * @property {Array} exit - Exit handlers
+ * @property {string} host - Server host address
+ * @property {Object} hypermedia - Hypermedia/HATEOAS configuration
+ * @property {Array} index - Index route configuration
+ * @property {Object} initRoutes - Initial route definitions
+ * @property {number} jsonIndent - JSON response indentation level
+ * @property {Object} logging - Logging configuration
+ * @property {number} maxBytes - Maximum request body size in bytes
+ * @property {string} mimeType - Default MIME type for responses
+ * @property {Array<string>} origins - Allowed CORS origins
+ * @property {number} pageSize - Default pagination page size
+ * @property {number} port - Server port number
+ * @property {Object} prometheus - Prometheus metrics configuration
+ * @property {Object} rate - Rate limiting configuration
+ * @property {boolean} renderHeaders - Include headers in rendered output
+ * @property {boolean} time - Include timing information in responses
+ * @property {Object} security - Security-related settings (CSRF, CSP, etc.)
+ * @property {Object} session - Session management configuration
+ * @property {boolean} silent - Suppress console output
+ * @property {Object} ssl - SSL/TLS configuration
+ * @property {Object} webroot - Web root and static file serving configuration
+ * 
+ * @type {TensoConfig}
+ */
+const config = {
 	auth: {
 		delay: INT_0,
 		protect: [],
@@ -323,18 +444,76 @@ const X_RATELIMIT_RESET = "x-ratelimit-reset";const config = {
 		static: PATH_ASSETS,
 		template: EMPTY
 	}
-};function json$1 (arg = EMPTY) {
+};/**
+ * Parses JSON string into JavaScript object
+ * @param {string} [arg=EMPTY] - The JSON string to parse
+ * @returns {*} The parsed JavaScript object or value
+ * @throws {SyntaxError} When the JSON string is invalid
+ */
+function json$1 (arg = EMPTY) {
 	return JSON.parse(arg);
-}function jsonl$1 (arg = EMPTY) {
+}/**
+ * Parses JSON Lines (JSONL) string into JavaScript array
+ * Each line should contain a valid JSON object
+ * @param {string} [arg=EMPTY] - The JSONL string to parse
+ * @returns {Array} Array of parsed JavaScript objects
+ * @throws {Error} When any line contains invalid JSON
+ */
+function jsonl$1 (arg = EMPTY) {
 	return parse$1(arg);
-}const bodySplit = /&|=/;
+}/**
+ * Regular expression for splitting request body parameters on & and = characters
+ * @type {RegExp}
+ */
+const bodySplit = /&|=/;
+
+/**
+ * Regular expression for matching collection patterns in URLs
+ * @type {RegExp}
+ */
 const collection = /(.*)(\/.*)$/;
+
+/**
+ * Regular expression for matching hypermedia-related field names (id, url, uri patterns)
+ * @type {RegExp}
+ */
 const hypermedia$1 = /(([a-z]+(_)?)?id|url|uri)$/i;
+
+/**
+ * Regular expression for matching MIME type parameters (semicolon and beyond)
+ * @type {RegExp}
+ */
 const mimetype = /;.*/;
+
+/**
+ * Regular expression for matching trailing underscore patterns
+ * @type {RegExp}
+ */
 const trailing = /_.*$/;
+
+/**
+ * Regular expression for matching trailing 's' character
+ * @type {RegExp}
+ */
 const trailingS = /s$/;
+
+/**
+ * Regular expression for matching trailing slash character
+ * @type {RegExp}
+ */
 const trailingSlash = /\/$/;
-const trailingY = /y$/;function chunk (arg = [], size = INT_2) {
+
+/**
+ * Regular expression for matching trailing 'y' character
+ * @type {RegExp}
+ */
+const trailingY = /y$/;/**
+ * Splits an array into chunks of specified size
+ * @param {Array} [arg=[]] - The array to chunk
+ * @param {number} [size=INT_2] - The size of each chunk
+ * @returns {Array<Array>} Array of chunks, each containing up to 'size' elements
+ */
+function chunk (arg = [], size = INT_2) {
 	const result = [];
 	const nth = Math.ceil(arg.length / size);
 	let i = INT_0;
@@ -344,7 +523,13 @@ const trailingY = /y$/;function chunk (arg = [], size = INT_2) {
 	}
 
 	return result;
-}function xWwwFormURLEncoded (arg) {
+}/**
+ * Parses URL-encoded form data into JavaScript object
+ * Decodes URL-encoded strings and converts values to appropriate types
+ * @param {string} arg - The URL-encoded form data string to parse
+ * @returns {Object} Object containing the parsed form data with decoded keys and coerced values
+ */
+function xWwwFormURLEncoded (arg) {
 	const args = arg ? chunk(arg.split(bodySplit), INT_2) : [],
 		result = {};
 
@@ -353,7 +538,12 @@ const trailingY = /y$/;function chunk (arg = [], size = INT_2) {
 	}
 
 	return result;
-}const parsers = new Map([
+}/**
+ * Map of content types to their corresponding parser functions
+ * Maps MIME types to functions that can parse request bodies of that type
+ * @type {Map<string, Function>}
+ */
+const parsers = new Map([
 	[
 		HEADER_APPLICATION_X_WWW_FORM_URLENCODED,
 		xWwwFormURLEncoded
@@ -374,13 +564,44 @@ const trailingY = /y$/;function chunk (arg = [], size = INT_2) {
 		HEADER_TEXT_JSON_LINES,
 		jsonl$1
 	]
-]);function indent (arg = EMPTY, fallback = INT_0) {
+]);/**
+ * Extracts indentation value from a string or returns fallback
+ * Looks for "indent=number" pattern in the input string
+ * @param {string} [arg=EMPTY] - The string to parse for indentation value
+ * @param {number} [fallback=INT_0] - The fallback value if no indent pattern is found
+ * @returns {number} The parsed indentation value or fallback
+ */
+function indent (arg = EMPTY, fallback = INT_0) {
 	return arg.includes(IDENT_VAR) ? parseInt(arg.match(/indent=(\d+)/)[INT_1], INT_10) : fallback;
-}function json (req, res, arg) {
+}/**
+ * Renders data as JSON with configurable indentation
+ * Uses server configuration and request headers to determine indentation level
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {*} arg - The data to render as JSON
+ * @returns {string} The JSON formatted string
+ */
+function json (req, res, arg) {
 	return JSON.stringify(arg, null, indent(req.headers.accept, req.server.jsonIndent));
-}function yaml (req, res, arg) {
+}/**
+ * Renders data as YAML format
+ * Converts JavaScript objects and arrays to YAML string representation
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {*} arg - The data to render as YAML
+ * @returns {string} The YAML formatted string
+ */
+function yaml (req, res, arg) {
 	return YAML.stringify(arg);
-}function xml (req, res, arg) {
+}/**
+ * Renders data as XML format with proper formatting and entity processing
+ * Handles arrays with special array node names and includes XML prolog
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {*} arg - The data to render as XML
+ * @returns {string} The XML formatted string with prolog
+ */
+function xml (req, res, arg) {
 	const builder = new XMLBuilder({
 		processEntities: true,
 		format: true,
@@ -389,14 +610,38 @@ const trailingY = /y$/;function chunk (arg = [], size = INT_2) {
 	});
 
 	return `${XML_PROLOG}\n${builder.build({output: arg})}`;
-}function plain$1 (req, res, arg) {
+}/**
+ * Renders data as plain text with recursive handling of arrays and objects
+ * Arrays are joined with commas, objects are JSON stringified, primitives are converted to strings
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {*} arg - The data to render as plain text
+ * @returns {string} The plain text representation
+ */
+function plain$1 (req, res, arg) {
 	return Array.isArray(arg) ? arg.map(i => plain$1(req, res, i)).join(COMMA) : arg instanceof Object ? JSON.stringify(arg, null, indent(req.headers.accept, req.server.json)) : arg.toString();
-}function javascript (req, res, arg) {
+}/**
+ * Renders data as JSONP callback for JavaScript consumption
+ * Wraps JSON data in a callback function for cross-domain requests
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {*} arg - The data to render as JSONP
+ * @returns {string} The JSONP callback string
+ */
+function javascript (req, res, arg) {
 	req.headers.accept = HEADER_APPLICATION_JAVASCRIPT;
 	res.header(HEADER_CONTENT_TYPE, HEADER_APPLICATION_JAVASCRIPT);
 
 	return `${req.parsed.searchParams.get(CALLBACK) ?? CALLBACK}(${JSON.stringify(arg, null, INT_0)});`;
-}function csv (req, res, arg) {
+}/**
+ * Renders data as CSV format with headers and download attachment
+ * Converts arrays and objects to CSV format with proper casting for different data types
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {*} arg - The data to render as CSV
+ * @returns {string} The CSV formatted string
+ */
+function csv (req, res, arg) {
 	const filename = req.url.split("/").pop().split(".")[0];
 	const input = res.statusCode < 400 ? Array.isArray(arg) ? arg : [arg] : [{Error: arg}];
 
@@ -412,11 +657,31 @@ const trailingY = /y$/;function chunk (arg = [], size = INT_2) {
 		header: true,
 		quoted: false
 	});
-}function explode (arg = EMPTY, delimiter = COMMA) {
+}/**
+ * Splits a string by delimiter and trims whitespace around each piece
+ * @param {string} [arg=EMPTY] - The string to split
+ * @param {string} [delimiter=COMMA] - The delimiter to split by
+ * @returns {Array<string>} Array of trimmed string pieces
+ */
+function explode (arg = EMPTY, delimiter = COMMA) {
 	return arg.trim().split(new RegExp(`\\s*${delimiter}\\s*`));
-}function sanitize (arg) {
+}/**
+ * Sanitizes HTML by escaping < and > characters
+ * @param {*} arg - The value to sanitize
+ * @returns {*} The sanitized value with HTML entities escaped, or original value if not a string
+ */
+function sanitize (arg) {
 	return typeof arg === STRING ? arg.replace(/</g, LT).replace(/>/g, GT) : arg;
-}function html (req, res, arg, tpl = EMPTY) {
+}/**
+ * Renders data as HTML using template replacement
+ * Replaces template placeholders with actual values including headers, body, and metadata
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {*} arg - The data to render in the HTML template
+ * @param {string} [tpl=EMPTY] - The HTML template string with placeholders
+ * @returns {string} The rendered HTML string
+ */
+function html (req, res, arg, tpl = EMPTY) {
 	const protocol = X_FORWARDED_PROTO in req.headers ? req.headers[X_FORWARDED_PROTO] + COLON : req.parsed.protocol,
 		headers = res.getHeaders();
 
@@ -431,9 +696,22 @@ const trailingY = /y$/;function chunk (arg = [], size = INT_2) {
 		.replace(TEMPLATE_METHODS, explode((headers?.allow ?? EMPTY).replace(HEADER_ALLOW_GET, EMPTY)).filter(i => i !== EMPTY).map(i => `<option value='${i.trim()}'>$i.trim()}</option>`).join(NL))
 		.replace(TEMPLATE_CSRF, headers?.[X_CSRF_TOKEN] ?? EMPTY)
 		.replace("class=\"headers", req.server.renderHeaders === false ? "class=\"headers dr-hidden" : "class=\"headers") : EMPTY;
-}function jsonl (req, res, arg) {
+}/**
+ * Renders data as JSON Lines format
+ * Each object is serialized as a separate line of JSON
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {*} arg - The data to render as JSON Lines
+ * @returns {string} The JSON Lines formatted string
+ */
+function jsonl (req, res, arg) {
 	return stringify$1(arg);
-}const renderers = new Map([
+}/**
+ * Map of content types to their corresponding renderer functions
+ * Maps MIME types to functions that can render data in that format
+ * @type {Map<string, Function>}
+ */
+const renderers = new Map([
 	[HEADER_APPLICATION_JSON, json],
 	[HEADER_APPLICATION_YAML, yaml],
 	[HEADER_APPLICATION_XML, xml],
@@ -444,16 +722,39 @@ const trailingY = /y$/;function chunk (arg = [], size = INT_2) {
 	[HEADER_APPLICATION_JSON_LINES, jsonl],
 	[HEADER_APPLICATION_JSONL, jsonl],
 	[HEADER_TEXT_JSON_LINES, jsonl]
-]);function custom (arg, err, status = INT_200, stack = false) {
+]);/**
+ * Custom serializer that creates a structured response object with metadata
+ * Returns an object containing data, error, links, and status fields
+ * @param {*} arg - The data to serialize
+ * @param {Error|string|null} err - The error object or message, null if no error
+ * @param {number} [status=INT_200] - HTTP status code
+ * @param {boolean} [stack=false] - Whether to include error stack trace
+ * @returns {Object} Structured response object with data, error, links, and status
+ */
+function custom (arg, err, status = INT_200, stack = false) {
 	return {
 		data: arg,
 		error: err !== null ? (stack ? err.stack : err.message) || err || STATUS_CODES[status] : null,
 		links: [],
 		status: status
 	};
-}function plain (arg, err, status = INT_200, stack = false) {
+}/**
+ * Plain serializer that returns data directly or error information
+ * Returns the original data if no error, otherwise returns error message or stack trace
+ * @param {*} arg - The data to serialize
+ * @param {Error|string|null} err - The error object or message, null if no error
+ * @param {number} [status=INT_200] - HTTP status code (used for fallback error message)
+ * @param {boolean} [stack=false] - Whether to return error stack trace instead of message
+ * @returns {*} The original data or error information
+ */
+function plain (arg, err, status = INT_200, stack = false) {
 	return err !== null ? (stack ? err.stack : err.message) || err || STATUS_CODES[status] : arg;
-}const serializers = new Map([
+}/**
+ * Map of content types to their corresponding serializer functions
+ * Maps MIME types to functions that can serialize data for that format
+ * @type {Map<string, Function>}
+ */
+const serializers = new Map([
 	[HEADER_APPLICATION_JSON, custom],
 	[HEADER_APPLICATION_YAML, custom],
 	[HEADER_APPLICATION_XML, custom],
@@ -464,11 +765,28 @@ const trailingY = /y$/;function chunk (arg = [], size = INT_2) {
 	[HEADER_APPLICATION_JSON_LINES, plain],
 	[HEADER_APPLICATION_JSONL, plain],
 	[HEADER_TEXT_JSON_LINES, plain]
-]);function hasBody (arg) {
+]);/**
+ * Checks if an HTTP method typically has a request body
+ * @param {string} arg - The HTTP method string to check
+ * @returns {boolean} True if the method can have a body (PATCH, POST, PUT), false otherwise
+ */
+function hasBody (arg) {
 	return arg.includes(PATCH) || arg.includes(POST) || arg.includes(PUT);
-}const clone = arg => JSON.parse(JSON.stringify(arg));const ORDER_BY_EQ_DESC = `${ORDER_BY}${EQ}${DESC}`;
+}/**
+ * Deep clones an object using JSON serialization/deserialization
+ * @param {*} arg - The object to clone
+ * @returns {*} A deep clone of the input object
+ */
+const clone = arg => JSON.parse(JSON.stringify(arg));const ORDER_BY_EQ_DESC = `${ORDER_BY}${EQ}${DESC}`;
 const COMMA_SPACE = `${COMMA}${SPACE}`;
 
+/**
+ * Sorts an array based on query parameters in the request
+ * Supports ordering by object keys and reverse ordering
+ * @param {*} arg - The data to sort (typically an array)
+ * @param {Object} req - The HTTP request object containing parsed query parameters
+ * @returns {*} The sorted data or original data if not sortable
+ */
 function sort (arg, req) {
 	let output = clone(arg);
 
@@ -489,7 +807,15 @@ function sort (arg, req) {
 	}
 
 	return output;
-}function serialize (req, res, arg) {
+}/**
+ * Serializes response data based on content type negotiation
+ * Handles format selection, sorting, and error serialization
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {*} arg - The data to serialize
+ * @returns {*} The serialized data
+ */
+function serialize (req, res, arg) {
 	const status = res.statusCode;
 	let format = req.server.mimeType,
 		accepts = explode(req.parsed.searchParams.get(FORMAT) || req.headers.accept || res.getHeader(HEADER_CONTENT_TYPE) || format, COMMA),
@@ -518,11 +844,33 @@ function sort (arg, req) {
 	return result;
 }const pattern = new RegExp(`${ID}|${ID_2}$`, I);
 
+/**
+ * Checks if a string matches common ID patterns
+ * @param {string} [arg=EMPTY] - The string to test for ID patterns
+ * @returns {boolean} True if the string matches ID patterns, false otherwise
+ */
 function id (arg = EMPTY) {
 	return pattern.test(arg);
-}function scheme (arg = EMPTY) {
+}/**
+ * Checks if a string contains a URI scheme indicator
+ * @param {string} [arg=EMPTY] - The string to check for URI scheme
+ * @returns {boolean} True if the string contains a slash or starts with URI scheme character
+ */
+function scheme (arg = EMPTY) {
 	return arg.includes(SLASH) || arg[0] === URI_SCHEME;
-}// Parsing the object for hypermedia properties
+}/**
+ * Parses objects for hypermedia properties and generates links
+ * Identifies ID-like and linkable properties to create hypermedia links
+ * @param {Object} obj - The object to parse for hypermedia properties
+ * @param {string} rel - The relationship type for links
+ * @param {string} item_collection - The collection name for items
+ * @param {string} root - The root URL for relative links
+ * @param {Set} seen - Set of already processed URIs to avoid duplicates
+ * @param {Array} links - Array to collect generated links
+ * @param {Object} server - The server object for permission checking
+ * @returns {Object|null} The processed object or null if empty
+ */
+// Parsing the object for hypermedia properties
 function marshal (obj, rel, item_collection, root, seen, links, server) {
 	let keys = Object.keys(obj),
 		lrel = rel || RELATED,
@@ -568,7 +916,15 @@ function marshal (obj, rel, item_collection, root, seen, links, server) {
 	}
 
 	return result;
-}function hypermedia (req, res, rep) {
+}/**
+ * Processes hypermedia links for responses including pagination and resource links
+ * Handles collection pagination, resource linking, and hypermedia header generation
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {Object} rep - The response representation object
+ * @returns {Object} The processed response with hypermedia links
+ */
+function hypermedia (req, res, rep) {
 	const server = req.server,
 		headers = res.getHeaders(),
 		collection$1 = req.url,
@@ -685,13 +1041,28 @@ function marshal (obj, rel, item_collection, root, seen, links, server) {
 	}
 
 	return rep;
-}function exit (req, res, next) {
+}/**
+ * Middleware that terminates the request if the URL matches configured exit patterns
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {Function} next - The next middleware function
+ * @returns {void}
+ */
+function exit (req, res, next) {
 	if (req.server.exit.includes(req.url)) {
 		req.exit();
 	} else {
 		next();
 	}
-}function payload (req, res, next) {
+}/**
+ * Request payload collection middleware that handles request body data
+ * Collects request body data for non-multipart requests and enforces size limits
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {Function} next - The next middleware function
+ * @returns {void}
+ */
+function payload (req, res, next) {
 	if (hasBody(req.method) && req.headers?.[HEADER_CONTENT_TYPE]?.includes(MULTIPART) === false) {
 		const max = req.server.maxBytes;
 		let body = EMPTY,
@@ -719,7 +1090,15 @@ function marshal (obj, rel, item_collection, root, seen, links, server) {
 	} else {
 		next();
 	}
-}function parse (req, res, next) {
+}/**
+ * Request body parsing middleware that uses registered parsers based on content type
+ * Attempts to parse the request body and handles parsing errors
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {Function} next - The next middleware function
+ * @returns {void}
+ */
+function parse (req, res, next) {
 	let valid = true,
 		exception;
 
@@ -738,16 +1117,109 @@ function marshal (obj, rel, item_collection, root, seen, links, server) {
 	}
 
 	next(valid === false ? exception : void 0);
-}// Prometheus metrics
-const prometheus = config => promBundle(config);function asyncFlag (req, res, next) {
+}/**
+ * Prometheus metrics setup
+ * Creates histogram and counter metrics for HTTP requests
+ * @param {Object} config - The Prometheus configuration object
+ * @returns {Object} Object containing middleware function and metrics registry
+ */
+function prometheus(config) {
+	// Create a Registry to register metrics
+	const register = new promClient.Registry();
+
+	// Add default metrics (process stats, etc.)
+	if (config.includeUp) {
+		promClient.collectDefaultMetrics({ register });
+	}
+
+	// Create histogram for request duration
+	const httpRequestDuration = new promClient.Histogram({
+		name: 'http_request_duration_seconds',
+		help: 'Duration of HTTP requests in seconds',
+		labelNames: ['method', 'route', 'status_code', ...Object.keys(config.customLabels || {})],
+		buckets: config.buckets || [0.001, 0.01, 0.1, 1, 2, 3, 5, 7, 10, 15, 20, 25, 30, 35, 40, 50, 70, 100, 200]
+	});
+
+	// Create counter for request count
+	const httpRequestsTotal = new promClient.Counter({
+		name: 'http_requests_total',
+		help: 'Total number of HTTP requests',
+		labelNames: ['method', 'route', 'status_code', ...Object.keys(config.customLabels || {})]
+	});
+
+	// Register metrics
+	register.registerMetric(httpRequestDuration);
+	register.registerMetric(httpRequestsTotal);
+
+	// Middleware function
+	const middleware = (req, res, next) => {
+		const startTime = Date.now();
+		
+		// Store original end method
+		const originalEnd = res.end;
+		
+		// Override end method to capture metrics
+		res.end = function(...args) {
+			const duration = (Date.now() - startTime) / 1000; // Convert to seconds
+			const route = req.route || req.url || 'unknown';
+			const method = req.method || 'unknown';
+			const statusCode = res.statusCode || 0;
+			
+			// Build labels object
+			const labels = {
+				method: config.includeMethod ? method : 'HTTP',
+				route: config.includePath ? route : '',
+				status_code: config.includeStatusCode ? statusCode.toString() : '',
+				...config.customLabels
+			};
+			
+			// Record metrics
+			httpRequestDuration.observe(labels, duration);
+			httpRequestsTotal.inc(labels);
+			
+			// Call original end method
+			originalEnd.apply(this, args);
+		};
+		
+		if (typeof next === 'function') {
+			next();
+		}
+	};
+
+	// Return middleware function and register for metrics endpoint
+	middleware.register = register;
+	return middleware;
+}/**
+ * Middleware that sets the async protection flag on the request object
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {Function} next - The next middleware function
+ * @returns {void}
+ */
+function asyncFlag (req, res, next) {
 	req.protectAsync = true;
 	next();
-}function bypass (req, res, next) {
+}/**
+ * Middleware that determines if request should bypass protection based on CORS/OPTIONS or auth patterns
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {Function} next - The next middleware function
+ * @returns {void}
+ */
+function bypass (req, res, next) {
 	req.unprotect = req.cors && req.method === OPTIONS || req.server.auth.unprotect.some(i => i.test(req.url));
 	next();
 }let memoized = false,
 	cachedFn, cachedKey;
 
+/**
+ * CSRF protection middleware wrapper using lusca
+ * Memoizes the CSRF function for performance and handles unprotected requests
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {Function} next - The next middleware function
+ * @returns {void}
+ */
 function csrfWrapper (req, res, next) {
 	if (memoized === false) {
 		cachedKey = req.server.security.key;
@@ -766,7 +1238,15 @@ function csrfWrapper (req, res, next) {
 			next(err);
 		});
 	}
-}function guard (req, res, next) {
+}/**
+ * Authentication guard middleware that protects routes requiring authentication
+ * Allows access to login URL or for authenticated users, otherwise returns 401
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {Function} next - The next middleware function
+ * @returns {void}
+ */
+function guard (req, res, next) {
 	const login = req.server.auth.uri.login;
 
 	if (req.url === login || req.isAuthenticated()) {
@@ -774,7 +1254,13 @@ function csrfWrapper (req, res, next) {
 	} else {
 		res.error(INT_401);
 	}
-}function redirect (req, res) {
+}/**
+ * Authentication redirect middleware that redirects to the configured auth redirect URI
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @returns {void}
+ */
+function redirect (req, res) {
 	res.redirect(req.server.auth.uri.redirect, false);
 }const rateHeaders = [
 	X_RATELIMIT_LIMIT,
@@ -782,6 +1268,14 @@ function csrfWrapper (req, res, next) {
 	X_RATELIMIT_RESET
 ];
 
+/**
+ * Rate limiting middleware that enforces request rate limits
+ * Tracks request rates and returns 429 status when limits are exceeded
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {Function} next - The next middleware function
+ * @returns {void}
+ */
 function rate (req, res, next) {
 	const config = req.server.rate;
 
@@ -802,7 +1296,15 @@ function rate (req, res, next) {
 			res.error(config.status || INT_429);
 		}
 	}
-}function zuul (req, res, next) {
+}/**
+ * Main protection middleware that coordinates authentication and rate limiting
+ * Determines if a request should be protected based on auth patterns and handles rate limiting
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {Function} next - The next middleware function
+ * @returns {void}
+ */
+function zuul (req, res, next) {
 	const uri = req.url;
 	let protect = false;
 
@@ -828,19 +1330,41 @@ function rate (req, res, next) {
 			req.exit();
 		}
 	});
-}function random (n = INT_100) {
+}/**
+ * Generates a random integer between 1 and n (inclusive)
+ * @param {number} [n=INT_100] - The upper bound for the random number
+ * @returns {number} A random integer between 1 and n
+ */
+function random (n = INT_100) {
 	return randomInt(INT_1, n);
-}function delay (fn = () => void 0, n = INT_0) {
+}/**
+ * Executes a function after a random delay or immediately if no delay is specified
+ * @param {Function} [fn=() => void 0] - The function to execute
+ * @param {number} [n=INT_0] - Maximum delay in milliseconds (0 means execute immediately)
+ * @returns {void}
+ */
+function delay (fn = () => void 0, n = INT_0) {
 	if (n === INT_0) {
 		fn();
 	} else {
 		setTimeout(fn, random(n));
 	}
-}function isEmpty (arg = EMPTY) {
+}/**
+ * Checks if a value is an empty string
+ * @param {*} [arg=EMPTY] - The value to check
+ * @returns {boolean} True if the value equals the EMPTY constant, false otherwise
+ */
+function isEmpty (arg = EMPTY) {
 	return arg === EMPTY;
 }const {Strategy: JWTStrategy, ExtractJwt} = passportJWT,
 	groups = [PROTECT, UNPROTECT];
 
+/**
+ * Configures authentication middleware and strategies for the server
+ * Sets up various authentication methods (Basic, Bearer, JWT, OAuth2) and security middleware
+ * @param {Object} obj - The server configuration object
+ * @returns {Object} The configured server object with authentication middleware
+ */
 function auth (obj) {
 	const ssl = obj.ssl.cert && obj.ssl.key,
 		realm = `http${ssl ? S : EMPTY}://${obj.host}${obj.port !== INT_80 && obj.port !== INT_443 ? COLON + obj.port : EMPTY}`,
@@ -1005,7 +1529,7 @@ function auth (obj) {
 					} else if (user === void 0) {
 						done(null, false);
 					} else {
-						done(null, user, {scope: READ});
+						done(null, user, {scope: read});
 					}
 				});
 			}, authDelay);
@@ -1107,7 +1631,16 @@ function auth (obj) {
 const require = createRequire(import.meta.url);
 const {name, version} = require(join(__dirname, "..", "package.json"));
 
+/**
+ * Tenso web framework class that extends Woodland
+ * @class Tenso
+ * @extends {Woodland}
+ */
 class Tenso extends Woodland {
+	/**
+	 * Creates an instance of Tenso
+	 * @param {Object} [config=defaultConfig] - Configuration object for the Tenso instance
+	 */
 	constructor (config$1 = config) {
 		super(config$1);
 
@@ -1125,10 +1658,21 @@ class Tenso extends Woodland {
 		this.version = config$1.version;
 	}
 
+	/**
+	 * Checks if a given HTTP method can modify data
+	 * @param {string} arg - HTTP method to check
+	 * @returns {boolean} True if the method can modify data, false otherwise
+	 */
 	canModify (arg) {
 		return arg.includes(DELETE) || hasBody(arg);
 	}
 
+	/**
+	 * Handles connection setup for incoming requests
+	 * @param {Object} req - Request object
+	 * @param {Object} res - Response object
+	 * @returns {void}
+	 */
 	connect (req, res) {
 		req.csrf = this.canModify(req.method) === false && this.canModify(req.allow) && this.security.csrf === true;
 		req.hypermedia = this.hypermedia.enabled;
@@ -1148,14 +1692,32 @@ class Tenso extends Woodland {
 		}
 	}
 
+	/**
+	 * Creates an EventSource instance
+	 * @param {...any} args - Arguments to pass to the eventsource function
+	 * @returns {*} Result of the eventsource function
+	 */
 	eventsource (...args) {
 		return eventsource(...args);
 	}
 
+	/**
+	 * Final processing step in the request pipeline
+	 * @param {Object} req - Request object
+	 * @param {Object} res - Response object
+	 * @param {*} arg - Data to be processed
+	 * @returns {*} The processed data
+	 */
 	final (req, res, arg) {
 		return arg;
 	}
 
+	/**
+	 * Handles response headers, particularly caching headers
+	 * @param {Object} req - Request object
+	 * @param {Object} res - Response object
+	 * @returns {void}
+	 */
 	headers (req, res) {
 		const key = CACHE_CONTROL,
 			cache = res.getHeader(key) || EMPTY;
@@ -1168,6 +1730,10 @@ class Tenso extends Woodland {
 		}
 	}
 
+	/**
+	 * Initializes the Tenso server with middleware, routes, and configuration
+	 * @returns {Tenso} The Tenso instance for method chaining
+	 */
 	init () {
 		const authorization = Object.keys(this.auth).filter(i => this.auth?.[i]?.enabled === true).length > INT_0 || this.rate.enabled || this.security.csrf;
 
@@ -1191,13 +1757,22 @@ class Tenso extends Woodland {
 
 		// Prometheus metrics
 		if (this.prometheus.enabled) {
-			const middleware = prometheus(this.prometheus.metrics);
+			const metricsHandler = prometheus(this.prometheus.metrics);
+			const middleware = metricsHandler;
 
 			this.log(`type=init, message"${MSG_PROMETHEUS_ENABLED}"`);
 			this.always(middleware).ignore(middleware);
 
-			// Registering a route for middleware response to be served
-			this.get(METRICS_PATH, EMPTY);
+			// Registering a route for metrics endpoint
+			this.get(METRICS_PATH, (req, res) => {
+				res.setHeader('Content-Type', metricsHandler.register.contentType);
+				metricsHandler.register.metrics().then(metrics => {
+					res.end(metrics);
+				}).catch(err => {
+					res.statusCode = 500;
+					res.end(`Error collecting metrics: ${err.message}`);
+				});
+			});
 
 			// Hooking events that might bypass middleware
 			this.on(ERROR, (req, res) => {
@@ -1244,12 +1819,24 @@ class Tenso extends Woodland {
 		return this;
 	}
 
+	/**
+	 * Registers a parser for a specific media type
+	 * @param {string} [mediatype=EMPTY] - The media type to register the parser for
+	 * @param {Function} [fn=arg => arg] - The parser function
+	 * @returns {Tenso} The Tenso instance for method chaining
+	 */
 	parser (mediatype = EMPTY, fn = arg => arg) {
 		this.parsers.set(mediatype, fn);
 
 		return this;
 	}
 
+	/**
+	 * Handles rate limiting for incoming requests
+	 * @param {Object} req - Request object
+	 * @param {Function} fn - Optional function to modify rate limit state
+	 * @returns {Array} Array containing [valid, limit, remaining, reset]
+	 */
 	rateLimit (req, fn) {
 		const reqId = req.sessionID || req.ip;
 		let valid = true,
@@ -1287,6 +1874,13 @@ class Tenso extends Woodland {
 		return [valid, limit, remaining, reset];
 	}
 
+	/**
+	 * Renders the response based on the accepted content type
+	 * @param {Object} req - Request object
+	 * @param {Object} res - Response object
+	 * @param {*} arg - Data to be rendered
+	 * @returns {*} The rendered response
+	 */
 	render (req, res, arg) {
 		if (arg === null) {
 			arg = NULL;
@@ -1316,18 +1910,34 @@ class Tenso extends Woodland {
 		return result;
 	}
 
+	/**
+	 * Registers a renderer for a specific media type
+	 * @param {string} mediatype - The media type to register the renderer for
+	 * @param {Function} fn - The renderer function
+	 * @returns {Tenso} The Tenso instance for method chaining
+	 */
 	renderer (mediatype, fn) {
 		this.renderers.set(mediatype, fn);
 
 		return this;
 	}
 
+	/**
+	 * Registers a serializer for a specific media type
+	 * @param {string} mediatype - The media type to register the serializer for
+	 * @param {Function} fn - The serializer function
+	 * @returns {Tenso} The Tenso instance for method chaining
+	 */
 	serializer (mediatype, fn) {
 		this.serializers.set(mediatype, fn);
 
 		return this;
 	}
 
+	/**
+	 * Sets up signal handlers for graceful server shutdown
+	 * @returns {Tenso} The Tenso instance for method chaining
+	 */
 	signals () {
 		for (const signal of [SIGHUP, SIGINT, SIGTERM]) {
 			process.on(signal, () => {
@@ -1339,6 +1949,10 @@ class Tenso extends Woodland {
 		return this;
 	}
 
+	/**
+	 * Starts the HTTP or HTTPS server
+	 * @returns {Tenso} The Tenso instance for method chaining
+	 */
 	start () {
 		if (this.server === null) {
 			if (this.ssl.cert === null && this.ssl.pfx === null && this.ssl.key === null) {
@@ -1359,6 +1973,10 @@ class Tenso extends Woodland {
 		return this;
 	}
 
+	/**
+	 * Stops the server
+	 * @returns {Tenso} The Tenso instance for method chaining
+	 */
 	stop () {
 		if (this.server !== null) {
 			this.server.close();
@@ -1370,6 +1988,11 @@ class Tenso extends Woodland {
 	}
 }
 
+/**
+ * Factory function that creates and initializes a Tenso server instance
+ * @param {Object} [userConfig={}] - User configuration object to override defaults
+ * @returns {Tenso} An initialized Tenso server instance
+ */
 function tenso (userConfig = {}) {
 	const config$1 = merge(clone(config), userConfig);
 

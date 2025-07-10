@@ -189,13 +189,22 @@ class Tenso extends Woodland {
 
 		// Prometheus metrics
 		if (this.prometheus.enabled) {
-			const middleware = prometheus(this.prometheus.metrics);
+			const metricsHandler = prometheus(this.prometheus.metrics);
+			const middleware = metricsHandler;
 
 			this.log(`type=init, message"${MSG_PROMETHEUS_ENABLED}"`);
 			this.always(middleware).ignore(middleware);
 
-			// Registering a route for middleware response to be served
-			this.get(METRICS_PATH, EMPTY);
+			// Registering a route for metrics endpoint
+			this.get(METRICS_PATH, (req, res) => {
+				res.setHeader('Content-Type', metricsHandler.register.contentType);
+				metricsHandler.register.metrics().then(metrics => {
+					res.end(metrics);
+				}).catch(err => {
+					res.statusCode = 500;
+					res.end(`Error collecting metrics: ${err.message}`);
+				});
+			});
 
 			// Hooking events that might bypass middleware
 			this.on(ERROR, (req, res) => {

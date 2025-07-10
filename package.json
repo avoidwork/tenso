@@ -48,7 +48,6 @@
     "connect-redis": "^9.0.0",
     "cookie-parser": "^1.4.7",
     "csv-stringify": "^6.5.2",
-    "express-prom-bundle": "^8.0.0",
     "express-session": "^1.18.1",
     "fast-xml-parser": "^5.2.5",
     "ioredis": "^5.6.1",

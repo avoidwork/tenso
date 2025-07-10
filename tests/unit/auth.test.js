@@ -128,7 +128,9 @@ describe("auth", () => {
 	it("should handle JWT authentication", () => {
 		mockObj.auth.jwt = {
 			enabled: true,
-			secret: "secret-key"
+			scheme: "Bearer",
+			secretOrKey: "secret-key",
+			auth: (token, done) => done(null, { id: 1, username: "test" })
 		};
 
 		const result = auth(mockObj);
@@ -140,8 +142,11 @@ describe("auth", () => {
 	it("should handle OAuth2 authentication", () => {
 		mockObj.auth.oauth2 = {
 			enabled: true,
-			clientId: "client-id",
-			clientSecret: "client-secret"
+			auth_url: "https://example.com/oauth/authorize",
+			token_url: "https://example.com/oauth/token", 
+			client_id: "client-id",
+			client_secret: "client-secret",
+			auth: (accessToken, refreshToken, profile, done) => done(null, { id: 1, username: "test" })
 		};
 
 		const result = auth(mockObj);

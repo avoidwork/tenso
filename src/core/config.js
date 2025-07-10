@@ -44,10 +44,10 @@ import {
 
 /**
  * Default configuration object for Tenso framework
- * 
+ *
  * This configuration object contains all the default settings for a Tenso server instance.
  * It includes settings for authentication, security, logging, caching, middleware, and more.
- * 
+ *
  * @typedef {Object} TensoConfig
  * @property {Object} auth - Authentication configuration
  * @property {number} auth.delay - Authentication delay in milliseconds
@@ -89,7 +89,7 @@ import {
  * @property {boolean} silent - Suppress console output
  * @property {Object} ssl - SSL/TLS configuration
  * @property {Object} webroot - Web root and static file serving configuration
- * 
+ *
  * @type {TensoConfig}
  */
 export const config = {

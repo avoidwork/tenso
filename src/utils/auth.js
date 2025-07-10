@@ -54,6 +54,12 @@ import lusca from "lusca";
 const {Strategy: JWTStrategy, ExtractJwt} = passportJWT,
 	groups = [PROTECT, UNPROTECT];
 
+/**
+ * Configures authentication middleware and strategies for the server
+ * Sets up various authentication methods (Basic, Bearer, JWT, OAuth2) and security middleware
+ * @param {Object} obj - The server configuration object
+ * @returns {Object} The configured server object with authentication middleware
+ */
 export function auth (obj) {
 	const ssl = obj.ssl.cert && obj.ssl.key,
 		realm = `http${ssl ? S : EMPTY}://${obj.host}${obj.port !== INT_80 && obj.port !== INT_443 ? COLON + obj.port : EMPTY}`,

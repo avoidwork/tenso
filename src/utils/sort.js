@@ -5,6 +5,13 @@ import {BOOLEAN, COMMA, DESC, EQ, INT_0, NUMBER, ORDER_BY, SPACE, STRING, UNDEFI
 const ORDER_BY_EQ_DESC = `${ORDER_BY}${EQ}${DESC}`;
 const COMMA_SPACE = `${COMMA}${SPACE}`;
 
+/**
+ * Sorts an array based on query parameters in the request
+ * Supports ordering by object keys and reverse ordering
+ * @param {*} arg - The data to sort (typically an array)
+ * @param {Object} req - The HTTP request object containing parsed query parameters
+ * @returns {*} The sorted data or original data if not sortable
+ */
 export function sort (arg, req) {
 	let output = clone(arg);
 

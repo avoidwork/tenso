@@ -3,6 +3,18 @@ import {id} from "./id.js";
 import {hypermedia as hypermediaPattern, trailing, trailingS, trailingY} from "./regex.js";
 import {scheme} from "./scheme.js";
 
+/**
+ * Parses objects for hypermedia properties and generates links
+ * Identifies ID-like and linkable properties to create hypermedia links
+ * @param {Object} obj - The object to parse for hypermedia properties
+ * @param {string} rel - The relationship type for links
+ * @param {string} item_collection - The collection name for items
+ * @param {string} root - The root URL for relative links
+ * @param {Set} seen - Set of already processed URIs to avoid duplicates
+ * @param {Array} links - Array to collect generated links
+ * @param {Object} server - The server object for permission checking
+ * @returns {Object|null} The processed object or null if empty
+ */
 // Parsing the object for hypermedia properties
 export function marshal (obj, rel, item_collection, root, seen, links, server) {
 	let keys = Object.keys(obj),

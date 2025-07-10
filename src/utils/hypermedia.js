@@ -28,6 +28,14 @@ import {
 } from "../core/constants.js";
 import {marshal} from "./marshal.js";
 
+/**
+ * Processes hypermedia links for responses including pagination and resource links
+ * Handles collection pagination, resource linking, and hypermedia header generation
+ * @param {Object} req - The HTTP request object
+ * @param {Object} res - The HTTP response object
+ * @param {Object} rep - The response representation object
+ * @returns {Object} The processed response with hypermedia links
+ */
 export function hypermedia (req, res, rep) {
 	const server = req.server,
 		headers = res.getHeaders(),

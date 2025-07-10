@@ -13,6 +13,11 @@ import {
 	HEADER_TEXT_PLAIN
 } from "../core/constants.js";
 
+/**
+ * Map of content types to their corresponding serializer functions
+ * Maps MIME types to functions that can serialize data for that format
+ * @type {Map<string, Function>}
+ */
 export const serializers = new Map([
 	[HEADER_APPLICATION_JSON, custom],
 	[HEADER_APPLICATION_YAML, custom],

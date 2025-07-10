@@ -10,6 +10,11 @@ import {
 	HEADER_TEXT_JSON_LINES
 } from "../core/constants.js";
 
+/**
+ * Map of content types to their corresponding parser functions
+ * Maps MIME types to functions that can parse request bodies of that type
+ * @type {Map<string, Function>}
+ */
 export const parsers = new Map([
 	[
 		HEADER_APPLICATION_X_WWW_FORM_URLENCODED,

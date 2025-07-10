@@ -7,6 +7,9 @@ import {INT_0, INT_2} from "../core/constants.js";
  * @returns {Array<Array>} Array of chunks, each containing up to 'size' elements
  */
 export function chunk (arg = [], size = INT_2) {
+	if (arg === null || arg === undefined) {
+		arg = [];
+	}
 	const result = [];
 	const nth = Math.ceil(arg.length / size);
 	let i = INT_0;

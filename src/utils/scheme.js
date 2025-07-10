@@ -6,5 +6,9 @@ import {EMPTY, SLASH, URI_SCHEME} from "../core/constants.js";
  * @returns {boolean} True if the string contains a slash or starts with URI scheme character
  */
 export function scheme (arg = EMPTY) {
+	if (arg === null || arg === undefined) {
+		arg = EMPTY;
+	}
+
 	return arg.includes(SLASH) || arg[0] === URI_SCHEME;
 }

@@ -7,5 +7,9 @@ import {COMMA, EMPTY} from "../core/constants.js";
  * @returns {Array<string>} Array of trimmed string pieces
  */
 export function explode (arg = EMPTY, delimiter = COMMA) {
+	if (arg === null || arg === undefined) {
+		arg = EMPTY;
+	}
+
 	return arg.trim().split(new RegExp(`\\s*${delimiter}\\s*`));
 }

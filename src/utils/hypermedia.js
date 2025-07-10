@@ -1,6 +1,6 @@
 import {URL} from "url";
 import {keysort} from "keysort";
-import {collection as collectionPattern, trailingSlash} from "./regex";
+import {collection as collectionPattern, trailingSlash} from "./regex.js";
 import {
 	COLLECTION,
 	COMMA_SPACE,

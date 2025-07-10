@@ -1,5 +1,5 @@
 import {keysort} from "keysort";
-import {clone} from "./clone";
+import {clone} from "./clone.js";
 import {BOOLEAN, COMMA, DESC, EQ, INT_0, NUMBER, ORDER_BY, SPACE, STRING, UNDEFINED} from "../core/constants.js";
 
 const ORDER_BY_EQ_DESC = `${ORDER_BY}${EQ}${DESC}`;

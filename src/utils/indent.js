@@ -8,5 +8,9 @@ import {EMPTY, IDENT_VAR, INT_0, INT_1, INT_10} from "../core/constants.js";
  * @returns {number} The parsed indentation value or fallback
  */
 export function indent (arg = EMPTY, fallback = INT_0) {
+	if (arg === null || arg === undefined) {
+		arg = EMPTY;
+	}
+
 	return arg.includes(IDENT_VAR) ? parseInt(arg.match(/indent=(\d+)/)[INT_1], INT_10) : fallback;
 }

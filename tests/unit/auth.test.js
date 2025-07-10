@@ -21,7 +21,8 @@ describe("auth", () => {
 					list: []
 				},
 				bearer: {
-					enabled: false
+					enabled: false,
+					tokens: []
 				},
 				jwt: {
 					enabled: false
@@ -33,7 +34,11 @@ describe("auth", () => {
 					enabled: false
 				},
 				uri: {
-					login: "/auth/login"
+					login: "/auth/login",
+					root: "/auth"
+				},
+				msg: {
+					login: "Please login"
 				}
 			},
 			rate: {
@@ -143,7 +148,7 @@ describe("auth", () => {
 		mockObj.auth.oauth2 = {
 			enabled: true,
 			auth_url: "https://example.com/oauth/authorize",
-			token_url: "https://example.com/oauth/token", 
+			token_url: "https://example.com/oauth/token",
 			client_id: "client-id",
 			client_secret: "client-secret",
 			auth: (accessToken, refreshToken, profile, done) => done(null, { id: 1, username: "test" })
@@ -171,7 +176,9 @@ describe("auth", () => {
 		mockObj.security = {
 			csrf: true,
 			csp: {
-				defaultSrc: "'self'"
+				policy: {
+					"default-src": "'self'"
+				}
 			},
 			xframe: "DENY",
 			p3p: "CP='NOI ADM DEV PSAi COM NAV OUR OTRo STP IND DEM'",

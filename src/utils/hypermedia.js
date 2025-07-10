@@ -88,17 +88,17 @@ export function hypermedia (req, res, rep) {
 						links.push({uri: `${root.pathname}${root.search}`, rel: FIRST});
 					}
 
-					if (page - INT_1 > INT_1 && page <= nth) {
+					if (page > INT_1) {
 						root.searchParams.set(PAGE, page - INT_1);
 						links.push({uri: `${root.pathname}${root.search}`, rel: PREV});
 					}
 
-					if (page + INT_1 < nth) {
+					if (page < nth) {
 						root.searchParams.set(PAGE, page + INT_1);
 						links.push({uri: `${root.pathname}${root.search}`, rel: NEXT});
 					}
 
-					if (nth > INT_0 && page !== nth) {
+					if (nth > INT_0 && page !== nth && page + INT_1 < nth) {
 						root.searchParams.set(PAGE, nth);
 						links.push({uri: `${root.pathname}${root.search}`, rel: LAST});
 					}

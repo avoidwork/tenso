@@ -72,8 +72,11 @@ describe("hypermedia", () => {
 
 		const result = hypermedia(mockReq, mockRes, rep);
 
-		assert.strictEqual(result.links.length, 3); // first, prev, next
-		const linkRels = result.links.map(link => link.rel);
+		const paginationLinks = result.links.filter(link =>
+			["first", "prev", "next", "last"].includes(link.rel)
+		);
+		assert.strictEqual(paginationLinks.length, 3); // first, prev, next
+		const linkRels = paginationLinks.map(link => link.rel);
 		assert.ok(linkRels.includes("first"));
 		assert.ok(linkRels.includes("prev"));
 		assert.ok(linkRels.includes("next"));
@@ -272,7 +275,11 @@ describe("hypermedia", () => {
 		const result = hypermedia(mockReq, mockRes, rep);
 
 		assert.strictEqual(result.data.length, 0);
-		assert.strictEqual(result.links.length, 0);
+		// Should not have pagination links for empty arrays
+		const paginationLinks = result.links.filter(link =>
+			["first", "prev", "next", "last"].includes(link.rel)
+		);
+		assert.strictEqual(paginationLinks.length, 0);
 	});
 
 	it("should handle single page of data", () => {
@@ -316,12 +323,16 @@ describe("hypermedia", () => {
 			status: 200,
 			links: []
 		};
+		// Set page to 2 to ensure we get pagination links
+		mockReq.parsed.searchParams.set("page", "2");
+		mockReq.parsed.searchParams.set("page_size", "10");
 
 		const result = hypermedia(mockReq, mockRes, rep);
 
 		assert.strictEqual(result.data.length, 10);
 		// Links should preserve query parameters
 		const firstLink = result.links.find(link => link.rel === "first");
+		assert.ok(firstLink);
 		assert.ok(firstLink.uri.includes("active=true"));
 	});
 

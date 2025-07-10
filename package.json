@@ -30,16 +30,16 @@
   "source": "src/tenso.js",
   "main": "dist/tenso.cjs",
   "exports": {
-    "types": "./types/tenso.d.ts",
+    "types": "./types/index.d.ts",
     "import": "./dist/tenso.js",
     "require": "./dist/tenso.cjs"
   },
   "type": "module",
-  "types": "types/**/*.d.ts",
+  "types": "types/*.d.ts",
   "files": [
     "dist/tenso.cjs",
     "dist/tenso.js",
-    "types/tenso.d.ts",
+    "types",
     "www/template.html",
     "www/assets"
   ],

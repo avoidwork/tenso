@@ -1,0 +1,320 @@
+/**
+ * Core constants exported from the constants module
+ */
+export declare const ACCESS_CONTROL: string;
+export declare const ALLOW: string;
+export declare const ALGORITHMS: string;
+export declare const AUDIENCE: string;
+export declare const AUTH: string;
+export declare const AUTO: string;
+export declare const BASIC: string;
+export declare const BEARER: string;
+export declare const BOOLEAN: string;
+export declare const CACHE_CONTROL: string;
+export declare const CALLBACK: string;
+export declare const CHARSET_UTF8: string;
+export declare const COLLECTION: string;
+export declare const COLON: string;
+export declare const COMMA: string;
+export declare const COMMA_SPACE: string;
+export declare const CONNECT: string;
+export declare const COOKIE_NAME: string;
+export declare const DEBUG: string;
+export declare const DEFAULT_CONTENT_TYPE: string;
+export declare const DEFAULT_VARY: string;
+export declare const DELETE: string;
+export declare const DESC: string;
+export declare const DOUBLE_SLASH: string;
+export declare const EMPTY: string;
+export declare const ENCODED_SPACE: string;
+export declare const END: string;
+export declare const ERROR: string;
+export declare const EXPOSE: string;
+export declare const EXPOSE_HEADERS: string;
+export declare const FALSE: string;
+export declare const FIRST: string;
+export declare const FORMAT: string;
+export declare const FUNCTION: string;
+export declare const G: string;
+export declare const GET: string;
+export declare const GT: string;
+export declare const HEAD: string;
+export declare const HEADER_ALLOW_GET: string;
+export declare const HEADER_APPLICATION_JAVASCRIPT: string;
+export declare const HEADER_APPLICATION_JSON: string;
+export declare const HEADER_APPLICATION_JSON_LINES: string;
+export declare const HEADER_APPLICATION_JSONL: string;
+export declare const HEADER_APPLICATION_X_WWW_FORM_URLENCODED: string;
+export declare const HEADER_APPLICATION_XML: string;
+export declare const HEADER_APPLICATION_YAML: string;
+export declare const HEADER_CONTENT_DISPOSITION: string;
+export declare const HEADER_CONTENT_DISPOSITION_VALUE: string;
+export declare const HEADER_CONTENT_TYPE: string;
+export declare const HEADER_SPLIT: string;
+export declare const HEADER_TEXT_CSV: string;
+export declare const HEADER_TEXT_HTML: string;
+export declare const HEADER_TEXT_JSON_LINES: string;
+export declare const HEADER_TEXT_PLAIN: string;
+export declare const HEADER_VARY: string;
+export declare const HEADERS: string;
+export declare const HS256: string;
+export declare const HS384: string;
+export declare const HS512: string;
+export declare const HTML: string;
+export declare const HYPHEN: string;
+export declare const I: string;
+export declare const ID: string;
+export declare const ID_2: string;
+export declare const INVALID_CONFIGURATION: string;
+export declare const IP_0000: string;
+export declare const IP_127001: string;
+export declare const ISSUER: string;
+export declare const ITEM: string;
+export declare const JWT: string;
+export declare const LAST: string;
+export declare const LINK: string;
+export declare const LOG_FORMAT: string;
+export declare const LT: string;
+export declare const MEMORY: string;
+export declare const METRICS_PATH: string;
+export declare const MSG_LOGIN: string;
+export declare const MSG_PROMETHEUS_ENABLED: string;
+export declare const MSG_TOO_MANY_REQUESTS: string;
+export declare const MULTIPART: string;
+export declare const NEXT: string;
+export declare const NL: string;
+export declare const NULL: string;
+export declare const NUMBER: string;
+export declare const OAUTH2: string;
+export declare const OPTIONS: string;
+export declare const ORDER_BY: string;
+export declare const PAGE: string;
+export declare const PAGE_SIZE: string;
+export declare const PATCH: string;
+export declare const PATH_ASSETS: string;
+export declare const PERIOD: string;
+export declare const PIPE: string;
+export declare const POST: string;
+export declare const PREV: string;
+export declare const PREV_DIR: string;
+export declare const PRIVATE: string;
+export declare const PROTECT: string;
+export declare const PUT: string;
+export declare const REDIS: string;
+export declare const REGEX_REPLACE: string;
+export declare const REL_URI: string;
+export declare const RELATED: string;
+export declare const RETRY_AFTER: string;
+export declare const S: string;
+export declare const SAMEORIGIN: string;
+export declare const SESSION_SECRET: string;
+export declare const SIGHUP: string;
+export declare const SIGINT: string;
+export declare const SIGTERM: string;
+export declare const SLASH: string;
+export declare const SPACE: string;
+export declare const STRING: string;
+export declare const TEMPLATE_ALLOW: RegExp;
+export declare const TEMPLATE_BODY: RegExp;
+export declare const TEMPLATE_CSRF: RegExp;
+export declare const TEMPLATE_FILE: string;
+export declare const TEMPLATE_FORMATS: RegExp;
+export declare const TEMPLATE_HEADERS: RegExp;
+export declare const TEMPLATE_METHODS: RegExp;
+export declare const TEMPLATE_TITLE: RegExp;
+export declare const TEMPLATE_URL: RegExp;
+export declare const TEMPLATE_VERSION: RegExp;
+export declare const TEMPLATE_YEAR: RegExp;
+export declare const TENSO: string;
+export declare const TRUE: string;
+export declare const UNDEFINED: string;
+export declare const UNDERSCORE: string;
+export declare const UNPROTECT: string;
+export declare const URI: string;
+export declare const URI_SCHEME: string;
+export declare const URL_127001: string;
+export declare const URL_AUTH_LOGIN: string;
+export declare const URL_AUTH_LOGOUT: string;
+export declare const URL_AUTH_ROOT: string;
+export declare const UTF8: string;
+export declare const UTF_8: string;
+export declare const WILDCARD: string;
+export declare const WWW: string;
+export declare const X_CSRF_TOKEN: string;
+export declare const X_FORWARDED_PROTO: string;
+export declare const X_POWERED_BY: string;
+export declare const X_RATELIMIT_LIMIT: string;
+export declare const X_RATELIMIT_REMAINING: string;
+export declare const X_RATELIMIT_RESET: string;
+export declare const XML_ARRAY_NODE_NAME: string;
+export declare const XML_PROLOG: string;
+
+// Numeric constants
+export declare const INT_0: number;
+export declare const INT_1: number;
+export declare const INT_2: number;
+export declare const INT_3: number;
+export declare const INT_5: number;
+export declare const INT_10: number;
+export declare const INT_80: number;
+export declare const INT_100: number;
+export declare const INT_200: number;
+export declare const INT_204: number;
+export declare const INT_304: number;
+export declare const INT_401: number;
+export declare const INT_413: number;
+export declare const INT_429: number;
+export declare const INT_443: number;
+export declare const INT_450: number;
+export declare const INT_500: number;
+export declare const INT_900: number;
+export declare const INT_1000: number;
+export declare const INT_6379: number;
+export declare const INT_8000: number;
+export declare const INT_300000: number;
+export declare const INT_NEG_1: number;
+
+// Special data constants
+export declare const DATA: string;
+export declare const read: string;
+
+/**
+ * Default configuration object for Tenso framework
+ */
+export declare const config: {
+  auth: {
+    delay: number;
+    protect: string[];
+    unprotect: string[];
+    basic: {
+      enabled: boolean;
+      list: string[];
+    };
+    bearer: {
+      enabled: boolean;
+      tokens: string[];
+    };
+    jwt: {
+      enabled: boolean;
+      auth: any | null;
+      audience: string;
+      algorithms: string[];
+      ignoreExpiration: boolean;
+      issuer: string;
+      scheme: string;
+      secretOrKey: string;
+    };
+    msg: {
+      login: string;
+    };
+    oauth2: {
+      enabled: boolean;
+      auth: any | null;
+      auth_url: string;
+      token_url: string;
+      client_id: string;
+      client_secret: string;
+    };
+    uri: {
+      login: string;
+      logout: string;
+      redirect: string;
+      root: string;
+    };
+    saml: {
+      enabled: boolean;
+      auth: any | null;
+    };
+  };
+  autoindex: boolean;
+  cacheSize: number;
+  cacheTTL: number;
+  catchAll: boolean;
+  charset: string;
+  corsExpose: string;
+  defaultHeaders: Record<string, string>;
+  digit: number;
+  etags: boolean;
+  exit: string[];
+  host: string;
+  hypermedia: {
+    enabled: boolean;
+    header: boolean;
+  };
+  index: any[];
+  initRoutes: Record<string, any>;
+  jsonIndent: number;
+  logging: {
+    enabled: boolean;
+    format: string;
+    level: string;
+    stack: boolean;
+  };
+  maxBytes: number;
+  mimeType: string;
+  origins: string[];
+  pageSize: number;
+  port: number;
+  prometheus: {
+    enabled: boolean;
+    metrics: {
+      includeMethod: boolean;
+      includePath: boolean;
+      includeStatusCode: boolean;
+      includeUp: boolean;
+      buckets: number[];
+      customLabels: Record<string, any>;
+    };
+  };
+  rate: {
+    enabled: boolean;
+    limit: number;
+    message: string;
+    override: any | null;
+    reset: number;
+    status: number;
+  };
+  renderHeaders: boolean;
+  time: boolean;
+  security: {
+    key: string;
+    secret: string;
+    csrf: boolean;
+    csp: string | null;
+    xframe: string;
+    p3p: string;
+    hsts: string | null;
+    xssProtection: boolean;
+    nosniff: boolean;
+  };
+  session: {
+    cookie: {
+      httpOnly: boolean;
+      path: string;
+      sameSite: boolean;
+      secure: string;
+    };
+    name: string;
+    proxy: boolean;
+    redis: {
+      host: string;
+      port: number;
+    };
+    rolling: boolean;
+    resave: boolean;
+    saveUninitialized: boolean;
+    secret: string;
+    store: string;
+  };
+  silent: boolean;
+  ssl: {
+    cert: string | null;
+    key: string | null;
+    pfx: string | null;
+  };
+  webroot: {
+    root: string;
+    static: string;
+    template: string;
+  };
+}; 

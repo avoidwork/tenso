@@ -619,10 +619,10 @@ graph TD
     J --> J1["Set security & cache headers"]
     J1 --> K["Response Sent"]
     
-    style A fill:#e1f5fe
-    style K fill:#e8f5e8
-    style G1 fill:#fff2cc
-    style I1 fill:#f0f4ff
+    style A fill:#4a90e2
+    style K fill:#28a745
+    style G1 fill:#ff9800
+    style I1 fill:#9c27b0
 ```
 
 ### Response Processing Detail

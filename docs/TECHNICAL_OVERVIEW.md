@@ -601,26 +601,28 @@ Tenso provides a comprehensive set of enterprise-ready features that require min
 
 ```mermaid
 graph TD
-    A["1. Request Received"] --> B["2. Connection Setup<br/>(connect middleware)"]
-    B --> B1["Set request properties<br/>(csrf, hypermedia, protect flags)<br/>Configure CORS headers"]
-    B1 --> C["3. Prometheus Metrics<br/>(optional)"]
-    C --> D["4. Exit Check<br/>(early termination for<br/>configured routes)"]
-    D --> E["5. Payload Collection"]
-    E --> E1["Collect request body<br/>Enforce size limits"]
-    E1 --> F["6. Request Parsing"]
-    F --> F1["Parse body based on Content-Type<br/>Apply registered parsers"]
-    F1 --> G["7. Authentication Pipeline<br/>(if enabled)"]
-    G --> G1["Cookie parsing<br/>Session management<br/>Bypass check<br/>CSRF validation<br/>Security headers (Helmet)<br/>Zuul protection coordination<br/>Passport authentication"]
-    G1 --> H["8. Route Handling"]
-    H --> H1["Match route patterns<br/>Execute route handlers"]
-    H1 --> I["9. Response Processing Pipeline"]
-    I --> I1["serialize() - Content negotiation<br/>hypermedia() - Link generation<br/>final() - Custom processing<br/>render() - Format output"]
-    I1 --> J["10. Response Headers"]
-    J --> J1["Cache control<br/>Security headers<br/>Rate limit headers"]
-    J1 --> K["11. Response Sent"]
+    A["Request Received"] --> B["Connection Setup"]
+    B --> B1["Set request properties & CORS"]
+    B1 --> C["Prometheus Metrics"]
+    C --> D["Exit Check"]
+    D --> E["Payload Collection"]
+    E --> E1["Collect body & enforce limits"]
+    E1 --> F["Request Parsing"]
+    F --> F1["Parse by Content-Type"]
+    F1 --> G["Authentication Pipeline"]
+    G --> G1["Session, CSRF & auth validation"]
+    G1 --> H["Route Handling"]
+    H --> H1["Match patterns & execute"]
+    H1 --> I["Response Processing"]
+    I --> I1["Serialize, hypermedia & render"]
+    I1 --> J["Response Headers"]
+    J --> J1["Set security & cache headers"]
+    J1 --> K["Response Sent"]
     
     style A fill:#e1f5fe
     style K fill:#e8f5e8
+    style G1 fill:#fff2cc
+    style I1 fill:#f0f4ff
 ```
 
 ### Response Processing Detail

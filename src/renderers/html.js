@@ -35,18 +35,33 @@ import {renderers} from "../utils/renderers.js";
  * @returns {string} The rendered HTML string
  */
 export function html (req, res, arg, tpl = EMPTY) {
+	if (tpl.length === INT_0) {
+		return EMPTY;
+	}
+
 	const protocol = X_FORWARDED_PROTO in req.headers ? req.headers[X_FORWARDED_PROTO] + COLON : req.parsed.protocol,
 		headers = res.getHeaders();
 
-	return tpl.length > INT_0 ? tpl.replace(new RegExp(TEMPLATE_TITLE, G), req.server.title)
-		.replace(TEMPLATE_URL, req.parsed.href.replace(req.parsed.protocol, protocol))
-		.replace(TEMPLATE_HEADERS, Object.keys(headers).sort().map(i => `<tr><td>${i}</td><td>${sanitize(headers[i])}</td></tr>`).join(NL))
-		.replace(TEMPLATE_FORMATS, `<option value=''></option>${Array.from(renderers.keys()).filter(i => i.indexOf(HTML) === INT_NEG_1).map(i => `<option value='${i.trim()}'>${i.replace(/^.*\//, EMPTY).toUpperCase()}</option>`).join(NL)}`)
-		.replace(TEMPLATE_BODY, sanitize(JSON.stringify(arg, null, INT_2)))
-		.replace(TEMPLATE_YEAR, new Date().getFullYear())
-		.replace(TEMPLATE_VERSION, req.server.version)
-		.replace(TEMPLATE_ALLOW, headers.allow)
-		.replace(TEMPLATE_METHODS, explode((headers?.allow ?? EMPTY).replace(HEADER_ALLOW_GET, EMPTY)).filter(i => i !== EMPTY).map(i => `<option value='${i.trim()}'>$i.trim()}</option>`).join(NL))
-		.replace(TEMPLATE_CSRF, headers?.[X_CSRF_TOKEN] ?? EMPTY)
-		.replace("class=\"headers", req.server.renderHeaders === false ? "class=\"headers dr-hidden" : "class=\"headers") : EMPTY;
+	// Build all replacement values once
+	const replacements = new Map([
+		[new RegExp(TEMPLATE_TITLE, G), req.server.title],
+		[TEMPLATE_URL, req.parsed.href.replace(req.parsed.protocol, protocol)],
+		[TEMPLATE_HEADERS, Object.keys(headers).sort().map(i => `<tr><td>${i}</td><td>${sanitize(headers[i])}</td></tr>`).join(NL)],
+		[TEMPLATE_FORMATS, `<option value=''></option>${Array.from(renderers.keys()).filter(i => i.indexOf(HTML) === INT_NEG_1).map(i => `<option value='${i.trim()}'>${i.replace(/^.*\//, EMPTY).toUpperCase()}</option>`).join(NL)}`],
+		[TEMPLATE_BODY, sanitize(JSON.stringify(arg, null, INT_2))],
+		[TEMPLATE_YEAR, new Date().getFullYear()],
+		[TEMPLATE_VERSION, req.server.version],
+		[TEMPLATE_ALLOW, headers.allow],
+		[TEMPLATE_METHODS, explode((headers?.allow ?? EMPTY).replace(HEADER_ALLOW_GET, EMPTY)).filter(i => i !== EMPTY).map(i => `<option value='${i.trim()}'>${i.trim()}</option>`).join(NL)],
+		[TEMPLATE_CSRF, headers?.[X_CSRF_TOKEN] ?? EMPTY],
+		["class=\"headers", req.server.renderHeaders === false ? "class=\"headers dr-hidden" : "class=\"headers"]
+	]);
+
+	// Apply all replacements in a single pass
+	let result = tpl;
+	for (const [pattern, replacement] of replacements) {
+		result = result.replace(pattern, replacement);
+	}
+
+	return result;
 }

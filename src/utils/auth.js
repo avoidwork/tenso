@@ -54,6 +54,39 @@ import helmet from "helmet";
 const {Strategy: JWTStrategy, ExtractJwt} = passportJWT,
 	groups = [PROTECT, UNPROTECT];
 
+// Regex cache to avoid recompiling the same patterns
+const regexCache = new Map();
+
+/**
+ * Creates a cached regex pattern to avoid recompiling
+ * @param {string} pattern - The regex pattern string
+ * @param {string} flags - The regex flags
+ * @returns {RegExp} The compiled regex pattern
+ */
+function createCachedRegex (pattern, flags = "") {
+	const key = `${pattern}|${flags}`;
+
+	if (!regexCache.has(key)) {
+		regexCache.set(key, new RegExp(pattern, flags));
+	}
+
+	return regexCache.get(key);
+}
+
+/**
+ * Converts a pattern string to a regex pattern with wildcard handling
+ * @param {string} pattern - The pattern string
+ * @param {string} loginUri - The login URI to compare against
+ * @returns {string} The converted regex pattern
+ */
+function convertPatternToRegex (pattern, loginUri) {
+	if (pattern === loginUri) {
+		return `^${EMPTY}(/|$)`;
+	}
+
+	return `^${pattern.replace(/\.\*/g, WILDCARD).replace(/\*/g, `${PERIOD}${WILDCARD}`)}(/|$)`;
+}
+
 /**
  * Configures authentication middleware and strategies for the server
  * Sets up various authentication methods (Basic, Bearer, JWT, OAuth2) and security middleware
@@ -73,8 +106,13 @@ export function auth (obj) {
 
 	obj.ignore(asyncFlag);
 
+	// Use cached regex compilation for auth patterns
 	for (const k of groups) {
-		obj.auth[k] = (obj.auth[k] || []).map(i => new RegExp(`^${i !== obj.auth.uri.login ? i.replace(/\.\*/g, WILDCARD).replace(/\*/g, `${PERIOD}${WILDCARD}`) : EMPTY}(/|$)`, I));
+		obj.auth[k] = (obj.auth[k] || []).map(i => {
+			const pattern = convertPatternToRegex(i, obj.auth.uri.login);
+
+			return createCachedRegex(pattern, I);
+		});
 	}
 
 	for (const i of Object.keys(obj.auth)) {
@@ -83,7 +121,7 @@ export function auth (obj) {
 
 			authMap[`${i}${UNDERSCORE}${URI}`] = uri;
 			authUris.push(uri);
-			obj.auth.protect.push(new RegExp(`^/auth/${i}(/|$)`));
+			obj.auth.protect.push(createCachedRegex(`^/auth/${i}(/|$)`));
 		}
 	}
 

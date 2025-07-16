@@ -3,7 +3,7 @@
  *
  * @copyright 2025 Jason Mulligan <jason.mulligan@avoidwork.com>
  * @license BSD-3-Clause
- * @version 17.2.5
+ * @version 17.3.0
  */
 'use strict';
 
@@ -199,6 +199,7 @@ const INT_2 = 2;
 const INT_3 = 3;
 const INT_5 = 5;
 const INT_10 = 10;
+const INT_25 = 25;
 const INT_80 = 80;
 const INT_100 = 1e2;
 const INT_443 = 443;
@@ -291,45 +292,124 @@ const MSG_TOO_MANY_REQUESTS = "Too many requests";
  *
  * @typedef {Object} TensoConfig
  * @property {Object} auth - Authentication configuration
- * @property {number} auth.delay - Authentication delay in milliseconds
+ * @property {number} auth.delay - Authentication delay in milliseconds (default: 0)
  * @property {Array<string>} auth.protect - Routes to protect with authentication
  * @property {Array<string>} auth.unprotect - Routes to exclude from authentication
  * @property {Object} auth.basic - Basic authentication settings
+ * @property {boolean} auth.basic.enabled - Enable basic authentication
+ * @property {Array} auth.basic.list - List of basic auth credentials
  * @property {Object} auth.bearer - Bearer token authentication settings
+ * @property {boolean} auth.bearer.enabled - Enable bearer token authentication
+ * @property {Array} auth.bearer.tokens - Valid bearer tokens
  * @property {Object} auth.jwt - JWT authentication settings
+ * @property {boolean} auth.jwt.enabled - Enable JWT authentication
+ * @property {Function|null} auth.jwt.auth - Custom JWT authentication function
+ * @property {string} auth.jwt.audience - JWT audience claim
+ * @property {Array<string>} auth.jwt.algorithms - Allowed JWT signing algorithms
+ * @property {boolean} auth.jwt.ignoreExpiration - Ignore JWT expiration
+ * @property {string} auth.jwt.issuer - JWT issuer claim
+ * @property {string} auth.jwt.scheme - JWT authentication scheme
+ * @property {string} auth.jwt.secretOrKey - JWT secret or public key
+ * @property {Object} auth.msg - Authentication messages
+ * @property {string} auth.msg.login - Login message
  * @property {Object} auth.oauth2 - OAuth2 authentication settings
- * @property {Object} auth.saml - SAML authentication settings
+ * @property {boolean} auth.oauth2.enabled - Enable OAuth2 authentication
+ * @property {Function|null} auth.oauth2.auth - Custom OAuth2 authentication function
+ * @property {string} auth.oauth2.auth_url - OAuth2 authorization URL
+ * @property {string} auth.oauth2.token_url - OAuth2 token URL
+ * @property {string} auth.oauth2.client_id - OAuth2 client ID
+ * @property {string} auth.oauth2.client_secret - OAuth2 client secret
  * @property {Object} auth.uri - Authentication URI endpoints
- * @property {boolean} autoindex - Enable automatic directory indexing
- * @property {number} cacheSize - Maximum number of items in cache
- * @property {number} cacheTTL - Cache time-to-live in milliseconds
- * @property {boolean} catchAll - Enable catch-all route handling
- * @property {string} charset - Default character encoding
+ * @property {string} auth.uri.login - Login endpoint URI
+ * @property {string} auth.uri.logout - Logout endpoint URI
+ * @property {string} auth.uri.redirect - Post-authentication redirect URI
+ * @property {string} auth.uri.root - Authentication root URI
+ * @property {Object} auth.saml - SAML authentication settings
+ * @property {boolean} auth.saml.enabled - Enable SAML authentication
+ * @property {Function|null} auth.saml.auth - Custom SAML authentication function
+ * @property {boolean} autoindex - Enable automatic directory indexing for static files
+ * @property {number} cacheSize - Maximum number of items in memory cache (default: 1000)
+ * @property {number} cacheTTL - Cache time-to-live in milliseconds (default: 300000)
+ * @property {boolean} catchAll - Enable catch-all route handling for unmatched requests
+ * @property {string} charset - Default character encoding for responses (default: "utf-8")
  * @property {string} corsExpose - CORS exposed headers
- * @property {Object} defaultHeaders - Default HTTP headers to include in responses
- * @property {number} digit - Number of decimal places for numeric formatting
- * @property {boolean} etags - Enable ETag generation
- * @property {Array} exit - Exit handlers
- * @property {string} host - Server host address
+ * @property {Object} defaultHeaders - Default HTTP headers to include in all responses
+ * @property {string} defaultHeaders["content-type"] - Default content type header
+ * @property {string} defaultHeaders.vary - Default vary header
+ * @property {number} digit - Number of decimal places for numeric formatting (default: 3)
+ * @property {boolean} etags - Enable ETag generation for response caching
+ * @property {Array} exit - Exit handlers to execute on server shutdown
+ * @property {string} host - Server host address to bind to (default: "0.0.0.0")
  * @property {Object} hypermedia - Hypermedia/HATEOAS configuration
- * @property {Array} index - Index route configuration
- * @property {Object} initRoutes - Initial route definitions
- * @property {number} jsonIndent - JSON response indentation level
+ * @property {boolean} hypermedia.enabled - Enable hypermedia links in responses
+ * @property {boolean} hypermedia.header - Include hypermedia links in response headers
+ * @property {Array} index - Index route configuration for root path handling
+ * @property {Object} initRoutes - Initial route definitions to register on startup
+ * @property {number} jsonIndent - JSON response indentation level (default: 0 for minified)
  * @property {Object} logging - Logging configuration
- * @property {number} maxBytes - Maximum request body size in bytes
+ * @property {boolean} logging.enabled - Enable logging output
+ * @property {string} logging.format - Log message format
+ * @property {string} logging.level - Minimum log level to output
+ * @property {boolean} logging.stack - Include stack traces in error logs
+ * @property {number} maxBytes - Maximum request body size in bytes (0 = unlimited)
+ * @property {number} maxListeners - Maximum number of event listeners (default: 25)
  * @property {string} mimeType - Default MIME type for responses
- * @property {Array<string>} origins - Allowed CORS origins
- * @property {number} pageSize - Default pagination page size
- * @property {number} port - Server port number
+ * @property {Array<string>} origins - Allowed CORS origins (default: ["*"])
+ * @property {number} pageSize - Default pagination page size (default: 5)
+ * @property {number} port - Server port number to listen on (default: 8000)
  * @property {Object} prometheus - Prometheus metrics configuration
+ * @property {boolean} prometheus.enabled - Enable Prometheus metrics collection
+ * @property {Object} prometheus.metrics - Metrics collection settings
+ * @property {boolean} prometheus.metrics.includeMethod - Include HTTP method in metrics
+ * @property {boolean} prometheus.metrics.includePath - Include request path in metrics
+ * @property {boolean} prometheus.metrics.includeStatusCode - Include status code in metrics
+ * @property {boolean} prometheus.metrics.includeUp - Include uptime metrics
+ * @property {Array<number>} prometheus.metrics.buckets - Histogram buckets for response times
+ * @property {Object} prometheus.metrics.customLabels - Custom metric labels
  * @property {Object} rate - Rate limiting configuration
- * @property {boolean} renderHeaders - Include headers in rendered output
- * @property {boolean} time - Include timing information in responses
- * @property {Object} security - Security-related settings (CSRF, CSP, etc.)
+ * @property {boolean} rate.enabled - Enable rate limiting
+ * @property {number} rate.limit - Maximum requests per time window (default: 450)
+ * @property {string} rate.message - Rate limit exceeded message
+ * @property {Function|null} rate.override - Custom rate limit override function
+ * @property {number} rate.reset - Rate limit reset window in seconds (default: 900)
+ * @property {number} rate.status - HTTP status code for rate limit responses (default: 429)
+ * @property {boolean} renderHeaders - Include headers in rendered output responses
+ * @property {boolean} time - Include timing information in response headers
+ * @property {Object} security - Security-related settings
+ * @property {string} security.key - CSRF token header name
+ * @property {string} security.secret - CSRF secret key
+ * @property {boolean} security.csrf - Enable CSRF protection
+ * @property {string|null} security.csp - Content Security Policy header value
+ * @property {string} security.xframe - X-Frame-Options header value
+ * @property {string} security.p3p - P3P privacy policy header value
+ * @property {string|null} security.hsts - HTTP Strict Transport Security header value
+ * @property {boolean} security.xssProtection - Enable X-XSS-Protection header
+ * @property {boolean} security.nosniff - Enable X-Content-Type-Options: nosniff header
  * @property {Object} session - Session management configuration
- * @property {boolean} silent - Suppress console output
+ * @property {Object} session.cookie - Session cookie settings
+ * @property {boolean} session.cookie.httpOnly - Set httpOnly flag on session cookies
+ * @property {string} session.cookie.path - Session cookie path
+ * @property {boolean} session.cookie.sameSite - Enable SameSite cookie attribute
+ * @property {string} session.cookie.secure - Secure cookie setting ("auto", true, false)
+ * @property {string} session.name - Session cookie name
+ * @property {boolean} session.proxy - Trust proxy for secure cookies
+ * @property {Object} session.redis - Redis session store configuration
+ * @property {string} session.redis.host - Redis host address
+ * @property {number} session.redis.port - Redis port number
+ * @property {boolean} session.rolling - Enable rolling session expiration
+ * @property {boolean} session.resave - Force session save even if not modified
+ * @property {boolean} session.saveUninitialized - Save uninitialized sessions
+ * @property {string} session.secret - Session signing secret
+ * @property {string} session.store - Session store type ("memory", "redis", etc.)
+ * @property {boolean} silent - Suppress console output and logging
  * @property {Object} ssl - SSL/TLS configuration
+ * @property {string|null} ssl.cert - SSL certificate file path or content
+ * @property {string|null} ssl.key - SSL private key file path or content
+ * @property {string|null} ssl.pfx - SSL PFX file path or content
  * @property {Object} webroot - Web root and static file serving configuration
+ * @property {string} webroot.root - Document root directory for static files
+ * @property {string} webroot.static - Static assets directory path
+ * @property {string} webroot.template - Template file path for rendered responses
  *
  * @type {TensoConfig}
  */
@@ -410,6 +490,7 @@ const config = {
 		stack: true
 	},
 	maxBytes: INT_0,
+	maxListeners: INT_25,
 	mimeType: HEADER_APPLICATION_JSON,
 	origins: [WILDCARD],
 	pageSize: INT_5,
@@ -2294,6 +2375,10 @@ class Tenso extends woodland.Woodland {
 	 */
 	init () {
 		const authorization = Object.keys(this.auth).filter(i => this.auth?.[i]?.enabled === true).length > INT_0 || this.rate.enabled || this.security.csrf;
+
+		// Matching MaxListeners for signals
+		this.setMaxListeners(this.maxListeners);
+		process.setMaxListeners(this.maxListeners);
 
 		this.decorate = this.decorate.bind(this);
 		this.route = this.route.bind(this);

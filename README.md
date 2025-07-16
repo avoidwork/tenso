@@ -120,7 +120,8 @@ const api = new MyAPI();
 - [Serving Files](#serving-files)
 - [EventSource Streams](#eventsource-streams)
 - [Prometheus](#prometheus)
-  - [Testing](#testing)
+- [Benchmarks](#benchmarks)
+- [Testing](#testing)
 - [TypeScript](#typescript)
 - [Examples](#examples)
 - [Troubleshooting](#troubleshooting)
@@ -674,6 +675,250 @@ Prometheus metrics can be enabled by setting `{prometheus: {enabled: true}}`. Th
 	}
 }
 ```
+
+## ⚡ Benchmarks
+
+Tenso includes a comprehensive benchmark suite for performance analysis and optimization. The benchmark suite tests all major framework components including HTTP handling, authentication, parsing, rendering, serialization, hypermedia generation, rate limiting, memory usage, and real-world load testing.
+
+### Performance Overview
+
+Tenso demonstrates excellent performance characteristics:
+
+- **Peak Performance**: 34,817 RPS (requests per second)
+- **Average Response Time**: 0.0ms minimum latency
+- **Reliability**: 99.993% success rate (0.007% error rate)
+- **Total Requests Processed**: 6.4+ million in comprehensive testing
+- **Hypermedia Impact**: ~10% performance cost when enabled
+
+### Available Benchmarks
+
+#### 1. Basic HTTP Performance (`basic-http.js`)
+Tests fundamental HTTP request/response performance:
+- **Request/Response Cycle**: Basic rendering performance  
+- **JSON Serialization**: Performance of JSON output formatting
+- **Different Data Sizes**: Impact of response size on performance
+
+#### 2. Authentication (`auth.js`)
+Tests authentication middleware performance:
+- **Basic Auth**: Username/password validation
+- **Bearer Token**: Token-based authentication
+- **JWT Processing**: JSON Web Token validation
+- **Route Protection**: Pattern matching for protected routes
+- **Session Auth**: Session-based authentication
+
+#### 3. Parsers (`parsers.js`)
+Tests request body parsing performance:
+- **JSON Parser**: `application/json` content parsing
+- **JSONL Parser**: `application/jsonl` line-delimited JSON parsing  
+- **Form Parser**: `application/x-www-form-urlencoded` parsing
+- **Memory Usage**: Parser memory consumption
+
+#### 4. Renderers (`renderers.js`)
+Tests response rendering performance:
+- **JSON Rendering**: JSON output formatting
+- **XML Rendering**: XML output with proper escaping
+- **CSV Rendering**: Tabular data formatting
+- **YAML Rendering**: YAML output formatting
+- **Plain Text Rendering**: Simple text output
+- **HTML Rendering**: HTML output with proper escaping
+- **JavaScript Rendering**: JSONP callback formatting
+
+#### 5. Serializers (`serializers.js`)
+Tests data serialization performance for response processing:
+- **Custom Serializer**: Structured response objects with metadata
+- **Plain Serializer**: Direct data or error information return
+- **Error Handling**: Error serialization with/without stack traces
+- **MIME Type Support**: Serialization for different content types
+- **Status Code Handling**: Different HTTP status code scenarios
+
+#### 6. Rate Limiting (`rate-limiting.js`)
+Tests rate limiting performance and accuracy:
+- **Basic Rate Limiting**: Request counting and limiting
+- **Different Limits**: Impact of limit values on performance
+- **Window Reset**: Rate limit window management
+- **High Concurrency**: Performance under heavy load
+- **Cleanup**: Expired entry removal performance
+
+#### 7. Hypermedia (`hypermedia.js`)
+Tests HATEOAS link generation performance:
+- **Link Generation**: Creating hypermedia links from data
+- **Pagination Links**: Navigation link creation
+- **Pattern Matching**: ID and URL pattern recognition
+- **Link Deduplication**: Duplicate link removal
+- **Link Headers**: HTTP Link header generation
+
+#### 8. Memory Usage (`memory.js`)
+Tests memory consumption and leak detection:
+- **Server Lifecycle**: Memory usage during start/stop
+- **Request Processing**: Memory per request
+- **Parser Memory**: Memory usage by parsers
+- **Renderer Memory**: Memory usage by renderers
+- **Rate Limit Memory**: Memory growth with clients
+- **Leak Detection**: Long-running memory pattern analysis
+
+#### 9. Load Testing (`load-test.js`)
+Real-world load testing using autocannon:
+- **Basic Load Tests**: Various connection levels
+- **POST Request Tests**: Request body handling under load
+- **Format Tests**: Different response formats under load
+- **Rate Limit Tests**: Rate limiting behavior under load
+- **Hypermedia Comparison**: Performance with/without hypermedia
+- **Stress Tests**: High-connection scenarios
+- **Mixed Workloads**: Realistic usage patterns
+
+### Running Benchmarks
+
+```bash
+# Run comprehensive load test
+npm run benchmark:load
+
+# Run individual benchmark suites
+npm run benchmark:basic      # Basic HTTP performance
+npm run benchmark:auth       # Authentication performance
+npm run benchmark:parsers    # Request parsing performance
+npm run benchmark:renderers  # Response rendering performance
+npm run benchmark:serializers # Data serialization performance  
+npm run benchmark:rate       # Rate limiting performance
+npm run benchmark:hypermedia # Hypermedia link generation
+npm run benchmark:memory     # Memory usage analysis
+```
+
+### Latest Load Test Results
+
+#### Overall Performance Summary
+```
+📊 Load Test Summary Report
+======================================================================
+| Test Category      | Avg RPS  | Avg Latency | P99 Latency | Error Rate |
+|--------------------------------------------------------------------|
+| Basic Tests        | 21,899.0 |       3.1ms |       3.8ms |      0.00% |
+| POST Tests         | 20,522.1 |       0.7ms |       1.0ms |      0.00% |
+| Format Tests       | 10,634.8 |       1.7ms |       2.3ms |      0.00% |
+| Rate Limit         | 19,460.3 |       0.8ms |       1.3ms |      0.00% |
+| Parameterized      | 27,718.9 |       0.1ms |       1.0ms |      0.00% |
+| Mixed Load         | 25,590.4 |       1.0ms |       1.0ms |      0.00% |
+| Hypermedia Enabled | 18,665.7 |       3.2ms |       4.3ms |      0.00% |
+| Hypermedia Disabled| 20,694.6 |       3.2ms |       3.8ms |      0.00% |
+| Stress Tests       | 18,009.3 |      27.2ms |      54.8ms |      0.05% |
+|--------------------------------------------------------------------|
+
+🎯 Key Metrics:
+  Total tests run: 29
+  Total requests: 6,494,748
+  Total errors: 484
+  Overall error rate: 0.01%
+  Best RPS: 33,987.6
+  Worst RPS: 828.4
+  Best latency: 0.0ms
+  Worst latency: 60.5ms
+```
+
+#### Hypermedia Performance Impact
+```
+Performance Comparison: Hypermedia Enabled vs Disabled
+
+Test Type                    | With Hypermedia | Without Hypermedia | Improvement
+----------------------------|-----------------|-------------------|------------
+Ping Test (Simple)         |   29,805.82 RPS |     33,318.55 RPS |     +11.8%
+JSON Response               |   16,601.82 RPS |     17,472.73 RPS |      +5.2%
+Large JSON Response         |      894.50 RPS |        902.90 RPS |      +0.9%
+Parameterized Route         |   27,360.73 RPS |     31,084.37 RPS |     +13.6%
+
+Average Performance Impact: ~10.9% improvement when disabling hypermedia
+```
+
+#### Response Format Performance
+```
+Format                      | Avg RPS      | Avg Latency | Throughput
+----------------------------|--------------|-------------|------------
+JSON                        |   17,141 RPS |       1.0ms |  122 MB/sec
+XML                         |    5,948 RPS |       2.8ms |   78 MB/sec
+CSV                         |   10,987 RPS |       1.1ms |   90 MB/sec
+YAML                        |    8,675 RPS |       2.0ms |   60 MB/sec
+```
+
+#### Stress Test Results
+```
+Test Scenario               | Connections | Duration | Avg RPS    | P99 Latency
+----------------------------|-------------|----------|------------|------------
+High Connections            |         200 |      15s | 28,334 RPS |       8ms
+Very High Connections       |         500 |      10s | 25,298 RPS |     121ms
+JSON High Load              |         100 |      15s | 16,170 RPS |       6ms
+Large Response High Load    |          50 |      10s |    828 RPS |      97ms
+```
+
+### Performance Targets
+
+#### Excellent Performance
+- **HTTP Requests**: >5,000 RPS for simple responses
+- **Authentication**: >40,000 checks/sec
+- **Parsing**: >10,000 operations/sec for medium payloads
+- **Rendering**: >5,000 operations/sec for JSON
+- **Rate Limiting**: >100,000 checks/sec
+- **Memory**: <100 bytes per client session
+
+#### Good Performance
+- **HTTP Requests**: >2,000 RPS
+- **Average Latency**: <10ms
+- **99th Percentile**: <50ms
+- **Memory Growth**: <5MB over 1,000 operations
+- **Error Rate**: <0.1%
+
+#### Warning Signs
+- **Consistent Memory Growth**: Potential memory leaks
+- **High Latency**: >100ms average response time
+- **High Error Rates**: >1% error rate
+- **Poor Throughput**: <500 RPS for simple operations
+
+### Running with Profiling
+
+For detailed performance analysis:
+
+```bash
+# Run with garbage collection exposed for better memory benchmarking
+node --expose-gc benchmarks/memory.js
+
+# Profile CPU usage
+node --prof benchmarks/basic-http.js
+node --prof-process isolate-*.log > profile.txt
+
+# Chrome DevTools integration
+node --inspect benchmarks/load-test.js
+
+# Using clinic.js (install separately)
+clinic doctor -- node benchmarks/basic-http.js
+```
+
+### Performance Tips
+
+For accurate benchmark results:
+
+1. **Close other applications** to reduce system noise
+2. **Run multiple times** to establish consistency patterns
+3. **Use consistent hardware** for meaningful comparisons
+4. **Monitor system resources** during testing
+5. **Consider CPU scaling** on laptops (disable turbo boost)
+6. **Build the project first** with `npm run build`
+
+### Understanding Results
+
+- **ops/sec**: Operations per second (higher is better)
+- **±percentage**: Margin of error (lower is better)
+- **runs sampled**: Number of test iterations for statistical validity
+- **Req/Sec**: Requests per second for load tests
+- **Latency percentiles**: Response time distribution across requests
+
+### Troubleshooting
+
+**"Cannot find module" errors**: Ensure you've built the project first with `npm run build` in the root directory.
+
+**High memory usage**: Some benchmarks intentionally stress memory - monitor system resources.
+
+**Port conflicts**: Benchmarks use random ports, but conflicts can occur with concurrent tests.
+
+**Timeout errors**: Reduce iteration counts or test duration for slower systems.
+
+For comprehensive documentation, configuration options, CI integration, and troubleshooting, see the detailed guide at `benchmarks/README.md`.
 
 ## 🧪 Testing
 

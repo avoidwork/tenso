@@ -94,6 +94,29 @@ function createTestServer (config = {}) {
 }
 
 /**
+ * Starts a server and waits for it to be listening
+ * @param {Object} server - The Tenso server instance
+ * @returns {Promise<Object>} Promise that resolves with the server instance when listening
+ */
+function startServer (server) {
+	return new Promise((resolve, reject) => {
+		server.start();
+
+		if (server.server) {
+			server.server.on("listening", () => {
+				resolve(server);
+			});
+
+			server.server.on("error", err => {
+				reject(err);
+			});
+		} else {
+			reject(new Error("Server was not created"));
+		}
+	});
+}
+
+/**
  * Runs a load test with autocannon
  */
 async function runLoadTest (options) {
@@ -331,8 +354,8 @@ async function rateLimitLoadTests () {
 		}
 	});
 
-	server.start();
-	const baseUrl = `http://localhost:${server.server.address().port}`;
+	const startedServer = await startServer(server);
+	const baseUrl = `http://localhost:${startedServer.server.address().port}`;
 
 	const tests = [
 		{
@@ -363,7 +386,7 @@ async function rateLimitLoadTests () {
 		await new Promise(resolve => setTimeout(resolve, 2000)); // Longer pause for rate limit reset
 	}
 
-	server.stop();
+	startedServer.stop();
 
 	return results;
 }
@@ -476,6 +499,120 @@ async function mixedWorkloadTests (server) {
 }
 
 /**
+ * Tests with hypermedia options explicitly enabled for performance comparison
+ */
+async function hypermediaEnabledTests () {
+	console.log("\n🔥 Hypermedia Enabled Tests");
+	console.log("=".repeat(50));
+
+	const server = createTestServer({
+		hypermedia: {
+			enabled: true,
+			header: true
+		}
+	});
+
+	const startedServer = await startServer(server);
+	const baseUrl = `http://localhost:${startedServer.server.address().port}`;
+
+	const tests = [
+		{
+			title: "Ping Test (With Hypermedia)",
+			url: `${baseUrl}/ping`,
+			connections: 50,
+			duration: 10
+		},
+		{
+			title: "JSON Response (With Hypermedia)",
+			url: `${baseUrl}/users`,
+			connections: 25,
+			duration: 10
+		},
+		{
+			title: "Large JSON Response (With Hypermedia)",
+			url: `${baseUrl}/large`,
+			connections: 10,
+			duration: 10
+		},
+		{
+			title: "Parameterized Route (With Hypermedia)",
+			url: `${baseUrl}/users/42`,
+			connections: 20,
+			duration: 10
+		}
+	];
+
+	const results = [];
+	for (const test of tests) {
+		const result = await runLoadTest(test);
+		results.push({ ...test, result });
+
+		await new Promise(resolve => setTimeout(resolve, 1000));
+	}
+
+	startedServer.stop();
+
+	return results;
+}
+
+/**
+ * Tests with hypermedia options disabled for performance comparison
+ */
+async function hypermediaDisabledTests () {
+	console.log("\n🔥 Hypermedia Disabled Tests");
+	console.log("=".repeat(50));
+
+	const server = createTestServer({
+		hypermedia: {
+			enabled: false,
+			header: false
+		}
+	});
+
+	const startedServer = await startServer(server);
+	const baseUrl = `http://localhost:${startedServer.server.address().port}`;
+
+	const tests = [
+		{
+			title: "Ping Test (No Hypermedia)",
+			url: `${baseUrl}/ping`,
+			connections: 50,
+			duration: 10
+		},
+		{
+			title: "JSON Response (No Hypermedia)",
+			url: `${baseUrl}/users`,
+			connections: 25,
+			duration: 10
+		},
+		{
+			title: "Large JSON Response (No Hypermedia)",
+			url: `${baseUrl}/large`,
+			connections: 10,
+			duration: 10
+		},
+		{
+			title: "Parameterized Route (No Hypermedia)",
+			url: `${baseUrl}/users/42`,
+			connections: 20,
+			duration: 10
+		}
+	];
+
+	const results = [];
+	for (const test of tests) {
+		const result = await runLoadTest(test);
+		results.push({ ...test, result });
+
+		await new Promise(resolve => setTimeout(resolve, 1000));
+	}
+
+	startedServer.stop();
+
+	return results;
+}
+
+/**
  * Generates a summary report of all test results
  */
 function generateSummaryReport (allResults) {
@@ -565,37 +702,43 @@ async function main () {
 
 	// Create and start the main test server
 	const server = createTestServer();
-	server.start();
+	const startedServer = await startServer(server);
 
-	console.log(`Test server started on port ${server.server.address().port}`);
+	console.log(`Test server started on port ${startedServer.server.address().port}`);
 
 	const allResults = [];
 
 	try {
 		// Run all test suites
-		const basicResults = await basicLoadTests(server);
+		const basicResults = await basicLoadTests(startedServer);
 		allResults.push({ name: "Basic Tests", results: basicResults });
 
-		const postResults = await postLoadTests(server);
+		const postResults = await postLoadTests(startedServer);
 		allResults.push({ name: "POST Tests", results: postResults });
 
-		const formatResults = await formatLoadTests(server);
+		const formatResults = await formatLoadTests(startedServer);
 		allResults.push({ name: "Format Tests", results: formatResults });
 
 		const rateLimitResults = await rateLimitLoadTests();
 		allResults.push({ name: "Rate Limit", results: rateLimitResults });
 
-		const paramResults = await parameterizedTests(server);
+		const paramResults = await parameterizedTests(startedServer);
 		allResults.push({ name: "Parameterized", results: paramResults });
 
-		const mixedResults = await mixedWorkloadTests(server);
+		const mixedResults = await mixedWorkloadTests(startedServer);
 		allResults.push({ name: "Mixed Load", results: mixedResults });
+
+		const hypermediaEnabledResults = await hypermediaEnabledTests();
+		allResults.push({ name: "Hypermedia Enabled", results: hypermediaEnabledResults });
+
+		const hypermediaDisabledResults = await hypermediaDisabledTests();
+		allResults.push({ name: "Hypermedia Disabled", results: hypermediaDisabledResults });
 
 		// Ask before running stress tests
 		console.log("\n⚠️  Stress tests can be resource intensive.");
 		console.log("Running stress tests automatically...\n");
 
-		const stressResults = await stressTests(server);
+		const stressResults = await stressTests(startedServer);
 		allResults.push({ name: "Stress Tests", results: stressResults });
 
 		// Generate summary report
@@ -608,7 +751,7 @@ async function main () {
 		process.exit(1);
 	} finally {
 		// Clean up
-		server.stop();
+		startedServer.stop();
 		console.log("\nTest server stopped.");
 	}
 }

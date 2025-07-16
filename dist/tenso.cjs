@@ -309,7 +309,7 @@ const MSG_TOO_MANY_REQUESTS = "Too many requests";
  * @property {boolean} auth.jwt.ignoreExpiration - Ignore JWT expiration
  * @property {string} auth.jwt.issuer - JWT issuer claim
  * @property {string} auth.jwt.scheme - JWT authentication scheme
- * @property {string} auth.jwt.secretOrKey - JWT secret or public key
+ * @property {string} auth.jwt.secretOrKey - JWT secret or private key
  * @property {Object} auth.msg - Authentication messages
  * @property {string} auth.msg.login - Login message
  * @property {Object} auth.oauth2 - OAuth2 authentication settings

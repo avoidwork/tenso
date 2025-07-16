@@ -3,7 +3,7 @@
  *
  * @copyright 2025 Jason Mulligan <jason.mulligan@avoidwork.com>
  * @license BSD-3-Clause
- * @version 17.2.5
+ * @version 17.3.0
  */
 'use strict';
 
@@ -199,6 +199,7 @@ const INT_2 = 2;
 const INT_3 = 3;
 const INT_5 = 5;
 const INT_10 = 10;
+const INT_25 = 25;
 const INT_80 = 80;
 const INT_100 = 1e2;
 const INT_443 = 443;
@@ -291,45 +292,124 @@ const MSG_TOO_MANY_REQUESTS = "Too many requests";
  *
  * @typedef {Object} TensoConfig
  * @property {Object} auth - Authentication configuration
- * @property {number} auth.delay - Authentication delay in milliseconds
+ * @property {number} auth.delay - Authentication delay in milliseconds (default: 0)
  * @property {Array<string>} auth.protect - Routes to protect with authentication
  * @property {Array<string>} auth.unprotect - Routes to exclude from authentication
  * @property {Object} auth.basic - Basic authentication settings
+ * @property {boolean} auth.basic.enabled - Enable basic authentication
+ * @property {Array} auth.basic.list - List of basic auth credentials
  * @property {Object} auth.bearer - Bearer token authentication settings
+ * @property {boolean} auth.bearer.enabled - Enable bearer token authentication
+ * @property {Array} auth.bearer.tokens - Valid bearer tokens
  * @property {Object} auth.jwt - JWT authentication settings
+ * @property {boolean} auth.jwt.enabled - Enable JWT authentication
+ * @property {Function|null} auth.jwt.auth - Custom JWT authentication function
+ * @property {string} auth.jwt.audience - JWT audience claim
+ * @property {Array<string>} auth.jwt.algorithms - Allowed JWT signing algorithms
+ * @property {boolean} auth.jwt.ignoreExpiration - Ignore JWT expiration
+ * @property {string} auth.jwt.issuer - JWT issuer claim
+ * @property {string} auth.jwt.scheme - JWT authentication scheme
+ * @property {string} auth.jwt.secretOrKey - JWT secret or private key
+ * @property {Object} auth.msg - Authentication messages
+ * @property {string} auth.msg.login - Login message
  * @property {Object} auth.oauth2 - OAuth2 authentication settings
- * @property {Object} auth.saml - SAML authentication settings
+ * @property {boolean} auth.oauth2.enabled - Enable OAuth2 authentication
+ * @property {Function|null} auth.oauth2.auth - Custom OAuth2 authentication function
+ * @property {string} auth.oauth2.auth_url - OAuth2 authorization URL
+ * @property {string} auth.oauth2.token_url - OAuth2 token URL
+ * @property {string} auth.oauth2.client_id - OAuth2 client ID
+ * @property {string} auth.oauth2.client_secret - OAuth2 client secret
  * @property {Object} auth.uri - Authentication URI endpoints
- * @property {boolean} autoindex - Enable automatic directory indexing
- * @property {number} cacheSize - Maximum number of items in cache
- * @property {number} cacheTTL - Cache time-to-live in milliseconds
- * @property {boolean} catchAll - Enable catch-all route handling
- * @property {string} charset - Default character encoding
+ * @property {string} auth.uri.login - Login endpoint URI
+ * @property {string} auth.uri.logout - Logout endpoint URI
+ * @property {string} auth.uri.redirect - Post-authentication redirect URI
+ * @property {string} auth.uri.root - Authentication root URI
+ * @property {Object} auth.saml - SAML authentication settings
+ * @property {boolean} auth.saml.enabled - Enable SAML authentication
+ * @property {Function|null} auth.saml.auth - Custom SAML authentication function
+ * @property {boolean} autoindex - Enable automatic directory indexing for static files
+ * @property {number} cacheSize - Maximum number of items in memory cache (default: 1000)
+ * @property {number} cacheTTL - Cache time-to-live in milliseconds (default: 300000)
+ * @property {boolean} catchAll - Enable catch-all route handling for unmatched requests
+ * @property {string} charset - Default character encoding for responses (default: "utf-8")
  * @property {string} corsExpose - CORS exposed headers
- * @property {Object} defaultHeaders - Default HTTP headers to include in responses
- * @property {number} digit - Number of decimal places for numeric formatting
- * @property {boolean} etags - Enable ETag generation
- * @property {Array} exit - Exit handlers
- * @property {string} host - Server host address
+ * @property {Object} defaultHeaders - Default HTTP headers to include in all responses
+ * @property {string} defaultHeaders["content-type"] - Default content type header
+ * @property {string} defaultHeaders.vary - Default vary header
+ * @property {number} digit - Number of decimal places for numeric formatting (default: 3)
+ * @property {boolean} etags - Enable ETag generation for response caching
+ * @property {Array} exit - Exit handlers to execute on server shutdown
+ * @property {string} host - Server host address to bind to (default: "0.0.0.0")
  * @property {Object} hypermedia - Hypermedia/HATEOAS configuration
- * @property {Array} index - Index route configuration
- * @property {Object} initRoutes - Initial route definitions
- * @property {number} jsonIndent - JSON response indentation level
+ * @property {boolean} hypermedia.enabled - Enable hypermedia links in responses
+ * @property {boolean} hypermedia.header - Include hypermedia links in response headers
+ * @property {Array} index - Index route configuration for root path handling
+ * @property {Object} initRoutes - Initial route definitions to register on startup
+ * @property {number} jsonIndent - JSON response indentation level (default: 0 for minified)
  * @property {Object} logging - Logging configuration
- * @property {number} maxBytes - Maximum request body size in bytes
+ * @property {boolean} logging.enabled - Enable logging output
+ * @property {string} logging.format - Log message format
+ * @property {string} logging.level - Minimum log level to output
+ * @property {boolean} logging.stack - Include stack traces in error logs
+ * @property {number} maxBytes - Maximum request body size in bytes (0 = unlimited)
+ * @property {number} maxListeners - Maximum number of event listeners (default: 25)
  * @property {string} mimeType - Default MIME type for responses
- * @property {Array<string>} origins - Allowed CORS origins
- * @property {number} pageSize - Default pagination page size
- * @property {number} port - Server port number
+ * @property {Array<string>} origins - Allowed CORS origins (default: ["*"])
+ * @property {number} pageSize - Default pagination page size (default: 5)
+ * @property {number} port - Server port number to listen on (default: 8000)
  * @property {Object} prometheus - Prometheus metrics configuration
+ * @property {boolean} prometheus.enabled - Enable Prometheus metrics collection
+ * @property {Object} prometheus.metrics - Metrics collection settings
+ * @property {boolean} prometheus.metrics.includeMethod - Include HTTP method in metrics
+ * @property {boolean} prometheus.metrics.includePath - Include request path in metrics
+ * @property {boolean} prometheus.metrics.includeStatusCode - Include status code in metrics
+ * @property {boolean} prometheus.metrics.includeUp - Include uptime metrics
+ * @property {Array<number>} prometheus.metrics.buckets - Histogram buckets for response times
+ * @property {Object} prometheus.metrics.customLabels - Custom metric labels
  * @property {Object} rate - Rate limiting configuration
- * @property {boolean} renderHeaders - Include headers in rendered output
- * @property {boolean} time - Include timing information in responses
- * @property {Object} security - Security-related settings (CSRF, CSP, etc.)
+ * @property {boolean} rate.enabled - Enable rate limiting
+ * @property {number} rate.limit - Maximum requests per time window (default: 450)
+ * @property {string} rate.message - Rate limit exceeded message
+ * @property {Function|null} rate.override - Custom rate limit override function
+ * @property {number} rate.reset - Rate limit reset window in seconds (default: 900)
+ * @property {number} rate.status - HTTP status code for rate limit responses (default: 429)
+ * @property {boolean} renderHeaders - Include headers in rendered output responses
+ * @property {boolean} time - Include timing information in response headers
+ * @property {Object} security - Security-related settings
+ * @property {string} security.key - CSRF token header name
+ * @property {string} security.secret - CSRF secret key
+ * @property {boolean} security.csrf - Enable CSRF protection
+ * @property {string|null} security.csp - Content Security Policy header value
+ * @property {string} security.xframe - X-Frame-Options header value
+ * @property {string} security.p3p - P3P privacy policy header value
+ * @property {string|null} security.hsts - HTTP Strict Transport Security header value
+ * @property {boolean} security.xssProtection - Enable X-XSS-Protection header
+ * @property {boolean} security.nosniff - Enable X-Content-Type-Options: nosniff header
  * @property {Object} session - Session management configuration
- * @property {boolean} silent - Suppress console output
+ * @property {Object} session.cookie - Session cookie settings
+ * @property {boolean} session.cookie.httpOnly - Set httpOnly flag on session cookies
+ * @property {string} session.cookie.path - Session cookie path
+ * @property {boolean} session.cookie.sameSite - Enable SameSite cookie attribute
+ * @property {string} session.cookie.secure - Secure cookie setting ("auto", true, false)
+ * @property {string} session.name - Session cookie name
+ * @property {boolean} session.proxy - Trust proxy for secure cookies
+ * @property {Object} session.redis - Redis session store configuration
+ * @property {string} session.redis.host - Redis host address
+ * @property {number} session.redis.port - Redis port number
+ * @property {boolean} session.rolling - Enable rolling session expiration
+ * @property {boolean} session.resave - Force session save even if not modified
+ * @property {boolean} session.saveUninitialized - Save uninitialized sessions
+ * @property {string} session.secret - Session signing secret
+ * @property {string} session.store - Session store type ("memory", "redis", etc.)
+ * @property {boolean} silent - Suppress console output and logging
  * @property {Object} ssl - SSL/TLS configuration
+ * @property {string|null} ssl.cert - SSL certificate file path or content
+ * @property {string|null} ssl.key - SSL private key file path or content
+ * @property {string|null} ssl.pfx - SSL PFX file path or content
  * @property {Object} webroot - Web root and static file serving configuration
+ * @property {string} webroot.root - Document root directory for static files
+ * @property {string} webroot.static - Static assets directory path
+ * @property {string} webroot.template - Template file path for rendered responses
  *
  * @type {TensoConfig}
  */
@@ -410,6 +490,7 @@ const config = {
 		stack: true
 	},
 	maxBytes: INT_0,
+	maxListeners: INT_25,
 	mimeType: HEADER_APPLICATION_JSON,
 	origins: [WILDCARD],
 	pageSize: INT_5,
@@ -611,6 +692,9 @@ function yaml (req, res, arg) {
 	return YAML.stringify(arg);
 }
 
+// Memoization cache for XML transformations
+const transformCache = new WeakMap();
+
 /**
  * Renders data as XML format with proper formatting and entity processing
  * Handles arrays with special array node names and includes XML prolog
@@ -627,26 +711,44 @@ function xml (req, res, arg) {
 		arrayNodeName: Array.isArray(arg) ? XML_ARRAY_NODE_NAME : undefined
 	});
 
-	// Transform property names for XML compatibility
+	// Transform property names for XML compatibility with memoization
 	const transformForXml = obj => {
+		// Handle primitive types directly
+		if (obj === null || obj === undefined || typeof obj !== "object") {
+			return obj;
+		}
+
+		// Check cache for objects we've already transformed
+		if (transformCache.has(obj)) {
+			return transformCache.get(obj);
+		}
+
+		let result;
+
 		if (Array.isArray(obj)) {
-			return obj.map(transformForXml);
+			result = obj.map(transformForXml);
 		} else if (obj instanceof Date) {
-			return obj.toISOString();
-		} else if (obj && typeof obj === "object") {
+			result = obj.toISOString();
+		} else if (typeof obj === "object") {
 			const transformed = {};
 
 			for (const [key, value] of Object.entries(obj)) {
 				// Transform property names: name -> n, etc.
 				const xmlKey = key === "name" ? "n" : key;
-
 				transformed[xmlKey] = transformForXml(value);
 			}
 
-			return transformed;
+			result = transformed;
+		} else {
+			result = obj;
 		}
 
-		return obj;
+		// Cache the result for objects (but not primitives)
+		if (obj && typeof obj === "object") {
+			transformCache.set(obj, result);
+		}
+
+		return result;
 	};
 
 	// Handle different data types appropriately
@@ -667,6 +769,9 @@ function xml (req, res, arg) {
 	return `${XML_PROLOG}\n${builder.build({o: data})}`;
 }
 
+// Memoization cache for plain text rendering
+const plainCache = new WeakMap();
+
 /**
  * Renders data as plain text with recursive handling of arrays and objects
  * Arrays are joined with commas, objects are JSON stringified, primitives are converted to strings
@@ -676,7 +781,36 @@ function xml (req, res, arg) {
  * @returns {string} The plain text representation
  */
 function plain$1 (req, res, arg) {
-	return Array.isArray(arg) ? arg.map(i => plain$1(req, res, i)).join(COMMA) : arg instanceof Date ? arg.toISOString() : typeof arg === "function" ? arg.toString() : arg instanceof Object ? JSON.stringify(arg, null, indent(req.headers.accept, req.server.json)) : arg.toString();
+	// Handle primitive types directly
+	if (arg === null || arg === undefined) {
+		return arg.toString();
+	}
+
+	// Check cache for objects we've already processed
+	if (typeof arg === "object" && plainCache.has(arg)) {
+		return plainCache.get(arg);
+	}
+
+	let result;
+
+	if (Array.isArray(arg)) {
+		result = arg.map(i => plain$1(req, res, i)).join(COMMA);
+	} else if (arg instanceof Date) {
+		result = arg.toISOString();
+	} else if (typeof arg === "function") {
+		result = arg.toString();
+	} else if (arg instanceof Object) {
+		result = JSON.stringify(arg, null, indent(req.headers.accept, req.server.json));
+	} else {
+		result = arg.toString();
+	}
+
+	// Cache the result for objects
+	if (typeof arg === "object" && arg !== null) {
+		plainCache.set(arg, result);
+	}
+
+	return result;
 }
 
 /**
@@ -760,20 +894,35 @@ function sanitize (arg) {
  * @returns {string} The rendered HTML string
  */
 function html (req, res, arg, tpl = EMPTY) {
+	if (tpl.length === INT_0) {
+		return EMPTY;
+	}
+
 	const protocol = X_FORWARDED_PROTO in req.headers ? req.headers[X_FORWARDED_PROTO] + COLON : req.parsed.protocol,
 		headers = res.getHeaders();
 
-	return tpl.length > INT_0 ? tpl.replace(new RegExp(TEMPLATE_TITLE, G), req.server.title)
-		.replace(TEMPLATE_URL, req.parsed.href.replace(req.parsed.protocol, protocol))
-		.replace(TEMPLATE_HEADERS, Object.keys(headers).sort().map(i => `<tr><td>${i}</td><td>${sanitize(headers[i])}</td></tr>`).join(NL))
-		.replace(TEMPLATE_FORMATS, `<option value=''></option>${Array.from(renderers.keys()).filter(i => i.indexOf(HTML) === INT_NEG_1).map(i => `<option value='${i.trim()}'>${i.replace(/^.*\//, EMPTY).toUpperCase()}</option>`).join(NL)}`)
-		.replace(TEMPLATE_BODY, sanitize(JSON.stringify(arg, null, INT_2)))
-		.replace(TEMPLATE_YEAR, new Date().getFullYear())
-		.replace(TEMPLATE_VERSION, req.server.version)
-		.replace(TEMPLATE_ALLOW, headers.allow)
-		.replace(TEMPLATE_METHODS, explode((headers?.allow ?? EMPTY).replace(HEADER_ALLOW_GET, EMPTY)).filter(i => i !== EMPTY).map(i => `<option value='${i.trim()}'>$i.trim()}</option>`).join(NL))
-		.replace(TEMPLATE_CSRF, headers?.[X_CSRF_TOKEN] ?? EMPTY)
-		.replace("class=\"headers", req.server.renderHeaders === false ? "class=\"headers dr-hidden" : "class=\"headers") : EMPTY;
+	// Build all replacement values once
+	const replacements = new Map([
+		[new RegExp(TEMPLATE_TITLE, G), req.server.title],
+		[TEMPLATE_URL, req.parsed.href.replace(req.parsed.protocol, protocol)],
+		[TEMPLATE_HEADERS, Object.keys(headers).sort().map(i => `<tr><td>${i}</td><td>${sanitize(headers[i])}</td></tr>`).join(NL)],
+		[TEMPLATE_FORMATS, `<option value=''></option>${Array.from(renderers.keys()).filter(i => i.indexOf(HTML) === INT_NEG_1).map(i => `<option value='${i.trim()}'>${i.replace(/^.*\//, EMPTY).toUpperCase()}</option>`).join(NL)}`],
+		[TEMPLATE_BODY, sanitize(JSON.stringify(arg, null, INT_2))],
+		[TEMPLATE_YEAR, new Date().getFullYear()],
+		[TEMPLATE_VERSION, req.server.version],
+		[TEMPLATE_ALLOW, headers.allow],
+		[TEMPLATE_METHODS, explode((headers?.allow ?? EMPTY).replace(HEADER_ALLOW_GET, EMPTY)).filter(i => i !== EMPTY).map(i => `<option value='${i.trim()}'>${i.trim()}</option>`).join(NL)],
+		[TEMPLATE_CSRF, headers?.[X_CSRF_TOKEN] ?? EMPTY],
+		["class=\"headers", req.server.renderHeaders === false ? "class=\"headers dr-hidden" : "class=\"headers"]
+	]);
+
+	// Apply all replacements in a single pass
+	let result = tpl;
+	for (const [pattern, replacement] of replacements) {
+		result = result.replace(pattern, replacement);
+	}
+
+	return result;
 }
 
 /**
@@ -922,11 +1071,109 @@ function hasBody (arg) {
 }
 
 /**
- * Deep clones an object using JSON serialization/deserialization
- * @param {*} arg - The object to clone
+ * Deep clones an object using efficient recursive copying
+ * Handles circular references, various data types, and maintains performance
+ * Maintains compatibility with JSON-based cloning by filtering functions and undefined values
+ * @param {*} obj - The object to clone
+ * @param {WeakMap} [seen] - Internal map to handle circular references
  * @returns {*} A deep clone of the input object
  */
-const clone = arg => JSON.parse(JSON.stringify(arg));
+function clone (obj, seen = new WeakMap()) {
+	// Handle primitive types and null
+	if (obj === null || typeof obj !== "object") {
+		return obj;
+	}
+
+	// Handle circular references
+	if (seen.has(obj)) {
+		return seen.get(obj);
+	}
+
+	// Handle Date objects
+	if (obj instanceof Date) {
+		return new Date(obj.getTime());
+	}
+
+	// Handle RegExp objects
+	if (obj instanceof RegExp) {
+		return new RegExp(obj.source, obj.flags);
+	}
+
+	// Handle Arrays
+	if (Array.isArray(obj)) {
+		const cloned = [];
+		seen.set(obj, cloned);
+
+		for (let i = 0; i < obj.length; i++) {
+			const value = obj[i];
+			// Skip functions and undefined values like JSON.stringify does
+			if (typeof value !== "function" && value !== undefined) {
+				cloned[i] = clone(value, seen);
+			} else if (value === undefined) {
+				// JSON.stringify converts undefined array elements to null
+				cloned[i] = null;
+			} else if (typeof value === "function") {
+				// Functions in arrays are converted to null by JSON.stringify
+				cloned[i] = null;
+			}
+		}
+
+		return cloned;
+	}
+
+	// Handle Map objects
+	if (obj instanceof Map) {
+		const cloned = new Map();
+		seen.set(obj, cloned);
+
+		for (const [key, value] of obj) {
+			// Skip functions and undefined values
+			if (typeof value !== "function" && value !== undefined) {
+				cloned.set(clone(key, seen), clone(value, seen));
+			}
+		}
+
+		return cloned;
+	}
+
+	// Handle Set objects
+	if (obj instanceof Set) {
+		const cloned = new Set();
+		seen.set(obj, cloned);
+
+		for (const value of obj) {
+			// Skip functions and undefined values
+			if (typeof value !== "function" && value !== undefined) {
+				cloned.add(clone(value, seen));
+			}
+		}
+
+		return cloned;
+	}
+
+	// Handle plain objects
+	if (Object.prototype.toString.call(obj) === "[object Object]") {
+		const cloned = {};
+		seen.set(obj, cloned);
+
+		for (const key in obj) {
+			if (Object.prototype.hasOwnProperty.call(obj, key)) {
+				const value = obj[key];
+				// Skip functions and undefined values like JSON.stringify does
+				if (typeof value !== "function" && value !== undefined) {
+					cloned[key] = clone(value, seen);
+				}
+			}
+		}
+
+		return cloned;
+	}
+
+	// For other object types (like functions, custom classes), return as-is
+	// This maintains compatibility with the original JSON-based approach
+	// which would also not clone these properly
+	return obj;
+}
 
 const COMMA_SPACE = `${COMMA}${SPACE}`;
 
@@ -937,6 +1184,15 @@ const COMMA_SPACE = `${COMMA}${SPACE}`;
  */
 function hasUndefined (arg) {
 	return Array.isArray(arg) && arg.some(item => item === undefined);
+}
+
+/**
+ * Clones data efficiently based on whether it contains undefined values
+ * @param {*} arg - The data to clone
+ * @returns {*} The cloned data
+ */
+function smartClone (arg) {
+	return hasUndefined(arg) ? structuredClone(arg) : clone(arg);
 }
 
 /**
@@ -952,41 +1208,56 @@ function sort (arg, req) {
 		return undefined;
 	}
 
-	// Handle missing properties
-	if (!req || !req.parsed || typeof req.parsed.search !== STRING || !req.parsed.searchParams) {
-		return hasUndefined(arg) ? structuredClone(arg) : clone(arg);
+	// Handle missing properties - early return
+	if (!req?.parsed?.searchParams || typeof req.parsed.search !== STRING) {
+		return smartClone(arg);
 	}
 
 	if (!req.parsed.searchParams.has(ORDER_BY) || !Array.isArray(arg)) {
-		return hasUndefined(arg) ? structuredClone(arg) : clone(arg);
+		return smartClone(arg);
 	}
 
 	const type = typeof arg[INT_0];
 
+	// Early return for non-sortable arrays
 	if (type === BOOLEAN || type === NUMBER || type === STRING || type === UNDEFINED || arg[INT_0] === null) {
-		return hasUndefined(arg) ? structuredClone(arg) : clone(arg);
+		return smartClone(arg);
 	}
 
 	const allOrderByValues = req.parsed.searchParams.getAll(ORDER_BY);
-	const orderByValues = allOrderByValues.filter(i => i !== DESC && i.trim() !== "");
-	const args = orderByValues.join(COMMA_SPACE);
 
-	let output = hasUndefined(arg) ? structuredClone(arg) : clone(arg);
+	// Process order_by values more efficiently
+	const orderByValues = [];
+	let hasDesc = false;
+	let lastNonDescIndex = -1;
 
-	if (args.length > INT_0) {
+	for (let i = 0; i < allOrderByValues.length; i++) {
+		const value = allOrderByValues[i];
+		if (value === DESC) {
+			hasDesc = true;
+		} else if (value.trim() !== "") {
+			orderByValues.push(value);
+			lastNonDescIndex = i;
+		}
+	}
+
+	// Clone only once when we know we need to sort
+	let output = smartClone(arg);
+
+	// Apply sorting if we have valid order_by values
+	if (orderByValues.length > INT_0) {
+		const args = orderByValues.join(COMMA_SPACE);
 		output = keysort.keysort(output, args);
 	}
 
-	// Reverse logic:
-	// - If desc appears after other sort keys, reverse the sort
-	// - If desc is standalone, also reverse
-	const hasDesc = allOrderByValues.includes(DESC);
-	const hasOtherKeys = orderByValues.length > INT_0;
-	const descIndex = allOrderByValues.indexOf(DESC);
-	const lastNonDescIndex = Math.max(...allOrderByValues.map((val, idx) => val !== DESC ? idx : -1));
+	// Handle reverse logic efficiently
+	if (hasDesc) {
+		const descIndex = allOrderByValues.indexOf(DESC);
+		const hasOtherKeys = orderByValues.length > INT_0;
 
-	if (hasDesc && (descIndex > lastNonDescIndex || !hasOtherKeys)) {
-		output = output.reverse();
+		if (descIndex > lastNonDescIndex || !hasOtherKeys) {
+			output = output.reverse();
+		}
 	}
 
 	return output;
@@ -1041,6 +1312,25 @@ function id (arg = EMPTY) {
 	return pattern.test(arg) && !(/[\s\-.@]/).test(arg);
 }
 
+// Cache for URI transformations to avoid repeated string operations
+const uriCache = new Map();
+
+/**
+ * Optimized URI encoding with caching
+ * @param {string} str - String to encode
+ * @returns {string} Encoded string
+ */
+function cachedUriEncode (str) {
+	if (uriCache.has(str)) {
+		return uriCache.get(str);
+	}
+
+	const encoded = str.replace(/\s/g, ENCODED_SPACE);
+	uriCache.set(str, encoded);
+
+	return encoded;
+}
+
 /**
  * Parses objects for hypermedia properties and generates links
  * Identifies ID-like and linkable properties to create hypermedia links
@@ -1063,30 +1353,43 @@ function marshal (obj, rel, item_collection, root, seen, links, server) {
 		result = null;
 	} else {
 		for (const i of keys) {
-			if (obj[i] !== void 0 && obj[i] !== null) {
+			const value = obj[i];
+
+			if (value !== void 0 && value !== null) {
 				const lid = id(i);
 				const isLinkable = hypermedia$1.test(i);
 
 				// If ID like keys are found, and are not URIs, they are assumed to be root collections
 				if (lid || isLinkable) {
-					const lkey = obj[i].toString();
+					const lkey = value.toString();
 					let lcollection, uri;
 
 					if (lid) {
 						lcollection = item_collection;
 						lrel = ITEM;
 					} else if (isLinkable) {
-						lcollection = i.replace(trailing, EMPTY).replace(trailingS, EMPTY).replace(trailingY, IE) + S;
+						// Cache the collection transformation
+						const cacheKey = `collection_${i}`;
+						if (uriCache.has(cacheKey)) {
+							lcollection = uriCache.get(cacheKey);
+						} else {
+							lcollection = i.replace(trailing, EMPTY).replace(trailingS, EMPTY).replace(trailingY, IE) + S;
+							uriCache.set(cacheKey, lcollection);
+						}
 						lrel = RELATED;
 					}
 
-					if (!lkey.startsWith("http://") && !lkey.startsWith("https://") && !lkey.startsWith("ftp://") && !lkey.startsWith("://")) {
+					// Check if it's not already an absolute URI
+					if (!lkey.includes("://")) {
 						if (lid) {
 							// For ID-like keys, use collection + value
-							uri = `${lcollection[0] === SLASH ? EMPTY : SLASH}${lcollection.replace(/\s/g, ENCODED_SPACE)}/${lkey.replace(/\s/g, ENCODED_SPACE)}`;
+							const encodedCollection = cachedUriEncode(lcollection);
+							const encodedKey = cachedUriEncode(lkey);
+							uri = `${lcollection[0] === SLASH ? EMPTY : SLASH}${encodedCollection}/${encodedKey}`;
 						} else {
 							// For URL/URI keys, use value directly (it already contains the collection)
-							uri = `${lkey[0] === SLASH ? EMPTY : SLASH}${lkey.replace(/\s/g, ENCODED_SPACE)}`;
+							const encodedKey = cachedUriEncode(lkey);
+							uri = `${lkey[0] === SLASH ? EMPTY : SLASH}${encodedKey}`;
 						}
 
 						if (uri !== root && seen.has(uri) === false) {
@@ -1639,6 +1942,39 @@ function isEmpty (arg) {
 const {Strategy: JWTStrategy, ExtractJwt} = passportJWT,
 	groups = [PROTECT, UNPROTECT];
 
+// Regex cache to avoid recompiling the same patterns
+const regexCache = new Map();
+
+/**
+ * Creates a cached regex pattern to avoid recompiling
+ * @param {string} pattern - The regex pattern string
+ * @param {string} flags - The regex flags
+ * @returns {RegExp} The compiled regex pattern
+ */
+function createCachedRegex (pattern, flags = "") {
+	const key = `${pattern}|${flags}`;
+
+	if (!regexCache.has(key)) {
+		regexCache.set(key, new RegExp(pattern, flags));
+	}
+
+	return regexCache.get(key);
+}
+
+/**
+ * Converts a pattern string to a regex pattern with wildcard handling
+ * @param {string} pattern - The pattern string
+ * @param {string} loginUri - The login URI to compare against
+ * @returns {string} The converted regex pattern
+ */
+function convertPatternToRegex (pattern, loginUri) {
+	if (pattern === loginUri) {
+		return `^${EMPTY}(/|$)`;
+	}
+
+	return `^${pattern.replace(/\.\*/g, WILDCARD).replace(/\*/g, `${PERIOD}${WILDCARD}`)}(/|$)`;
+}
+
 /**
  * Configures authentication middleware and strategies for the server
  * Sets up various authentication methods (Basic, Bearer, JWT, OAuth2) and security middleware
@@ -1658,8 +1994,13 @@ function auth (obj) {
 
 	obj.ignore(asyncFlag);
 
+	// Use cached regex compilation for auth patterns
 	for (const k of groups) {
-		obj.auth[k] = (obj.auth[k] || []).map(i => new RegExp(`^${i !== obj.auth.uri.login ? i.replace(/\.\*/g, WILDCARD).replace(/\*/g, `${PERIOD}${WILDCARD}`) : EMPTY}(/|$)`, I));
+		obj.auth[k] = (obj.auth[k] || []).map(i => {
+			const pattern = convertPatternToRegex(i, obj.auth.uri.login);
+
+			return createCachedRegex(pattern, I);
+		});
 	}
 
 	for (const i of Object.keys(obj.auth)) {
@@ -1668,7 +2009,7 @@ function auth (obj) {
 
 			authMap[`${i}${UNDERSCORE}${URI}`] = uri;
 			authUris.push(uri);
-			obj.auth.protect.push(new RegExp(`^/auth/${i}(/|$)`));
+			obj.auth.protect.push(createCachedRegex(`^/auth/${i}(/|$)`));
 		}
 	}
 
@@ -2034,6 +2375,10 @@ class Tenso extends woodland.Woodland {
 	 */
 	init () {
 		const authorization = Object.keys(this.auth).filter(i => this.auth?.[i]?.enabled === true).length > INT_0 || this.rate.enabled || this.security.csrf;
+
+		// Matching MaxListeners for signals
+		this.setMaxListeners(this.maxListeners);
+		process.setMaxListeners(this.maxListeners);
 
 		this.decorate = this.decorate.bind(this);
 		this.route = this.route.bind(this);

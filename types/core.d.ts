@@ -366,65 +366,70 @@ export interface WebrootConfig {
 
 /**
  * Complete Tenso configuration object
+ *
+ * This configuration object contains all the default settings for a Tenso server instance.
+ * It includes settings for authentication, security, logging, caching, middleware, and more.
  */
 export interface TensoConfig {
   /** Authentication configuration */
   auth: AuthConfig;
-  /** Enable automatic directory indexing */
+  /** Enable automatic directory indexing for static files */
   autoindex: boolean;
-  /** Maximum number of items in cache */
+  /** Maximum number of items in memory cache (default: 1000) */
   cacheSize: number;
-  /** Cache time-to-live in milliseconds */
+  /** Cache time-to-live in milliseconds (default: 300000) */
   cacheTTL: number;
-  /** Enable catch-all route handling */
+  /** Enable catch-all route handling for unmatched requests */
   catchAll: boolean;
-  /** Default character encoding */
+  /** Default character encoding for responses (default: "utf-8") */
   charset: string;
   /** CORS exposed headers */
   corsExpose: string;
-  /** Default HTTP headers to include in responses */
+  /** Default HTTP headers to include in all responses */
   defaultHeaders: Record<string, string>;
-  /** Number of decimal places for numeric formatting */
+  /** Number of decimal places for numeric formatting (default: 3) */
   digit: number;
-  /** Enable ETag generation */
+  /** Enable ETag generation for response caching */
   etags: boolean;
-  /** Exit handlers */
+  /** Exit handlers to execute on server shutdown */
   exit: string[];
-  /** Server host address */
+  /** Server host address to bind to (default: "0.0.0.0") */
   host: string;
   /** Hypermedia/HATEOAS configuration */
   hypermedia: HypermediaConfig;
-  /** Index route configuration */
+  /** Index route configuration for root path handling */
   index: any[];
-  /** Initial route definitions */
+  /** Initial route definitions to register on startup */
   initRoutes: Record<string, Record<string, RouteHandler>>;
-  /** JSON response indentation level */
+  /** JSON response indentation level (default: 0 for minified) */
   jsonIndent: number;
   /** Logging configuration */
   logging: LoggingConfig;
-  /** Maximum request body size in bytes */
+  /** Maximum request body size in bytes (0 = unlimited) */
   maxBytes: number;
+  /** Maximum number of event listeners (default: 25) */
+  maxListeners: number;
   /** Default MIME type for responses */
   mimeType: string;
-  /** Allowed CORS origins */
+  /** Allowed CORS origins (default: ["*"]) */
   origins: string[];
-  /** Default pagination page size */
+  /** Default pagination page size (default: 5) */
   pageSize: number;
-  /** Server port number */
+  /** Server port number to listen on (default: 8000) */
   port: number;
   /** Prometheus metrics configuration */
   prometheus: PrometheusConfig;
   /** Rate limiting configuration */
   rate: RateConfig;
-  /** Include headers in rendered output */
+  /** Include headers in rendered output responses */
   renderHeaders: boolean;
-  /** Include timing information in responses */
+  /** Include timing information in response headers */
   time: boolean;
   /** Security-related settings */
   security: SecurityConfig;
   /** Session management configuration */
   session: SessionConfig;
-  /** Suppress console output */
+  /** Suppress console output and logging */
   silent: boolean;
   /** SSL/TLS configuration */
   ssl: SSLConfig;

@@ -169,6 +169,10 @@ class Tenso extends Woodland {
 	init () {
 		const authorization = Object.keys(this.auth).filter(i => this.auth?.[i]?.enabled === true).length > INT_0 || this.rate.enabled || this.security.csrf;
 
+		// Matching MaxListeners for signals
+		this.setMaxListeners(this.maxListeners);
+		process.setMaxListeners(this.maxListeners);
+
 		this.decorate = this.decorate.bind(this);
 		this.route = this.route.bind(this);
 		this.render = this.render.bind(this);

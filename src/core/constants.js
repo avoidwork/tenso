@@ -160,6 +160,7 @@ export const INT_2 = 2;
 export const INT_3 = 3;
 export const INT_5 = 5;
 export const INT_10 = 10;
+export const INT_25 = 25;
 export const INT_80 = 80;
 export const INT_100 = 1e2;
 export const INT_443 = 443;

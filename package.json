@@ -83,7 +83,7 @@
   },
   "devDependencies": {
     "auto-changelog": "^2.5.0",
-    "autocannon": "^7.15.0",
+    "autocannon": "^8.0.0",
     "benchmark": "^2.1.4",
     "csv-parse": "^6.0.0",
     "eslint": "^9.30.1",

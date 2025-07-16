@@ -345,7 +345,8 @@ Everything is optional! You can provide as much or as little configuration as yo
 		level: "debug",
 		stack: true
 	},
-	maxBytes: 20480,
+	maxBytes: 0,
+	maxListeners: 25,
 	mimeType: "application/json",
 	origins: ["*"],
 	pageSize: 5,
@@ -373,10 +374,10 @@ Everything is optional! You can provide as much or as little configuration as yo
 	time: true,
 	security: {
 		key: "x-csrf-token",
-		secret: "",
+		secret: "tenso",
 		csrf: true,
 		csp: null,
-		xframe: "",
+		xframe: "SAMEORIGIN",
 		p3p: "",
 		hsts: null,
 		xssProtection: true,
@@ -408,9 +409,9 @@ Everything is optional! You can provide as much or as little configuration as yo
 		pfx: null
 	},
 	webroot: {
-		root: "process.cwd()/www",
+		root: "",
 		static: "/assets",
-		template: "template.html"
+		template: ""
 	}
 }
 ```
@@ -586,7 +587,7 @@ Rate limiting can be overridden by providing an `override` function that takes `
 
 ## 📁 Upload Size Limiting
 
-A 'max byte' limit can be enforced on all routes that handle `PATCH`, `POST`, & `PUT` requests. The default limit is 20 KB (20,480 bytes).
+A 'max byte' limit can be enforced on all routes that handle `PATCH`, `POST`, & `PUT` requests. The default limit is 0 (unlimited).
 
 ```javascript
 {

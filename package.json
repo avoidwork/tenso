@@ -35,7 +35,7 @@
     "benchmark:rate": "node benchmarks/rate-limiting.js",
     "benchmark:hypermedia": "node benchmarks/hypermedia.js",
     "benchmark:memory": "node benchmarks/memory.js",
-    "benchmark:load": "node benchmarks/load-test.js"
+    "benchmark:load-test": "node benchmarks/load-test.js"
   },
   "source": "src/tenso.js",
   "main": "dist/tenso.cjs",

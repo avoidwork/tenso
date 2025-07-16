@@ -769,8 +769,11 @@ Real-world load testing using autocannon:
 ### Running Benchmarks
 
 ```bash
+# Run all benchmarks
+npm run benchmark
+
 # Run comprehensive load test
-npm run benchmark:load
+npm run benchmark:load-test
 
 # Run individual benchmark suites
 npm run benchmark:basic      # Basic HTTP performance

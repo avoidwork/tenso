@@ -3,19 +3,19 @@
  *
  * @copyright 2025 Jason Mulligan <jason.mulligan@avoidwork.com>
  * @license BSD-3-Clause
- * @version 17.3.0
+ * @version 17.3.1
  */
 'use strict';
 
 var node_fs = require('node:fs');
 var http = require('node:http');
 var https = require('node:https');
-var node_module = require('node:module');
 var node_path = require('node:path');
-var node_url = require('node:url');
 var woodland = require('woodland');
 var tinyMerge = require('tiny-merge');
 var tinyEventsource = require('tiny-eventsource');
+var node_module = require('node:module');
+var node_url = require('node:url');
 var tinyJsonl = require('tiny-jsonl');
 var tinyCoerce = require('tiny-coerce');
 var YAML = require('yamljs');
@@ -38,6 +38,10 @@ var connectRedis = require('connect-redis');
 var helmet = require('helmet');
 
 var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
+const __dirname$1 = node_url.fileURLToPath(new node_url.URL(".", (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('tenso.cjs', document.baseURI).href))));
+const require$1 = node_module.createRequire((typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('tenso.cjs', document.baseURI).href)));
+const {name, version} = require$1(node_path.join(__dirname$1, "..", "package.json"));
+
 // =============================================================================
 // HTTP METHODS
 // =============================================================================
@@ -223,7 +227,6 @@ const DOUBLE_SLASH = "//";
 const EMPTY = "";
 const ENCODED_SPACE = "%20";
 const END = "end";
-const ERROR = "error";
 const FALSE = "false";
 const FORMAT = "format";
 const FUNCTION = "function";
@@ -252,6 +255,8 @@ const UTF8 = "utf8";
 const UTF_8 = "utf-8";
 const WILDCARD = "*";
 const WWW = "www";
+const VERSION = version;
+const TITLE = name;
 
 // =============================================================================
 // XML CONSTANTS
@@ -283,6 +288,12 @@ const SIGTERM = "SIGTERM";
 const MSG_LOGIN = "POST 'username' & 'password' to authenticate";
 const MSG_PROMETHEUS_ENABLED = "Prometheus metrics enabled";
 const MSG_TOO_MANY_REQUESTS = "Too many requests";
+
+// =============================================================================
+// HTML Renderer
+// =============================================================================
+const WEBROOT_ROOT = node_path.join(__dirname$1, PREV_DIR, WWW);
+const WEBROOT_TEMPLATE = node_path.join(__dirname$1, PREV_DIR, WWW, TEMPLATE_FILE);
 
 /**
  * Default configuration object for Tenso framework
@@ -375,6 +386,7 @@ const MSG_TOO_MANY_REQUESTS = "Too many requests";
  * @property {number} rate.status - HTTP status code for rate limit responses (default: 429)
  * @property {boolean} renderHeaders - Include headers in rendered output responses
  * @property {boolean} time - Include timing information in response headers
+ * @property {string} title - Application title for branding and display purposes
  * @property {Object} security - Security-related settings
  * @property {string} security.key - CSRF token header name
  * @property {string} security.secret - CSRF secret key
@@ -410,6 +422,7 @@ const MSG_TOO_MANY_REQUESTS = "Too many requests";
  * @property {string} webroot.root - Document root directory for static files
  * @property {string} webroot.static - Static assets directory path
  * @property {string} webroot.template - Template file path for rendered responses
+ * @property {string} version - Framework version string
  *
  * @type {TensoConfig}
  */
@@ -516,6 +529,7 @@ const config = {
 	},
 	renderHeaders: true,
 	time: true,
+	title: TITLE,
 	security: {
 		key: X_CSRF_TOKEN,
 		secret: TENSO,
@@ -553,10 +567,11 @@ const config = {
 		pfx: null
 	},
 	webroot: {
-		root: EMPTY,
+		root: WEBROOT_ROOT,
 		static: PATH_ASSETS,
-		template: EMPTY
-	}
+		template: WEBROOT_TEMPLATE
+	},
+	version: VERSION
 };
 
 /**
@@ -1688,10 +1703,7 @@ function prometheus (config) {
 		}
 	};
 
-	// Return middleware function and register for metrics endpoint
-	middleware.register = register;
-
-	return middleware;
+	return {middleware, register};
 }
 
 /**
@@ -2266,10 +2278,6 @@ function auth (obj) {
 	return obj;
 }
 
-const __dirname$1 = node_url.fileURLToPath(new node_url.URL(".", (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('tenso.cjs', document.baseURI).href))));
-const require$1 = node_module.createRequire((typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('tenso.cjs', document.baseURI).href)));
-const {name, version} = require$1(node_path.join(__dirname$1, "..", "package.json"));
-
 /**
  * Tenso web framework class that extends Woodland
  * @class Tenso
@@ -2400,28 +2408,18 @@ class Tenso extends woodland.Woodland {
 
 		// Prometheus metrics
 		if (this.prometheus.enabled) {
-			const metricsHandler = prometheus(this.prometheus.metrics);
-			const middleware = metricsHandler;
+			const {middleware, register} = prometheus(this.prometheus.metrics);
 
 			this.log(`type=init, message"${MSG_PROMETHEUS_ENABLED}"`);
 			this.always(middleware).ignore(middleware);
 
 			// Registering a route for metrics endpoint
 			this.get(METRICS_PATH, (req, res) => {
-				res.setHeader('Content-Type', metricsHandler.register.contentType);
-				metricsHandler.register.metrics().then(metrics => {
-					res.end(metrics);
-				}).catch(err => {
-					res.statusCode = 500;
+				res.header(HEADER_CONTENT_TYPE, register.contentType);
+				register.metrics().then(result => res.end(result)).catch(err => {
+					res.statusCode = INT_500;
 					res.end(`Error collecting metrics: ${err.message}`);
 				});
-			});
-
-			// Hooking events that might bypass middleware
-			this.on(ERROR, (req, res) => {
-				if (req.valid === false) {
-					middleware(req, res, () => void 0);
-				}
 			});
 		}
 
@@ -2644,13 +2642,11 @@ function tenso (userConfig = {}) {
 		process.exit(INT_1);
 	}
 
-	config$1.title = config$1.title ?? name;
-	config$1.version = version;
-	config$1.webroot.root = node_path.resolve(config$1.webroot.root || node_path.join(__dirname$1, PREV_DIR, WWW));
-	config$1.webroot.template = node_fs.readFileSync(config$1.webroot.template || node_path.join(config$1.webroot.root, TEMPLATE_FILE), {encoding: UTF8});
+	config$1.webroot.root = node_path.resolve(config$1.webroot.root);
+	config$1.webroot.template = node_fs.readFileSync(config$1.webroot.template, {encoding: UTF8});
 
 	if (config$1.silent !== true) {
-		config$1.defaultHeaders.server = `tenso/${config$1.version}`;
+		config$1.defaultHeaders.server = `${config$1.title.toLowerCase()}/${config$1.version}`;
 		config$1.defaultHeaders[X_POWERED_BY] = `nodejs/${process.version}, ${process.platform}/${process.arch}`;
 	}
 

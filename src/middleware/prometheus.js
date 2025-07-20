@@ -69,8 +69,5 @@ export function prometheus (config) {
 		}
 	};
 
-	// Return middleware function and register for metrics endpoint
-	middleware.register = register;
-
-	return middleware;
+	return {middleware, register};
 }

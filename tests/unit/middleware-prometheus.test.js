@@ -38,15 +38,15 @@ describe("middleware/prometheus", () => {
 	});
 
 	it("should return a middleware function with register property", () => {
-		const middleware = prometheus(config);
+		const {middleware, register} = prometheus(config);
 
 		assert.strictEqual(typeof middleware, "function");
-		assert.ok(middleware.register);
-		assert.strictEqual(typeof middleware.register, "object");
+		assert.ok(register);
+		assert.strictEqual(typeof register, "object");
 	});
 
 	it("should create middleware that calls next", () => {
-		const middleware = prometheus(config);
+		const {middleware} = prometheus(config);
 
 		middleware(mockReq, mockRes, mockNext);
 
@@ -54,7 +54,7 @@ describe("middleware/prometheus", () => {
 	});
 
 	it("should override res.end method", () => {
-		const middleware = prometheus(config);
+		const {middleware} = prometheus(config);
 		const originalEnd = mockRes.end;
 
 		middleware(mockReq, mockRes, mockNext);
@@ -64,7 +64,7 @@ describe("middleware/prometheus", () => {
 	});
 
 	it("should handle requests without next function", () => {
-		const middleware = prometheus(config);
+		const {middleware} = prometheus(config);
 
 		// Should not throw error when next is undefined
 		middleware(mockReq, mockRes, undefined);
@@ -78,7 +78,7 @@ describe("middleware/prometheus", () => {
 			version: "1.0"
 		};
 
-		const middleware = prometheus(config);
+		const {middleware} = prometheus(config);
 
 		middleware(mockReq, mockRes, mockNext);
 
@@ -88,24 +88,24 @@ describe("middleware/prometheus", () => {
 	it("should handle includeUp configuration", () => {
 		config.includeUp = true;
 
-		const middleware = prometheus(config);
+		const {register} = prometheus(config);
 
-		assert.ok(middleware.register);
-		assert.strictEqual(typeof middleware.register, "object");
+		assert.ok(register);
+		assert.strictEqual(typeof register, "object");
 	});
 
 	it("should handle different bucket configurations", () => {
 		config.buckets = [0.001, 0.01, 0.1, 1, 2, 5, 10, 20, 50, 100];
 
-		const middleware = prometheus(config);
+		const {register} = prometheus(config);
 
-		assert.ok(middleware.register);
-		assert.strictEqual(typeof middleware.register, "object");
+		assert.ok(register);
+		assert.strictEqual(typeof register, "object");
 	});
 
 	it("should handle missing route property", () => {
 		delete mockReq.route;
-		const middleware = prometheus(config);
+		const {middleware} = prometheus(config);
 
 		middleware(mockReq, mockRes, mockNext);
 
@@ -114,7 +114,7 @@ describe("middleware/prometheus", () => {
 
 	it("should handle missing method property", () => {
 		delete mockReq.method;
-		const middleware = prometheus(config);
+		const {middleware} = prometheus(config);
 
 		middleware(mockReq, mockRes, mockNext);
 
@@ -123,7 +123,7 @@ describe("middleware/prometheus", () => {
 
 	it("should handle missing statusCode on response", () => {
 		delete mockRes.statusCode;
-		const middleware = prometheus(config);
+		const {middleware} = prometheus(config);
 
 		middleware(mockReq, mockRes, mockNext);
 
@@ -135,7 +135,7 @@ describe("middleware/prometheus", () => {
 		config.includePath = false;
 		config.includeStatusCode = false;
 
-		const middleware = prometheus(config);
+		const {middleware} = prometheus(config);
 
 		middleware(mockReq, mockRes, mockNext);
 
@@ -145,7 +145,7 @@ describe("middleware/prometheus", () => {
 	it("should handle empty custom labels", () => {
 		config.customLabels = {};
 
-		const middleware = prometheus(config);
+		const {middleware} = prometheus(config);
 
 		middleware(mockReq, mockRes, mockNext);
 
@@ -155,7 +155,7 @@ describe("middleware/prometheus", () => {
 	it("should handle undefined custom labels", () => {
 		delete config.customLabels;
 
-		const middleware = prometheus(config);
+		const {middleware} = prometheus(config);
 
 		middleware(mockReq, mockRes, mockNext);
 
@@ -163,12 +163,10 @@ describe("middleware/prometheus", () => {
 	});
 
 	it("should create metrics with proper names", () => {
-		const middleware = prometheus(config);
+		const {middleware, register} = prometheus(config);
 
 		// Need to call the middleware first to ensure metrics are created
 		middleware(mockReq, mockRes, mockNext);
-
-		const register = middleware.register;
 
 		// Check that metrics are registered
 		try {

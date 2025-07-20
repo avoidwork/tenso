@@ -1,9 +1,7 @@
 import {readFileSync} from "node:fs";
 import http from "node:http";
 import https from "node:https";
-import {createRequire} from "node:module";
-import {join, resolve} from "node:path";
-import {fileURLToPath, URL} from "node:url";
+import {resolve} from "node:path";
 import {Woodland} from "woodland";
 import {merge} from "tiny-merge";
 import {eventsource} from "tiny-eventsource";
@@ -35,19 +33,17 @@ import {
 	INT_200,
 	INT_204,
 	INT_304,
+	INT_500,
 	INVALID_CONFIGURATION,
 	METRICS_PATH,
 	MSG_PROMETHEUS_ENABLED,
 	NULL,
 	OPTIONS,
-	PREV_DIR,
 	PRIVATE,
 	SIGHUP,
 	SIGINT,
 	SIGTERM,
-	TEMPLATE_FILE,
 	UTF8,
-	WWW,
 	X_POWERED_BY
 } from "./core/constants.js";
 import {serialize} from "./utils/serialize.js";
@@ -58,10 +54,6 @@ import {parse} from "./middleware/parse.js";
 import {prometheus} from "./middleware/prometheus.js";
 import {auth} from "./utils/auth.js";
 import {clone} from "./utils/clone.js";
-
-const __dirname = fileURLToPath(new URL(".", import.meta.url));
-const require = createRequire(import.meta.url);
-const {name, version} = require(join(__dirname, "..", "package.json"));
 
 /**
  * Tenso web framework class that extends Woodland
@@ -193,28 +185,18 @@ class Tenso extends Woodland {
 
 		// Prometheus metrics
 		if (this.prometheus.enabled) {
-			const metricsHandler = prometheus(this.prometheus.metrics);
-			const middleware = metricsHandler;
+			const {middleware, register} = prometheus(this.prometheus.metrics);
 
 			this.log(`type=init, message"${MSG_PROMETHEUS_ENABLED}"`);
 			this.always(middleware).ignore(middleware);
 
 			// Registering a route for metrics endpoint
 			this.get(METRICS_PATH, (req, res) => {
-				res.setHeader('Content-Type', metricsHandler.register.contentType);
-				metricsHandler.register.metrics().then(metrics => {
-					res.end(metrics);
-				}).catch(err => {
-					res.statusCode = 500;
+				res.header(HEADER_CONTENT_TYPE, register.contentType);
+				register.metrics().then(result => res.end(result)).catch(err => {
+					res.statusCode = INT_500;
 					res.end(`Error collecting metrics: ${err.message}`);
 				});
-			});
-
-			// Hooking events that might bypass middleware
-			this.on(ERROR, (req, res) => {
-				if (req.valid === false) {
-					middleware(req, res, () => void 0);
-				}
 			});
 		}
 
@@ -437,13 +419,11 @@ export function tenso (userConfig = {}) {
 		process.exit(INT_1);
 	}
 
-	config.title = config.title ?? name;
-	config.version = version;
-	config.webroot.root = resolve(config.webroot.root || join(__dirname, PREV_DIR, WWW));
-	config.webroot.template = readFileSync(config.webroot.template || join(config.webroot.root, TEMPLATE_FILE), {encoding: UTF8});
+	config.webroot.root = resolve(config.webroot.root);
+	config.webroot.template = readFileSync(config.webroot.template, {encoding: UTF8});
 
 	if (config.silent !== true) {
-		config.defaultHeaders.server = `tenso/${config.version}`;
+		config.defaultHeaders.server = `${config.title.toLowerCase()}/${config.version}`;
 		config.defaultHeaders[X_POWERED_BY] = `nodejs/${process.version}, ${process.platform}/${process.arch}`;
 	}
 

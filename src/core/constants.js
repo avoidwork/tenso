@@ -1,3 +1,11 @@
+import {createRequire} from "node:module";
+import {join} from "node:path";
+import {fileURLToPath, URL} from "node:url";
+
+const __dirname = fileURLToPath(new URL(".", import.meta.url));
+const require = createRequire(import.meta.url);
+const {name, version} = require(join(__dirname, "..", "package.json"));
+
 // =============================================================================
 // HTTP METHODS
 // =============================================================================
@@ -216,6 +224,8 @@ export const UTF8 = "utf8";
 export const UTF_8 = "utf-8";
 export const WILDCARD = "*";
 export const WWW = "www";
+export const VERSION = version;
+export const TITLE = name;
 
 // =============================================================================
 // XML CONSTANTS
@@ -247,3 +257,9 @@ export const SIGTERM = "SIGTERM";
 export const MSG_LOGIN = "POST 'username' & 'password' to authenticate";
 export const MSG_PROMETHEUS_ENABLED = "Prometheus metrics enabled";
 export const MSG_TOO_MANY_REQUESTS = "Too many requests";
+
+// =============================================================================
+// HTML Renderer
+// =============================================================================
+export const WEBROOT_ROOT = join(__dirname, PREV_DIR, WWW);
+export const WEBROOT_TEMPLATE = join(__dirname, PREV_DIR, WWW, TEMPLATE_FILE);

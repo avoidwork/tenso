@@ -39,6 +39,10 @@ import {
 	URL_AUTH_LOGOUT,
 	URL_AUTH_ROOT,
 	UTF_8,
+	VERSION,
+	TITLE,
+	WEBROOT_ROOT,
+	WEBROOT_TEMPLATE,
 	WILDCARD,
 	X_CSRF_TOKEN
 } from "./constants.js";
@@ -134,6 +138,7 @@ import {
  * @property {number} rate.status - HTTP status code for rate limit responses (default: 429)
  * @property {boolean} renderHeaders - Include headers in rendered output responses
  * @property {boolean} time - Include timing information in response headers
+ * @property {string} title - Application title for branding and display purposes
  * @property {Object} security - Security-related settings
  * @property {string} security.key - CSRF token header name
  * @property {string} security.secret - CSRF secret key
@@ -169,6 +174,7 @@ import {
  * @property {string} webroot.root - Document root directory for static files
  * @property {string} webroot.static - Static assets directory path
  * @property {string} webroot.template - Template file path for rendered responses
+ * @property {string} version - Framework version string
  *
  * @type {TensoConfig}
  */
@@ -275,6 +281,7 @@ export const config = {
 	},
 	renderHeaders: true,
 	time: true,
+	title: TITLE,
 	security: {
 		key: X_CSRF_TOKEN,
 		secret: TENSO,
@@ -312,8 +319,9 @@ export const config = {
 		pfx: null
 	},
 	webroot: {
-		root: EMPTY,
+		root: WEBROOT_ROOT,
 		static: PATH_ASSETS,
-		template: EMPTY
-	}
+		template: WEBROOT_TEMPLATE
+	},
+	version: VERSION
 };

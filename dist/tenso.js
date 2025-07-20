@@ -3,9 +3,13 @@
  *
  * @copyright 2025 Jason Mulligan <jason.mulligan@avoidwork.com>
  * @license BSD-3-Clause
- * @version 17.3.0
+ * @version 17.3.1
  */
-import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import {merge}from'tiny-merge';import {eventsource}from'tiny-eventsource';import {parse as parse$1,stringify as stringify$1}from'tiny-jsonl';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {keysort}from'keysort';import {URL}from'url';import promClient from'prom-client';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import passportJWT from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-oauth2';import {doubleCsrf}from'csrf-csrf';import {randomInt,randomUUID}from'node:crypto';import {RedisStore}from'connect-redis';import helmet from'helmet';// =============================================================================
+import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {join,resolve}from'node:path';import {Woodland}from'woodland';import {merge}from'tiny-merge';import {eventsource}from'tiny-eventsource';import {createRequire}from'node:module';import {fileURLToPath,URL}from'node:url';import {parse as parse$1,stringify as stringify$1}from'tiny-jsonl';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {keysort}from'keysort';import {URL as URL$1}from'url';import promClient from'prom-client';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import passportJWT from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-oauth2';import {doubleCsrf}from'csrf-csrf';import {randomInt,randomUUID}from'node:crypto';import {RedisStore}from'connect-redis';import helmet from'helmet';const __dirname = fileURLToPath(new URL(".", import.meta.url));
+const require = createRequire(import.meta.url);
+const {name, version} = require(join(__dirname, "..", "package.json"));
+
+// =============================================================================
 // HTTP METHODS
 // =============================================================================
 
@@ -190,7 +194,6 @@ const DOUBLE_SLASH = "//";
 const EMPTY = "";
 const ENCODED_SPACE = "%20";
 const END = "end";
-const ERROR = "error";
 const FALSE = "false";
 const FORMAT = "format";
 const FUNCTION = "function";
@@ -219,6 +222,8 @@ const UTF8 = "utf8";
 const UTF_8 = "utf-8";
 const WILDCARD = "*";
 const WWW = "www";
+const VERSION = version;
+const TITLE = name;
 
 // =============================================================================
 // XML CONSTANTS
@@ -249,7 +254,13 @@ const SIGTERM = "SIGTERM";
 
 const MSG_LOGIN = "POST 'username' & 'password' to authenticate";
 const MSG_PROMETHEUS_ENABLED = "Prometheus metrics enabled";
-const MSG_TOO_MANY_REQUESTS = "Too many requests";/**
+const MSG_TOO_MANY_REQUESTS = "Too many requests";
+
+// =============================================================================
+// HTML Renderer
+// =============================================================================
+const WEBROOT_ROOT = join(__dirname, PREV_DIR, WWW);
+const WEBROOT_TEMPLATE = join(__dirname, PREV_DIR, WWW, TEMPLATE_FILE);/**
  * Default configuration object for Tenso framework
  *
  * This configuration object contains all the default settings for a Tenso server instance.
@@ -340,6 +351,7 @@ const MSG_TOO_MANY_REQUESTS = "Too many requests";/**
  * @property {number} rate.status - HTTP status code for rate limit responses (default: 429)
  * @property {boolean} renderHeaders - Include headers in rendered output responses
  * @property {boolean} time - Include timing information in response headers
+ * @property {string} title - Application title for branding and display purposes
  * @property {Object} security - Security-related settings
  * @property {string} security.key - CSRF token header name
  * @property {string} security.secret - CSRF secret key
@@ -375,6 +387,7 @@ const MSG_TOO_MANY_REQUESTS = "Too many requests";/**
  * @property {string} webroot.root - Document root directory for static files
  * @property {string} webroot.static - Static assets directory path
  * @property {string} webroot.template - Template file path for rendered responses
+ * @property {string} version - Framework version string
  *
  * @type {TensoConfig}
  */
@@ -481,6 +494,7 @@ const config = {
 	},
 	renderHeaders: true,
 	time: true,
+	title: TITLE,
 	security: {
 		key: X_CSRF_TOKEN,
 		secret: TENSO,
@@ -518,10 +532,11 @@ const config = {
 		pfx: null
 	},
 	webroot: {
-		root: EMPTY,
+		root: WEBROOT_ROOT,
 		static: PATH_ASSETS,
-		template: EMPTY
-	}
+		template: WEBROOT_TEMPLATE
+	},
+	version: VERSION
 };/**
  * Parses JSON string into JavaScript object
  * @param {string} [arg=EMPTY] - The JSON string to parse
@@ -1350,7 +1365,7 @@ function hypermedia (req, res, rep) {
 		page_size = server.pageSize || INT_5;
 	}
 
-	root = new URL(`${URL_127001}${req.url}${req.parsed.search}`);
+	root = new URL$1(`${URL_127001}${req.url}${req.parsed.search}`);
 	root.searchParams.delete(PAGE);
 	root.searchParams.delete(PAGE_SIZE);
 
@@ -1591,10 +1606,7 @@ function prometheus (config) {
 		}
 	};
 
-	// Return middleware function and register for metrics endpoint
-	middleware.register = register;
-
-	return middleware;
+	return {middleware, register};
 }/**
  * Middleware that sets the async protection flag on the request object
  * @param {Object} req - The HTTP request object
@@ -2145,11 +2157,7 @@ function auth (obj) {
 	});
 
 	return obj;
-}const __dirname = fileURLToPath(new URL$1(".", import.meta.url));
-const require = createRequire(import.meta.url);
-const {name, version} = require(join(__dirname, "..", "package.json"));
-
-/**
+}/**
  * Tenso web framework class that extends Woodland
  * @class Tenso
  * @extends {Woodland}
@@ -2279,28 +2287,18 @@ class Tenso extends Woodland {
 
 		// Prometheus metrics
 		if (this.prometheus.enabled) {
-			const metricsHandler = prometheus(this.prometheus.metrics);
-			const middleware = metricsHandler;
+			const {middleware, register} = prometheus(this.prometheus.metrics);
 
 			this.log(`type=init, message"${MSG_PROMETHEUS_ENABLED}"`);
 			this.always(middleware).ignore(middleware);
 
 			// Registering a route for metrics endpoint
 			this.get(METRICS_PATH, (req, res) => {
-				res.setHeader('Content-Type', metricsHandler.register.contentType);
-				metricsHandler.register.metrics().then(metrics => {
-					res.end(metrics);
-				}).catch(err => {
-					res.statusCode = 500;
+				res.header(HEADER_CONTENT_TYPE, register.contentType);
+				register.metrics().then(result => res.end(result)).catch(err => {
+					res.statusCode = INT_500;
 					res.end(`Error collecting metrics: ${err.message}`);
 				});
-			});
-
-			// Hooking events that might bypass middleware
-			this.on(ERROR, (req, res) => {
-				if (req.valid === false) {
-					middleware(req, res, () => void 0);
-				}
 			});
 		}
 
@@ -2523,13 +2521,11 @@ function tenso (userConfig = {}) {
 		process.exit(INT_1);
 	}
 
-	config$1.title = config$1.title ?? name;
-	config$1.version = version;
-	config$1.webroot.root = resolve(config$1.webroot.root || join(__dirname, PREV_DIR, WWW));
-	config$1.webroot.template = readFileSync(config$1.webroot.template || join(config$1.webroot.root, TEMPLATE_FILE), {encoding: UTF8});
+	config$1.webroot.root = resolve(config$1.webroot.root);
+	config$1.webroot.template = readFileSync(config$1.webroot.template, {encoding: UTF8});
 
 	if (config$1.silent !== true) {
-		config$1.defaultHeaders.server = `tenso/${config$1.version}`;
+		config$1.defaultHeaders.server = `${config$1.title.toLowerCase()}/${config$1.version}`;
 		config$1.defaultHeaders[X_POWERED_BY] = `nodejs/${process.version}, ${process.platform}/${process.arch}`;
 	}
 

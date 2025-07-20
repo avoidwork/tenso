@@ -438,7 +438,7 @@ export function tenso (userConfig = {}) {
 	}
 
 	config.title = config.title ?? name;
-	config.version = version;
+	config.version = config.version ?? version;
 	config.webroot.root = resolve(config.webroot.root || join(__dirname, PREV_DIR, WWW));
 	config.webroot.template = readFileSync(config.webroot.template || join(config.webroot.root, TEMPLATE_FILE), {encoding: UTF8});
 

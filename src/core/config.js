@@ -41,7 +41,7 @@ import {
 	UTF_8,
 	WILDCARD,
 	X_CSRF_TOKEN,
-	VERSION
+	VERSION, TITLE
 } from "./constants.js";
 
 /**
@@ -135,6 +135,7 @@ import {
  * @property {number} rate.status - HTTP status code for rate limit responses (default: 429)
  * @property {boolean} renderHeaders - Include headers in rendered output responses
  * @property {boolean} time - Include timing information in response headers
+ * @property {string} title - Application title for branding and display purposes
  * @property {Object} security - Security-related settings
  * @property {string} security.key - CSRF token header name
  * @property {string} security.secret - CSRF secret key
@@ -277,6 +278,7 @@ export const config = {
 	},
 	renderHeaders: true,
 	time: true,
+	title: TITLE,
 	security: {
 		key: X_CSRF_TOKEN,
 		secret: TENSO,

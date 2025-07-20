@@ -425,6 +425,8 @@ export interface TensoConfig {
   renderHeaders: boolean;
   /** Include timing information in response headers */
   time: boolean;
+  /** Application title for branding and display purposes */
+  title: string;
   /** Security-related settings */
   security: SecurityConfig;
   /** Session management configuration */
@@ -435,8 +437,6 @@ export interface TensoConfig {
   ssl: SSLConfig;
   /** Web root and static file serving configuration */
   webroot: WebrootConfig;
-  /** Application title */
-  title?: string;
   /** Framework version string */
   version: string;
 }

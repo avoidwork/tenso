@@ -1,9 +1,7 @@
 import {readFileSync} from "node:fs";
 import http from "node:http";
 import https from "node:https";
-import {createRequire} from "node:module";
 import {join, resolve} from "node:path";
-import {fileURLToPath, URL} from "node:url";
 import {Woodland} from "woodland";
 import {merge} from "tiny-merge";
 import {eventsource} from "tiny-eventsource";
@@ -34,7 +32,7 @@ import {
 	INT_1000,
 	INT_200,
 	INT_204,
-	INT_304,
+	INT_304, INT_500,
 	INVALID_CONFIGURATION,
 	METRICS_PATH,
 	MSG_PROMETHEUS_ENABLED,
@@ -58,10 +56,6 @@ import {parse} from "./middleware/parse.js";
 import {prometheus} from "./middleware/prometheus.js";
 import {auth} from "./utils/auth.js";
 import {clone} from "./utils/clone.js";
-
-const __dirname = fileURLToPath(new URL(".", import.meta.url));
-const require = createRequire(import.meta.url);
-const {name, version} = require(join(__dirname, "..", "package.json"));
 
 /**
  * Tenso web framework class that extends Woodland
@@ -201,11 +195,11 @@ class Tenso extends Woodland {
 
 			// Registering a route for metrics endpoint
 			this.get(METRICS_PATH, (req, res) => {
-				res.setHeader('Content-Type', metricsHandler.register.contentType);
+				res.setHeader(HEADER_CONTENT_TYPE, metricsHandler.register.contentType);
 				metricsHandler.register.metrics().then(metrics => {
 					res.end(metrics);
 				}).catch(err => {
-					res.statusCode = 500;
+					res.statusCode = INT_500;
 					res.end(`Error collecting metrics: ${err.message}`);
 				});
 			});

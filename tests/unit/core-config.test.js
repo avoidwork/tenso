@@ -13,6 +13,13 @@ describe("core/config", () => {
 		assert.ok(config.version.length > 0);
 	});
 
+	it("should have a title property", () => {
+		assert.ok(Object.prototype.hasOwnProperty.call(config, "title"));
+		assert.strictEqual(typeof config.title, "string");
+		assert.strictEqual(config.title, "tenso");
+		assert.ok(config.title.length > 0);
+	});
+
 	it("should have all required top-level properties", () => {
 		const requiredProperties = [
 			"auth",
@@ -42,6 +49,7 @@ describe("core/config", () => {
 			"rate",
 			"renderHeaders",
 			"time",
+			"title",
 			"security",
 			"session",
 			"silent",
@@ -115,6 +123,7 @@ describe("core/config", () => {
 		assert.strictEqual(config.autoindex, false);
 		assert.strictEqual(config.renderHeaders, true);
 		assert.strictEqual(config.time, true);
+		assert.strictEqual(config.title, "tenso");
 	});
 
 	it("should have properly structured logging configuration", () => {

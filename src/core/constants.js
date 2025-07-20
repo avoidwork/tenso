@@ -1,3 +1,11 @@
+import {createRequire} from "node:module";
+import {join} from "node:path";
+import {fileURLToPath, URL} from "node:url";
+
+const __dirname = fileURLToPath(new URL(".", import.meta.url));
+const require = createRequire(import.meta.url);
+const {name, version} = require(join(__dirname, "..", "package.json"));
+
 // =============================================================================
 // HTTP METHODS
 // =============================================================================
@@ -216,7 +224,8 @@ export const UTF8 = "utf8";
 export const UTF_8 = "utf-8";
 export const WILDCARD = "*";
 export const WWW = "www";
-export const VERSION = "0.0.0";
+export const VERSION = version;
+export const TITLE = name;
 
 // =============================================================================
 // XML CONSTANTS

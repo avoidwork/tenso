@@ -227,7 +227,6 @@ const DOUBLE_SLASH = "//";
 const EMPTY = "";
 const ENCODED_SPACE = "%20";
 const END = "end";
-const ERROR = "error";
 const FALSE = "false";
 const FORMAT = "format";
 const FUNCTION = "function";
@@ -1704,10 +1703,7 @@ function prometheus (config) {
 		}
 	};
 
-	// Return middleware function and register for metrics endpoint
-	middleware.register = register;
-
-	return middleware;
+	return {middleware, register};
 }
 
 /**
@@ -2412,28 +2408,18 @@ class Tenso extends woodland.Woodland {
 
 		// Prometheus metrics
 		if (this.prometheus.enabled) {
-			const metricsHandler = prometheus(this.prometheus.metrics);
-			const middleware = metricsHandler;
+			const {middleware, register} = prometheus(this.prometheus.metrics);
 
 			this.log(`type=init, message"${MSG_PROMETHEUS_ENABLED}"`);
 			this.always(middleware).ignore(middleware);
 
 			// Registering a route for metrics endpoint
 			this.get(METRICS_PATH, (req, res) => {
-				res.setHeader(HEADER_CONTENT_TYPE, metricsHandler.register.contentType);
-				metricsHandler.register.metrics().then(metrics => {
-					res.end(metrics);
-				}).catch(err => {
+				res.header(HEADER_CONTENT_TYPE, register.contentType);
+				register.metrics().then(result => res.end(result)).catch(err => {
 					res.statusCode = INT_500;
 					res.end(`Error collecting metrics: ${err.message}`);
 				});
-			});
-
-			// Hooking events that might bypass middleware
-			this.on(ERROR, (req, res) => {
-				if (req.valid === false) {
-					middleware(req, res, () => void 0);
-				}
 			});
 		}
 

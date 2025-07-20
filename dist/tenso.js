@@ -3,7 +3,7 @@
  *
  * @copyright 2025 Jason Mulligan <jason.mulligan@avoidwork.com>
  * @license BSD-3-Clause
- * @version 17.3.1
+ * @version 17.3.2
  */
 import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {join,resolve}from'node:path';import {Woodland}from'woodland';import {merge}from'tiny-merge';import {eventsource}from'tiny-eventsource';import {createRequire}from'node:module';import {fileURLToPath,URL}from'node:url';import {parse as parse$1,stringify as stringify$1}from'tiny-jsonl';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {keysort}from'keysort';import {URL as URL$1}from'url';import promClient from'prom-client';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import passportJWT from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-oauth2';import {doubleCsrf}from'csrf-csrf';import {randomInt,randomUUID}from'node:crypto';import {RedisStore}from'connect-redis';import helmet from'helmet';const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const require = createRequire(import.meta.url);

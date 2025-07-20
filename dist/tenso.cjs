@@ -10,12 +10,12 @@
 var node_fs = require('node:fs');
 var http = require('node:http');
 var https = require('node:https');
-var node_module = require('node:module');
 var node_path = require('node:path');
-var node_url = require('node:url');
 var woodland = require('woodland');
 var tinyMerge = require('tiny-merge');
 var tinyEventsource = require('tiny-eventsource');
+var node_module = require('node:module');
+var node_url = require('node:url');
 var tinyJsonl = require('tiny-jsonl');
 var tinyCoerce = require('tiny-coerce');
 var YAML = require('yamljs');
@@ -38,6 +38,10 @@ var connectRedis = require('connect-redis');
 var helmet = require('helmet');
 
 var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
+const __dirname$1 = node_url.fileURLToPath(new node_url.URL(".", (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('tenso.cjs', document.baseURI).href))));
+const require$1 = node_module.createRequire((typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('tenso.cjs', document.baseURI).href)));
+const {name, version} = require$1(node_path.join(__dirname$1, "..", "package.json"));
+
 // =============================================================================
 // HTTP METHODS
 // =============================================================================
@@ -252,7 +256,8 @@ const UTF8 = "utf8";
 const UTF_8 = "utf-8";
 const WILDCARD = "*";
 const WWW = "www";
-const VERSION = "0.0.0";
+const VERSION = version;
+const TITLE = name;
 
 // =============================================================================
 // XML CONSTANTS
@@ -376,6 +381,7 @@ const MSG_TOO_MANY_REQUESTS = "Too many requests";
  * @property {number} rate.status - HTTP status code for rate limit responses (default: 429)
  * @property {boolean} renderHeaders - Include headers in rendered output responses
  * @property {boolean} time - Include timing information in response headers
+ * @property {string} title - Application title for branding and display purposes
  * @property {Object} security - Security-related settings
  * @property {string} security.key - CSRF token header name
  * @property {string} security.secret - CSRF secret key
@@ -518,6 +524,7 @@ const config = {
 	},
 	renderHeaders: true,
 	time: true,
+	title: TITLE,
 	security: {
 		key: X_CSRF_TOKEN,
 		secret: TENSO,
@@ -2269,10 +2276,6 @@ function auth (obj) {
 	return obj;
 }
 
-const __dirname$1 = node_url.fileURLToPath(new node_url.URL(".", (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('tenso.cjs', document.baseURI).href))));
-const require$1 = node_module.createRequire((typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('tenso.cjs', document.baseURI).href)));
-const {name, version} = require$1(node_path.join(__dirname$1, "..", "package.json"));
-
 /**
  * Tenso web framework class that extends Woodland
  * @class Tenso
@@ -2411,11 +2414,11 @@ class Tenso extends woodland.Woodland {
 
 			// Registering a route for metrics endpoint
 			this.get(METRICS_PATH, (req, res) => {
-				res.setHeader('Content-Type', metricsHandler.register.contentType);
+				res.setHeader(HEADER_CONTENT_TYPE, metricsHandler.register.contentType);
 				metricsHandler.register.metrics().then(metrics => {
 					res.end(metrics);
 				}).catch(err => {
-					res.statusCode = 500;
+					res.statusCode = INT_500;
 					res.end(`Error collecting metrics: ${err.message}`);
 				});
 			});
@@ -2647,13 +2650,11 @@ function tenso (userConfig = {}) {
 		process.exit(INT_1);
 	}
 
-	config$1.title = config$1.title ?? name;
-	config$1.version = config$1.version ?? version;
-	config$1.webroot.root = node_path.resolve(config$1.webroot.root || node_path.join(__dirname$1, PREV_DIR, WWW));
+	config$1.webroot.root = node_path.resolve(config$1.webroot.root || node_path.join(__dirname, PREV_DIR, WWW));
 	config$1.webroot.template = node_fs.readFileSync(config$1.webroot.template || node_path.join(config$1.webroot.root, TEMPLATE_FILE), {encoding: UTF8});
 
 	if (config$1.silent !== true) {
-		config$1.defaultHeaders.server = `tenso/${config$1.version}`;
+		config$1.defaultHeaders.server = `${config$1.title.toLowerCase()}/${config$1.version}`;
 		config$1.defaultHeaders[X_POWERED_BY] = `nodejs/${process.version}, ${process.platform}/${process.arch}`;
 	}
 

@@ -5,7 +5,11 @@
  * @license BSD-3-Clause
  * @version 17.3.1
  */
-import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import {merge}from'tiny-merge';import {eventsource}from'tiny-eventsource';import {parse as parse$1,stringify as stringify$1}from'tiny-jsonl';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {keysort}from'keysort';import {URL}from'url';import promClient from'prom-client';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import passportJWT from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-oauth2';import {doubleCsrf}from'csrf-csrf';import {randomInt,randomUUID}from'node:crypto';import {RedisStore}from'connect-redis';import helmet from'helmet';// =============================================================================
+import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {join,resolve}from'node:path';import {Woodland}from'woodland';import {merge}from'tiny-merge';import {eventsource}from'tiny-eventsource';import {createRequire}from'node:module';import {fileURLToPath,URL}from'node:url';import {parse as parse$1,stringify as stringify$1}from'tiny-jsonl';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {keysort}from'keysort';import {URL as URL$1}from'url';import promClient from'prom-client';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import passportJWT from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-oauth2';import {doubleCsrf}from'csrf-csrf';import {randomInt,randomUUID}from'node:crypto';import {RedisStore}from'connect-redis';import helmet from'helmet';const __dirname$1 = fileURLToPath(new URL(".", import.meta.url));
+const require = createRequire(import.meta.url);
+const {name, version} = require(join(__dirname$1, "..", "package.json"));
+
+// =============================================================================
 // HTTP METHODS
 // =============================================================================
 
@@ -219,7 +223,8 @@ const UTF8 = "utf8";
 const UTF_8 = "utf-8";
 const WILDCARD = "*";
 const WWW = "www";
-const VERSION = "0.0.0";
+const VERSION = version;
+const TITLE = name;
 
 // =============================================================================
 // XML CONSTANTS
@@ -341,6 +346,7 @@ const MSG_TOO_MANY_REQUESTS = "Too many requests";/**
  * @property {number} rate.status - HTTP status code for rate limit responses (default: 429)
  * @property {boolean} renderHeaders - Include headers in rendered output responses
  * @property {boolean} time - Include timing information in response headers
+ * @property {string} title - Application title for branding and display purposes
  * @property {Object} security - Security-related settings
  * @property {string} security.key - CSRF token header name
  * @property {string} security.secret - CSRF secret key
@@ -483,6 +489,7 @@ const config = {
 	},
 	renderHeaders: true,
 	time: true,
+	title: TITLE,
 	security: {
 		key: X_CSRF_TOKEN,
 		secret: TENSO,
@@ -1353,7 +1360,7 @@ function hypermedia (req, res, rep) {
 		page_size = server.pageSize || INT_5;
 	}
 
-	root = new URL(`${URL_127001}${req.url}${req.parsed.search}`);
+	root = new URL$1(`${URL_127001}${req.url}${req.parsed.search}`);
 	root.searchParams.delete(PAGE);
 	root.searchParams.delete(PAGE_SIZE);
 
@@ -2148,11 +2155,7 @@ function auth (obj) {
 	});
 
 	return obj;
-}const __dirname = fileURLToPath(new URL$1(".", import.meta.url));
-const require = createRequire(import.meta.url);
-const {name, version} = require(join(__dirname, "..", "package.json"));
-
-/**
+}/**
  * Tenso web framework class that extends Woodland
  * @class Tenso
  * @extends {Woodland}
@@ -2290,11 +2293,11 @@ class Tenso extends Woodland {
 
 			// Registering a route for metrics endpoint
 			this.get(METRICS_PATH, (req, res) => {
-				res.setHeader('Content-Type', metricsHandler.register.contentType);
+				res.setHeader(HEADER_CONTENT_TYPE, metricsHandler.register.contentType);
 				metricsHandler.register.metrics().then(metrics => {
 					res.end(metrics);
 				}).catch(err => {
-					res.statusCode = 500;
+					res.statusCode = INT_500;
 					res.end(`Error collecting metrics: ${err.message}`);
 				});
 			});
@@ -2526,13 +2529,11 @@ function tenso (userConfig = {}) {
 		process.exit(INT_1);
 	}
 
-	config$1.title = config$1.title ?? name;
-	config$1.version = config$1.version ?? version;
 	config$1.webroot.root = resolve(config$1.webroot.root || join(__dirname, PREV_DIR, WWW));
 	config$1.webroot.template = readFileSync(config$1.webroot.template || join(config$1.webroot.root, TEMPLATE_FILE), {encoding: UTF8});
 
 	if (config$1.silent !== true) {
-		config$1.defaultHeaders.server = `tenso/${config$1.version}`;
+		config$1.defaultHeaders.server = `${config$1.title.toLowerCase()}/${config$1.version}`;
 		config$1.defaultHeaders[X_POWERED_BY] = `nodejs/${process.version}, ${process.platform}/${process.arch}`;
 	}
 

@@ -431,13 +431,11 @@ export function tenso (userConfig = {}) {
 		process.exit(INT_1);
 	}
 
-	config.title = config.title ?? name;
-	config.version = config.version ?? version;
 	config.webroot.root = resolve(config.webroot.root || join(__dirname, PREV_DIR, WWW));
 	config.webroot.template = readFileSync(config.webroot.template || join(config.webroot.root, TEMPLATE_FILE), {encoding: UTF8});
 
 	if (config.silent !== true) {
-		config.defaultHeaders.server = `tenso/${config.version}`;
+		config.defaultHeaders.server = `${config.title.toLowerCase()}/${config.version}`;
 		config.defaultHeaders[X_POWERED_BY] = `nodejs/${process.version}, ${process.platform}/${process.arch}`;
 	}
 

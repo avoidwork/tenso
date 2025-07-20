@@ -3,7 +3,7 @@
  *
  * @copyright 2025 Jason Mulligan <jason.mulligan@avoidwork.com>
  * @license BSD-3-Clause
- * @version 17.3.0
+ * @version 17.3.1
  */
 import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {createRequire}from'node:module';import {join,resolve}from'node:path';import {fileURLToPath,URL as URL$1}from'node:url';import {Woodland}from'woodland';import {merge}from'tiny-merge';import {eventsource}from'tiny-eventsource';import {parse as parse$1,stringify as stringify$1}from'tiny-jsonl';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {keysort}from'keysort';import {URL}from'url';import promClient from'prom-client';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import passportJWT from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-oauth2';import {doubleCsrf}from'csrf-csrf';import {randomInt,randomUUID}from'node:crypto';import {RedisStore}from'connect-redis';import helmet from'helmet';// =============================================================================
 // HTTP METHODS
@@ -219,6 +219,7 @@ const UTF8 = "utf8";
 const UTF_8 = "utf-8";
 const WILDCARD = "*";
 const WWW = "www";
+const VERSION = "0.0.0";
 
 // =============================================================================
 // XML CONSTANTS
@@ -375,6 +376,7 @@ const MSG_TOO_MANY_REQUESTS = "Too many requests";/**
  * @property {string} webroot.root - Document root directory for static files
  * @property {string} webroot.static - Static assets directory path
  * @property {string} webroot.template - Template file path for rendered responses
+ * @property {string} version - Framework version string
  *
  * @type {TensoConfig}
  */
@@ -521,7 +523,8 @@ const config = {
 		root: EMPTY,
 		static: PATH_ASSETS,
 		template: EMPTY
-	}
+	},
+	version: VERSION
 };/**
  * Parses JSON string into JavaScript object
  * @param {string} [arg=EMPTY] - The JSON string to parse

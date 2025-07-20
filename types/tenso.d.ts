@@ -39,19 +39,19 @@ export type RateLimitResult = [valid: boolean, limit: number, remaining: number,
 export declare class Tenso extends Woodland {
   /** Map of parsers for different media types */
   parsers: Map<string, ParserFunction>;
-  
+
   /** Map of rate limiting states by request ID */
   rates: Map<string, RateLimitState>;
-  
+
   /** Map of renderers for different media types */
   renderers: Map<string, RendererFunction>;
-  
+
   /** Map of serializers for different media types */
   serializers: Map<string, SerializerFunction>;
-  
+
   /** HTTP/HTTPS server instance */
   server: Server | null;
-  
+
   /** Framework version */
   version: string;
 
@@ -73,7 +73,7 @@ export declare class Tenso extends Woodland {
    * @param req - Request object
    * @param res - Response object
    */
-  connect(req: TensoRequest, res: TensoResponse): void;
+  override connect(req: TensoRequest, res: TensoResponse): void;
 
   /**
    * Creates an EventSource instance
@@ -180,4 +180,4 @@ export declare class Tenso extends Woodland {
  * @param userConfig - User configuration object to override defaults
  * @returns An initialized Tenso server instance
  */
-export declare function tenso(userConfig?: Partial<TensoConfig>): Tenso; 
+export declare function tenso(userConfig?: Partial<TensoConfig>): Tenso;

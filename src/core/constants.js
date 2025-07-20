@@ -216,6 +216,7 @@ export const UTF8 = "utf8";
 export const UTF_8 = "utf-8";
 export const WILDCARD = "*";
 export const WWW = "www";
+export const VERSION = "0.0.0";
 
 // =============================================================================
 // XML CONSTANTS

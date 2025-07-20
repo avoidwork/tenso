@@ -3,7 +3,7 @@
  *
  * @copyright 2025 Jason Mulligan <jason.mulligan@avoidwork.com>
  * @license BSD-3-Clause
- * @version 17.3.0
+ * @version 17.3.1
  */
 'use strict';
 
@@ -252,6 +252,7 @@ const UTF8 = "utf8";
 const UTF_8 = "utf-8";
 const WILDCARD = "*";
 const WWW = "www";
+const VERSION = "0.0.0";
 
 // =============================================================================
 // XML CONSTANTS
@@ -410,6 +411,7 @@ const MSG_TOO_MANY_REQUESTS = "Too many requests";
  * @property {string} webroot.root - Document root directory for static files
  * @property {string} webroot.static - Static assets directory path
  * @property {string} webroot.template - Template file path for rendered responses
+ * @property {string} version - Framework version string
  *
  * @type {TensoConfig}
  */
@@ -556,7 +558,8 @@ const config = {
 		root: EMPTY,
 		static: PATH_ASSETS,
 		template: EMPTY
-	}
+	},
+	version: VERSION
 };
 
 /**

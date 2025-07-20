@@ -40,7 +40,8 @@ import {
 	URL_AUTH_ROOT,
 	UTF_8,
 	WILDCARD,
-	X_CSRF_TOKEN
+	X_CSRF_TOKEN,
+	VERSION
 } from "./constants.js";
 
 /**
@@ -169,6 +170,7 @@ import {
  * @property {string} webroot.root - Document root directory for static files
  * @property {string} webroot.static - Static assets directory path
  * @property {string} webroot.template - Template file path for rendered responses
+ * @property {string} version - Framework version string
  *
  * @type {TensoConfig}
  */
@@ -315,5 +317,6 @@ export const config = {
 		root: EMPTY,
 		static: PATH_ASSETS,
 		template: EMPTY
-	}
+	},
+	version: VERSION
 };

@@ -437,8 +437,8 @@ export interface TensoConfig {
   webroot: WebrootConfig;
   /** Application title */
   title?: string;
-  /** Application version */
-  version?: string;
+  /** Framework version string */
+  version: string;
 }
 
 /**

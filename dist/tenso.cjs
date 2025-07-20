@@ -290,6 +290,12 @@ const MSG_LOGIN = "POST 'username' & 'password' to authenticate";
 const MSG_PROMETHEUS_ENABLED = "Prometheus metrics enabled";
 const MSG_TOO_MANY_REQUESTS = "Too many requests";
 
+// =============================================================================
+// HTML Renderer
+// =============================================================================
+const WEBROOT_ROOT = node_path.join(__dirname$1, PREV_DIR, WWW);
+const WEBROOT_TEMPLATE = node_path.join(__dirname$1, PREV_DIR, WWW, TEMPLATE_FILE);
+
 /**
  * Default configuration object for Tenso framework
  *
@@ -562,9 +568,9 @@ const config = {
 		pfx: null
 	},
 	webroot: {
-		root: EMPTY,
+		root: WEBROOT_ROOT,
 		static: PATH_ASSETS,
-		template: EMPTY
+		template: WEBROOT_TEMPLATE
 	},
 	version: VERSION
 };
@@ -2650,8 +2656,8 @@ function tenso (userConfig = {}) {
 		process.exit(INT_1);
 	}
 
-	config$1.webroot.root = node_path.resolve(config$1.webroot.root || node_path.join(__dirname, PREV_DIR, WWW));
-	config$1.webroot.template = node_fs.readFileSync(config$1.webroot.template || node_path.join(config$1.webroot.root, TEMPLATE_FILE), {encoding: UTF8});
+	config$1.webroot.root = node_path.resolve(config$1.webroot.root);
+	config$1.webroot.template = node_fs.readFileSync(config$1.webroot.template, {encoding: UTF8});
 
 	if (config$1.silent !== true) {
 		config$1.defaultHeaders.server = `${config$1.title.toLowerCase()}/${config$1.version}`;

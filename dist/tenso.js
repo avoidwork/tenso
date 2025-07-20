@@ -5,9 +5,9 @@
  * @license BSD-3-Clause
  * @version 17.3.1
  */
-import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {join,resolve}from'node:path';import {Woodland}from'woodland';import {merge}from'tiny-merge';import {eventsource}from'tiny-eventsource';import {createRequire}from'node:module';import {fileURLToPath,URL}from'node:url';import {parse as parse$1,stringify as stringify$1}from'tiny-jsonl';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {keysort}from'keysort';import {URL as URL$1}from'url';import promClient from'prom-client';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import passportJWT from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-oauth2';import {doubleCsrf}from'csrf-csrf';import {randomInt,randomUUID}from'node:crypto';import {RedisStore}from'connect-redis';import helmet from'helmet';const __dirname$1 = fileURLToPath(new URL(".", import.meta.url));
+import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {join,resolve}from'node:path';import {Woodland}from'woodland';import {merge}from'tiny-merge';import {eventsource}from'tiny-eventsource';import {createRequire}from'node:module';import {fileURLToPath,URL}from'node:url';import {parse as parse$1,stringify as stringify$1}from'tiny-jsonl';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {keysort}from'keysort';import {URL as URL$1}from'url';import promClient from'prom-client';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import passportJWT from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-oauth2';import {doubleCsrf}from'csrf-csrf';import {randomInt,randomUUID}from'node:crypto';import {RedisStore}from'connect-redis';import helmet from'helmet';const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const require = createRequire(import.meta.url);
-const {name, version} = require(join(__dirname$1, "..", "package.json"));
+const {name, version} = require(join(__dirname, "..", "package.json"));
 
 // =============================================================================
 // HTTP METHODS
@@ -255,7 +255,13 @@ const SIGTERM = "SIGTERM";
 
 const MSG_LOGIN = "POST 'username' & 'password' to authenticate";
 const MSG_PROMETHEUS_ENABLED = "Prometheus metrics enabled";
-const MSG_TOO_MANY_REQUESTS = "Too many requests";/**
+const MSG_TOO_MANY_REQUESTS = "Too many requests";
+
+// =============================================================================
+// HTML Renderer
+// =============================================================================
+const WEBROOT_ROOT = join(__dirname, PREV_DIR, WWW);
+const WEBROOT_TEMPLATE = join(__dirname, PREV_DIR, WWW, TEMPLATE_FILE);/**
  * Default configuration object for Tenso framework
  *
  * This configuration object contains all the default settings for a Tenso server instance.
@@ -527,9 +533,9 @@ const config = {
 		pfx: null
 	},
 	webroot: {
-		root: EMPTY,
+		root: WEBROOT_ROOT,
 		static: PATH_ASSETS,
-		template: EMPTY
+		template: WEBROOT_TEMPLATE
 	},
 	version: VERSION
 };/**
@@ -2529,8 +2535,8 @@ function tenso (userConfig = {}) {
 		process.exit(INT_1);
 	}
 
-	config$1.webroot.root = resolve(config$1.webroot.root || join(__dirname, PREV_DIR, WWW));
-	config$1.webroot.template = readFileSync(config$1.webroot.template || join(config$1.webroot.root, TEMPLATE_FILE), {encoding: UTF8});
+	config$1.webroot.root = resolve(config$1.webroot.root);
+	config$1.webroot.template = readFileSync(config$1.webroot.template, {encoding: UTF8});
 
 	if (config$1.silent !== true) {
 		config$1.defaultHeaders.server = `${config$1.title.toLowerCase()}/${config$1.version}`;

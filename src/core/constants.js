@@ -257,3 +257,9 @@ export const SIGTERM = "SIGTERM";
 export const MSG_LOGIN = "POST 'username' & 'password' to authenticate";
 export const MSG_PROMETHEUS_ENABLED = "Prometheus metrics enabled";
 export const MSG_TOO_MANY_REQUESTS = "Too many requests";
+
+// =============================================================================
+// HTML Renderer
+// =============================================================================
+export const WEBROOT_ROOT = join(__dirname, PREV_DIR, WWW);
+export const WEBROOT_TEMPLATE = join(__dirname, PREV_DIR, WWW, TEMPLATE_FILE);

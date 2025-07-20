@@ -431,8 +431,8 @@ export function tenso (userConfig = {}) {
 		process.exit(INT_1);
 	}
 
-	config.webroot.root = resolve(config.webroot.root || join(__dirname, PREV_DIR, WWW));
-	config.webroot.template = readFileSync(config.webroot.template || join(config.webroot.root, TEMPLATE_FILE), {encoding: UTF8});
+	config.webroot.root = resolve(config.webroot.root);
+	config.webroot.template = readFileSync(config.webroot.template, {encoding: UTF8});
 
 	if (config.silent !== true) {
 		config.defaultHeaders.server = `${config.title.toLowerCase()}/${config.version}`;

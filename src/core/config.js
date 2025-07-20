@@ -39,9 +39,12 @@ import {
 	URL_AUTH_LOGOUT,
 	URL_AUTH_ROOT,
 	UTF_8,
+	VERSION,
+	TITLE,
+	WEBROOT_ROOT,
+	WEBROOT_TEMPLATE,
 	WILDCARD,
-	X_CSRF_TOKEN,
-	VERSION, TITLE
+	X_CSRF_TOKEN
 } from "./constants.js";
 
 /**
@@ -316,9 +319,9 @@ export const config = {
 		pfx: null
 	},
 	webroot: {
-		root: EMPTY,
+		root: WEBROOT_ROOT,
 		static: PATH_ASSETS,
-		template: EMPTY
+		template: WEBROOT_TEMPLATE
 	},
 	version: VERSION
 };

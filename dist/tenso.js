@@ -2524,7 +2524,7 @@ function tenso (userConfig = {}) {
 	}
 
 	config$1.title = config$1.title ?? name;
-	config$1.version = version;
+	config$1.version = config$1.version ?? version;
 	config$1.webroot.root = resolve(config$1.webroot.root || join(__dirname, PREV_DIR, WWW));
 	config$1.webroot.template = readFileSync(config$1.webroot.template || join(config$1.webroot.root, TEMPLATE_FILE), {encoding: UTF8});
 

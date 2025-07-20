@@ -1,7 +1,7 @@
 import {readFileSync} from "node:fs";
 import http from "node:http";
 import https from "node:https";
-import {join, resolve} from "node:path";
+import {resolve} from "node:path";
 import {Woodland} from "woodland";
 import {merge} from "tiny-merge";
 import {eventsource} from "tiny-eventsource";
@@ -32,20 +32,18 @@ import {
 	INT_1000,
 	INT_200,
 	INT_204,
-	INT_304, INT_500,
+	INT_304,
+	INT_500,
 	INVALID_CONFIGURATION,
 	METRICS_PATH,
 	MSG_PROMETHEUS_ENABLED,
 	NULL,
 	OPTIONS,
-	PREV_DIR,
 	PRIVATE,
 	SIGHUP,
 	SIGINT,
 	SIGTERM,
-	TEMPLATE_FILE,
 	UTF8,
-	WWW,
 	X_POWERED_BY
 } from "./core/constants.js";
 import {serialize} from "./utils/serialize.js";

@@ -265,156 +265,389 @@ Hypermedia processing of the response body can be disabled as of `10.2.0` by set
 
 ## ⚙️ Configuration
 
-This is the default configuration for Tenso, without authentication or SSL. This would be ideal for development, but not production! Enabling SSL is as easy as providing file paths for the certificate and key.
+Tenso provides comprehensive configuration options to customize every aspect of your server. All configuration options are optional - provide only what you need to override the sensible defaults.
 
-Everything is optional! You can provide as much or as little configuration as you like.
+### Core Server Configuration
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `host` | string | `"0.0.0.0"` | Server host address to bind to |
+| `port` | number | `8000` | Server port number to listen on |
+| `title` | string | `"tenso"` | Application title for branding and display |
+| `version` | string | `auto` | Framework version (auto-detected) |
+| `silent` | boolean | `false` | Suppress console output and logging |
+| `maxListeners` | number | `25` | Maximum number of event listeners |
+
+### Content & Response Configuration
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `mimeType` | string | `"application/json"` | Default MIME type for responses |
+| `charset` | string | `"utf-8"` | Default character encoding for responses |
+| `jsonIndent` | number | `0` | JSON response indentation level (0 = minified) |
+| `digit` | number | `3` | Number of decimal places for numeric formatting |
+| `renderHeaders` | boolean | `true` | Include headers in rendered output responses |
+| `time` | boolean | `true` | Include timing information in response headers |
+| `etags` | boolean | `true` | Enable ETag generation for response caching |
+
+### Default Headers
 
 ```javascript
 {
-	auth: {
-		delay: 0,
-		protect: [],
-		unprotect: [],
-		basic: {
-			enabled: false,
-			list: []
-		},
-		bearer: {
-			enabled: false,
-			tokens: []
-		},
-		jwt: {
-			enabled: false,
-			auth: null,
-			audience: "",
-			algorithms: [
-				"HS256",
-				"HS384",
-				"HS512"
-			],
-			ignoreExpiration: false,
-			issuer: "",
-			scheme: "bearer",
-			secretOrKey: ""
-		},
-		msg: {
-			login: "POST 'username' & 'password' to authenticate"
-		},
-		oauth2: {
-			enabled: false,
-			auth: null,
-			auth_url: "",
-			token_url: "",
-			client_id: "",
-			client_secret: ""
-		},
-		uri: {
-			login: "/auth/login",
-			logout: "/auth/logout",
-			redirect: "/",
-			root: "/auth"
-		},
-		saml: {
-			enabled: false,
-			auth: null
-		}
-	},
-	autoindex: false,
-	cacheSize: 1000,
-	cacheTTL: 300000,
-	catchAll: true,
-	charset: "utf-8",
-	corsExpose: "cache-control, content-language, content-type, expires, last-modified, pragma",
-	defaultHeaders: {
-		"content-type": "application/json; charset=utf-8",
-		"vary": "accept, accept-encoding, accept-language, origin"
-	},
-	digit: 3,
-	etags: true,
-	exit: [],
-	host: "0.0.0.0",
-	hypermedia: {
-		enabled: true,
-		header: true
-	},
-	index: [],
-	initRoutes: {},
-	jsonIndent: 0,
-	logging: {
-		enabled: true,
-		format: "%h %l %u %t \"%r\" %>s %b",
-		level: "debug",
-		stack: true
-	},
-	maxBytes: 0,
-	maxListeners: 25,
-	mimeType: "application/json",
-	origins: ["*"],
-	pageSize: 5,
-	port: 8000,
-	prometheus: {
-		enabled: false,
-		metrics: {
-			includeMethod: true,
-			includePath: true,
-			includeStatusCode: true,
-			includeUp: true,
-			buckets: [0.001, 0.01, 0.1, 1, 2, 3, 5, 7, 10, 15, 20, 25, 30, 35, 40, 50, 70, 100, 200],
-			customLabels: {}
-		}
-	},
-	rate: {
-		enabled: false,
-		limit: 450,
-		message: "Too many requests",
-		override: null,
-		reset: 900,
-		status: 429
-	},
-	renderHeaders: true,
-	time: true,
-	security: {
-		key: "x-csrf-token",
-		secret: "tenso",
-		csrf: true,
-		csp: null,
-		xframe: "SAMEORIGIN",
-		p3p: "",
-		hsts: null,
-		xssProtection: true,
-		nosniff: true
-	},
-	session: {
-		cookie: {
-			httpOnly: true,
-			path: "/",
-			sameSite: true,
-			secure: "auto"
-		},
-		name: "tenso.sid",
-		proxy: true,
-		redis: {
-			host: "127.0.0.1",
-			port: 6379
-		},
-		rolling: true,
-		resave: true,
-		saveUninitialized: true,
-		secret: "tensoABC",
-		store: "memory"
-	},
-	silent: false,
-	ssl: {
-		cert: null,
-		key: null,
-		pfx: null
-	},
-	webroot: {
-		root: "",
-		static: "/assets",
-		template: ""
-	}
+  defaultHeaders: {
+    "content-type": "application/json; charset=utf-8",
+    "vary": "accept, accept-encoding, accept-language, origin"
+  }
 }
+```
+
+### CORS Configuration
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `origins` | Array<string> | `["*"]` | Allowed CORS origins |
+| `corsExpose` | string | `"cache-control, content-language, content-type, expires, last-modified, pragma"` | CORS exposed headers |
+
+### Caching Configuration
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `cacheSize` | number | `1000` | Maximum number of items in memory cache |
+| `cacheTTL` | number | `300000` | Cache time-to-live in milliseconds (5 minutes) |
+
+### Request Handling
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `maxBytes` | number | `0` | Maximum request body size in bytes (0 = unlimited) |
+| `catchAll` | boolean | `true` | Enable catch-all route handling for unmatched requests |
+| `exit` | Array | `[]` | Exit handlers to execute on server shutdown |
+
+### Pagination & Hypermedia
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `pageSize` | number | `5` | Default pagination page size |
+| `hypermedia.enabled` | boolean | `true` | Enable hypermedia links in responses |
+| `hypermedia.header` | boolean | `true` | Include hypermedia links in response headers |
+
+### Static File Serving
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `autoindex` | boolean | `false` | Enable automatic directory indexing for static files |
+| `webroot.root` | string | `"www/"` | Document root directory for static files |
+| `webroot.static` | string | `"/assets"` | Static assets directory path |
+| `webroot.template` | string | `"template.html"` | Template file path for rendered responses |
+
+### Authentication Configuration
+
+The `auth` object controls all authentication-related settings:
+
+#### Basic Authentication
+```javascript
+{
+  auth: {
+    basic: {
+      enabled: false,        // Enable basic authentication
+      list: []              // Array of "username:password" strings
+    }
+  }
+}
+```
+
+#### Bearer Token Authentication
+```javascript
+{
+  auth: {
+    bearer: {
+      enabled: false,        // Enable bearer token authentication
+      tokens: []            // Array of valid bearer tokens
+    }
+  }
+}
+```
+
+#### JWT Authentication
+```javascript
+{
+  auth: {
+    jwt: {
+      enabled: false,        // Enable JWT authentication
+      auth: null,           // Custom JWT authentication function
+      audience: "",         // JWT audience claim
+      algorithms: [         // Allowed JWT signing algorithms
+        "HS256", "HS384", "HS512"
+      ],
+      ignoreExpiration: false, // Ignore JWT expiration
+      issuer: "",           // JWT issuer claim
+      scheme: "Bearer",     // JWT authentication scheme
+      secretOrKey: ""       // JWT secret or private key
+    }
+  }
+}
+```
+
+#### OAuth2 Authentication
+```javascript
+{
+  auth: {
+    oauth2: {
+      enabled: false,        // Enable OAuth2 authentication
+      auth: null,           // Custom OAuth2 authentication function
+      auth_url: "",         // OAuth2 authorization URL
+      token_url: "",        // OAuth2 token URL
+      client_id: "",        // OAuth2 client ID
+      client_secret: ""     // OAuth2 client secret
+    }
+  }
+}
+```
+
+#### SAML Authentication
+```javascript
+{
+  auth: {
+    saml: {
+      enabled: false,        // Enable SAML authentication
+      auth: null            // Custom SAML authentication function
+    }
+  }
+}
+```
+
+#### Authentication Routes & Protection
+```javascript
+{
+  auth: {
+    delay: 0,             // Authentication delay in milliseconds
+    protect: [],          // Routes requiring authentication (regex patterns)
+    unprotect: [],        // Routes excluded from authentication
+    uri: {
+      login: "/auth/login",    // Login endpoint URI
+      logout: "/auth/logout",  // Logout endpoint URI
+      redirect: "/",          // Post-authentication redirect URI
+      root: "/auth"           // Authentication root URI
+    },
+    msg: {
+      login: "POST 'username' & 'password' to authenticate"
+    }
+  }
+}
+```
+
+### Security Configuration
+
+```javascript
+{
+  security: {
+    key: "x-csrf-token",     // CSRF token header name
+    secret: "tenso",         // CSRF secret key
+    csrf: true,              // Enable CSRF protection
+    csp: null,               // Content Security Policy header value
+    xframe: "SAMEORIGIN",    // X-Frame-Options header value
+    p3p: "",                 // P3P privacy policy header value
+    hsts: null,              // HTTP Strict Transport Security header
+    xssProtection: true,     // Enable X-XSS-Protection header
+    nosniff: true           // Enable X-Content-Type-Options: nosniff
+  }
+}
+```
+
+### Session Management
+
+```javascript
+{
+  session: {
+    cookie: {
+      httpOnly: true,        // Set httpOnly flag on session cookies
+      path: "/",            // Session cookie path
+      sameSite: true,       // Enable SameSite cookie attribute
+      secure: "auto"        // Secure cookie setting ("auto", true, false)
+    },
+    name: "tenso.sid",      // Session cookie name
+    proxy: true,            // Trust proxy for secure cookies
+    redis: {
+      host: "127.0.0.1",    // Redis host address
+      port: 6379            // Redis port number
+    },
+    rolling: true,          // Enable rolling session expiration
+    resave: true,           // Force session save even if not modified
+    saveUninitialized: true, // Save uninitialized sessions
+    secret: "tensoABC",     // Session signing secret
+    store: "memory"         // Session store type ("memory", "redis")
+  }
+}
+```
+
+### Rate Limiting
+
+```javascript
+{
+  rate: {
+    enabled: false,         // Enable rate limiting
+    limit: 450,            // Maximum requests per time window
+    message: "Too many requests", // Rate limit exceeded message
+    override: null,         // Custom rate limit override function
+    reset: 900,            // Rate limit reset window in seconds
+    status: 429            // HTTP status code for rate limit responses
+  }
+}
+```
+
+### Logging Configuration
+
+```javascript
+{
+  logging: {
+    enabled: true,          // Enable logging output
+    format: "%h %l %u %t \"%r\" %>s %b", // Log message format
+    level: "debug",         // Minimum log level to output
+    stack: true            // Include stack traces in error logs
+  }
+}
+```
+
+### Prometheus Metrics
+
+```javascript
+{
+  prometheus: {
+    enabled: false,         // Enable Prometheus metrics collection
+    metrics: {
+      includeMethod: true,      // Include HTTP method in metrics
+      includePath: true,        // Include request path in metrics
+      includeStatusCode: true,  // Include status code in metrics
+      includeUp: true,         // Include uptime metrics
+      buckets: [               // Histogram buckets for response times
+        0.001, 0.01, 0.1, 1, 2, 3, 5, 7, 10, 
+        15, 20, 25, 30, 35, 40, 50, 70, 100, 200
+      ],
+      customLabels: {}         // Custom metric labels
+    }
+  }
+}
+```
+
+### SSL/TLS Configuration
+
+```javascript
+{
+  ssl: {
+    cert: null,             // SSL certificate file path or content
+    key: null,              // SSL private key file path or content
+    pfx: null              // SSL PFX file path or content
+  }
+}
+```
+
+### Route Initialization
+
+```javascript
+{
+  initRoutes: {
+    // Define routes to be registered on startup
+    get: {
+      "/health": (req, res) => res.json({status: "ok"})
+    },
+    post: {
+      "/users": userController.create
+    },
+    always: {
+      // Middleware that runs for all requests
+      "/": authMiddleware
+    }
+  }
+}
+```
+
+### Complete Example Configuration
+
+Here's a production-ready configuration example:
+
+```javascript
+import {tenso} from "tenso";
+
+const app = tenso({
+  // Server settings
+  host: "0.0.0.0",
+  port: process.env.PORT || 3000,
+  title: "My API",
+  
+  // Security
+  auth: {
+    jwt: {
+      enabled: true,
+      secretOrKey: process.env.JWT_SECRET,
+      algorithms: ["HS256"]
+    },
+    protect: ["/api/private"]
+  },
+  
+  security: {
+    csrf: true,
+    csp: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"]
+    },
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true
+    }
+  },
+  
+  // Performance
+  rate: {
+    enabled: true,
+    limit: 1000,
+    reset: 3600
+  },
+  
+  // Monitoring
+  prometheus: {
+    enabled: true
+  },
+  
+  // Session management
+  session: {
+    store: "redis",
+    redis: {
+      host: process.env.REDIS_HOST || "localhost",
+      port: process.env.REDIS_PORT || 6379
+    },
+    secret: process.env.SESSION_SECRET
+  },
+  
+  // SSL in production
+  ssl: {
+    cert: process.env.SSL_CERT_PATH,
+    key: process.env.SSL_KEY_PATH
+  }
+});
+```
+
+### Environment-Specific Configurations
+
+#### Development
+```javascript
+const devConfig = {
+  logging: {level: "debug"},
+  rate: {enabled: false},
+  security: {csrf: false},
+  ssl: {cert: null, key: null}
+};
+```
+
+#### Production
+```javascript
+const prodConfig = {
+  logging: {level: "warn"},
+  rate: {enabled: true, limit: 1000},
+  security: {csrf: true, hsts: {maxAge: 31536000}},
+  session: {store: "redis"},
+  prometheus: {enabled: true}
+};
+```
 ```
 
 ## 🔐 Authentication

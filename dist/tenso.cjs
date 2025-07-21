@@ -3,7 +3,7 @@
  *
  * @copyright 2025 Jason Mulligan <jason.mulligan@avoidwork.com>
  * @license BSD-3-Clause
- * @version 17.4.0
+ * @version 18.0.0
  */
 'use strict';
 
@@ -2314,6 +2314,7 @@ class Tenso extends woodland.Woodland {
 		const mergedConfig = tinyMerge.merge(clone(config), config$1);
 		super(mergedConfig);
 
+		// No longer valid (reformed)
 		delete mergedConfig.defaultHeaders;
 
 		// Method names that should not be overwritten by configuration

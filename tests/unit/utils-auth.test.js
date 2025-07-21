@@ -35,6 +35,8 @@ describe("auth", () => {
 				},
 				uri: {
 					login: "/auth/login",
+					logout: "/auth/logout",
+					redirect: "/",
 					root: "/auth"
 				},
 				msg: {
@@ -302,5 +304,333 @@ describe("auth", () => {
 		assert.strictEqual(result, mockObj);
 		assert.ok(middlewareCallsIgnore.length > 0);
 		assert.ok(middlewareCallsAlways.length > 0);
+	});
+
+	it("should handle enabled auth types with URI mapping", () => {
+		mockObj.auth.basic = { enabled: true };
+		mockObj.auth.bearer = { enabled: true };
+		mockObj.auth.jwt = { enabled: true };
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle stateless configuration", () => {
+		mockObj.rate.enabled = false;
+		mockObj.security.csrf = false;
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle Redis session store configuration", () => {
+		mockObj.session.store = "redis";
+		mockObj.session.redis = {
+			host: "localhost",
+			port: 6379
+		};
+
+		// Mock to avoid actual Redis connection
+		const originalEnv = process.env.TEST_MODE;
+		process.env.TEST_MODE = "1";
+
+		const result = auth(mockObj);
+
+		process.env.TEST_MODE = originalEnv;
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle basic authentication with empty list", () => {
+		mockObj.auth.basic = {
+			enabled: true,
+			list: []
+		};
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle basic authentication with invalid list entries", () => {
+		mockObj.auth.basic = {
+			enabled: true,
+			list: ["invalid-entry", "another:invalid:entry:with:colons"]
+		};
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle basic authentication with async configuration", () => {
+		mockObj.auth.basic = {
+			enabled: true,
+			list: ["admin:password"]
+		};
+		mockObj.auth.oauth2.enabled = true; // This makes async = true
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle bearer token authentication with empty tokens", () => {
+		mockObj.auth.bearer = {
+			enabled: true,
+			tokens: []
+		};
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle bearer token authentication with async configuration", () => {
+		mockObj.auth.bearer = {
+			enabled: true,
+			tokens: ["valid-token"]
+		};
+		mockObj.auth.oauth2.enabled = true; // This makes async = true
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle JWT authentication with all optional parameters", () => {
+		mockObj.auth.jwt = {
+			enabled: true,
+			scheme: "Bearer",
+			secretOrKey: "secret-key",
+			algorithms: ["HS256"],
+			audience: "test-audience",
+			issuer: "test-issuer",
+			ignoreExpiration: true,
+			auth: (token, done) => done(null, { id: 1, username: "test" })
+		};
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle OAuth2 authentication with full configuration", () => {
+		mockObj.auth.oauth2 = {
+			enabled: true,
+			auth_url: "https://example.com/oauth/authorize",
+			token_url: "https://example.com/oauth/token",
+			client_id: "client-id",
+			client_secret: "client-secret",
+			auth: (accessToken, refreshToken, profile, done) => done(null, { id: 1, username: "test" })
+		};
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle CSP security configuration with policy object", () => {
+		mockObj.security.csp = {
+			policy: {
+				"default-src": "'self'",
+				"script-src": "'self' 'unsafe-inline'"
+			}
+		};
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle CSP security configuration with direct directives", () => {
+		mockObj.security.csp = {
+			"default-src": "'self'",
+			"script-src": "'self'"
+		};
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle X-Frame-Options security configuration", () => {
+		mockObj.security.xframe = "SAMEORIGIN";
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle P3P security configuration", () => {
+		mockObj.security.p3p = "CP='NOI ADM DEV PSAi COM NAV OUR OTRo STP IND DEM'";
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle P3P with 'none' value", () => {
+		mockObj.security.p3p = "none";
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle HSTS security configuration", () => {
+		mockObj.security.hsts = {
+			maxAge: 31536000,
+			includeSubDomains: false,
+			preload: true
+		};
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle HSTS with default values", () => {
+		mockObj.security.hsts = {};
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle XSS Protection configuration", () => {
+		mockObj.security.xssProtection = true;
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle nosniff configuration", () => {
+		mockObj.security.nosniff = true;
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle auth URIs with multiple enabled auth types", () => {
+		mockObj.auth.basic = { enabled: true };
+		mockObj.auth.bearer = { enabled: true };
+		mockObj.auth.jwt = { enabled: true };
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle login endpoint configuration", () => {
+		const loginRequests = [];
+
+		mockObj.get = function (uri, handler) {
+			if (uri === mockObj.auth.uri.login) {
+				loginRequests.push({ uri, handler });
+			}
+
+			return this;
+		};
+
+		mockObj.auth.basic = { enabled: true };
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle logout endpoint with session destruction", () => {
+		const logoutRequests = [];
+
+		mockObj.get = function (uri, handler) {
+			if (uri === mockObj.auth.uri.logout) {
+				logoutRequests.push({ uri, handler });
+
+				// Test the logout handler
+				const mockReq = {
+					session: {
+						destroy: () => {}
+					},
+					server: mockObj
+				};
+				const mockRes = {
+					redirect: function () {}
+				};
+
+				// Call the handler to exercise the logout logic
+				handler(mockReq, mockRes);
+			}
+
+			return this;
+		};
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle logout endpoint without session", () => {
+		const logoutRequests = [];
+
+		mockObj.get = function (uri, handler) {
+			if (uri === mockObj.auth.uri.logout) {
+				logoutRequests.push({ uri, handler });
+
+				// Test the logout handler without session
+				const mockReq = {
+					server: mockObj
+				}; // No session
+				const mockRes = {
+					redirect: function () {}
+				};
+
+				// Call the handler to exercise the logout logic
+				handler(mockReq, mockRes);
+			}
+
+			return this;
+		};
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle SSL ports correctly", () => {
+		mockObj.port = 80;
+		mockObj.ssl = { cert: false, key: false };
+
+		let result = auth(mockObj);
+		assert.strictEqual(result, mockObj);
+
+		mockObj.port = 443;
+		mockObj.ssl = { cert: "cert", key: "key" };
+
+		result = auth(mockObj);
+		assert.strictEqual(result, mockObj);
+	});
+
+	it("should handle regex caching for auth patterns", () => {
+		mockObj.auth.protect = ["admin.*", "users.*", "admin.*"]; // Duplicate pattern
+		mockObj.auth.unprotect = ["public.*"];
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
+		assert.ok(result.auth.protect.every(item => item instanceof RegExp));
+	});
+
+	it("should handle login URI pattern conversion", () => {
+		mockObj.auth.protect = ["/auth/login"]; // Should match login URI
+		mockObj.auth.uri.login = "/auth/login";
+
+		const result = auth(mockObj);
+
+		assert.strictEqual(result, mockObj);
 	});
 });

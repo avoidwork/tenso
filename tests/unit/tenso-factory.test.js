@@ -15,6 +15,9 @@ describe("tenso factory", () => {
 
 	it("should return a Tenso instance", () => {
 		const app = tenso({
+			logging: {
+				enabled: false
+			},
 			webroot: {
 				root: "./",
 				static: "",
@@ -28,6 +31,9 @@ describe("tenso factory", () => {
 
 	it("should use package.json version when no version is provided in config", () => {
 		const app = tenso({
+			logging: {
+				enabled: false
+			},
 			webroot: {
 				root: "./",
 				static: "",
@@ -43,6 +49,9 @@ describe("tenso factory", () => {
 	it("should use custom version when provided in config", () => {
 		const customVersion = "2.0.0-custom";
 		const app = tenso({
+			logging: {
+				enabled: false
+			},
 			version: customVersion,
 			webroot: {
 				root: "./",
@@ -57,6 +66,9 @@ describe("tenso factory", () => {
 	it("should preserve user-provided version over package.json version", () => {
 		const userVersion = "1.5.0-beta";
 		const app = tenso({
+			logging: {
+				enabled: false
+			},
 			version: userVersion,
 			webroot: {
 				root: "./",
@@ -70,6 +82,9 @@ describe("tenso factory", () => {
 
 	it("should handle empty string version in config", () => {
 		const app = tenso({
+			logging: {
+				enabled: false
+			},
 			version: "",
 			webroot: {
 				root: "./",
@@ -83,6 +98,9 @@ describe("tenso factory", () => {
 
 	it("should handle null version in config (should use package.json version)", () => {
 		const app = tenso({
+			logging: {
+				enabled: false
+			},
 			version: null,
 			webroot: {
 				root: "./",
@@ -98,6 +116,9 @@ describe("tenso factory", () => {
 
 	it("should handle undefined version in config (should use package.json version)", () => {
 		const app = tenso({
+			logging: {
+				enabled: false
+			},
 			version: undefined,
 			webroot: {
 				root: "./",
@@ -113,6 +134,9 @@ describe("tenso factory", () => {
 
 	it("should merge user config with defaults while preserving custom version", () => {
 		const customConfig = {
+			logging: {
+				enabled: false
+			},
 			version: "3.0.0-test",
 			port: 9000,
 			host: "127.0.0.1",
@@ -132,6 +156,9 @@ describe("tenso factory", () => {
 
 	it("should use package.json version when config is empty object", () => {
 		const app = tenso({
+			logging: {
+				enabled: false
+			},
 			webroot: {
 				root: "./",
 				static: "",
@@ -145,6 +172,9 @@ describe("tenso factory", () => {
 
 	it("should use package.json version when no config is provided", () => {
 		const app = tenso({
+			logging: {
+				enabled: false
+			},
 			webroot: {
 				root: "./",
 				static: "",

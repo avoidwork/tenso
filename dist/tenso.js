@@ -2572,13 +2572,23 @@ class Tenso extends Woodland {
 function tenso (userConfig = {}) {
 	const config$1 = merge(clone(config), userConfig);
 
+	// Ensure version falls back to default when null or undefined
+	if (config$1.version == null) {
+		config$1.version = config.version;
+	}
+
 	if ((/^[^\d+]$/).test(config$1.port) && config$1.port < INT_1) {
 		console.error(INVALID_CONFIGURATION);
 		process.exit(INT_1);
 	}
 
 	config$1.webroot.root = resolve(config$1.webroot.root);
-	config$1.webroot.template = readFileSync(config$1.webroot.template, {encoding: UTF8});
+	
+	// Only read template from file if it's a file path, not already a template string
+	if (typeof config$1.webroot.template === 'string' && config$1.webroot.template.includes('<')) ; else {
+		// Template is a file path, read the file
+		config$1.webroot.template = readFileSync(config$1.webroot.template, {encoding: UTF8});
+	}
 
 	if (config$1.silent !== true) {
 		config$1.defaultHeaders.server = `${config$1.title.toLowerCase()}/${config$1.version}`;

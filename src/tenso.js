@@ -449,13 +449,25 @@ export class Tenso extends Woodland {
 export function tenso (userConfig = {}) {
 	const config = merge(clone(defaultConfig), userConfig);
 
+	// Ensure version falls back to default when null or undefined
+	if (config.version == null) {
+		config.version = defaultConfig.version;
+	}
+
 	if ((/^[^\d+]$/).test(config.port) && config.port < INT_1) {
 		console.error(INVALID_CONFIGURATION);
 		process.exit(INT_1);
 	}
 
 	config.webroot.root = resolve(config.webroot.root);
-	config.webroot.template = readFileSync(config.webroot.template, {encoding: UTF8});
+	
+	// Only read template from file if it's a file path, not already a template string
+	if (typeof config.webroot.template === 'string' && config.webroot.template.includes('<')) {
+		// Template is already a string (contains HTML), no need to read from file
+	} else {
+		// Template is a file path, read the file
+		config.webroot.template = readFileSync(config.webroot.template, {encoding: UTF8});
+	}
 
 	if (config.silent !== true) {
 		config.defaultHeaders.server = `${config.title.toLowerCase()}/${config.version}`;

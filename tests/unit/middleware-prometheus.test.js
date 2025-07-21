@@ -168,21 +168,11 @@ describe("middleware/prometheus", () => {
 		// Need to call the middleware first to ensure metrics are created
 		middleware(mockReq, mockRes, mockNext);
 
-		// Check that metrics are registered
-		try {
-			const metrics = register.getMetricsAsJSON();
-			// Handle both array and object return types
-			const metricNames = Array.isArray(metrics) ?
-				metrics.map(m => m.name) :
-				Object.keys(metrics);
+		// Trigger the metrics by calling res.end()
+		mockRes.end();
 
-			assert.ok(metricNames.includes("http_request_duration_seconds"));
-			assert.ok(metricNames.includes("http_requests_total"));
-		} catch (e) {
-			// If getMetricsAsJSON doesn't work, check for getSingleMetric
-			console.log("getMetricsAsJSON failed:", e.message);
-			assert.ok(register.getSingleMetric("http_request_duration_seconds"));
-			assert.ok(register.getSingleMetric("http_requests_total"));
-		}
+		// Check that metrics are registered using getSingleMetric
+		assert.ok(register.getSingleMetric("http_request_duration_seconds"));
+		assert.ok(register.getSingleMetric("http_requests_total"));
 	});
 });

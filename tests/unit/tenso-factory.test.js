@@ -2,19 +2,34 @@ import assert from "node:assert";
 import { tenso } from "../../src/tenso.js";
 
 describe("tenso factory", () => {
+	const mockTemplate = `<!DOCTYPE html>
+<html>
+<head><title>{{title}}</title></head>
+<body><h1>Test Template</h1></body>
+</html>`;
+
+	const getTestConfig = (overrides = {}) => ({
+		webroot: {
+			template: mockTemplate,
+			root: process.cwd(),
+			static: ""
+		},
+		...overrides
+	});
+
 	it("should be a function", () => {
 		assert.strictEqual(typeof tenso, "function");
 	});
 
 	it("should return a Tenso instance", () => {
-		const app = tenso();
+		const app = tenso(getTestConfig());
 		assert.strictEqual(typeof app, "object");
 		assert.strictEqual(typeof app.start, "function");
 		assert.strictEqual(typeof app.stop, "function");
 	});
 
 	it("should use package.json version when no version is provided in config", () => {
-		const app = tenso({});
+		const app = tenso(getTestConfig());
 
 		// The version should be set from package.json
 		assert.strictEqual(typeof app.version, "string");
@@ -23,26 +38,26 @@ describe("tenso factory", () => {
 
 	it("should use custom version when provided in config", () => {
 		const customVersion = "2.0.0-custom";
-		const app = tenso({ version: customVersion });
+		const app = tenso(getTestConfig({ version: customVersion }));
 
 		assert.strictEqual(app.version, customVersion);
 	});
 
 	it("should preserve user-provided version over package.json version", () => {
 		const userVersion = "1.5.0-beta";
-		const app = tenso({ version: userVersion });
+		const app = tenso(getTestConfig({ version: userVersion }));
 
 		assert.strictEqual(app.version, userVersion);
 	});
 
 	it("should handle empty string version in config", () => {
-		const app = tenso({ version: "" });
+		const app = tenso(getTestConfig({ version: "" }));
 
 		assert.strictEqual(app.version, "");
 	});
 
 	it("should handle null version in config (should use package.json version)", () => {
-		const app = tenso({ version: null });
+		const app = tenso(getTestConfig({ version: null }));
 
 		// null should trigger the nullish coalescing to use package.json version
 		assert.strictEqual(typeof app.version, "string");
@@ -50,7 +65,7 @@ describe("tenso factory", () => {
 	});
 
 	it("should handle undefined version in config (should use package.json version)", () => {
-		const app = tenso({ version: undefined });
+		const app = tenso(getTestConfig({ version: undefined }));
 
 		// undefined should trigger the nullish coalescing to use package.json version
 		assert.strictEqual(typeof app.version, "string");
@@ -58,11 +73,11 @@ describe("tenso factory", () => {
 	});
 
 	it("should merge user config with defaults while preserving custom version", () => {
-		const customConfig = {
+		const customConfig = getTestConfig({
 			version: "3.0.0-test",
 			port: 9000,
 			host: "127.0.0.1"
-		};
+		});
 
 		const app = tenso(customConfig);
 
@@ -72,14 +87,14 @@ describe("tenso factory", () => {
 	});
 
 	it("should use package.json version when config is empty object", () => {
-		const app = tenso({});
+		const app = tenso(getTestConfig());
 
 		assert.strictEqual(typeof app.version, "string");
 		assert.ok(app.version.length > 0);
 	});
 
 	it("should use package.json version when no config is provided", () => {
-		const app = tenso();
+		const app = tenso(getTestConfig());
 
 		assert.strictEqual(typeof app.version, "string");
 		assert.ok(app.version.length > 0);

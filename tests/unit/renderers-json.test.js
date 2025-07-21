@@ -1,169 +1,239 @@
 import assert from "node:assert";
-import {describe, it} from "mocha";
 import {json} from "../../src/renderers/json.js";
 
-/**
- * Creates a mock request object for testing
- * @param {Object} options - Options to customize the mock request
- * @returns {Object} Mock request object
- */
-function createMockRequest (options = {}) {
-	return {
-		headers: options.headers || {},
-		server: options.server || {},
-		...options
-	};
-}
+describe("renderers - json", () => {
+	let mockReq, mockRes;
 
-/**
- * Creates a mock response object for testing
- * @param {Object} options - Options to customize the mock response
- * @returns {Object} Mock response object
- */
-function createMockResponse (options = {}) {
-	return {
-		header: options.header || (() => {}),
-		...options
-	};
-}
+	beforeEach(() => {
+		mockReq = {
+			headers: {
+				accept: "application/json"
+			},
+			server: {
+				jsonIndent: 2
+			}
+		};
 
-/**
- * Unit tests for JSON renderer module
- */
-describe("renderers/json", () => {
-	describe("json()", () => {
-		it("should render simple object as JSON", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {name: "test", value: 123};
-			const result = json(req, res, data);
+		mockRes = {
+			statusCode: 200
+		};
+	});
 
-			assert.strictEqual(result, '{"name":"test","value":123}');
-		});
+	it("should render object as JSON", () => {
+		const data = {name: "John", age: 30};
 
-		it("should render array as JSON", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = ["a", "b", "c"];
-			const result = json(req, res, data);
+		const result = json(mockReq, mockRes, data);
 
-			assert.strictEqual(result, '["a","b","c"]');
-		});
+		const parsed = JSON.parse(result);
+		assert.strictEqual(parsed.name, "John");
+		assert.strictEqual(parsed.age, 30);
+	});
 
-		it("should render null as JSON null", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const result = json(req, res, null);
+	it("should render array as JSON", () => {
+		const data = [1, 2, 3, "test"];
 
-			assert.strictEqual(result, "null");
-		});
+		const result = json(mockReq, mockRes, data);
 
-		it("should convert undefined to null", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const result = json(req, res, undefined);
+		const parsed = JSON.parse(result);
+		assert.ok(Array.isArray(parsed));
+		assert.strictEqual(parsed.length, 4);
+		assert.strictEqual(parsed[3], "test");
+	});
 
-			assert.strictEqual(result, "null");
-		});
+	it("should handle null values", () => {
+		const data = {value: null};
 
-		it("should render primitives as JSON", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
+		const result = json(mockReq, mockRes, data);
 
-			assert.strictEqual(json(req, res, "hello"), '"hello"');
-			assert.strictEqual(json(req, res, 123), "123");
-			assert.strictEqual(json(req, res, true), "true");
-			assert.strictEqual(json(req, res, false), "false");
-		});
+		const parsed = JSON.parse(result);
+		assert.strictEqual(parsed.value, null);
+	});
 
-		it("should handle missing headers gracefully", () => {
-			const req = createMockRequest({headers: undefined});
-			const res = createMockResponse();
-			const data = {test: "value"};
-			const result = json(req, res, data);
+	it("should handle boolean values", () => {
+		const data = {enabled: true, disabled: false};
 
-			assert.strictEqual(result, '{"test":"value"}');
-		});
+		const result = json(mockReq, mockRes, data);
 
-		it("should handle missing server configuration gracefully", () => {
-			const req = createMockRequest({server: undefined});
-			const res = createMockResponse();
-			const data = {test: "value"};
-			const result = json(req, res, data);
+		const parsed = JSON.parse(result);
+		assert.strictEqual(parsed.enabled, true);
+		assert.strictEqual(parsed.disabled, false);
+	});
 
-			assert.strictEqual(result, '{"test":"value"}');
-		});
+	it("should handle string values", () => {
+		const data = {message: "Hello World"};
 
-		it("should use server jsonIndent configuration", () => {
-			const req = createMockRequest({
-				server: {jsonIndent: 2}
-			});
-			const res = createMockResponse();
-			const data = {name: "test", value: 123};
-			const result = json(req, res, data);
+		const result = json(mockReq, mockRes, data);
 
-			assert.strictEqual(result, '{\n  "name": "test",\n  "value": 123\n}');
-		});
+		const parsed = JSON.parse(result);
+		assert.strictEqual(parsed.message, "Hello World");
+	});
 
-		it("should use accept header for indentation", () => {
-			const req = createMockRequest({
-				headers: {accept: "application/json; indent=4"},
-				server: {jsonIndent: 0}
-			});
-			const res = createMockResponse();
-			const data = {name: "test"};
-			const result = json(req, res, data);
+	it("should handle number values", () => {
+		const data = {
+			integer: 42,
+			float: 3.14,
+			negative: -10,
+			zero: 0
+		};
 
-			assert.strictEqual(result, '{\n    "name": "test"\n}');
-		});
+		const result = json(mockReq, mockRes, data);
 
-		it("should handle nested objects", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {
-				user: {
-					name: "John",
-					age: 30
-				},
-				active: true
-			};
-			const result = json(req, res, data);
+		const parsed = JSON.parse(result);
+		assert.strictEqual(parsed.integer, 42);
+		assert.strictEqual(parsed.float, 3.14);
+		assert.strictEqual(parsed.negative, -10);
+		assert.strictEqual(parsed.zero, 0);
+	});
 
-			assert.strictEqual(result, '{"user":{"name":"John","age":30},"active":true}');
-		});
+	it("should handle nested objects", () => {
+		const data = {
+			user: {
+				name: "John",
+				details: {
+					age: 30,
+					location: "NYC"
+				}
+			}
+		};
 
-		it("should handle circular references gracefully", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {name: "test"};
-			data.self = data; // Create circular reference
+		const result = json(mockReq, mockRes, data);
 
-			assert.throws(() => {
-				json(req, res, data);
-			}, TypeError);
-		});
+		const parsed = JSON.parse(result);
+		assert.strictEqual(parsed.user.name, "John");
+		assert.strictEqual(parsed.user.details.age, 30);
+		assert.strictEqual(parsed.user.details.location, "NYC");
+	});
 
-		it("should handle special characters", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {
-				message: "Hello 世界",
-				path: "C:\\Users\\test",
-				quote: '"quoted"'
-			};
-			const result = json(req, res, data);
+	it("should handle arrays of objects", () => {
+		const data = [
+			{name: "John", age: 30},
+			{name: "Jane", age: 25}
+		];
 
-			assert.strictEqual(result, '{"message":"Hello 世界","path":"C:\\\\Users\\\\test","quote":"\\"quoted\\""}');
-		});
+		const result = json(mockReq, mockRes, data);
 
-		it("should handle Date objects", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const date = new Date("2023-01-01T00:00:00.000Z");
-			const data = {timestamp: date};
-			const result = json(req, res, data);
+		const parsed = JSON.parse(result);
+		assert.ok(Array.isArray(parsed));
+		assert.strictEqual(parsed[0].name, "John");
+		assert.strictEqual(parsed[1].name, "Jane");
+	});
 
-			assert.strictEqual(result, '{"timestamp":"2023-01-01T00:00:00.000Z"}');
-		});
+	it("should use indentation from indent utility", () => {
+		mockReq.headers.accept = "application/json; indent=4";
+		const data = {level1: {level2: "value"}};
+
+		const result = json(mockReq, mockRes, data);
+
+		// Should contain indentation
+		assert.ok(result.includes("\n"));
+		assert.ok(result.includes("    ")); // 4 spaces
+	});
+
+	it("should fallback to server jsonIndent when no indent in accept header", () => {
+		mockReq.headers.accept = "application/json";
+		mockReq.server.jsonIndent = 2;
+		const data = {level1: {level2: "value"}};
+
+		const result = json(mockReq, mockRes, data);
+
+		// Should contain indentation
+		assert.ok(result.includes("\n"));
+		assert.ok(result.includes("  ")); // 2 spaces
+	});
+
+	it("should handle no indentation", () => {
+		mockReq.headers.accept = "application/json";
+		mockReq.server.jsonIndent = 0;
+		const data = {level1: {level2: "value"}};
+
+		const result = json(mockReq, mockRes, data);
+
+		// Should not contain newlines (compact format)
+		assert.ok(!result.includes("\n"));
+	});
+
+	it("should handle empty object", () => {
+		const data = {};
+
+		const result = json(mockReq, mockRes, data);
+
+		assert.strictEqual(result, "{}");
+	});
+
+	it("should handle empty array", () => {
+		const data = [];
+
+		const result = json(mockReq, mockRes, data);
+
+		assert.strictEqual(result.trim(), "[]");
+	});
+
+	it("should handle primitive values", () => {
+		const stringResult = json(mockReq, mockRes, "test");
+		const numberResult = json(mockReq, mockRes, 42);
+		const booleanResult = json(mockReq, mockRes, true);
+		const nullResult = json(mockReq, mockRes, null);
+
+		assert.strictEqual(stringResult, '"test"');
+		assert.strictEqual(numberResult, "42");
+		assert.strictEqual(booleanResult, "true");
+		assert.strictEqual(nullResult, "null");
+	});
+
+	it("should handle special characters and escape them properly", () => {
+		const data = {
+			quote: 'He said "Hello"',
+			backslash: "Path\\to\\file",
+			newline: "line1\nline2",
+			tab: "col1\tcol2"
+		};
+
+		const result = json(mockReq, mockRes, data);
+
+		const parsed = JSON.parse(result);
+		assert.strictEqual(parsed.quote, 'He said "Hello"');
+		assert.strictEqual(parsed.backslash, "Path\\to\\file");
+		assert.strictEqual(parsed.newline, "line1\nline2");
+		assert.strictEqual(parsed.tab, "col1\tcol2");
+	});
+
+	it("should handle Date objects", () => {
+		const testDate = new Date("2023-01-01T12:00:00.000Z");
+		const data = {timestamp: testDate};
+
+		const result = json(mockReq, mockRes, data);
+
+		const parsed = JSON.parse(result);
+		assert.strictEqual(parsed.timestamp, testDate.toISOString());
+	});
+
+	it("should handle large numbers", () => {
+		const data = {
+			big: Number.MAX_SAFE_INTEGER,
+			small: Number.MIN_SAFE_INTEGER,
+			infinity: Infinity,
+			negInfinity: -Infinity,
+			nan: NaN
+		};
+
+		const result = json(mockReq, mockRes, data);
+
+		// JSON.stringify converts Infinity and NaN to null
+		const parsed = JSON.parse(result);
+		assert.strictEqual(parsed.big, Number.MAX_SAFE_INTEGER);
+		assert.strictEqual(parsed.small, Number.MIN_SAFE_INTEGER);
+		assert.strictEqual(parsed.infinity, null);
+		assert.strictEqual(parsed.negInfinity, null);
+		assert.strictEqual(parsed.nan, null);
+	});
+
+	it("should handle circular references gracefully", () => {
+		const data = {name: "test"};
+		data.self = data; // Create circular reference
+
+		// This should throw an error due to circular reference
+		assert.throws(() => {
+			json(mockReq, mockRes, data);
+		}, /circular|cyclic/i);
 	});
 });

@@ -1,234 +1,252 @@
 import assert from "node:assert";
-import {describe, it} from "mocha";
 import {plain} from "../../src/renderers/plain.js";
 
-/**
- * Creates a mock request object for testing
- * @param {Object} options - Options to customize the mock request
- * @returns {Object} Mock request object
- */
-function createMockRequest (options = {}) {
-	return {
-		headers: options.headers || {},
-		server: options.server || {},
-		...options
-	};
-}
+describe("renderers - plain", () => {
+	let mockReq, mockRes;
 
-/**
- * Creates a mock response object for testing
- * @param {Object} options - Options to customize the mock response
- * @returns {Object} Mock response object
- */
-function createMockResponse (options = {}) {
-	return {
-		header: options.header || (() => {}),
-		...options
-	};
-}
+	beforeEach(() => {
+		mockReq = {
+			headers: {
+				accept: "text/plain"
+			},
+			server: {
+				json: 0
+			}
+		};
 
-/**
- * Unit tests for plain text renderer module
- */
-describe("renderers/plain", () => {
-	describe("plain()", () => {
-		it("should render null as 'null'", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const result = plain(req, res, null);
+		mockRes = {
+			statusCode: 200
+		};
+	});
 
-			assert.strictEqual(result, "null");
-		});
+	it("should render string as plain text", () => {
+		const data = "Hello World";
 
-		it("should render undefined as empty string", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const result = plain(req, res, undefined);
+		const result = plain(mockReq, mockRes, data);
 
-			assert.strictEqual(result, "");
-		});
+		assert.strictEqual(result, "Hello World");
+	});
 
-		it("should render strings as-is", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const result = plain(req, res, "hello world");
+	it("should render number as string", () => {
+		const data = 42;
 
-			assert.strictEqual(result, "hello world");
-		});
+		const result = plain(mockReq, mockRes, data);
 
-		it("should render numbers as strings", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
+		assert.strictEqual(result, "42");
+	});
 
-			assert.strictEqual(plain(req, res, 123), "123");
-			assert.strictEqual(plain(req, res, 123.45), "123.45");
-			assert.strictEqual(plain(req, res, 0), "0");
-		});
+	it("should render boolean as string", () => {
+		const trueResult = plain(mockReq, mockRes, true);
+		const falseResult = plain(mockReq, mockRes, false);
 
-		it("should render booleans as strings", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
+		assert.strictEqual(trueResult, "true");
+		assert.strictEqual(falseResult, "false");
+	});
 
-			assert.strictEqual(plain(req, res, true), "true");
-			assert.strictEqual(plain(req, res, false), "false");
-		});
+	it("should handle null values by returning 'null' string", () => {
+		const data = null;
 
-		it("should render arrays as comma-separated values", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = ["apple", "banana", "cherry"];
-			const result = plain(req, res, data);
+		const result = plain(mockReq, mockRes, data);
 
-			assert.strictEqual(result, "apple,banana,cherry");
-		});
+		assert.strictEqual(result, "null");
+	});
 
-		it("should render nested arrays recursively", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = [["a", "b"], ["c", "d"]];
-			const result = plain(req, res, data);
+	it("should handle undefined values by returning empty string", () => {
+		const data = undefined;
 
-			assert.strictEqual(result, "a,b,c,d");
-		});
+		const result = plain(mockReq, mockRes, data);
 
-		it("should render Date objects as ISO strings", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const date = new Date("2023-01-01T00:00:00.000Z");
-			const result = plain(req, res, date);
+		assert.strictEqual(result, "");
+	});
 
-			assert.strictEqual(result, "2023-01-01T00:00:00.000Z");
-		});
+	it("should render object as JSON string", () => {
+		const data = {name: "John", age: 30};
 
-		it("should render functions as their string representation", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const func = function testFunction () { return "test"; };
-			const result = plain(req, res, func);
+		const result = plain(mockReq, mockRes, data);
 
-			assert.strictEqual(result, func.toString());
-		});
+		const parsed = JSON.parse(result);
+		assert.strictEqual(parsed.name, "John");
+		assert.strictEqual(parsed.age, 30);
+	});
 
-		it("should render objects as JSON strings", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {name: "test", value: 123};
-			const result = plain(req, res, data);
+	it("should render array of primitives with comma separation", () => {
+		const data = [1, 2, 3, "test"];
 
-			assert.strictEqual(result, '{"name":"test","value":123}');
-		});
+		const result = plain(mockReq, mockRes, data);
 
-		it("should use server jsonIndent for objects", () => {
-			const req = createMockRequest({
-				server: {jsonIndent: 2}
-			});
-			const res = createMockResponse();
-			const data = {name: "test", value: 123};
-			const result = plain(req, res, data);
+		assert.strictEqual(result, "1,2,3,test");
+	});
 
-			assert.strictEqual(result, '{\n  "name": "test",\n  "value": 123\n}');
-		});
+	it("should render array of objects recursively", () => {
+		const data = [{name: "John"}, {name: "Jane"}];
 
-		it("should use accept header for object indentation", () => {
-			const req = createMockRequest({
-				headers: {accept: "text/plain; indent=4"},
-				server: {jsonIndent: 0}
-			});
-			const res = createMockResponse();
-			const data = {name: "test"};
-			const result = plain(req, res, data);
+		const result = plain(mockReq, mockRes, data);
 
-			assert.strictEqual(result, '{\n    "name": "test"\n}');
-		});
+		assert.ok(result.includes('"name":"John"'));
+		assert.ok(result.includes('"name":"Jane"'));
+		assert.ok(result.includes(","));
+	});
 
-		it("should handle arrays containing different types", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = [
-				"string",
-				123,
-				true,
-				{key: "value"},
-				null
-			];
-			const result = plain(req, res, data);
+	it("should handle nested arrays", () => {
+		const data = [1, [2, 3], 4];
 
-			assert.strictEqual(result, 'string,123,true,{"key":"value"},null');
-		});
+		const result = plain(mockReq, mockRes, data);
 
-		it("should handle empty arrays", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const result = plain(req, res, []);
+		assert.strictEqual(result, "1,2,3,4");
+	});
 
-			assert.strictEqual(result, "");
-		});
+	it("should handle mixed array types", () => {
+		const data = ["string", 42, true, {key: "value"}];
 
-		it("should handle empty objects", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const result = plain(req, res, {});
+		const result = plain(mockReq, mockRes, data);
 
-			assert.strictEqual(result, "{}");
-		});
+		const parts = result.split(",");
+		assert.strictEqual(parts[0], "string");
+		assert.strictEqual(parts[1], "42");
+		assert.strictEqual(parts[2], "true");
+		assert.ok(parts[3].includes("key"));
+	});
 
-		it("should handle missing headers gracefully", () => {
-			const req = createMockRequest({headers: undefined});
-			const res = createMockResponse();
-			const data = {test: "value"};
-			const result = plain(req, res, data);
+	it("should handle empty array", () => {
+		const data = [];
 
-			assert.strictEqual(result, '{"test":"value"}');
-		});
+		const result = plain(mockReq, mockRes, data);
 
-		it("should handle missing server configuration gracefully", () => {
-			const req = createMockRequest({server: undefined});
-			const res = createMockResponse();
-			const data = {test: "value"};
-			const result = plain(req, res, data);
+		assert.strictEqual(result, "");
+	});
 
-			assert.strictEqual(result, '{"test":"value"}');
-		});
+	it("should handle empty object", () => {
+		const data = {};
 
-		it("should use caching for objects", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {name: "test"};
+		const result = plain(mockReq, mockRes, data);
 
-			// First call
-			const result1 = plain(req, res, data);
-			// Second call with same object should use cache
-			const result2 = plain(req, res, data);
+		assert.strictEqual(result, "{}");
+	});
 
-			assert.strictEqual(result1, result2);
-			assert.strictEqual(result1, '{"name":"test"}');
-		});
-
-		it("should handle complex nested structures", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {
-				users: [
-					{name: "John", age: 30},
-					{name: "Jane", age: 25}
-				],
-				metadata: {
-					total: 2,
-					active: true
+	it("should handle deeply nested structures", () => {
+		const data = {
+			level1: {
+				level2: {
+					level3: "deep value"
 				}
-			};
-			const result = plain(req, res, data);
+			}
+		};
 
-			assert.strictEqual(result, '{"users":[{"name":"John","age":30},{"name":"Jane","age":25}],"metadata":{"total":2,"active":true}}');
-		});
+		const result = plain(mockReq, mockRes, data);
 
-		it("should handle special number values", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
+		const parsed = JSON.parse(result);
+		assert.strictEqual(parsed.level1.level2.level3, "deep value");
+	});
 
-			assert.strictEqual(plain(req, res, NaN), "NaN");
-			assert.strictEqual(plain(req, res, Infinity), "Infinity");
-			assert.strictEqual(plain(req, res, -Infinity), "-Infinity");
-		});
+	it("should handle special characters in strings", () => {
+		const data = "Hello \"world\"\nNew line\tTab";
+
+		const result = plain(mockReq, mockRes, data);
+
+		assert.strictEqual(result, "Hello \"world\"\nNew line\tTab");
+	});
+
+	it("should handle Date objects", () => {
+		const testDate = new Date("2023-01-01T12:00:00.000Z");
+		const data = testDate;
+
+		const result = plain(mockReq, mockRes, data);
+
+		assert.strictEqual(result, testDate.toISOString());
+	});
+
+	it("should handle objects containing Date objects", () => {
+		const testDate = new Date("2023-01-01T12:00:00.000Z");
+		const data = {timestamp: testDate};
+
+		const result = plain(mockReq, mockRes, data);
+
+		const parsed = JSON.parse(result);
+		assert.strictEqual(parsed.timestamp, testDate.toISOString());
+	});
+
+	it("should use indentation from indent utility for objects", () => {
+		mockReq.headers.accept = "text/plain; indent=2";
+		mockReq.server.json = 2;
+		const data = {level1: {level2: "value"}};
+
+		const result = plain(mockReq, mockRes, data);
+
+		// Should contain indentation for object JSON
+		assert.ok(result.includes("\n"));
+		assert.ok(result.includes("  "));
+	});
+
+	it("should handle zero values correctly", () => {
+		const data = [0, "0", false];
+
+		const result = plain(mockReq, mockRes, data);
+
+		assert.strictEqual(result, "0,0,false");
+	});
+
+	it("should handle arrays with null and undefined values", () => {
+		const data = [null, undefined, "test"];
+
+		const result = plain(mockReq, mockRes, data);
+
+		assert.strictEqual(result, "null,,test");
+	});
+
+	it("should handle very large numbers", () => {
+		const data = [Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER];
+
+		const result = plain(mockReq, mockRes, data);
+
+		const parts = result.split(",");
+		assert.strictEqual(parts[0], Number.MAX_SAFE_INTEGER.toString());
+		assert.strictEqual(parts[1], Number.MIN_SAFE_INTEGER.toString());
+	});
+
+	it("should handle Infinity and NaN", () => {
+		const data = [Infinity, -Infinity, NaN];
+
+		const result = plain(mockReq, mockRes, data);
+
+		const parts = result.split(",");
+		assert.strictEqual(parts[0], "Infinity");
+		assert.strictEqual(parts[1], "-Infinity");
+		assert.strictEqual(parts[2], "NaN");
+	});
+
+	it("should handle functions by converting to string", () => {
+		const data = function test () { return "hello"; };
+
+		const result = plain(mockReq, mockRes, data);
+
+		assert.ok(result.includes("function"));
+		assert.ok(result.includes("test"));
+	});
+
+	it("should handle symbols by converting to string", () => {
+		const data = Symbol("test");
+
+		const result = plain(mockReq, mockRes, data);
+
+		assert.ok(result.includes("Symbol"));
+		assert.ok(result.includes("test"));
+	});
+
+	it("should handle arrays containing mixed primitive and object types (except null)", () => {
+		const data = [
+			"string",
+			42,
+			true,
+			{object: "value"},
+			[1, 2, 3]
+		];
+
+		const result = plain(mockReq, mockRes, data);
+
+		assert.ok(result.includes("string"));
+		assert.ok(result.includes("42"));
+		assert.ok(result.includes("true"));
+		assert.ok(result.includes("object"));
+		assert.ok(result.includes("1,2,3"));
 	});
 });

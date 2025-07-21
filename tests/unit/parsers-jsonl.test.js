@@ -1,181 +1,144 @@
 import assert from "node:assert";
-import {describe, it} from "mocha";
-import {jsonl} from "../../src/parsers/jsonl.js";
-import {EMPTY} from "../../src/core/constants.js";
+import { jsonl } from "../../src/parsers/jsonl.js";
 
-/**
- * Unit tests for JSONL (JSON Lines) parser module
- */
 describe("parsers/jsonl", () => {
-	describe("jsonl()", () => {
-		it("should parse single line JSON object", () => {
-			const input = '{"name": "test", "value": 123}';
-			const expected = [{name: "test", value: 123}];
-			const result = jsonl(input);
+	it("should be a function", () => {
+		assert.strictEqual(typeof jsonl, "function");
+	});
 
-			assert.deepStrictEqual(result, expected);
-		});
+	it("should parse single line JSON", () => {
+		const input = '{"name": "Alice", "age": 30}';
+		const result = jsonl(input);
 
-		it("should parse multiple line JSON objects", () => {
-			const input = '{"name": "first", "id": 1}\n{"name": "second", "id": 2}';
-			const expected = [
-				{name: "first", id: 1},
-				{name: "second", id: 2}
-			];
-			const result = jsonl(input);
+		assert.ok(Array.isArray(result));
+		assert.strictEqual(result.length, 1);
+		assert.deepStrictEqual(result[0], { name: "Alice", age: 30 });
+	});
 
-			assert.deepStrictEqual(result, expected);
-		});
+	it("should parse multiple lines of JSON", () => {
+		const input = `{"id": 1, "name": "Alice"}
+{"id": 2, "name": "Bob"}
+{"id": 3, "name": "Charlie"}`;
+		const result = jsonl(input);
 
-		it("should handle CRLF line endings", () => {
-			const input = '{"name": "first", "id": 1}\r\n{"name": "second", "id": 2}';
-			const expected = [
-				{name: "first", id: 1},
-				{name: "second", id: 2}
-			];
-			const result = jsonl(input);
+		assert.ok(Array.isArray(result));
+		assert.strictEqual(result.length, 3);
+		assert.deepStrictEqual(result[0], { id: 1, name: "Alice" });
+		assert.deepStrictEqual(result[1], { id: 2, name: "Bob" });
+		assert.deepStrictEqual(result[2], { id: 3, name: "Charlie" });
+	});
 
-			assert.deepStrictEqual(result, expected);
-		});
+	it("should handle empty lines", () => {
+		const input = `{"id": 1}
 
-		it("should handle mixed line endings", () => {
-			const input = '{"name": "first", "id": 1}\r\n{"name": "second", "id": 2}\n{"name": "third", "id": 3}';
-			const expected = [
-				{name: "first", id: 1},
-				{name: "second", id: 2},
-				{name: "third", id: 3}
-			];
-			const result = jsonl(input);
+{"id": 2}`;
+		const result = jsonl(input);
 
-			assert.deepStrictEqual(result, expected);
-		});
+		assert.ok(Array.isArray(result));
+		assert.strictEqual(result.length, 2);
+		assert.deepStrictEqual(result[0], { id: 1 });
+		assert.deepStrictEqual(result[1], { id: 2 });
+	});
 
-		it("should return empty array for empty string", () => {
-			const result = jsonl("");
-			assert.deepStrictEqual(result, []);
-		});
+	it("should parse different JSON object types on each line", () => {
+		const input = `{"type": "object", "value": {"nested": true}}
+{"type": "user", "data": {"name": "Alice", "age": 30}}
+{"type": "config", "settings": {"theme": "dark", "language": "en"}}
+{"type": "empty", "data": {}}
+{"type": "metadata", "flags": {"active": true, "verified": false}}
+{"type": "result", "output": null}`;
+		const result = jsonl(input);
 
-		it("should return empty array for EMPTY constant", () => {
-			const result = jsonl(EMPTY);
-			assert.deepStrictEqual(result, []);
-		});
+		assert.strictEqual(result.length, 6);
+		assert.deepStrictEqual(result[0], { type: "object", value: { nested: true } });
+		assert.deepStrictEqual(result[1], { type: "user", data: { name: "Alice", age: 30 } });
+		assert.deepStrictEqual(result[2], { type: "config", settings: { theme: "dark", language: "en" } });
+		assert.deepStrictEqual(result[3], { type: "empty", data: {} });
+		assert.deepStrictEqual(result[4], { type: "metadata", flags: { active: true, verified: false } });
+		assert.deepStrictEqual(result[5], { type: "result", output: null });
+	});
 
-		it("should return empty array for null input", () => {
-			const result = jsonl(null);
-			assert.deepStrictEqual(result, []);
-		});
+	it("should handle empty string input", () => {
+		const result = jsonl("");
+		assert.ok(Array.isArray(result));
+		assert.strictEqual(result.length, 0);
+	});
 
-		it("should return empty array for undefined input", () => {
-			const result = jsonl(undefined);
-			assert.deepStrictEqual(result, []);
-		});
+	it("should handle undefined parameter (uses EMPTY default)", () => {
+		const result = jsonl();
+		assert.ok(Array.isArray(result));
+		assert.strictEqual(result.length, 0);
+	});
 
-		it("should return empty array for no parameters", () => {
-			const result = jsonl();
-			assert.deepStrictEqual(result, []);
-		});
+	it("should handle trailing newlines", () => {
+		const input = `{"id": 1}
+{"id": 2}
+`;
+		const result = jsonl(input);
 
-		it("should parse JSON primitives", () => {
-			const input = '{"value": "hello"}\n{"value": 123}\n{"value": true}\n{"value": false}\n{"value": null}';
-			const expected = [
-				{value: "hello"},
-				{value: 123},
-				{value: true},
-				{value: false},
-				{value: null}
-			];
-			const result = jsonl(input);
+		assert.strictEqual(result.length, 2);
+		assert.deepStrictEqual(result[0], { id: 1 });
+		assert.deepStrictEqual(result[1], { id: 2 });
+	});
 
-			assert.deepStrictEqual(result, expected);
-		});
+	it("should throw error for invalid JSON line", () => {
+		const input = `{"valid": "json"}
+{invalid json}`;
 
-		it("should parse objects with array values", () => {
-			const input = '{"items": ["a", "b", "c"]}\n{"items": ["x", "y", "z"]}';
-			const expected = [
-				{items: ["a", "b", "c"]},
-				{items: ["x", "y", "z"]}
-			];
-			const result = jsonl(input);
+		assert.throws(() => jsonl(input), Error);
+	});
 
-			assert.deepStrictEqual(result, expected);
-		});
+	it("should parse complex objects on each line", () => {
+		const input = `{"user": {"id": 1, "profile": {"name": "Alice", "preferences": {"theme": "dark"}}}, "timestamp": "2023-01-01"}
+{"user": {"id": 2, "profile": {"name": "Bob", "preferences": {"theme": "light"}}}, "timestamp": "2023-01-02"}`;
 
-		it("should handle trailing newline", () => {
-			const input = '{"name": "test1"}\n{"name": "test2"}\n';
-			const expected = [
-				{name: "test1"},
-				{name: "test2"}
-			];
-			const result = jsonl(input);
+		const result = jsonl(input);
 
-			assert.deepStrictEqual(result, expected);
-		});
+		assert.strictEqual(result.length, 2);
+		assert.strictEqual(result[0].user.id, 1);
+		assert.strictEqual(result[0].user.profile.name, "Alice");
+		assert.strictEqual(result[0].user.profile.preferences.theme, "dark");
+		assert.strictEqual(result[1].user.id, 2);
+		assert.strictEqual(result[1].user.profile.name, "Bob");
+		assert.strictEqual(result[1].user.profile.preferences.theme, "light");
+	});
 
-		it("should handle leading newline", () => {
-			const input = '\n{"name": "test1"}\n{"name": "test2"}';
-			const expected = [
-				{name: "test1"},
-				{name: "test2"}
-			];
-			const result = jsonl(input);
+	it("should handle objects with different structures", () => {
+		const input = `{"items": [1, 2, 3], "count": 3}
+{"nested": {"object": true}, "text": "string", "number": 42}
+{"empty": {}, "list": []}`;
 
-			assert.deepStrictEqual(result, expected);
-		});
+		const result = jsonl(input);
 
-		it("should parse complex nested objects", () => {
-			const input = '{"user": {"name": "John", "age": 30}, "active": true}\n{"user": {"name": "Jane", "age": 25}, "active": false}';
-			const expected = [
-				{user: {name: "John", age: 30}, active: true},
-				{user: {name: "Jane", age: 25}, active: false}
-			];
-			const result = jsonl(input);
+		assert.strictEqual(result.length, 3);
+		assert.deepStrictEqual(result[0], { items: [1, 2, 3], count: 3 });
+		assert.deepStrictEqual(result[1], { nested: { object: true }, text: "string", number: 42 });
+		assert.deepStrictEqual(result[2], { empty: {}, list: [] });
+	});
 
-			assert.deepStrictEqual(result, expected);
-		});
+	it("should preserve special characters and unicode", () => {
+		const input = `{"message": "Hello\\nWorld", "emoji": "🌟"}
+{"path": "/home/user", "quote": "\\"escaped\\""}`;
 
-		it("should handle unicode characters", () => {
-			const input = '{"message": "Hello 世界"}\n{"emoji": "🌍"}';
-			const expected = [
-				{message: "Hello 世界"},
-				{emoji: "🌍"}
-			];
-			const result = jsonl(input);
+		const result = jsonl(input);
 
-			assert.deepStrictEqual(result, expected);
-		});
+		assert.strictEqual(result.length, 2);
+		assert.strictEqual(result[0].message, "Hello\nWorld");
+		assert.strictEqual(result[0].emoji, "🌟");
+		assert.strictEqual(result[1].path, "/home/user");
+		assert.strictEqual(result[1].quote, '"escaped"');
+	});
 
-		it("should throw error for invalid JSON lines", () => {
-			const input = '{"valid": true}\n{invalid json}\n{"also_valid": true}';
+	it("should handle numeric precision correctly", () => {
+		const input = `{"int": 42, "float": 3.14159, "scientific": 1.23e-10}
+{"bigNum": 999999999999999, "smallNum": 0.000000001}`;
 
-			assert.throws(() => {
-				jsonl(input);
-			}, Error);
-		});
+		const result = jsonl(input);
 
-		it("should handle empty lines gracefully", () => {
-			const input = '{"first": 1}\n\n{"second": 2}';
-			const expected = [
-				{first: 1},
-				{second: 2}
-			];
-			const result = jsonl(input);
-
-			assert.deepStrictEqual(result, expected);
-		});
-
-		it("should parse large number of lines", () => {
-			const lines = [];
-			const expected = [];
-
-			for (let i = 0; i < 1000; i++) {
-				lines.push(`{"id": ${i}, "value": "item${i}"}`);
-				expected.push({id: i, value: `item${i}`});
-			}
-
-			const input = lines.join("\n");
-			const result = jsonl(input);
-
-			assert.deepStrictEqual(result, expected);
-		});
+		assert.strictEqual(result[0].int, 42);
+		assert.strictEqual(result[0].float, 3.14159);
+		assert.strictEqual(result[0].scientific, 1.23e-10);
+		assert.strictEqual(result[1].bigNum, 999999999999999);
+		assert.strictEqual(result[1].smallNum, 0.000000001);
 	});
 });

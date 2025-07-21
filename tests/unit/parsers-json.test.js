@@ -1,119 +1,100 @@
 import assert from "node:assert";
-import {describe, it} from "mocha";
-import {json} from "../../src/parsers/json.js";
-import {EMPTY} from "../../src/core/constants.js";
+import { json } from "../../src/parsers/json.js";
 
-/**
- * Unit tests for JSON parser module
- */
 describe("parsers/json", () => {
-	describe("json()", () => {
-		it("should parse valid JSON string", () => {
-			const input = '{"name": "test", "value": 123}';
-			const expected = {name: "test", value: 123};
-			const result = json(input);
+	it("should be a function", () => {
+		assert.strictEqual(typeof json, "function");
+	});
 
-			assert.deepStrictEqual(result, expected);
+	it("should parse valid JSON string", () => {
+		const input = '{"key": "value", "number": 123}';
+		const expected = { key: "value", number: 123 };
+		const result = json(input);
+
+		assert.deepStrictEqual(result, expected);
+	});
+
+	it("should parse JSON array", () => {
+		const input = '[{"id": 1}, {"id": 2}]';
+		const expected = [{ id: 1 }, { id: 2 }];
+		const result = json(input);
+
+		assert.deepStrictEqual(result, expected);
+	});
+
+	it("should parse JSON primitive values", () => {
+		assert.strictEqual(json('"hello"'), "hello");
+		assert.strictEqual(json("123"), 123);
+		assert.strictEqual(json("true"), true);
+		assert.strictEqual(json("false"), false);
+		assert.strictEqual(json("null"), null);
+	});
+
+	it("should parse nested JSON objects", () => {
+		const input = '{"user": {"name": "John", "age": 30}, "active": true}';
+		const expected = { user: { name: "John", age: 30 }, active: true };
+		const result = json(input);
+
+		assert.deepStrictEqual(result, expected);
+	});
+
+	it("should handle empty object", () => {
+		const result = json("{}");
+		assert.deepStrictEqual(result, {});
+	});
+
+	it("should handle empty array", () => {
+		const result = json("[]");
+		assert.deepStrictEqual(result, []);
+	});
+
+	it("should throw SyntaxError for invalid JSON", () => {
+		assert.throws(() => json('{"invalid": json}'), SyntaxError);
+		assert.throws(() => json("{invalid}"), SyntaxError);
+		assert.throws(() => json('{"unclosed": "string}'), SyntaxError);
+		assert.throws(() => json("undefined"), SyntaxError);
+	});
+
+	it("should throw SyntaxError for empty string when no default", () => {
+		assert.throws(() => json(""), SyntaxError);
+	});
+
+	it("should handle undefined parameter (uses EMPTY default)", () => {
+		assert.throws(() => json(), SyntaxError);
+	});
+
+	it("should parse complex nested structures", () => {
+		const input = JSON.stringify({
+			users: [
+				{ id: 1, profile: { name: "Alice", tags: ["admin", "user"] } },
+				{ id: 2, profile: { name: "Bob", tags: ["user"] } }
+			],
+			metadata: { total: 2, timestamp: "2023-01-01T00:00:00Z" }
 		});
 
-		it("should parse JSON array", () => {
-			const input = '["a", "b", "c"]';
-			const expected = ["a", "b", "c"];
-			const result = json(input);
+		const result = json(input);
 
-			assert.deepStrictEqual(result, expected);
-		});
+		assert.strictEqual(result.users.length, 2);
+		assert.strictEqual(result.users[0].profile.name, "Alice");
+		assert.deepStrictEqual(result.users[0].profile.tags, ["admin", "user"]);
+		assert.strictEqual(result.metadata.total, 2);
+	});
 
-		it("should parse JSON primitives", () => {
-			assert.strictEqual(json('"hello"'), "hello");
-			assert.strictEqual(json("123"), 123);
-			assert.strictEqual(json("true"), true);
-			assert.strictEqual(json("false"), false);
-			assert.strictEqual(json("null"), null);
-		});
+	it("should handle JSON with special characters and unicode", () => {
+		const input = '{"message": "Hello\\nWorld\\t!", "emoji": "🚀", "escaped": "\\"quoted\\""}';
+		const result = json(input);
 
-		it("should parse nested JSON objects", () => {
-			const input = '{"user": {"name": "John", "age": 30}, "active": true}';
-			const expected = {
-				user: {
-					name: "John",
-					age: 30
-				},
-				active: true
-			};
-			const result = json(input);
+		assert.strictEqual(result.message, "Hello\nWorld\t!");
+		assert.strictEqual(result.emoji, "🚀");
+		assert.strictEqual(result.escaped, '"quoted"');
+	});
 
-			assert.deepStrictEqual(result, expected);
-		});
+	it("should preserve number precision", () => {
+		const input = '{"integer": 42, "float": 3.14159, "scientific": 1.23e-4}';
+		const result = json(input);
 
-		it("should handle empty string as default parameter", () => {
-			assert.throws(() => {
-				json();
-			}, SyntaxError);
-		});
-
-		it("should handle EMPTY constant as parameter", () => {
-			assert.throws(() => {
-				json(EMPTY);
-			}, SyntaxError);
-		});
-
-		it("should throw SyntaxError for invalid JSON", () => {
-			assert.throws(() => {
-				json("{invalid json}");
-			}, SyntaxError);
-		});
-
-		it("should throw SyntaxError for malformed JSON", () => {
-			assert.throws(() => {
-				json('{"name": "test",}'); // Trailing comma
-			}, SyntaxError);
-		});
-
-		it("should throw SyntaxError for unclosed objects", () => {
-			assert.throws(() => {
-				json('{"name": "test"'); // Missing closing brace
-			}, SyntaxError);
-		});
-
-		it("should throw SyntaxError for unclosed arrays", () => {
-			assert.throws(() => {
-				json('["a", "b"'); // Missing closing bracket
-			}, SyntaxError);
-		});
-
-		it("should parse JSON with unicode characters", () => {
-			const input = '{"message": "Hello 世界", "emoji": "🌍"}';
-			const expected = {message: "Hello 世界", emoji: "🌍"};
-			const result = json(input);
-
-			assert.deepStrictEqual(result, expected);
-		});
-
-		it("should parse JSON with escaped characters", () => {
-			const input = '{"path": "C:\\\\Users\\\\test", "quote": "\\"quoted\\""}';
-			const expected = {path: "C:\\Users\\test", quote: '"quoted"'};
-			const result = json(input);
-
-			assert.deepStrictEqual(result, expected);
-		});
-
-		it("should parse complex nested structure", () => {
-			const input = '{"data": [{"id": 1, "items": [{"name": "test"}]}], "count": 1}';
-			const expected = {
-				data: [
-					{
-						id: 1,
-						items: [
-							{name: "test"}
-						]
-					}
-				],
-				count: 1
-			};
-			const result = json(input);
-
-			assert.deepStrictEqual(result, expected);
-		});
+		assert.strictEqual(result.integer, 42);
+		assert.strictEqual(result.float, 3.14159);
+		assert.strictEqual(result.scientific, 1.23e-4);
 	});
 });

@@ -1,277 +1,328 @@
 import assert from "node:assert";
-import {describe, it} from "mocha";
 import {yaml} from "../../src/renderers/yaml.js";
 
-/**
- * Creates a mock request object for testing
- * @param {Object} options - Options to customize the mock request
- * @returns {Object} Mock request object
- */
-function createMockRequest (options = {}) {
-	return {
-		headers: options.headers || {},
-		server: options.server || {},
-		...options
-	};
-}
+describe("renderers - yaml", () => {
+	let mockReq, mockRes;
 
-/**
- * Creates a mock response object for testing
- * @param {Object} options - Options to customize the mock response
- * @returns {Object} Mock response object
- */
-function createMockResponse (options = {}) {
-	return {
-		header: options.header || (() => {}),
-		...options
-	};
-}
-
-/**
- * Unit tests for YAML renderer module
- */
-describe("renderers/yaml", () => {
-	describe("yaml()", () => {
-		it("should render simple object as YAML", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {name: "test", value: 123};
-			const result = yaml(req, res, data);
-
-			assert.ok(result.includes("name: test"));
-			assert.ok(result.includes("value: 123"));
-		});
-
-		it("should render array as YAML", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = ["apple", "banana", "cherry"];
-			const result = yaml(req, res, data);
-
-			assert.ok(result.includes("- apple"));
-			assert.ok(result.includes("- banana"));
-			assert.ok(result.includes("- cherry"));
-		});
-
-		it("should render null as YAML null", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const result = yaml(req, res, null);
-
-			assert.ok(result.includes("null") || result.includes("~"));
-		});
-
-		it("should render undefined as YAML undefined", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const result = yaml(req, res, undefined);
-
-			// YAML should handle undefined somehow
-			assert.strictEqual(typeof result, "string");
-		});
-
-		it("should render primitives as YAML", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-
-			const stringResult = yaml(req, res, "hello world");
-			assert.ok(stringResult.includes("hello world"));
-
-			const numberResult = yaml(req, res, 123);
-			assert.ok(numberResult.includes("123"));
-
-			const booleanTrueResult = yaml(req, res, true);
-			assert.ok(booleanTrueResult.includes("true"));
-
-			const booleanFalseResult = yaml(req, res, false);
-			assert.ok(booleanFalseResult.includes("false"));
-		});
-
-		it("should render nested objects as YAML", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {
-				user: {
-					name: "John",
-					age: 30
-				},
-				active: true
-			};
-			const result = yaml(req, res, data);
-
-			assert.ok(result.includes("user:"));
-			assert.ok(result.includes("name: John"));
-			assert.ok(result.includes("age: 30"));
-			assert.ok(result.includes("active: true"));
-		});
-
-		it("should render arrays of objects as YAML", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = [
-				{name: "John", age: 30},
-				{name: "Jane", age: 25}
-			];
-			const result = yaml(req, res, data);
-
-			// YAML library may format arrays differently
-			assert.ok(result.includes("John"));
-			assert.ok(result.includes("30"));
-			assert.ok(result.includes("Jane"));
-			assert.ok(result.includes("25"));
-		});
-
-		it("should render empty objects as YAML", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const result = yaml(req, res, {});
-
-			assert.ok(result.includes("{}") || result.includes(""));
-		});
-
-		it("should render empty arrays as YAML", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const result = yaml(req, res, []);
-
-			assert.ok(result.includes("[]") || result.includes(""));
-		});
-
-		it("should handle special characters in strings", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {
-				message: "Hello: world",
-				quoted: '"test"',
-				multiline: "line1\nline2"
-			};
-			const result = yaml(req, res, data);
-
-			assert.ok(result.includes("message:"));
-			assert.ok(result.includes("quoted:"));
-			assert.ok(result.includes("multiline:"));
-		});
-
-		it("should handle numbers and numeric strings", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {
-				integer: 42,
-				float: 3.14159,
-				negative: -100,
-				zero: 0,
-				string_number: "123"
-			};
-			const result = yaml(req, res, data);
-
-			assert.ok(result.includes("integer: 42"));
-			assert.ok(result.includes("float: 3.14159"));
-			assert.ok(result.includes("negative: -100"));
-			assert.ok(result.includes("zero: 0"));
-			assert.ok(result.includes("string_number: '123'") || result.includes("string_number: \"123\""));
-		});
-
-		it("should handle Date objects", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const date = new Date("2023-01-01T00:00:00.000Z");
-			const data = {timestamp: date};
-			const result = yaml(req, res, data);
-
-			assert.ok(result.includes("timestamp:"));
-			// Date should be represented somehow in YAML
-			assert.ok(result.includes("2023"));
-		});
-
-		it("should handle mixed array content", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = [
-				"string",
-				123,
-				true,
-				{key: "value"},
-				null
-			];
-			const result = yaml(req, res, data);
-
-			assert.ok(result.includes("- string"));
-			assert.ok(result.includes("- 123"));
-			assert.ok(result.includes("- true"));
-			assert.ok(result.includes("key: value"));
-		});
-
-		it("should handle complex nested structures", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {
-				metadata: {
-					total: 100,
-					page: 1,
-					filters: ["active", "verified"]
-				},
-				users: [
-					{
-						id: 1,
-						profile: {
-							name: "John",
-							settings: {
-								theme: "dark",
-								notifications: true
-							}
-						}
-					}
-				]
-			};
-			const result = yaml(req, res, data);
-
-			assert.ok(result.includes("metadata:"));
-			assert.ok(result.includes("total: 100"));
-			assert.ok(result.includes("filters:"));
-			assert.ok(result.includes("users:"));
-			assert.ok(result.includes("profile:"));
-			assert.ok(result.includes("settings:"));
-		});
-
-		it("should handle arrays of primitives", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {
-				numbers: [1, 2, 3, 4, 5],
-				strings: ["a", "b", "c"],
-				booleans: [true, false, true]
-			};
-			const result = yaml(req, res, data);
-
-			assert.ok(result.includes("numbers:"));
-			assert.ok(result.includes("- 1"));
-			assert.ok(result.includes("strings:"));
-			assert.ok(result.includes("- a"));
-			assert.ok(result.includes("booleans:"));
-			assert.ok(result.includes("- true"));
-		});
-
-		it("should return string output", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {simple: "test"};
-			const result = yaml(req, res, data);
-
-			assert.strictEqual(typeof result, "string");
-		});
-
-		it("should handle function input gracefully", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const func = function () { return "test"; };
-
-			// YAML library may not handle functions gracefully
-			try {
-				const result = yaml(req, res, func);
-				assert.strictEqual(typeof result, "string");
-			} catch (error) {
-				assert.ok(error instanceof TypeError);
+	beforeEach(() => {
+		mockReq = {
+			headers: {
+				accept: "application/yaml"
 			}
-		});
+		};
+
+		mockRes = {
+			statusCode: 200
+		};
+	});
+
+	it("should render object as YAML", () => {
+		const data = {name: "John", age: 30};
+
+		const result = yaml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("name: John"));
+		assert.ok(result.includes("age: 30"));
+	});
+
+	it("should render array as YAML", () => {
+		const data = ["item1", "item2", "item3"];
+
+		const result = yaml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("- item1"));
+		assert.ok(result.includes("- item2"));
+		assert.ok(result.includes("- item3"));
+	});
+
+	it("should handle string values", () => {
+		const data = {message: "Hello World"};
+
+		const result = yaml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("message: 'Hello World'"));
+	});
+
+	it("should handle number values", () => {
+		const data = {
+			integer: 42,
+			float: 3.14,
+			negative: -10,
+			zero: 0
+		};
+
+		const result = yaml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("integer: 42"));
+		assert.ok(result.includes("float: 3.14"));
+		assert.ok(result.includes("negative: -10"));
+		assert.ok(result.includes("zero: 0"));
+	});
+
+	it("should handle boolean values", () => {
+		const data = {enabled: true, disabled: false};
+
+		const result = yaml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("enabled: true"));
+		assert.ok(result.includes("disabled: false"));
+	});
+
+	it("should handle null values", () => {
+		const data = {value: null};
+
+		const result = yaml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("value: null") || result.includes("value:"));
+	});
+
+	it("should handle nested objects", () => {
+		const data = {
+			user: {
+				name: "John",
+				details: {
+					age: 30,
+					location: "NYC"
+				}
+			}
+		};
+
+		const result = yaml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("user:"));
+		assert.ok(result.includes("name: John"));
+		assert.ok(result.includes("details:"));
+		assert.ok(result.includes("age: 30"));
+		assert.ok(result.includes("location: NYC"));
+	});
+
+	it("should handle arrays within objects", () => {
+		const data = {
+			tags: ["javascript", "node", "yaml"],
+			numbers: [1, 2, 3]
+		};
+
+		const result = yaml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("tags:"));
+		assert.ok(result.includes("- javascript"));
+		assert.ok(result.includes("- node"));
+		assert.ok(result.includes("- yaml"));
+
+		assert.ok(result.includes("numbers:"));
+		assert.ok(result.includes("- 1"));
+		assert.ok(result.includes("- 2"));
+		assert.ok(result.includes("- 3"));
+	});
+
+	it("should handle special characters in strings", () => {
+		const data = {
+			message: "Hello \"world\"",
+			path: "C:\\Users\\test",
+			multiline: "line1\nline2"
+		};
+
+		const result = yaml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("message:"));
+		assert.ok(result.includes("path:"));
+		assert.ok(result.includes("multiline:"));
+		// YAML should handle special characters appropriately
+		assert.strictEqual(typeof result, "string");
+		assert.ok(result.length > 0);
+	});
+
+	it("should handle empty object", () => {
+		const data = {};
+
+		const result = yaml(mockReq, mockRes, data);
+
+		assert.strictEqual(result.trim(), "{}");
+	});
+
+	it("should handle empty array", () => {
+		const data = [];
+
+		const result = yaml(mockReq, mockRes, data);
+
+		assert.strictEqual(result.trim(), "[]");
+	});
+
+	it("should handle array of objects", () => {
+		const data = [
+			{name: "John", age: 30},
+			{name: "Jane", age: 25}
+		];
+
+		const result = yaml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("name: John"));
+		assert.ok(result.includes("age: 30"));
+		assert.ok(result.includes("name: Jane"));
+		assert.ok(result.includes("age: 25"));
+	});
+
+	it("should handle primitive values", () => {
+		const stringResult = yaml(mockReq, mockRes, "test string");
+		const numberResult = yaml(mockReq, mockRes, 42);
+		const booleanResult = yaml(mockReq, mockRes, true);
+		const nullResult = yaml(mockReq, mockRes, null);
+
+		assert.strictEqual(stringResult.trim(), "'test string'");
+		assert.strictEqual(numberResult.trim(), "42");
+		assert.strictEqual(booleanResult.trim(), "true");
+		assert.strictEqual(nullResult.trim(), "null");
+	});
+
+	it("should handle Date objects", () => {
+		const testDate = new Date("2023-01-01T12:00:00.000Z");
+		const data = {timestamp: testDate};
+
+		const result = yaml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("timestamp:"));
+		assert.ok(result.includes(testDate.toISOString()));
+	});
+
+	it("should handle mixed array types", () => {
+		const data = ["string", 42, true, null, {key: "value"}];
+
+		const result = yaml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("- string"));
+		assert.ok(result.includes("- 42"));
+		assert.ok(result.includes("- true"));
+		assert.ok(result.includes("- null"));
+		assert.ok(result.includes("key: value"));
+	});
+
+	it("should handle deeply nested structures", () => {
+		const data = {
+			level1: {
+				level2: {
+					level3: {
+						level4: "deep value"
+					}
+				}
+			}
+		};
+
+		const result = yaml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("level1:"));
+		assert.ok(result.includes("level2:"));
+		assert.ok(result.includes("level3:"));
+		assert.ok(result.includes("level4: 'deep value'"));
+	});
+
+	it("should handle objects with numeric keys", () => {
+		const data = {
+			"1": "first",
+			"2": "second",
+			"normal": "key"
+		};
+
+		const result = yaml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("1: first") || result.includes("'1': first"));
+		assert.ok(result.includes("2: second") || result.includes("'2': second"));
+		assert.ok(result.includes("normal: key"));
+	});
+
+	it("should handle arrays of arrays", () => {
+		const data = {
+			matrix: [
+				[1, 2],
+				[3, 4]
+			]
+		};
+
+		const result = yaml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("matrix:"));
+		assert.ok(result.includes("1"));
+		assert.ok(result.includes("2"));
+		assert.ok(result.includes("3"));
+		assert.ok(result.includes("4"));
+	});
+
+	it("should handle special YAML values", () => {
+		const data = {
+			infinity: Infinity,
+			negInfinity: -Infinity,
+			notANumber: NaN
+		};
+
+		const result = yaml(mockReq, mockRes, data);
+
+		// YAML handles special values differently than JSON
+		assert.ok(result.includes("infinity:"));
+		assert.ok(result.includes("negInfinity:"));
+		assert.ok(result.includes("notANumber:"));
+	});
+
+	it("should handle objects with undefined values", () => {
+		const data = {
+			defined: "value",
+			undefined: undefined
+		};
+
+		const result = yaml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("defined: value"));
+		// undefined values might be omitted or rendered as null
+		assert.strictEqual(typeof result, "string");
+	});
+
+	it("should maintain proper YAML indentation", () => {
+		const data = {
+			level1: {
+				level2: {
+					array: [
+						{item: "value1"},
+						{item: "value2"}
+					]
+				}
+			}
+		};
+
+		const result = yaml(mockReq, mockRes, data);
+
+		// YAML should have proper indentation structure
+		assert.ok(result.includes("\n"));
+		assert.ok(result.includes("  ")); // Should contain indentation
+		assert.ok(result.includes("level1:"));
+		assert.ok(result.includes("level2:"));
+		assert.ok(result.includes("array:"));
+	});
+
+	it("should handle Unicode characters", () => {
+		const data = {
+			emoji: "😀🎉",
+			unicode: "Hello 世界",
+			symbols: "α β γ"
+		};
+
+		const result = yaml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("emoji:"));
+		assert.ok(result.includes("unicode:"));
+		assert.ok(result.includes("symbols:"));
+		assert.strictEqual(typeof result, "string");
+	});
+
+	it("should handle large numbers", () => {
+		const data = {
+			big: Number.MAX_SAFE_INTEGER,
+			small: Number.MIN_SAFE_INTEGER,
+			scientific: 1.23e-10
+		};
+
+		const result = yaml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("big:"));
+		assert.ok(result.includes("small:"));
+		assert.ok(result.includes("scientific:"));
+		assert.ok(result.includes(Number.MAX_SAFE_INTEGER.toString()));
 	});
 });

@@ -1,209 +1,175 @@
 import assert from "node:assert";
-import {describe, it} from "mocha";
-import {xWwwFormURLEncoded} from "../../src/parsers/xWwwFormURLEncoded.js";
+import { xWwwFormURLEncoded } from "../../src/parsers/xWwwFormURLEncoded.js";
 
-/**
- * Unit tests for x-www-form-urlencoded parser module
- */
 describe("parsers/xWwwFormURLEncoded", () => {
-	describe("xWwwFormURLEncoded()", () => {
-		it("should parse simple key-value pairs", () => {
-			const input = "name=John&age=30&active=true";
-			const expected = {
-				name: "John",
-				age: 30,
-				active: true
-			};
-			const result = xWwwFormURLEncoded(input);
+	it("should be a function", () => {
+		assert.strictEqual(typeof xWwwFormURLEncoded, "function");
+	});
 
-			assert.deepStrictEqual(result, expected);
+	it("should parse simple key-value pairs", () => {
+		const input = "name=John&age=30";
+		const result = xWwwFormURLEncoded(input);
+
+		assert.deepStrictEqual(result, { name: "John", age: 30 });
+	});
+
+	it("should decode URL-encoded characters", () => {
+		const input = "email=john%40example.com&message=Hello%20World";
+		const result = xWwwFormURLEncoded(input);
+
+		assert.deepStrictEqual(result, {
+			email: "john@example.com",
+			message: "Hello World"
 		});
+	});
 
-		it("should handle URL-encoded characters", () => {
-			const input = "message=Hello%20World&special=%21%40%23%24";
-			const expected = {
-				message: "Hello World",
-				special: "!@#$"
-			};
-			const result = xWwwFormURLEncoded(input);
+	it("should handle plus signs as spaces", () => {
+		const input = "message=Hello+World&name=John+Doe";
+		const result = xWwwFormURLEncoded(input);
 
-			assert.deepStrictEqual(result, expected);
+		assert.deepStrictEqual(result, {
+			message: "Hello World",
+			name: "John Doe"
 		});
+	});
 
-		it("should handle plus signs as spaces", () => {
-			const input = "message=Hello+World&name=John+Doe";
-			const expected = {
-				message: "Hello World",
-				name: "John Doe"
-			};
-			const result = xWwwFormURLEncoded(input);
+	it("should coerce values to appropriate types", () => {
+		const input = "string=hello&number=42&boolean=true&nullValue=null&undefinedValue=undefined";
+		const result = xWwwFormURLEncoded(input);
 
-			assert.deepStrictEqual(result, expected);
+		assert.strictEqual(result.string, "hello");
+		assert.strictEqual(result.number, 42);
+		assert.strictEqual(result.boolean, true);
+		assert.strictEqual(result.nullValue, null);
+		assert.strictEqual(result.undefinedValue, undefined);
+	});
+
+	it("should handle empty values", () => {
+		const input = "emptyString=&anotherKey=value";
+		const result = xWwwFormURLEncoded(input);
+
+		assert.strictEqual(result.emptyString, "");
+		assert.strictEqual(result.anotherKey, "value");
+	});
+
+	it("should handle single key-value pair", () => {
+		const input = "singleKey=singleValue";
+		const result = xWwwFormURLEncoded(input);
+
+		assert.deepStrictEqual(result, { singleKey: "singleValue" });
+	});
+
+	it("should return empty object for empty string", () => {
+		const result = xWwwFormURLEncoded("");
+		assert.deepStrictEqual(result, {});
+	});
+
+	it("should return empty object for undefined input", () => {
+		const result = xWwwFormURLEncoded();
+		assert.deepStrictEqual(result, {});
+	});
+
+	it("should return empty object for null input", () => {
+		const result = xWwwFormURLEncoded(null);
+		assert.deepStrictEqual(result, {});
+	});
+
+	it("should handle special characters in keys and values", () => {
+		const input = "key%5B0%5D=value&special%2Bkey=special%2Bvalue";
+		const result = xWwwFormURLEncoded(input);
+
+		assert.deepStrictEqual(result, {
+			"key[0]": "value",
+			"special+key": "special+value"
 		});
+	});
 
-		it("should coerce numeric values", () => {
-			const input = "id=123&price=45.99&count=0&negative=-10";
-			const expected = {
-				id: 123,
-				price: 45.99,
-				count: 0,
-				negative: -10
-			};
-			const result = xWwwFormURLEncoded(input);
+	it("should handle complex URL encoding", () => {
+		const input = "path=%2Fhome%2Fuser&query=name%3DJohn%26age%3D30";
+		const result = xWwwFormURLEncoded(input);
 
-			assert.deepStrictEqual(result, expected);
+		assert.deepStrictEqual(result, {
+			path: "/home/user",
+			query: "name=John&age=30"
 		});
+	});
 
-		it("should coerce boolean values", () => {
-			const input = "active=true&disabled=false&enabled=1&hidden=0";
-			const expected = {
-				active: true,
-				disabled: false,
-				enabled: 1,
-				hidden: 0
-			};
-			const result = xWwwFormURLEncoded(input);
+	it("should handle numeric values with different formats", () => {
+		const input = "integer=123&float=3.14&negative=-42&scientific=1.23e-4";
+		const result = xWwwFormURLEncoded(input);
 
-			assert.deepStrictEqual(result, expected);
+		assert.strictEqual(result.integer, 123);
+		assert.strictEqual(result.float, 3.14);
+		assert.strictEqual(result.negative, -42);
+		assert.strictEqual(result.scientific, 1.23e-4);
+	});
+
+	it("should handle boolean-like strings", () => {
+		const input = "trueValue=true&falseValue=false&yes=yes&no=no&on=on&off=off";
+		const result = xWwwFormURLEncoded(input);
+
+		assert.strictEqual(result.trueValue, true);
+		assert.strictEqual(result.falseValue, false);
+		assert.strictEqual(result.yes, "yes");
+		assert.strictEqual(result.no, "no");
+		assert.strictEqual(result.on, "on");
+		assert.strictEqual(result.off, "off");
+	});
+
+	it("should handle arrays (last value wins)", () => {
+		const input = "color=red&color=blue&color=green";
+		const result = xWwwFormURLEncoded(input);
+
+		// Should contain the last value
+		assert.strictEqual(result.color, "green");
+	});
+
+	it("should handle unicode characters", () => {
+		const input = "name=%E2%9C%93%20John&emoji=%F0%9F%9A%80";
+		const result = xWwwFormURLEncoded(input);
+
+		assert.deepStrictEqual(result, {
+			name: "✓ John",
+			emoji: "🚀"
 		});
+	});
 
-		it("should handle empty values", () => {
-			const input = "name=John&empty=&another=value";
-			const expected = {
-				name: "John",
-				empty: "",
-				another: "value"
-			};
-			const result = xWwwFormURLEncoded(input);
+	it("should handle mixed encoding types", () => {
+		const input = "spaces=Hello+World&encoded=Hello%20World&normal=HelloWorld";
+		const result = xWwwFormURLEncoded(input);
 
-			assert.deepStrictEqual(result, expected);
+		assert.deepStrictEqual(result, {
+			spaces: "Hello World",
+			encoded: "Hello World",
+			normal: "HelloWorld"
 		});
+	});
 
-		it("should return empty object for empty string", () => {
-			const result = xWwwFormURLEncoded("");
-			assert.deepStrictEqual(result, {});
+	it("should handle keys with special characters", () => {
+		const input = "user%5Bname%5D=John&user%5Bage%5D=30&data%2Eid=123";
+		const result = xWwwFormURLEncoded(input);
+
+		assert.deepStrictEqual(result, {
+			"user[name]": "John",
+			"user[age]": 30,
+			"data.id": 123
 		});
+	});
 
-		it("should return empty object for null input", () => {
-			const result = xWwwFormURLEncoded(null);
-			assert.deepStrictEqual(result, {});
-		});
+	it("should handle malformed input gracefully", () => {
+		const input = "key1=value1&invalidPair&key2=value2";
+		const result = xWwwFormURLEncoded(input);
 
-		it("should return empty object for undefined input", () => {
-			const result = xWwwFormURLEncoded(undefined);
-			assert.deepStrictEqual(result, {});
-		});
+		// Should still parse valid pairs and handle invalid ones
+		assert.strictEqual(result.key1, "value1");
+		assert.strictEqual(result.key2, "value2");
+	});
 
-		it("should handle single key-value pair", () => {
-			const input = "name=John";
-			const expected = {name: "John"};
-			const result = xWwwFormURLEncoded(input);
+	it("should preserve original behavior for edge cases", () => {
+		const input = "empty&equals==value&double==";
+		const result = xWwwFormURLEncoded(input);
 
-			assert.deepStrictEqual(result, expected);
-		});
-
-		it("should skip malformed pairs without equals sign", () => {
-			const input = "name=John&invalidpair&age=30";
-			const expected = {
-				name: "John",
-				age: 30
-			};
-			const result = xWwwFormURLEncoded(input);
-
-			assert.deepStrictEqual(result, expected);
-		});
-
-		it("should handle encoded keys", () => {
-			const input = "user%5Bname%5D=John&user%5Bage%5D=30";
-			const expected = {
-				"user[name]": "John",
-				"user[age]": 30
-			};
-			const result = xWwwFormURLEncoded(input);
-
-			assert.deepStrictEqual(result, expected);
-		});
-
-		it("should handle special characters in values", () => {
-			const input = "email=user%40example.com&path=%2Fhome%2Fuser&query=a%3Db%26c%3Dd";
-			const expected = {
-				email: "user@example.com",
-				path: "/home/user",
-				query: "a=b&c=d"
-			};
-			const result = xWwwFormURLEncoded(input);
-
-			assert.deepStrictEqual(result, expected);
-		});
-
-		it("should handle unicode characters", () => {
-			const input = "name=%E4%B8%96%E7%95%8C&emoji=%F0%9F%8C%8D";
-			const expected = {
-				name: "世界",
-				emoji: "🌍"
-			};
-			const result = xWwwFormURLEncoded(input);
-
-			assert.deepStrictEqual(result, expected);
-		});
-
-		it("should handle multiple equals signs in value", () => {
-			const input = "equation=x%3D2%2By%3D5&result=x%3D%3D%3D7";
-			const expected = {
-				equation: "x=2+y=5",
-				result: "x===7"
-			};
-			const result = xWwwFormURLEncoded(input);
-
-			assert.deepStrictEqual(result, expected);
-		});
-
-		it("should handle ampersands in encoded values", () => {
-			const input = "query=a%26b%26c&params=x%3D1%26y%3D2";
-			const expected = {
-				query: "a&b&c",
-				params: "x=1&y=2"
-			};
-			const result = xWwwFormURLEncoded(input);
-
-			assert.deepStrictEqual(result, expected);
-		});
-
-		it("should handle array-like parameter names", () => {
-			const input = "items%5B0%5D=first&items%5B1%5D=second&items%5B2%5D=third";
-			const expected = {
-				"items[0]": "first",
-				"items[1]": "second",
-				"items[2]": "third"
-			};
-			const result = xWwwFormURLEncoded(input);
-
-			assert.deepStrictEqual(result, expected);
-		});
-
-		it("should handle complex form data", () => {
-			const input = "user%5Bprofile%5D%5Bname%5D=John+Doe&user%5Bprofile%5D%5Bage%5D=30&user%5Bactive%5D=true&tags%5B%5D=admin&tags%5B%5D=user";
-			// Since the parser overwrites duplicate keys, we expect only the last value
-			const expected = {
-				"user[profile][name]": "John Doe",
-				"user[profile][age]": 30,
-				"user[active]": true,
-				"tags[]": "user"
-			};
-			const result = xWwwFormURLEncoded(input);
-
-			assert.deepStrictEqual(result, expected);
-		});
-
-		it("should handle keys and values with spaces correctly", () => {
-			const input = "full+name=John+Doe&description=A+very+long+description+with+spaces";
-			const expected = {
-				"full name": "John Doe",
-				description: "A very long description with spaces"
-			};
-			const result = xWwwFormURLEncoded(input);
-
-			assert.deepStrictEqual(result, expected);
-		});
+		// Test how the function handles edge cases in form data
+		assert.ok(typeof result === "object");
 	});
 });

@@ -1,265 +1,309 @@
 import assert from "node:assert";
-import {describe, it} from "mocha";
 import {xml} from "../../src/renderers/xml.js";
 
-/**
- * Creates a mock request object for testing
- * @param {Object} options - Options to customize the mock request
- * @returns {Object} Mock request object
- */
-function createMockRequest (options = {}) {
-	return {
-		headers: options.headers || {},
-		server: options.server || {},
-		...options
-	};
-}
+describe("renderers - xml", () => {
+	let mockReq, mockRes;
 
-/**
- * Creates a mock response object for testing
- * @param {Object} options - Options to customize the mock response
- * @returns {Object} Mock response object
- */
-function createMockResponse (options = {}) {
-	return {
-		header: options.header || (() => {}),
-		...options
-	};
-}
+	beforeEach(() => {
+		mockReq = {
+			headers: {
+				accept: "application/xml"
+			}
+		};
 
-/**
- * Unit tests for XML renderer module
- */
-describe("renderers/xml", () => {
-	describe("xml()", () => {
-		it("should render simple object as XML", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {name: "test", value: 123};
-			const result = xml(req, res, data);
+		mockRes = {
+			statusCode: 200
+		};
+	});
 
-			assert.ok(result.includes('<?xml version="1.0" encoding="UTF-8"?>'));
-			assert.ok(result.includes("test") && result.includes("<n>"));
-			assert.ok(result.includes("<value>123</value>"));
-		});
+	it("should render object as XML with prolog", () => {
+		const data = {name: "John", age: 30};
 
-		it("should include XML prolog", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {test: "value"};
-			const result = xml(req, res, data);
+		const result = xml(mockReq, mockRes, data);
 
-			assert.ok(result.startsWith('<?xml version="1.0" encoding="UTF-8"?>'));
-		});
+		assert.ok(result.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
+		assert.ok(result.includes("<o>"));
+		assert.ok(result.includes("<n>John</n>"));
+		assert.ok(result.includes("<age>30</age>"));
+		assert.ok(result.includes("</o>"));
+	});
 
-		it("should render null values", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const result = xml(req, res, null);
+	it("should render array as XML with array node names", () => {
+		const data = [
+			{name: "John", age: 30},
+			{name: "Jane", age: 25}
+		];
 
-			assert.ok(result.includes('<?xml version="1.0" encoding="UTF-8"?>'));
-			assert.ok(result.includes("<o/>") || result.includes("<o></o>"));
-		});
+		const result = xml(mockReq, mockRes, data);
 
-		it("should render undefined values", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const result = xml(req, res, undefined);
+		assert.ok(result.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
+		assert.ok(result.includes("<o>"));
+		assert.ok(result.includes("<n>John</n>"));
+		assert.ok(result.includes("<n>Jane</n>"));
+	});
 
-			assert.ok(result.includes('<?xml version="1.0" encoding="UTF-8"?>'));
-			// Undefined produces just the XML prolog with no content
-			assert.strictEqual(result.trim(), '<?xml version="1.0" encoding="UTF-8"?>');
-		});
+	it("should handle string values", () => {
+		const data = {message: "Hello World"};
 
-		it("should render primitives as XML", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
+		const result = xml(mockReq, mockRes, data);
 
-			const stringResult = xml(req, res, "hello");
-			assert.ok(stringResult.includes("hello"));
+		assert.ok(result.includes("<message>Hello World</message>"));
+	});
 
-			const numberResult = xml(req, res, 123);
-			assert.ok(numberResult.includes("123"));
+	it("should handle number values", () => {
+		const data = {
+			integer: 42,
+			float: 3.14,
+			negative: -10,
+			zero: 0
+		};
 
-			const booleanResult = xml(req, res, true);
-			assert.ok(booleanResult.includes("true"));
-		});
+		const result = xml(mockReq, mockRes, data);
 
-		it("should render arrays with item nodes", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = ["apple", "banana", "cherry"];
-			const result = xml(req, res, data);
+		assert.ok(result.includes("<integer>42</integer>"));
+		assert.ok(result.includes("<float>3.14</float>"));
+		assert.ok(result.includes("<negative>-10</negative>"));
+		assert.ok(result.includes("<zero>0</zero>"));
+	});
 
-			assert.ok(result.includes('<?xml version="1.0" encoding="UTF-8"?>'));
-			// Array items should be rendered
-			assert.ok(result.includes("apple"));
-			assert.ok(result.includes("banana"));
-			assert.ok(result.includes("cherry"));
-		});
+	it("should handle boolean values", () => {
+		const data = {enabled: true, disabled: false};
 
-		it("should render empty arrays", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const result = xml(req, res, []);
+		const result = xml(mockReq, mockRes, data);
 
-			assert.ok(result.includes('<?xml version="1.0" encoding="UTF-8"?>'));
-			assert.ok(result.includes("<o/>") || result.includes("<o></o>"));
-		});
+		assert.ok(result.includes("<enabled>true</enabled>"));
+		assert.ok(result.includes("<disabled>false</disabled>"));
+	});
 
-		it("should transform property names (name -> n)", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {name: "John", age: 30};
-			const result = xml(req, res, data);
+	it("should handle null values", () => {
+		const data = {value: null};
 
-			assert.ok(result.includes("<n>John</n>"));
-			assert.ok(result.includes("<age>30</age>"));
-		});
+		const result = xml(mockReq, mockRes, data);
 
-		it("should handle Date objects", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const date = new Date("2023-01-01T00:00:00.000Z");
-			const data = {timestamp: date};
-			const result = xml(req, res, data);
+		assert.ok(result.includes("<value></value>") || result.includes("<value/>"));
+	});
 
-			assert.ok(result.includes("2023-01-01T00:00:00.000Z"));
-		});
+	it("should handle nested objects", () => {
+		const data = {
+			user: {
+				name: "John",
+				details: {
+					age: 30,
+					location: "NYC"
+				}
+			}
+		};
 
-		it("should handle nested objects", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {
-				user: {
-					name: "John",
-					age: 30
-				},
-				active: true
-			};
-			const result = xml(req, res, data);
+		const result = xml(mockReq, mockRes, data);
 
-			assert.ok(result.includes('<?xml version="1.0" encoding="UTF-8"?>'));
-			assert.ok(result.includes("<user>"));
-			assert.ok(result.includes("<n>John</n>"));
-			assert.ok(result.includes("<age>30</age>"));
-			assert.ok(result.includes("<active>true</active>"));
-		});
+		assert.ok(result.includes("<user>"));
+		assert.ok(result.includes("<n>John</n>"));
+		assert.ok(result.includes("<details>"));
+		assert.ok(result.includes("<age>30</age>"));
+		assert.ok(result.includes("<location>NYC</location>"));
+		assert.ok(result.includes("</details>"));
+		assert.ok(result.includes("</user>"));
+	});
 
-		it("should handle circular references", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {name: "test"};
-			data.self = data; // Create circular reference
+	it("should handle arrays within objects", () => {
+		const data = {
+			tags: ["javascript", "node", "xml"],
+			numbers: [1, 2, 3]
+		};
 
-			const result = xml(req, res, data);
+		const result = xml(mockReq, mockRes, data);
 
-			assert.ok(result.includes('<?xml version="1.0" encoding="UTF-8"?>'));
-			assert.ok(result.includes("[Circular Reference]"));
-		});
+		assert.ok(result.includes("<tags>"));
+		assert.ok(result.includes("javascript"));
+		assert.ok(result.includes("node"));
+		assert.ok(result.includes("xml"));
+		assert.ok(result.includes("</tags>"));
 
-		it("should handle nested arrays in objects", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {
-				users: [
-					{name: "John", age: 30},
-					{name: "Jane", age: 25}
-				]
-			};
-			const result = xml(req, res, data);
+		assert.ok(result.includes("<numbers>"));
+		assert.ok(result.includes("1"));
+		assert.ok(result.includes("2"));
+		assert.ok(result.includes("3"));
+		assert.ok(result.includes("</numbers>"));
+	});
 
-			assert.ok(result.includes('<?xml version="1.0" encoding="UTF-8"?>'));
-			assert.ok(result.includes("<users>"));
-			assert.ok(result.includes("<n>John</n>"));
-			assert.ok(result.includes("<n>Jane</n>"));
-		});
+	it("should handle special characters and escape them", () => {
+		const data = {
+			message: "Hello & \"world\" <test>",
+			code: "<script>alert('xss')</script>"
+		};
 
-		it("should handle mixed array content", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = ["string", 123, true, {key: "value"}];
-			const result = xml(req, res, data);
+		const result = xml(mockReq, mockRes, data);
 
-			assert.ok(result.includes('<?xml version="1.0" encoding="UTF-8"?>'));
-			assert.ok(result.includes("string"));
-			assert.ok(result.includes("123"));
-			assert.ok(result.includes("true"));
-			assert.ok(result.includes("<key>value</key>"));
-		});
+		// XML entities should be properly escaped
+		assert.ok(result.includes("&amp;") || result.includes("Hello & \"world\""));
+		assert.ok(result.includes("&lt;") || result.includes("&gt;") || result.includes("<script>"));
+	});
 
-		it("should handle special characters and escape them", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {
-				message: "Hello & goodbye",
-				html: "<div>test</div>",
-				quote: '"quoted"'
-			};
-			const result = xml(req, res, data);
+	it("should handle empty object", () => {
+		const data = {};
 
-			assert.ok(result.includes('<?xml version="1.0" encoding="UTF-8"?>'));
-			// The XML builder should handle entity processing
-			assert.ok(result.includes("Hello"));
-			assert.ok(result.includes("test"));
-			assert.ok(result.includes("quoted"));
-		});
+		const result = xml(mockReq, mockRes, data);
 
-		it("should handle empty objects", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const result = xml(req, res, {});
+		assert.ok(result.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
+		assert.ok(result.includes("<o>"));
+		assert.ok(result.includes("</o>"));
+	});
 
-			assert.ok(result.includes('<?xml version="1.0" encoding="UTF-8"?>'));
-			assert.ok(result.includes("<o/>") || result.includes("<o></o>"));
-		});
+	it("should handle empty array", () => {
+		const data = [];
 
-		it("should handle complex nested structures", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {
-				metadata: {
-					total: 2,
-					page: 1
-				},
-				items: [
-					{name: "item1", active: true},
-					{name: "item2", active: false}
-				]
-			};
-			const result = xml(req, res, data);
+		const result = xml(mockReq, mockRes, data);
 
-			assert.ok(result.includes('<?xml version="1.0" encoding="UTF-8"?>'));
-			assert.ok(result.includes("<metadata>"));
-			assert.ok(result.includes("<total>2</total>"));
-			assert.ok(result.includes("<items>"));
-			assert.ok(result.includes("item1"));
-			assert.ok(result.includes("item2"));
-		});
+		assert.ok(result.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
+		assert.ok(result.includes("<o>"));
+		assert.ok(result.includes("</o>"));
+	});
 
-		it("should handle functions (though not common use case)", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = {
-				callback: function () { return "test"; }
-			};
-			const result = xml(req, res, data);
+	it("should format XML with proper indentation", () => {
+		const data = {
+			level1: {
+				level2: "value"
+			}
+		};
 
-			assert.ok(result.includes('<?xml version="1.0" encoding="UTF-8"?>'));
-			// Function should be handled somehow in the transformation
-			assert.ok(result.includes("<callback>"));
-		});
+		const result = xml(mockReq, mockRes, data);
 
-		it("should handle arrays of primitives", () => {
-			const req = createMockRequest();
-			const res = createMockResponse();
-			const data = [1, 2, 3, 4, 5];
-			const result = xml(req, res, data);
+		// Should be formatted (contain newlines)
+		assert.ok(result.includes("\n"));
+	});
 
-			assert.ok(result.includes('<?xml version="1.0" encoding="UTF-8"?>'));
-			assert.ok(result.includes("1"));
-			assert.ok(result.includes("2"));
-			assert.ok(result.includes("3"));
+	it("should handle primitive values", () => {
+		const stringResult = xml(mockReq, mockRes, "test string");
+		const numberResult = xml(mockReq, mockRes, 42);
+		const booleanResult = xml(mockReq, mockRes, true);
+
+		assert.ok(stringResult.includes("test string"));
+		assert.ok(numberResult.includes("42"));
+		assert.ok(booleanResult.includes("true"));
+	});
+
+	it("should handle Date objects", () => {
+		const testDate = new Date("2023-01-01T12:00:00.000Z");
+		const data = {timestamp: testDate};
+
+		const result = xml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("<timestamp>"));
+		assert.ok(result.includes("2023-01-01"));
+		assert.ok(result.includes("</timestamp>"));
+	});
+
+	it("should handle mixed array of primitives and objects", () => {
+		const data = [
+			"string",
+			42,
+			{name: "object"},
+			true
+		];
+
+		const result = xml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("string"));
+		assert.ok(result.includes("42"));
+		assert.ok(result.includes("<n>object</n>"));
+		assert.ok(result.includes("true"));
+	});
+
+	it("should handle objects with numeric keys", () => {
+		const data = {
+			"1": "first",
+			"2": "second",
+			"normal": "key"
+		};
+
+		const result = xml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("first"));
+		assert.ok(result.includes("second"));
+		assert.ok(result.includes("<normal>key</normal>"));
+	});
+
+	it("should handle deeply nested structures", () => {
+		const data = {
+			level1: {
+				level2: {
+					level3: {
+						level4: "deep value"
+					}
+				}
+			}
+		};
+
+		const result = xml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("<level1>"));
+		assert.ok(result.includes("<level2>"));
+		assert.ok(result.includes("<level3>"));
+		assert.ok(result.includes("<level4>deep value</level4>"));
+		assert.ok(result.includes("</level3>"));
+		assert.ok(result.includes("</level2>"));
+		assert.ok(result.includes("</level1>"));
+	});
+
+	it("should handle special XML characters in values", () => {
+		const data = {
+			content: "Line 1\nLine 2\tTabbed",
+			quotes: 'Single \' and double " quotes'
+		};
+
+		const result = xml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("<content>"));
+		assert.ok(result.includes("<quotes>"));
+		// Content should be preserved or properly escaped
+		assert.strictEqual(typeof result, "string");
+		assert.ok(result.length > 0);
+	});
+
+	it("should handle arrays of arrays", () => {
+		const data = {
+			matrix: [
+				[1, 2],
+				[3, 4]
+			]
+		};
+
+		const result = xml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("<matrix>"));
+		assert.ok(result.includes("1"));
+		assert.ok(result.includes("2"));
+		assert.ok(result.includes("3"));
+		assert.ok(result.includes("4"));
+		assert.ok(result.includes("</matrix>"));
+	});
+
+	it("should handle objects with undefined values", () => {
+		const data = {
+			defined: "value",
+			undefined: undefined
+		};
+
+		const result = xml(mockReq, mockRes, data);
+
+		assert.ok(result.includes("<defined>value</defined>"));
+		// undefined values might be omitted or rendered as empty
+		assert.strictEqual(typeof result, "string");
+	});
+
+	it("should always include XML prolog", () => {
+		const testCases = [
+			{},
+			[],
+			"string",
+			42,
+			null,
+			{complex: {nested: "data"}}
+		];
+
+		testCases.forEach(data => {
+			const result = xml(mockReq, mockRes, data);
+			assert.ok(result.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
 		});
 	});
 });

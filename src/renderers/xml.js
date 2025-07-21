@@ -27,18 +27,22 @@ export function xml (req, res, arg) {
 			return obj;
 		}
 
-		// Check cache for objects we've already transformed
+		// Check cache for objects we've already transformed to prevent circular references
 		if (transformCache.has(obj)) {
-			return transformCache.get(obj);
+			return "[Circular Reference]";
 		}
 
 		let result;
 
 		if (Array.isArray(obj)) {
+			// Set cache first to prevent infinite recursion
+			transformCache.set(obj, "[Processing]");
 			result = obj.map(transformForXml);
 		} else if (obj instanceof Date) {
 			result = obj.toISOString();
 		} else if (typeof obj === "object") {
+			// Set cache first to prevent infinite recursion
+			transformCache.set(obj, "[Processing]");
 			const transformed = {};
 
 			for (const [key, value] of Object.entries(obj)) {

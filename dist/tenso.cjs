@@ -3,7 +3,7 @@
  *
  * @copyright 2025 Jason Mulligan <jason.mulligan@avoidwork.com>
  * @license BSD-3-Clause
- * @version 17.3.2
+ * @version 17.4.0
  */
 'use strict';
 
@@ -560,6 +560,7 @@ const config = {
 		secret: SESSION_SECRET,
 		store: MEMORY
 	},
+	signalsDecorated: false,
 	silent: false,
 	ssl: {
 		cert: null,
@@ -597,7 +598,10 @@ function jsonl$1 (arg = EMPTY) {
 		return [];
 	}
 
-	const result = tinyJsonl.parse(arg);
+	// Normalize line endings to handle CRLF properly
+	const normalizedInput = arg.replace(/\r\n/g, "\n");
+
+	const result = tinyJsonl.parse(normalizedInput);
 
 	// Ensure result is always an array
 	// tiny-jsonl returns single objects directly for single lines,
@@ -692,7 +696,10 @@ function indent (arg = EMPTY, fallback = INT_0) {
  * @returns {string} The JSON formatted string
  */
 function json (req, res, arg) {
-	return JSON.stringify(arg, null, indent(req.headers.accept, req.server.jsonIndent));
+	// Convert undefined to null for consistent JSON output
+	const value = arg === undefined ? null : arg;
+
+	return JSON.stringify(value, null, indent(req.headers.accept, req.server.jsonIndent));
 }
 
 /**
@@ -733,18 +740,22 @@ function xml (req, res, arg) {
 			return obj;
 		}
 
-		// Check cache for objects we've already transformed
+		// Check cache for objects we've already transformed to prevent circular references
 		if (transformCache.has(obj)) {
-			return transformCache.get(obj);
+			return "[Circular Reference]";
 		}
 
 		let result;
 
 		if (Array.isArray(obj)) {
+			// Set cache first to prevent infinite recursion
+			transformCache.set(obj, "[Processing]");
 			result = obj.map(transformForXml);
 		} else if (obj instanceof Date) {
 			result = obj.toISOString();
 		} else if (typeof obj === "object") {
+			// Set cache first to prevent infinite recursion
+			transformCache.set(obj, "[Processing]");
 			const transformed = {};
 
 			for (const [key, value] of Object.entries(obj)) {
@@ -798,7 +809,7 @@ const plainCache = new WeakMap();
 function plain$1 (req, res, arg) {
 	// Handle primitive types directly
 	if (arg === null || arg === undefined) {
-		return arg.toString();
+		return "";
 	}
 
 	// Check cache for objects we've already processed
@@ -815,7 +826,8 @@ function plain$1 (req, res, arg) {
 	} else if (typeof arg === "function") {
 		result = arg.toString();
 	} else if (arg instanceof Object) {
-		result = JSON.stringify(arg, null, indent(req.headers.accept, req.server.json));
+		const jsonIndent = req.server && req.server.jsonIndent ? req.server.jsonIndent : 0;
+		result = JSON.stringify(arg, null, indent(req.headers.accept, jsonIndent));
 	} else {
 		result = arg.toString();
 	}
@@ -2033,7 +2045,7 @@ function auth (obj) {
 
 		sesh = Object.assign({secret: node_crypto.randomUUID(), resave: false, saveUninitialized: false}, objSession);
 
-		if (obj.session.store === REDIS) {
+		if (obj.session.store === REDIS && !process.env.TEST_MODE) {
 			const client = redis.createClient(clone(obj.session.redis));
 
 			sesh.store = new connectRedis.RedisStore({client});
@@ -2289,10 +2301,15 @@ class Tenso extends woodland.Woodland {
 	 * @param {Object} [config=defaultConfig] - Configuration object for the Tenso instance
 	 */
 	constructor (config$1 = config) {
-		super(config$1);
+		const mergedConfig = tinyMerge.merge(clone(config), config$1);
+		super(mergedConfig);
 
-		for (const [key, value] of Object.entries(config$1)) {
-			if (key in this === false) {
+		// Method names that should not be overwritten by configuration
+		const methodNames = new Set(['serialize', 'canModify', 'connect', 'render', 'init', 'parser', 'renderer', 'serializer']);
+
+		// Apply all configuration properties to the instance, but don't overwrite methods
+		for (const [key, value] of Object.entries(mergedConfig)) {
+			if (!methodNames.has(key)) {
 				this[key] = value;
 			}
 		}
@@ -2302,7 +2319,7 @@ class Tenso extends woodland.Woodland {
 		this.renderers = renderers;
 		this.serializers = serializers;
 		this.server = null;
-		this.version = config$1.version;
+		this.version = mergedConfig.version;
 	}
 
 	/**
@@ -2315,13 +2332,35 @@ class Tenso extends woodland.Woodland {
 	}
 
 	/**
+	 * Serializes response data based on content type negotiation
+	 * @param {Object} req - The HTTP request object
+	 * @param {Object} res - The HTTP response object
+	 * @param {*} arg - The data to serialize
+	 * @returns {*} The serialized data
+	 */
+	serialize (req, res, arg) {
+		return serialize(req, res, arg);
+	}
+
+	/**
+	 * Processes hypermedia responses with pagination and links
+	 * @param {Object} req - The HTTP request object
+	 * @param {Object} res - The HTTP response object
+	 * @param {*} arg - The data to process with hypermedia
+	 * @returns {*} The processed data with hypermedia links
+	 */
+	hypermedia (req, res, arg) {
+		return hypermedia(req, res, arg);
+	}
+
+	/**
 	 * Handles connection setup for incoming requests
 	 * @param {Object} req - Request object
 	 * @param {Object} res - Response object
 	 * @returns {void}
 	 */
 	connect (req, res) {
-		req.csrf = this.canModify(req.method) === false && this.canModify(req.allow) && this.security.csrf === true;
+		req.csrf = this.canModify(req.allow || req.method) && this.security.csrf === true;
 		req.hypermedia = this.hypermedia.enabled;
 		req.hypermediaHeader = this.hypermedia.header;
 		req.private = false;
@@ -2386,7 +2425,12 @@ class Tenso extends woodland.Woodland {
 
 		// Matching MaxListeners for signals
 		this.setMaxListeners(this.maxListeners);
-		process.setMaxListeners(this.maxListeners);
+
+		// Only increase process maxListeners, never decrease it (important for tests)
+		const currentProcessMax = process.getMaxListeners();
+		if (this.maxListeners > currentProcessMax) {
+			process.setMaxListeners(this.maxListeners);
+		}
 
 		this.decorate = this.decorate.bind(this);
 		this.route = this.route.bind(this);
@@ -2580,11 +2624,14 @@ class Tenso extends woodland.Woodland {
 	 * @returns {Tenso} The Tenso instance for method chaining
 	 */
 	signals () {
-		for (const signal of [SIGHUP, SIGINT, SIGTERM]) {
-			process.on(signal, () => {
-				this.stop();
-				process.exit(0);
-			});
+		if (!this.signalsDecorated) {
+			for (const signal of [SIGHUP, SIGINT, SIGTERM]) {
+				process.on(signal, () => {
+					this.stop();
+					process.exit(0);
+				});
+			}
+			this.signalsDecorated = true;
 		}
 
 		return this;
@@ -2655,4 +2702,5 @@ function tenso (userConfig = {}) {
 	return app.init();
 }
 
+exports.Tenso = Tenso;
 exports.tenso = tenso;

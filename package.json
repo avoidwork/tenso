@@ -1,7 +1,7 @@
 {
   "name": "tenso",
   "description": "Tenso is an HTTP REST API framework",
-  "version": "17.3.2",
+  "version": "17.4.0",
   "homepage": "https://github.com/avoidwork/tenso",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -17,16 +17,16 @@
     "node": ">=17.0.0"
   },
   "scripts": {
+    "benchmark": "node benchmark.js",
     "build": "npm run lint && npm run rollup",
     "changelog": "auto-changelog -p",
     "sample": "node sample.js",
     "lint": "eslint *.js src/**/*.js tests/**/*.js benchmarks/**/*.js",
     "fix": "eslint --fix *.js src/**/*.js tests/**/*.js benchmarks/**/*.js",
-    "mocha": "mocha tests/**/*.js",
+    "mocha": "mocha --require tests/setup.js tests/**/*.js",
     "rollup": "rollup --config",
     "test": "npm run lint && npm run mocha",
     "prepare": "husky",
-    "benchmark": "node benchmark.js",
     "benchmark:basic": "node benchmarks/basic-http.js",
     "benchmark:parsers": "node benchmarks/parsers.js",
     "benchmark:renderers": "node benchmarks/renderers.js",

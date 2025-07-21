@@ -7,7 +7,8 @@
  */
 import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {join,resolve}from'node:path';import {Woodland}from'woodland';import {merge}from'tiny-merge';import {eventsource}from'tiny-eventsource';import {createRequire}from'node:module';import {fileURLToPath,URL}from'node:url';import {parse as parse$1,stringify as stringify$1}from'tiny-jsonl';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {keysort}from'keysort';import {URL as URL$1}from'url';import promClient from'prom-client';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import passportJWT from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-oauth2';import {doubleCsrf}from'csrf-csrf';import {randomInt,randomUUID}from'node:crypto';import {RedisStore}from'connect-redis';import helmet from'helmet';const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const require = createRequire(import.meta.url);
-const {name, version} = require(join(__dirname, "..", "..", "package.json"));
+const packagePath = __dirname.includes("src") ? join(__dirname, "..", "..", "package.json") : join(__dirname, "..", "package.json");
+const {name, version} = require(packagePath);
 
 // =============================================================================
 // HTTP METHODS
@@ -1108,8 +1109,8 @@ function clone (obj, seen = new WeakMap()) {
 		return cloned;
 	}
 
-	// Handle plain objects
-	if (Object.prototype.toString.call(obj) === "[object Object]") {
+	// Handle plain objects (only objects created with {} or new Object())
+	if (Object.prototype.toString.call(obj) === "[object Object]" && obj.constructor === Object) {
 		const cloned = {};
 		seen.set(obj, cloned);
 
@@ -2192,8 +2193,10 @@ class Tenso extends Woodland {
 		const mergedConfig = merge(clone(config), config$1);
 		super(mergedConfig);
 
+		delete mergedConfig.defaultHeaders;
+
 		// Method names that should not be overwritten by configuration
-		const methodNames = new Set(['serialize', 'canModify', 'connect', 'render', 'init', 'parser', 'renderer', 'serializer']);
+		const methodNames = new Set(["serialize", "canModify", "connect", "render", "init", "parser", "renderer", "serializer"]);
 
 		// Apply all configuration properties to the instance, but don't overwrite methods
 		for (const [key, value] of Object.entries(mergedConfig)) {
@@ -2573,7 +2576,7 @@ function tenso (userConfig = {}) {
 	const config$1 = merge(clone(config), userConfig);
 
 	// Ensure version falls back to default when null or undefined
-	if (config$1.version == null) {
+	if (config$1.version === null) {
 		config$1.version = config.version;
 	}
 
@@ -2583,9 +2586,9 @@ function tenso (userConfig = {}) {
 	}
 
 	config$1.webroot.root = resolve(config$1.webroot.root);
-	
+
 	// Only read template from file if it's a file path, not already a template string
-	if (typeof config$1.webroot.template === 'string' && config$1.webroot.template.includes('<')) ; else {
+	if (typeof config$1.webroot.template === "string" && config$1.webroot.template.includes("<")) ; else {
 		// Template is a file path, read the file
 		config$1.webroot.template = readFileSync(config$1.webroot.template, {encoding: UTF8});
 	}

@@ -69,8 +69,11 @@ export class Tenso extends Woodland {
 		const mergedConfig = merge(clone(defaultConfig), config);
 		super(mergedConfig);
 
+		// No longer valid (reformed)
+		delete mergedConfig.defaultHeaders;
+
 		// Method names that should not be overwritten by configuration
-		const methodNames = new Set(['serialize', 'canModify', 'connect', 'render', 'init', 'parser', 'renderer', 'serializer']);
+		const methodNames = new Set(["serialize", "canModify", "connect", "render", "init", "parser", "renderer", "serializer"]);
 
 		// Apply all configuration properties to the instance, but don't overwrite methods
 		for (const [key, value] of Object.entries(mergedConfig)) {
@@ -450,7 +453,7 @@ export function tenso (userConfig = {}) {
 	const config = merge(clone(defaultConfig), userConfig);
 
 	// Ensure version falls back to default when null or undefined
-	if (config.version == null) {
+	if (config.version === null) {
 		config.version = defaultConfig.version;
 	}
 
@@ -460,9 +463,9 @@ export function tenso (userConfig = {}) {
 	}
 
 	config.webroot.root = resolve(config.webroot.root);
-	
+
 	// Only read template from file if it's a file path, not already a template string
-	if (typeof config.webroot.template === 'string' && config.webroot.template.includes('<')) {
+	if (typeof config.webroot.template === "string" && config.webroot.template.includes("<")) {
 		// Template is already a string (contains HTML), no need to read from file
 	} else {
 		// Template is a file path, read the file

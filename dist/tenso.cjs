@@ -40,7 +40,8 @@ var helmet = require('helmet');
 var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
 const __dirname$1 = node_url.fileURLToPath(new node_url.URL(".", (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('tenso.cjs', document.baseURI).href))));
 const require$1 = node_module.createRequire((typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('tenso.cjs', document.baseURI).href)));
-const {name, version} = require$1(node_path.join(__dirname$1, "..", "..", "package.json"));
+const packagePath = __dirname$1.includes("src") ? node_path.join(__dirname$1, "..", "..", "package.json") : node_path.join(__dirname$1, "..", "package.json");
+const {name, version} = require$1(packagePath);
 
 // =============================================================================
 // HTTP METHODS
@@ -1187,8 +1188,8 @@ function clone (obj, seen = new WeakMap()) {
 		return cloned;
 	}
 
-	// Handle plain objects
-	if (Object.prototype.toString.call(obj) === "[object Object]") {
+	// Handle plain objects (only objects created with {} or new Object())
+	if (Object.prototype.toString.call(obj) === "[object Object]" && obj.constructor === Object) {
 		const cloned = {};
 		seen.set(obj, cloned);
 
@@ -2313,8 +2314,10 @@ class Tenso extends woodland.Woodland {
 		const mergedConfig = tinyMerge.merge(clone(config), config$1);
 		super(mergedConfig);
 
+		delete mergedConfig.defaultHeaders;
+
 		// Method names that should not be overwritten by configuration
-		const methodNames = new Set(['serialize', 'canModify', 'connect', 'render', 'init', 'parser', 'renderer', 'serializer']);
+		const methodNames = new Set(["serialize", "canModify", "connect", "render", "init", "parser", "renderer", "serializer"]);
 
 		// Apply all configuration properties to the instance, but don't overwrite methods
 		for (const [key, value] of Object.entries(mergedConfig)) {
@@ -2694,7 +2697,7 @@ function tenso (userConfig = {}) {
 	const config$1 = tinyMerge.merge(clone(config), userConfig);
 
 	// Ensure version falls back to default when null or undefined
-	if (config$1.version == null) {
+	if (config$1.version === null) {
 		config$1.version = config.version;
 	}
 
@@ -2704,9 +2707,9 @@ function tenso (userConfig = {}) {
 	}
 
 	config$1.webroot.root = node_path.resolve(config$1.webroot.root);
-	
+
 	// Only read template from file if it's a file path, not already a template string
-	if (typeof config$1.webroot.template === 'string' && config$1.webroot.template.includes('<')) ; else {
+	if (typeof config$1.webroot.template === "string" && config$1.webroot.template.includes("<")) ; else {
 		// Template is a file path, read the file
 		config$1.webroot.template = node_fs.readFileSync(config$1.webroot.template, {encoding: UTF8});
 	}

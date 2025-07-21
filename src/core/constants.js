@@ -4,7 +4,8 @@ import {fileURLToPath, URL} from "node:url";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const require = createRequire(import.meta.url);
-const {name, version} = require(join(__dirname, "..", "..", "package.json"));
+const packagePath = __dirname.includes("src") ? join(__dirname, "..", "..", "package.json") : join(__dirname, "..", "package.json");
+const {name, version} = require(packagePath);
 
 // =============================================================================
 // HTTP METHODS
@@ -71,6 +72,7 @@ export const X_POWERED_BY = "x-powered-by";
 export const X_RATELIMIT_LIMIT = "x-ratelimit-limit";
 export const X_RATELIMIT_REMAINING = "x-ratelimit-remaining";
 export const X_RATELIMIT_RESET = "x-ratelimit-reset";
+export const SERVER = "server";
 
 // =============================================================================
 // AUTHENTICATION & AUTHORIZATION

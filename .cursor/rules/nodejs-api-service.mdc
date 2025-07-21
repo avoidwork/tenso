@@ -13,3 +13,4 @@ alwaysApply: true
 - Use node.js community "Best Practices".
 - Adhere to DRY, KISS, YAGNI, & SOLID principles
 - Adhere to OWASP security guidance
+- Fix lint errors by running 'npm run fix'

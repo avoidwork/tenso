@@ -1,5 +1,4 @@
-/node_modules/
-/test/webpack/
+node_modules
 .idea
-.nyc_output
+coverage
 *.tgz

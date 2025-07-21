@@ -43,20 +43,20 @@ describe("renderers - plain", () => {
 		assert.strictEqual(falseResult, "false");
 	});
 
-	it("should handle null values by throwing error", () => {
+	it("should handle null values by returning 'null' string", () => {
 		const data = null;
 
-		assert.throws(() => {
-			plain(mockReq, mockRes, data);
-		}, /Cannot read properties of null/);
+		const result = plain(mockReq, mockRes, data);
+
+		assert.strictEqual(result, "null");
 	});
 
-	it("should handle undefined values by throwing error", () => {
+	it("should handle undefined values by returning empty string", () => {
 		const data = undefined;
 
-		assert.throws(() => {
-			plain(mockReq, mockRes, data);
-		}, /Cannot read properties of undefined/);
+		const result = plain(mockReq, mockRes, data);
+
+		assert.strictEqual(result, "");
 	});
 
 	it("should render object as JSON string", () => {
@@ -185,12 +185,12 @@ describe("renderers - plain", () => {
 		assert.strictEqual(result, "0,0,false");
 	});
 
-	it("should handle arrays with null and undefined by throwing error", () => {
+	it("should handle arrays with null and undefined values", () => {
 		const data = [null, undefined, "test"];
 
-		assert.throws(() => {
-			plain(mockReq, mockRes, data);
-		}, /Cannot read properties of null/);
+		const result = plain(mockReq, mockRes, data);
+
+		assert.strictEqual(result, "null,,test");
 	});
 
 	it("should handle very large numbers", () => {

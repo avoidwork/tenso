@@ -133,7 +133,7 @@ export function auth (obj) {
 
 		sesh = Object.assign({secret: uuid(), resave: false, saveUninitialized: false}, objSession);
 
-		if (obj.session.store === REDIS) {
+		if (obj.session.store === REDIS && !process.env.TEST_MODE) {
 			const client = redis.createClient(clone(obj.session.redis));
 
 			sesh.store = new RedisStore({client});

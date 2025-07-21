@@ -79,8 +79,8 @@ export function clone (obj, seen = new WeakMap()) {
 		return cloned;
 	}
 
-	// Handle plain objects
-	if (Object.prototype.toString.call(obj) === "[object Object]") {
+	// Handle plain objects (only objects created with {} or new Object())
+	if (Object.prototype.toString.call(obj) === "[object Object]" && obj.constructor === Object) {
 		const cloned = {};
 		seen.set(obj, cloned);
 

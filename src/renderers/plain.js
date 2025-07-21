@@ -14,7 +14,11 @@ const plainCache = new WeakMap();
  */
 export function plain (req, res, arg) {
 	// Handle primitive types directly
-	if (arg === null || arg === undefined) {
+	if (arg === null) {
+		return "null";
+	}
+
+	if (arg === undefined) {
 		return "";
 	}
 
@@ -33,7 +37,8 @@ export function plain (req, res, arg) {
 		result = arg.toString();
 	} else if (arg instanceof Object) {
 		const jsonIndent = req.server && req.server.jsonIndent ? req.server.jsonIndent : 0;
-		result = JSON.stringify(arg, null, indent(req.headers.accept, jsonIndent));
+		const acceptHeader = req.headers && req.headers.accept;
+		result = JSON.stringify(arg, null, indent(acceptHeader, jsonIndent));
 	} else {
 		result = arg.toString();
 	}

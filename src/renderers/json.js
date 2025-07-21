@@ -12,5 +12,9 @@ export function json (req, res, arg) {
 	// Convert undefined to null for consistent JSON output
 	const value = arg === undefined ? null : arg;
 
-	return JSON.stringify(value, null, indent(req.headers.accept, req.server.jsonIndent));
+	// Handle missing headers gracefully
+	const acceptHeader = req.headers && req.headers.accept;
+	const jsonIndent = req.server && req.server.jsonIndent ? req.server.jsonIndent : 0;
+
+	return JSON.stringify(value, null, indent(acceptHeader, jsonIndent));
 }

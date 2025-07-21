@@ -286,8 +286,9 @@ describe("Utility Functions", () => {
 			const data = { name: "test" };
 			const result = serialize(req, res, data);
 
-			// Result should be a plain text representation
-			assert(typeof result === "string" || result && result.data !== undefined);
+			// Plain serializer returns original data directly
+			assert(result && typeof result === "object");
+			assert.strictEqual(result.name, "test");
 		});
 
 		it("should use format from accept header", () => {
@@ -305,7 +306,9 @@ describe("Utility Functions", () => {
 			const data = { name: "test" };
 			const result = serialize(req, res, data);
 
-			assert(typeof result === "string" || result && result.data !== undefined);
+			// Plain serializer returns original data directly
+			assert(result && typeof result === "object");
+			assert.strictEqual(result.name, "test");
 		});
 
 		it("should handle multiple accept types", () => {

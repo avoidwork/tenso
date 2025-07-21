@@ -7,7 +7,7 @@
  */
 import {readFileSync}from'node:fs';import http,{STATUS_CODES}from'node:http';import https from'node:https';import {join,resolve}from'node:path';import {Woodland}from'woodland';import {merge}from'tiny-merge';import {eventsource}from'tiny-eventsource';import {createRequire}from'node:module';import {fileURLToPath,URL}from'node:url';import {parse as parse$1,stringify as stringify$1}from'tiny-jsonl';import {coerce}from'tiny-coerce';import YAML from'yamljs';import {XMLBuilder}from'fast-xml-parser';import {stringify}from'csv-stringify/sync';import {keysort}from'keysort';import {URL as URL$1}from'url';import promClient from'prom-client';import redis from'ioredis';import cookie from'cookie-parser';import session from'express-session';import passport from'passport';import passportJWT from'passport-jwt';import {BasicStrategy}from'passport-http';import {Strategy}from'passport-http-bearer';import {Strategy as Strategy$1}from'passport-oauth2';import {doubleCsrf}from'csrf-csrf';import {randomInt,randomUUID}from'node:crypto';import {RedisStore}from'connect-redis';import helmet from'helmet';const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const require = createRequire(import.meta.url);
-const {name, version} = require(join(__dirname, "..", "package.json"));
+const {name, version} = require(join(__dirname, "..", "..", "package.json"));
 
 // =============================================================================
 // HTTP METHODS
@@ -652,7 +652,11 @@ function json (req, res, arg) {
 	// Convert undefined to null for consistent JSON output
 	const value = arg === undefined ? null : arg;
 
-	return JSON.stringify(value, null, indent(req.headers.accept, req.server.jsonIndent));
+	// Handle missing headers gracefully
+	const acceptHeader = req.headers && req.headers.accept;
+	const jsonIndent = req.server && req.server.jsonIndent ? req.server.jsonIndent : 0;
+
+	return JSON.stringify(value, null, indent(acceptHeader, jsonIndent));
 }/**
  * Renders data as YAML format
  * Converts JavaScript objects and arrays to YAML string representation
@@ -755,7 +759,11 @@ const plainCache = new WeakMap();
  */
 function plain$1 (req, res, arg) {
 	// Handle primitive types directly
-	if (arg === null || arg === undefined) {
+	if (arg === null) {
+		return "null";
+	}
+
+	if (arg === undefined) {
 		return "";
 	}
 
@@ -774,7 +782,8 @@ function plain$1 (req, res, arg) {
 		result = arg.toString();
 	} else if (arg instanceof Object) {
 		const jsonIndent = req.server && req.server.jsonIndent ? req.server.jsonIndent : 0;
-		result = JSON.stringify(arg, null, indent(req.headers.accept, jsonIndent));
+		const acceptHeader = req.headers && req.headers.accept;
+		result = JSON.stringify(arg, null, indent(acceptHeader, jsonIndent));
 	} else {
 		result = arg.toString();
 	}

@@ -40,7 +40,7 @@ var helmet = require('helmet');
 var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
 const __dirname$1 = node_url.fileURLToPath(new node_url.URL(".", (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('tenso.cjs', document.baseURI).href))));
 const require$1 = node_module.createRequire((typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('tenso.cjs', document.baseURI).href)));
-const {name, version} = require$1(node_path.join(__dirname$1, "..", "package.json"));
+const {name, version} = require$1(node_path.join(__dirname$1, "..", "..", "package.json"));
 
 // =============================================================================
 // HTTP METHODS
@@ -699,7 +699,11 @@ function json (req, res, arg) {
 	// Convert undefined to null for consistent JSON output
 	const value = arg === undefined ? null : arg;
 
-	return JSON.stringify(value, null, indent(req.headers.accept, req.server.jsonIndent));
+	// Handle missing headers gracefully
+	const acceptHeader = req.headers && req.headers.accept;
+	const jsonIndent = req.server && req.server.jsonIndent ? req.server.jsonIndent : 0;
+
+	return JSON.stringify(value, null, indent(acceptHeader, jsonIndent));
 }
 
 /**
@@ -808,7 +812,11 @@ const plainCache = new WeakMap();
  */
 function plain$1 (req, res, arg) {
 	// Handle primitive types directly
-	if (arg === null || arg === undefined) {
+	if (arg === null) {
+		return "null";
+	}
+
+	if (arg === undefined) {
 		return "";
 	}
 
@@ -827,7 +835,8 @@ function plain$1 (req, res, arg) {
 		result = arg.toString();
 	} else if (arg instanceof Object) {
 		const jsonIndent = req.server && req.server.jsonIndent ? req.server.jsonIndent : 0;
-		result = JSON.stringify(arg, null, indent(req.headers.accept, jsonIndent));
+		const acceptHeader = req.headers && req.headers.accept;
+		result = JSON.stringify(arg, null, indent(acceptHeader, jsonIndent));
 	} else {
 		result = arg.toString();
 	}

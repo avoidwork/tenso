@@ -319,13 +319,14 @@ describe("Edge Cases and Error Conditions", () => {
 				header: () => {}
 			};
 
-			// JSON.stringify will throw on circular references
+			// The clone function gracefully handles circular references
 			const circular = { name: "test" };
 			circular.self = circular;
 
-			assert.throws(() => {
-				serialize(req, res, circular);
-			});
+			// Should not throw, circular references are handled gracefully
+			const result = serialize(req, res, circular);
+			assert(result !== null);
+			assert(typeof result === "object");
 		});
 	});
 

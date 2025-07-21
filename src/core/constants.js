@@ -4,7 +4,7 @@ import {fileURLToPath, URL} from "node:url";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const require = createRequire(import.meta.url);
-const {name, version} = require(join(__dirname, "..", "package.json"));
+const {name, version} = require(join(__dirname, "..", "..", "package.json"));
 
 // =============================================================================
 // HTTP METHODS

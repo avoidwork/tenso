@@ -7,7 +7,7 @@ describe("Integration Tests - Full Request/Response Cycle", () => {
 	let app;
 
 	beforeEach(() => {
-		app = tenso({ port: 0, host: "127.0.0.1", maxListeners: 100, logging: { enabled: false } }); // Use random port
+		app = tenso({ port: 0, host: "127.0.0.1", maxListeners: 140, logging: { enabled: false } }); // Use random port
 	});
 
 	afterEach(() => {
@@ -318,7 +318,7 @@ describe("Integration Tests - Full Request/Response Cycle", () => {
 		});
 
 		it("should integrate hypermedia with pagination", () => {
-			const testApp = tenso({ maxListeners: 100, logging: { enabled: false } });
+			const testApp = tenso({ maxListeners: 140, logging: { enabled: false } });
 
 			const items = Array.from({ length: 10 }, (_, i) => ({
 				id: i + 1,
@@ -454,7 +454,7 @@ describe("Integration Tests - Full Request/Response Cycle", () => {
 				pageSize: 2,
 				jsonIndent: 2,
 				hypermedia: { enabled: true, header: true },
-				maxListeners: 100,
+				maxListeners: 140,
 				renderHeaders: false,
 				corsExpose: "x-custom-header",
 				defaultHeaders: { "x-api-version": "1.0" },

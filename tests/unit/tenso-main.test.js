@@ -6,7 +6,7 @@ describe("Tenso Factory Function", () => {
 	let app;
 
 	beforeEach(() => {
-		app = tenso({ maxListeners: 120, logging: { enabled: false } });
+		app = tenso({ maxListeners: 60, logging: { enabled: false } });
 	});
 
 	afterEach(() => {
@@ -127,7 +127,7 @@ describe("Tenso Class", () => {
 		});
 
 		it("should accept custom config", () => {
-			const config = { port: 4000, title: "Custom", maxListeners: 120, logging: { enabled: false } };
+			const config = { port: 4000, title: "Custom", maxListeners: 60, logging: { enabled: false } };
 			const customInstance = new Tenso(config);
 			assert.strictEqual(customInstance.port, 4000);
 			assert.strictEqual(customInstance.title, "Custom");

@@ -10,7 +10,7 @@ describe("Edge Cases and Error Conditions", () => {
 	let app;
 
 	beforeEach(() => {
-		app = tenso({ maxListeners: 120, logging: { enabled: false } });
+		app = tenso({ maxListeners: 60, logging: { enabled: false } });
 	});
 
 	afterEach(() => {
@@ -21,22 +21,22 @@ describe("Edge Cases and Error Conditions", () => {
 
 	describe("Invalid Configuration", () => {
 		it("should handle missing configuration object", () => {
-			const emptyApp = tenso({ maxListeners: 120, logging: { enabled: false } });
+			const emptyApp = tenso({ maxListeners: 60, logging: { enabled: false } });
 			assert(emptyApp instanceof Object);
 			emptyApp.stop();
 		});
 
 		it("should handle null configuration", () => {
-			const nullApp = tenso({ maxListeners: 120, logging: { enabled: false } });
+			const nullApp = tenso({ maxListeners: 60, logging: { enabled: false } });
 			assert(nullApp instanceof Object);
 			nullApp.stop();
 		});
 
 		it("should handle invalid port configuration", () => {
 			// Port validation happens in the factory, test that it handles various port values
-			const config1 = { port: "invalid", maxListeners: 120, logging: { enabled: false }};
-			const config2 = { port: -1, maxListeners: 120, logging: { enabled: false }};
-			const config3 = { port: 65536, maxListeners: 120, logging: { enabled: false }};
+			const config1 = { port: "invalid", maxListeners: 60, logging: { enabled: false }};
+			const config2 = { port: -1, maxListeners: 60, logging: { enabled: false }};
+			const config3 = { port: 65536, maxListeners: 60, logging: { enabled: false }};
 
 			// These should create apps with default or corrected ports
 			const app1 = tenso(config1);
@@ -55,7 +55,7 @@ describe("Edge Cases and Error Conditions", () => {
 		it("should handle missing required configuration keys", () => {
 			const minimalConfig = {
 				title: "Test App",
-				maxListeners: 120,
+				maxListeners: 60,
 				logging: { enabled: false }
 			};
 
@@ -77,7 +77,7 @@ describe("Edge Cases and Error Conditions", () => {
 						buckets: [0.1, 1, 5, 10]
 					}
 				},
-				maxListeners: 120,
+				maxListeners: 60,
 				logging: { enabled: false }
 			};
 

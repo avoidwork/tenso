@@ -6,7 +6,7 @@ describe("Renderers", () => {
 	let app;
 
 	beforeEach(() => {
-		app = tenso({ maxListeners: 120, logging: { enabled: false } });
+		app = tenso({ maxListeners: 60, logging: { enabled: false } });
 	});
 
 	describe("JSON Renderer", () => {
@@ -86,7 +86,7 @@ describe("Renderers", () => {
 		});
 
 		it("should use custom JSON indentation when configured", () => {
-			const customApp = tenso({ jsonIndent: 2, maxListeners: 120, logging: { enabled: false } });
+			const customApp = tenso({ jsonIndent: 2, maxListeners: 60, logging: { enabled: false } });
 			const customJsonRenderer = customApp.renderers.get("application/json");
 			const req = {
 				server: customApp,

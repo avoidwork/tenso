@@ -6,7 +6,7 @@ describe("Parsers", () => {
 	let app;
 
 	beforeEach(() => {
-		app = tenso({ maxListeners: 120, logging: { enabled: false } });
+		app = tenso({ maxListeners: 60, logging: { enabled: false } });
 	});
 
 	describe("JSON Parser", () => {

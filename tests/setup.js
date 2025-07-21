@@ -2,7 +2,7 @@ import { beforeEach, before } from "mocha";
 
 // Increase maxListeners for test environment to handle multiple Tenso instances
 // Each instance adds event listeners, and tests create many instances
-process.setMaxListeners(100); // Increased from default 25 to 100 for tests
+process.setMaxListeners(140); // Increased from default 25 to 100 for tests
 
 // Suppress Redis connection error logs during tests
 const originalConsoleError = console.error;
@@ -39,4 +39,4 @@ beforeEach(async () => {
 
 // Set default session store to memory to avoid Redis
 process.env.TEST_MODE = "true";
-process.env.SESSION_STORE = "memory"; 
+process.env.SESSION_STORE = "memory";

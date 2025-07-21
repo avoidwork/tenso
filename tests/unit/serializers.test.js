@@ -1,6 +1,8 @@
 import assert from "node:assert";
 import { describe, it, beforeEach } from "mocha";
 import { tenso } from "../../dist/tenso.js";
+import { custom } from "../../src/serializers/custom.js";
+import { plain } from "../../src/serializers/plain.js";
 
 describe("Serializers", () => {
 	let app;
@@ -146,6 +148,36 @@ describe("Serializers", () => {
 			assert.strictEqual(result.error, null);
 			assert.strictEqual(result.status, 200);
 		});
+
+		// Enhanced custom serializer tests from coverage-completion.test.js
+		it("should handle error with no message property", () => {
+			const errorWithoutMessage = {};
+			Object.defineProperty(errorWithoutMessage, "name", { value: "CustomError" });
+
+			const result = custom(null, errorWithoutMessage, 500);
+			assert.strictEqual(result.error, errorWithoutMessage);
+		});
+
+		it("should handle string error (enhanced)", () => {
+			const result = custom(null, "String error", 400);
+			assert.strictEqual(result.error, "String error");
+		});
+
+		it("should use status code fallback when error is empty (enhanced)", () => {
+			const result = custom(null, "", 404);
+			assert.strictEqual(result.error, "Not Found");
+		});
+
+		it("should handle error with stack trace (enhanced)", () => {
+			const error = new Error("Test error");
+			const result = custom(null, error, 500, true);
+			assert.strictEqual(result.error, error.stack);
+		});
+
+		it("should handle null error (enhanced)", () => {
+			const result = custom("data", null, 200);
+			assert.strictEqual(result.error, null);
+		});
 	});
 
 	describe("Plain Serializer", () => {
@@ -240,6 +272,25 @@ describe("Serializers", () => {
 
 			// Should use message, not stack (default stack = false)
 			assert.strictEqual(result, "Test error");
+		});
+
+		// Enhanced plain serializer tests from coverage-completion.test.js
+		it("should handle error with no message property", () => {
+			const errorWithoutMessage = {};
+			Object.defineProperty(errorWithoutMessage, "name", { value: "CustomError" });
+
+			const result = plain(null, errorWithoutMessage, 500);
+			assert.strictEqual(result, errorWithoutMessage);
+		});
+
+		it("should handle string error (enhanced)", () => {
+			const result = plain(null, "String error", 400);
+			assert.strictEqual(result, "String error");
+		});
+
+		it("should use status code fallback when error is empty (enhanced)", () => {
+			const result = plain(null, "", 404);
+			assert.strictEqual(result, "Not Found");
 		});
 	});
 

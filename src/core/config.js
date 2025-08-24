@@ -312,6 +312,7 @@ export const config = {
 		secret: SESSION_SECRET,
 		store: MEMORY
 	},
+	signalsDecorated: false,
 	silent: false,
 	ssl: {
 		cert: null,

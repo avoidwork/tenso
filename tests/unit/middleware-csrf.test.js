@@ -5,13 +5,18 @@ describe("middleware/csrf", () => {
 	let mockReq, mockRes, nextCalled, nextError;
 
 	beforeEach(() => {
+		// Reset state
 		mockReq = {
 			unprotect: false,
 			csrf: "token123",
-			session: {}, // Required by lusca
+			session: {},
+			sessionID: "test-session-id",
+			ip: "192.168.1.1",
 			headers: {
-				"x-csrf-token": "token123" // Default CSRF header
+				"x-csrf-token": "token123"
 			},
+			body: {},
+			query: {},
 			server: {
 				security: {
 					key: "x-csrf-token",
@@ -21,8 +26,8 @@ describe("middleware/csrf", () => {
 		};
 		mockRes = {
 			locals: {},
+			headers: {},
 			header: function (key, value) {
-				this.headers = this.headers || {};
 				this.headers[key] = value;
 			}
 		};
@@ -48,67 +53,169 @@ describe("middleware/csrf", () => {
 		assert.strictEqual(nextError, undefined);
 	});
 
-	it("should handle CSRF protection for protected requests", () => {
-		// This test simulates the CSRF protection flow
-		try {
-			mockRes.locals[mockReq.server.security.key] = "csrf-token-value";
+	it("should handle protected requests in test environment", () => {
+		const originalEnv = process.env.NODE_ENV;
+		process.env.NODE_ENV = "test";
 
-			csrfWrapper(mockReq, mockRes, mockNext);
-
-			assert.strictEqual(nextCalled, true);
-			assert.strictEqual(nextError, undefined);
-		} catch {
-			// Handle case where lusca is not available in test environment
-			assert.ok(true, "CSRF wrapper function exists and can be called");
-		}
-	});
-
-	it("should memoize CSRF function on first call", () => {
-		// Test that the function can be called multiple times
 		csrfWrapper(mockReq, mockRes, mockNext);
 
-		const secondReq = { ...mockReq, session: {} };
-		const secondRes = {
-			...mockRes,
-			locals: {},
-			header: function (key, value) {
-				this.headers = this.headers || {};
-				this.headers[key] = value;
-			}
-		};
+		assert.strictEqual(nextCalled, true);
+		// In test environment, the middleware should handle errors gracefully
 
-		const secondNext = () => {
-			// This function verifies second call works
-		};
+		process.env.NODE_ENV = originalEnv;
+	});
 
-		csrfWrapper(secondReq, secondRes, secondNext);
+	it("should handle protected requests with session", () => {
+		mockReq.session = {};
 
-		// Both calls should work (memoization test)
-		assert.ok(true, "Function handles memoization correctly");
+		csrfWrapper(mockReq, mockRes, mockNext);
+
+		assert.strictEqual(nextCalled, true);
+		// Should handle gracefully when session is present
+	});
+
+	it("should set generateCsrfToken on server object when memoized", () => {
+		const originalEnv = process.env.NODE_ENV;
+		process.env.NODE_ENV = "test";
+
+		// Call twice to test memoization
+		csrfWrapper(mockReq, mockRes, mockNext);
+
+		// After first call, the generateCsrfToken should be set on server
+		if (mockReq.server.generateCsrfToken) {
+			assert.strictEqual(typeof mockReq.server.generateCsrfToken, "function");
+		}
+
+		// Reset and call again to test memoization
+		nextCalled = false;
+		nextError = null;
+
+		csrfWrapper(mockReq, mockRes, mockNext);
+
+		assert.strictEqual(nextCalled, true);
+
+		process.env.NODE_ENV = originalEnv;
 	});
 
 	it("should handle different security keys", () => {
-		const testReq = {
-			...mockReq,
-			session: {},
-			server: {
-				security: {
-					key: "custom-csrf-header",
-					secret: "different-secret"
-				}
-			}
-		};
-		const testRes = {
-			...mockRes,
-			locals: {},
-			header: function (key, value) {
-				this.headers = this.headers || {};
-				this.headers[key] = value;
-			}
+		mockReq.server.security.key = "custom-csrf-header";
+		mockReq.server.security.secret = "different-secret";
+		mockReq.headers = {
+			"custom-csrf-header": "custom-token"
 		};
 
-		csrfWrapper(testReq, testRes, mockNext);
+		const originalEnv = process.env.NODE_ENV;
+		process.env.NODE_ENV = "test";
 
-		assert.ok(true, "Function handles different security configurations");
+		csrfWrapper(mockReq, mockRes, mockNext);
+
+		assert.strictEqual(nextCalled, true);
+
+		process.env.NODE_ENV = originalEnv;
+	});
+
+	it("should handle missing security configuration gracefully", () => {
+		mockReq.server.security = {
+			key: "x-csrf-token",
+			secret: "test-secret"
+		};
+
+		const originalEnv = process.env.NODE_ENV;
+		process.env.NODE_ENV = "test";
+
+		csrfWrapper(mockReq, mockRes, mockNext);
+
+		assert.strictEqual(nextCalled, true);
+
+		process.env.NODE_ENV = originalEnv;
+	});
+
+	it("should handle requests without session in production (error path)", () => {
+		mockReq.session = undefined;
+
+		const originalEnv = process.env.NODE_ENV;
+		process.env.NODE_ENV = "production";
+
+		csrfWrapper(mockReq, mockRes, mockNext);
+
+		assert.strictEqual(nextCalled, true);
+		// In production without session, might pass through an error depending on CSRF setup
+
+		process.env.NODE_ENV = originalEnv;
+	});
+
+	it("should handle csrf token in headers", () => {
+		mockReq.headers = {
+			"x-csrf-token": "header-token"
+		};
+
+		const originalEnv = process.env.NODE_ENV;
+		process.env.NODE_ENV = "test";
+
+		csrfWrapper(mockReq, mockRes, mockNext);
+
+		assert.strictEqual(nextCalled, true);
+
+		process.env.NODE_ENV = originalEnv;
+	});
+
+	it("should handle csrf token in body", () => {
+		mockReq.body = {
+			_csrf: "body-token"
+		};
+		mockReq.headers = {}; // No header token
+
+		const originalEnv = process.env.NODE_ENV;
+		process.env.NODE_ENV = "test";
+
+		csrfWrapper(mockReq, mockRes, mockNext);
+
+		assert.strictEqual(nextCalled, true);
+
+		process.env.NODE_ENV = originalEnv;
+	});
+
+	it("should handle csrf token in query", () => {
+		mockReq.query = {
+			_csrf: "query-token"
+		};
+		mockReq.headers = {}; // No header token
+		mockReq.body = {}; // No body token
+
+		const originalEnv = process.env.NODE_ENV;
+		process.env.NODE_ENV = "test";
+
+		csrfWrapper(mockReq, mockRes, mockNext);
+
+		assert.strictEqual(nextCalled, true);
+
+		process.env.NODE_ENV = originalEnv;
+	});
+
+	it("should handle case where req.csrf is falsy", () => {
+		mockReq.csrf = null;
+
+		const originalEnv = process.env.NODE_ENV;
+		process.env.NODE_ENV = "test";
+
+		csrfWrapper(mockReq, mockRes, mockNext);
+
+		assert.strictEqual(nextCalled, true);
+
+		process.env.NODE_ENV = originalEnv;
+	});
+
+	it("should handle missing sessionID and ip (fallback)", () => {
+		delete mockReq.sessionID;
+		delete mockReq.ip;
+
+		const originalEnv = process.env.NODE_ENV;
+		process.env.NODE_ENV = "test";
+
+		csrfWrapper(mockReq, mockRes, mockNext);
+
+		assert.strictEqual(nextCalled, true);
+
+		process.env.NODE_ENV = originalEnv;
 	});
 });

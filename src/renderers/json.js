@@ -9,5 +9,12 @@ import {indent} from "../utils/indent.js";
  * @returns {string} The JSON formatted string
  */
 export function json (req, res, arg) {
-	return JSON.stringify(arg, null, indent(req.headers.accept, req.server.jsonIndent));
+	// Convert undefined to null for consistent JSON output
+	const value = arg === undefined ? null : arg;
+
+	// Handle missing headers gracefully
+	const acceptHeader = req.headers && req.headers.accept;
+	const jsonIndent = req.server && req.server.jsonIndent ? req.server.jsonIndent : 0;
+
+	return JSON.stringify(value, null, indent(acceptHeader, jsonIndent));
 }

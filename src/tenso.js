@@ -60,16 +60,24 @@ import {clone} from "./utils/clone.js";
  * @class Tenso
  * @extends {Woodland}
  */
-class Tenso extends Woodland {
+export class Tenso extends Woodland {
 	/**
 	 * Creates an instance of Tenso
 	 * @param {Object} [config=defaultConfig] - Configuration object for the Tenso instance
 	 */
 	constructor (config = defaultConfig) {
-		super(config);
+		const mergedConfig = merge(clone(defaultConfig), config);
+		super(mergedConfig);
 
-		for (const [key, value] of Object.entries(config)) {
-			if (key in this === false) {
+		// No longer valid (reformed)
+		delete mergedConfig.defaultHeaders;
+
+		// Method names that should not be overwritten by configuration
+		const methodNames = new Set(["serialize", "canModify", "connect", "render", "init", "parser", "renderer", "serializer"]);
+
+		// Apply all configuration properties to the instance, but don't overwrite methods
+		for (const [key, value] of Object.entries(mergedConfig)) {
+			if (!methodNames.has(key)) {
 				this[key] = value;
 			}
 		}
@@ -79,7 +87,7 @@ class Tenso extends Woodland {
 		this.renderers = renderers;
 		this.serializers = serializers;
 		this.server = null;
-		this.version = config.version;
+		this.version = mergedConfig.version;
 	}
 
 	/**
@@ -92,13 +100,35 @@ class Tenso extends Woodland {
 	}
 
 	/**
+	 * Serializes response data based on content type negotiation
+	 * @param {Object} req - The HTTP request object
+	 * @param {Object} res - The HTTP response object
+	 * @param {*} arg - The data to serialize
+	 * @returns {*} The serialized data
+	 */
+	serialize (req, res, arg) {
+		return serialize(req, res, arg);
+	}
+
+	/**
+	 * Processes hypermedia responses with pagination and links
+	 * @param {Object} req - The HTTP request object
+	 * @param {Object} res - The HTTP response object
+	 * @param {*} arg - The data to process with hypermedia
+	 * @returns {*} The processed data with hypermedia links
+	 */
+	hypermedia (req, res, arg) {
+		return hypermedia(req, res, arg);
+	}
+
+	/**
 	 * Handles connection setup for incoming requests
 	 * @param {Object} req - Request object
 	 * @param {Object} res - Response object
 	 * @returns {void}
 	 */
 	connect (req, res) {
-		req.csrf = this.canModify(req.method) === false && this.canModify(req.allow) && this.security.csrf === true;
+		req.csrf = this.canModify(req.allow || req.method) && this.security.csrf === true;
 		req.hypermedia = this.hypermedia.enabled;
 		req.hypermediaHeader = this.hypermedia.header;
 		req.private = false;
@@ -163,7 +193,12 @@ class Tenso extends Woodland {
 
 		// Matching MaxListeners for signals
 		this.setMaxListeners(this.maxListeners);
-		process.setMaxListeners(this.maxListeners);
+
+		// Only increase process maxListeners, never decrease it (important for tests)
+		const currentProcessMax = process.getMaxListeners();
+		if (this.maxListeners > currentProcessMax) {
+			process.setMaxListeners(this.maxListeners);
+		}
 
 		this.decorate = this.decorate.bind(this);
 		this.route = this.route.bind(this);
@@ -357,11 +392,14 @@ class Tenso extends Woodland {
 	 * @returns {Tenso} The Tenso instance for method chaining
 	 */
 	signals () {
-		for (const signal of [SIGHUP, SIGINT, SIGTERM]) {
-			process.on(signal, () => {
-				this.stop();
-				process.exit(0);
-			});
+		if (!this.signalsDecorated) {
+			for (const signal of [SIGHUP, SIGINT, SIGTERM]) {
+				process.on(signal, () => {
+					this.stop();
+					process.exit(0);
+				});
+			}
+			this.signalsDecorated = true;
 		}
 
 		return this;
@@ -414,13 +452,25 @@ class Tenso extends Woodland {
 export function tenso (userConfig = {}) {
 	const config = merge(clone(defaultConfig), userConfig);
 
+	// Ensure version falls back to default when null or undefined
+	if (config.version === null) {
+		config.version = defaultConfig.version;
+	}
+
 	if ((/^[^\d+]$/).test(config.port) && config.port < INT_1) {
 		console.error(INVALID_CONFIGURATION);
 		process.exit(INT_1);
 	}
 
 	config.webroot.root = resolve(config.webroot.root);
-	config.webroot.template = readFileSync(config.webroot.template, {encoding: UTF8});
+
+	// Only read template from file if it's a file path, not already a template string
+	if (typeof config.webroot.template === "string" && config.webroot.template.includes("<")) {
+		// Template is already a string (contains HTML), no need to read from file
+	} else {
+		// Template is a file path, read the file
+		config.webroot.template = readFileSync(config.webroot.template, {encoding: UTF8});
+	}
 
 	if (config.silent !== true) {
 		config.defaultHeaders.server = `${config.title.toLowerCase()}/${config.version}`;

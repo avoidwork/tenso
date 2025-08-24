@@ -35,6 +35,8 @@ pnpm add tenso
 
 ## 🚀 Quick Start
 
+Tenso can be used in two ways: via the factory function for quick setups, or by extending the `Tenso` class for more advanced applications.
+
 ### Basic Server
 
 ```javascript
@@ -65,7 +67,7 @@ export const app = tenso({initRoutes});
 app.start();
 ```
 
-### Using the Class
+### Using the Tenso Class
 
 ```javascript
 import {Tenso} from "tenso";
@@ -100,12 +102,16 @@ class MyAPI extends Tenso {
 }
 
 const api = new MyAPI();
+api.start();
 ```
+
+> 💡 **See the [Extending the Tenso Class](#extending-the-tenso-class) section for comprehensive examples and advanced patterns.**
 
 ## 📖 Table of Contents
 
 - [Creating Routes](#creating-routes)
 - [Request and Response Helpers](#request-and-response-helpers)
+- [Extending the Tenso Class](#extending-the-tenso-class)
 - [Extensibility](#extensibility)
 - [Responses](#responses)
 - [REST / Hypermedia](#rest--hypermedia)
@@ -197,6 +203,459 @@ Tenso decorates `res` with helpers such as:
 - `res.json()` - Send JSON response
 - `res.redirect()` - Send redirect response
 - `res.error()` - Send error response
+
+## 🎯 Extending the Tenso Class
+
+Tenso exports the `Tenso` class for direct extension, allowing you to create custom API servers with enhanced functionality. The class extends [Woodland](https://github.com/avoidwork/woodland) and provides numerous methods that can be overridden or extended.
+
+### Basic Class Extension
+
+```javascript
+import {Tenso} from "tenso";
+
+class MyAPI extends Tenso {
+  constructor(config = {}) {
+    super({
+      title: "My Custom API",
+      version: "1.0.0",
+      ...config
+    });
+    
+    // Initialize custom properties
+    this.database = new Map();
+    this.cache = new Map();
+    
+    // Setup routes after initialization
+    this.setupRoutes();
+  }
+  
+  setupRoutes() {
+    this.get("/api/status", this.getStatus.bind(this));
+    this.get("/api/users", this.getUsers.bind(this));
+    this.post("/api/users", this.createUser.bind(this));
+  }
+  
+  getStatus(req, res) {
+    res.json({
+      status: "online",
+      version: this.version,
+      timestamp: new Date().toISOString()
+    });
+  }
+  
+  getUsers(req, res) {
+    const users = Array.from(this.database.values());
+    res.json(users);
+  }
+  
+  createUser(req, res) {
+    const user = {
+      id: Date.now(),
+      ...req.body,
+      createdAt: new Date().toISOString()
+    };
+    
+    this.database.set(user.id, user);
+    res.status(201).json(user);
+  }
+}
+
+// Create and start the server
+const api = new MyAPI({
+  port: 3000,
+  auth: {
+    protect: ["/api/users"]
+  }
+});
+
+api.start();
+```
+
+### Overriding Core Methods
+
+You can override key methods to customize server behavior:
+
+#### Custom Connection Handler
+
+```javascript
+class CustomAPI extends Tenso {
+  connect(req, res) {
+    // Call parent method first
+    super.connect(req, res);
+    
+    // Add custom connection logic
+    req.requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    req.startTime = process.hrtime.bigint();
+    
+    this.log(`Connection: ${req.requestId} ${req.method} ${req.url}`);
+  }
+  
+  // Override final method to add request timing
+  final(req, res, arg) {
+    const duration = Number(process.hrtime.bigint() - req.startTime) / 1000000;
+    res.setHeader('X-Response-Time', `${duration.toFixed(2)}ms`);
+    res.setHeader('X-Request-ID', req.requestId);
+    
+    return super.final(req, res, arg);
+  }
+}
+```
+
+#### Custom Authentication
+
+```javascript
+class AuthenticatedAPI extends Tenso {
+  constructor(config = {}) {
+    super({
+      ...config,
+      auth: {
+        protect: ["/api/private"],
+        ...config.auth
+      }
+    });
+    
+    this.users = new Map([
+      ['admin', { id: 1, username: 'admin', role: 'admin' }],
+      ['user', { id: 2, username: 'user', role: 'user' }]
+    ]);
+  }
+  
+  // Override connect to add custom auth logic
+  connect(req, res) {
+    super.connect(req, res);
+    
+    // Add user context from session or token
+    if (req.session?.user) {
+      req.user = this.users.get(req.session.user);
+    }
+  }
+  
+  // Custom middleware for role-based access
+  requireRole(role) {
+    return (req, res, next) => {
+      if (!req.user) {
+        return res.error(401, "Authentication required");
+      }
+      
+      if (req.user.role !== role && req.user.role !== 'admin') {
+        return res.error(403, "Insufficient permissions");
+      }
+      
+      next();
+    };
+  }
+  
+  setupRoutes() {
+    // Public routes
+    this.get("/api/health", this.healthCheck);
+    
+    // Admin-only routes
+    this.get("/api/private/admin", this.requireRole('admin'), this.adminOnly);
+    
+    // User routes
+    this.get("/api/private/profile", this.getProfile);
+  }
+  
+  healthCheck(req, res) {
+    res.json({ status: "healthy" });
+  }
+  
+  adminOnly(req, res) {
+    res.json({ message: "Admin access granted", user: req.user });
+  }
+  
+  getProfile(req, res) {
+    res.json({ profile: req.user });
+  }
+}
+```
+
+#### Custom Rate Limiting
+
+```javascript
+class RateLimitedAPI extends Tenso {
+  constructor(config = {}) {
+    super({
+      ...config,
+      rate: {
+        enabled: true,
+        limit: 100,
+        reset: 3600,
+        ...config.rate
+      }
+    });
+    
+    this.premiumUsers = new Set(['premium_user_1', 'premium_user_2']);
+  }
+  
+  // Override rate limiting for premium users
+  rateLimit(req, fn) {
+    const userId = req.user?.id || req.sessionID || req.ip;
+    
+    // Custom function to modify rate limits
+    const customRateFn = (req, state) => {
+      if (this.premiumUsers.has(userId)) {
+        // Premium users get 10x the limit
+        return {
+          ...state,
+          limit: this.rate.limit * 10,
+          remaining: Math.max(state.remaining, this.rate.limit * 10 - 1)
+        };
+      }
+      return state;
+    };
+    
+    return super.rateLimit(req, customRateFn);
+  }
+}
+```
+
+### Advanced Customization
+
+#### Custom Renderers and Parsers
+
+```javascript
+class CustomFormatAPI extends Tenso {
+  constructor(config = {}) {
+    super(config);
+    
+    // Add custom format support
+    this.setupCustomFormats();
+  }
+  
+  setupCustomFormats() {
+    // Custom CSV renderer with specific formatting
+    this.renderer('text/csv', (req, res, data) => {
+      if (Array.isArray(data)) {
+        const headers = Object.keys(data[0] || {});
+        const csv = [
+          headers.join(','),
+          ...data.map(row => headers.map(h => `"${row[h] || ''}"`).join(','))
+        ].join('\n');
+        
+        res.setHeader('Content-Disposition', 'attachment; filename="data.csv"');
+        return csv;
+      }
+      
+      return 'No data available';
+    });
+    
+    // Custom parser for special format
+    this.parser('application/x-custom', (body) => {
+      // Parse custom format
+      return body.split('|').reduce((obj, pair) => {
+        const [key, value] = pair.split(':');
+        obj[key] = value;
+        return obj;
+      }, {});
+    });
+  }
+}
+```
+
+#### Database Integration
+
+```javascript
+import Database from 'better-sqlite3';
+
+class DatabaseAPI extends Tenso {
+  constructor(config = {}) {
+    super(config);
+    
+    this.db = new Database(config.database || 'api.db');
+    this.setupDatabase();
+    this.setupRoutes();
+  }
+  
+  setupDatabase() {
+    // Create tables
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    
+    // Prepare statements
+    this.queries = {
+      getUsers: this.db.prepare('SELECT * FROM users ORDER BY id'),
+      getUser: this.db.prepare('SELECT * FROM users WHERE id = ?'),
+      createUser: this.db.prepare('INSERT INTO users (username, email) VALUES (?, ?)'),
+      updateUser: this.db.prepare('UPDATE users SET username = ?, email = ? WHERE id = ?'),
+      deleteUser: this.db.prepare('DELETE FROM users WHERE id = ?')
+    };
+  }
+  
+  setupRoutes() {
+    this.get('/api/users', this.getUsers.bind(this));
+    this.get('/api/users/:id', this.getUser.bind(this));
+    this.post('/api/users', this.createUser.bind(this));
+    this.put('/api/users/:id', this.updateUser.bind(this));
+    this.delete('/api/users/:id', this.deleteUser.bind(this));
+  }
+  
+  getUsers(req, res) {
+    try {
+      const users = this.queries.getUsers.all();
+      res.json(users);
+    } catch (error) {
+      res.error(500, error);
+    }
+  }
+  
+  getUser(req, res) {
+    try {
+      const user = this.queries.getUser.get(req.params.id);
+      if (!user) {
+        return res.error(404, 'User not found');
+      }
+      res.json(user);
+    } catch (error) {
+      res.error(500, error);
+    }
+  }
+  
+  createUser(req, res) {
+    try {
+      const { username, email } = req.body;
+      const result = this.queries.createUser.run(username, email);
+      const user = this.queries.getUser.get(result.lastInsertRowid);
+      res.status(201).json(user);
+    } catch (error) {
+      res.error(400, error);
+    }
+  }
+  
+  updateUser(req, res) {
+    try {
+      const { username, email } = req.body;
+      const result = this.queries.updateUser.run(username, email, req.params.id);
+      
+      if (result.changes === 0) {
+        return res.error(404, 'User not found');
+      }
+      
+      const user = this.queries.getUser.get(req.params.id);
+      res.json(user);
+    } catch (error) {
+      res.error(400, error);
+    }
+  }
+  
+  deleteUser(req, res) {
+    try {
+      const result = this.queries.deleteUser.run(req.params.id);
+      
+      if (result.changes === 0) {
+        return res.error(404, 'User not found');
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      res.error(500, error);
+    }
+  }
+  
+  // Override stop method to close database
+  stop() {
+    this.db.close();
+    return super.stop();
+  }
+}
+```
+
+### Extending with Middleware
+
+```javascript
+class MiddlewareAPI extends Tenso {
+  constructor(config = {}) {
+    super(config);
+    this.setupMiddleware();
+  }
+  
+  setupMiddleware() {
+    // Global request logger
+    this.always('/api/*', this.logRequest.bind(this));
+    
+    // API key validation for specific routes
+    this.always('/api/secure/*', this.validateApiKey.bind(this));
+    
+    // Request validation middleware
+    this.always('/api/users', this.validateUserData.bind(this));
+  }
+  
+  logRequest(req, res, next) {
+    const start = Date.now();
+    
+    res.on('finish', () => {
+      const duration = Date.now() - start;
+      this.log(`${req.method} ${req.url} ${res.statusCode} ${duration}ms`);
+    });
+    
+    next();
+  }
+  
+  validateApiKey(req, res, next) {
+    const apiKey = req.headers['x-api-key'];
+    
+    if (!apiKey || !this.isValidApiKey(apiKey)) {
+      return res.error(401, 'Invalid API key');
+    }
+    
+    req.apiKey = apiKey;
+    next();
+  }
+  
+  validateUserData(req, res, next) {
+    if (req.method === 'POST' || req.method === 'PUT') {
+      const { username, email } = req.body || {};
+      
+      if (!username || !email) {
+        return res.error(400, 'Username and email are required');
+      }
+      
+      if (!this.isValidEmail(email)) {
+        return res.error(400, 'Invalid email format');
+      }
+    }
+    
+    next();
+  }
+  
+  isValidApiKey(key) {
+    // Implement API key validation logic
+    return key && key.startsWith('ak_');
+  }
+  
+  isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+}
+```
+
+### Available Methods to Override
+
+The `Tenso` class provides these methods that can be overridden:
+
+- **`connect(req, res)`** - Handle new connections
+- **`final(req, res, arg)`** - Final processing before response
+- **`headers(req, res)`** - Customize response headers
+- **`render(req, res, arg)`** - Customize response rendering
+- **`rateLimit(req, fn)`** - Custom rate limiting logic
+- **`start()`** - Server startup customization
+- **`stop()`** - Server shutdown customization
+
+### Best Practices for Extension
+
+1. **Always call `super()`** in constructor and overridden methods
+2. **Bind methods** when passing them as route handlers
+3. **Initialize custom properties** after calling `super()`
+4. **Use middleware** for cross-cutting concerns
+5. **Handle errors gracefully** in custom methods
+6. **Clean up resources** in the `stop()` method override
+7. **Document your extensions** for team members
 
 ## 🎛️ Extensibility
 

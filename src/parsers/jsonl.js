@@ -14,7 +14,10 @@ export function jsonl (arg = EMPTY) {
 		return [];
 	}
 
-	const result = parse(arg);
+	// Normalize line endings to handle CRLF properly
+	const normalizedInput = arg.replace(/\r\n/g, "\n");
+
+	const result = parse(normalizedInput);
 
 	// Ensure result is always an array
 	// tiny-jsonl returns single objects directly for single lines,

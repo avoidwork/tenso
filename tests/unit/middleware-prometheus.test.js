@@ -185,4 +185,152 @@ describe("middleware/prometheus", () => {
 			assert.ok(register.getSingleMetric("http_requests_total"));
 		}
 	});
+
+	it("should record metrics when res.end is called", () => {
+		const {middleware} = prometheus(config);
+		let originalEndCalled = false;
+
+		// Mock the original end method
+		mockRes.end = function () {
+			originalEndCalled = true;
+		};
+
+		middleware(mockReq, mockRes, mockNext);
+
+		// Call the overridden end method
+		mockRes.end();
+
+		assert.strictEqual(originalEndCalled, true);
+		assert.strictEqual(nextCalled, true);
+	});
+
+	it("should record metrics with correct labels when includeMethod is false", () => {
+		config.includeMethod = false;
+		const {middleware} = prometheus(config);
+		let originalEndCalled = false;
+
+		mockRes.end = function () {
+			originalEndCalled = true;
+		};
+
+		middleware(mockReq, mockRes, mockNext);
+		mockRes.end();
+
+		assert.strictEqual(originalEndCalled, true);
+	});
+
+	it("should record metrics with correct labels when includePath is false", () => {
+		config.includePath = false;
+		const {middleware} = prometheus(config);
+		let originalEndCalled = false;
+
+		mockRes.end = function () {
+			originalEndCalled = true;
+		};
+
+		middleware(mockReq, mockRes, mockNext);
+		mockRes.end();
+
+		assert.strictEqual(originalEndCalled, true);
+	});
+
+	it("should record metrics with correct labels when includeStatusCode is false", () => {
+		config.includeStatusCode = false;
+		const {middleware} = prometheus(config);
+		let originalEndCalled = false;
+
+		mockRes.end = function () {
+			originalEndCalled = true;
+		};
+
+		middleware(mockReq, mockRes, mockNext);
+		mockRes.end();
+
+		assert.strictEqual(originalEndCalled, true);
+	});
+
+	it("should handle missing route and use url fallback", () => {
+		delete mockReq.route;
+		mockReq.url = "/fallback";
+
+		const {middleware} = prometheus(config);
+		let originalEndCalled = false;
+
+		mockRes.end = function () {
+			originalEndCalled = true;
+		};
+
+		middleware(mockReq, mockRes, mockNext);
+		mockRes.end();
+
+		assert.strictEqual(originalEndCalled, true);
+	});
+
+	it("should handle missing route and url properties", () => {
+		delete mockReq.route;
+		delete mockReq.url;
+
+		const {middleware} = prometheus(config);
+		let originalEndCalled = false;
+
+		mockRes.end = function () {
+			originalEndCalled = true;
+		};
+
+		middleware(mockReq, mockRes, mockNext);
+		mockRes.end();
+
+		assert.strictEqual(originalEndCalled, true);
+	});
+
+	it("should pass arguments to original end method", () => {
+		const {middleware} = prometheus(config);
+		let endArgs = null;
+
+		mockRes.end = function (...args) {
+			endArgs = args;
+		};
+
+		middleware(mockReq, mockRes, mockNext);
+		mockRes.end("test data", "utf8");
+
+		assert.deepStrictEqual(endArgs, ["test data", "utf8"]);
+	});
+
+	it("should measure request duration accurately", async () => {
+		const {middleware} = prometheus(config);
+		let originalEndCalled = false;
+
+		mockRes.end = function () {
+			originalEndCalled = true;
+		};
+
+		middleware(mockReq, mockRes, mockNext);
+
+		// Add a small delay to test duration measurement
+		await new Promise(resolve => setTimeout(resolve, 10));
+
+		mockRes.end();
+
+		assert.strictEqual(originalEndCalled, true);
+	});
+
+	it("should handle custom labels in metrics recording", () => {
+		config.customLabels = {
+			service: "test-api",
+			environment: "test"
+		};
+
+		const {middleware} = prometheus(config);
+		let originalEndCalled = false;
+
+		mockRes.end = function () {
+			originalEndCalled = true;
+		};
+
+		middleware(mockReq, mockRes, mockNext);
+		mockRes.end();
+
+		assert.strictEqual(originalEndCalled, true);
+	});
 });

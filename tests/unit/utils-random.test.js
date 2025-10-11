@@ -75,4 +75,19 @@ describe("random", () => {
 			assert.ok(counts[i] > 0, `Value ${i + 1} should appear at least once`);
 		}
 	});
+
+	it("should return 1 when n is 0 (edge case)", () => {
+		const result = random(0);
+		assert.strictEqual(result, 1);
+	});
+
+	it("should return 1 when n is negative (edge case)", () => {
+		const result = random(-5);
+		assert.strictEqual(result, 1);
+	});
+
+	it("should return 1 when n is a negative decimal (edge case)", () => {
+		const result = random(-0.5);
+		assert.strictEqual(result, 1);
+	});
 });
